@@ -44,7 +44,7 @@ export const Navbar = () => {
                 Stats that tell you who touches the most paper.
               </ListItem>
               <ListItem href="/games/callofduty" title="Call of Duty">
-                Stats for FFA's and who sells the most online.
+                Stats for FFA&apos;s and who sells the most online.
               </ListItem>
               <ListItem href="/games/mariokart" title="Mario Kart">
                 Stats that tell you who races the hardest.
