@@ -52,6 +52,7 @@ export const Navbar = () => {
               <ListItem href="/games/speedrunners" title="Speedrunners">
                 Stats that tell you who races the hardest.
               </ListItem>
+              <ListItem href="/games" title="Browse all games"></ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
