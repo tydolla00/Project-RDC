@@ -42,15 +42,14 @@ model Post {
 model Player {
   player_id   Int      @id @default(autoincrement())
   player_name String
-  PlayerGameStats PlayerGameStats[]
+  player_game_stats PlayerGameStats[]
 }
 
 model Game {
   game_id     Int      @id @default(autoincrement())
   game_name   String
-  release_date DateTime
-  GameStats   GameStats[]
-  PlayerGameStats PlayerGameStats[]
+  game_stats   GameStats[]
+  player_game_stats PlayerGameStats[]
 }
 
 model GameStats {
@@ -59,8 +58,8 @@ model GameStats {
   stat_name   String
   stat_value  String
   recorded_at DateTime @default(now())
-  Game        Game     @relation(fields: [game_id], references: [game_id])
-  PlayerGameStats PlayerGameStats[]
+  game        Game     @relation(fields: [game_id], references: [game_id])
+  player_game_stats PlayerGameStats[]
 }
 
 model PlayerGameStats {
@@ -70,7 +69,7 @@ model PlayerGameStats {
   stat_id             Int
   value               String
   date_played         DateTime
-  Player              Player   @relation(fields: [player_id], references: [player_id])
-  Game                Game     @relation(fields: [game_id], references: [game_id])
-  GameStats           GameStats @relation(fields: [stat_id], references: [stat_id])
+  player              Player   @relation(fields: [player_id], references: [player_id])
+  game                Game     @relation(fields: [game_id], references: [game_id])
+game_stats            GameStats @relation(fields: [stat_id], references: [stat_id])
 }
