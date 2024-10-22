@@ -10,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Tutorial Stuff
 model User {
   id    Int     @id @default(autoincrement())
   email String  @unique
@@ -26,7 +27,17 @@ model Post {
   authorId  Int
 }
 
+////////////////////////////////////////////
 // Project RDC Models 
+// 1. Mark 
+// 2. Aff
+// 3. Ben 
+// 4. Des
+// 5. Lee
+// 6. Dyl 
+// 7. John 
+// 8. Ippi 
+////////////////////////////////////////////
 
 model Player {
   player_id   Int      @id @default(autoincrement())
