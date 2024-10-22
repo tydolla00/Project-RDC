@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  posts Post[]
+}
+
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean @default(false)
+  author    User    @relation(fields: [authorId], references: [id])
+  authorId  Int
+}
+
+// Project RDC Models 
+
+model Player {
+  player_id   Int      @id @default(autoincrement())
+  player_name String
+  PlayerGameStats PlayerGameStats[]
+}
+
+model Game {
+  game_id     Int      @id @default(autoincrement())
+  game_name   String
+  release_date DateTime
+  GameStats   GameStats[]
+  PlayerGameStats PlayerGameStats[]
+}
+
+model GameStats {
+  stat_id     Int      @id @default(autoincrement())
+  game_id     Int
+  stat_name   String
+  stat_value  String
+  recorded_at DateTime @default(now())
+  Game        Game     @relation(fields: [game_id], references: [game_id])
+  PlayerGameStats PlayerGameStats[]
+}
+
+model PlayerGameStats {
+  player_game_stat_id Int      @id @default(autoincrement())
+  player_id           Int
+  game_id             Int
+  stat_id             Int
+  value               String
+  date_played         DateTime
+  Player              Player   @relation(fields: [player_id], references: [player_id])
+  Game                Game     @relation(fields: [game_id], references: [game_id])
+  GameStats           GameStats @relation(fields: [stat_id], references: [stat_id])
+}
