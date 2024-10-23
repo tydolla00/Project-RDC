@@ -10,25 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Tutorial Stuff
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
-}
-
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
-}
-
-////////////////////////////////////////////
-// Project RDC Models 
+/////////////////////////
+// Project RDC Models   
+// Player IDS         
 // 1. Mark 
 // 2. Aff
 // 3. Ben 
@@ -37,39 +21,54 @@ model Post {
 // 6. Dyl 
 // 7. John 
 // 8. Ippi 
-////////////////////////////////////////////
+//////////////////////
 
+// {player_id: 1, player_name: "Mark", player_game_stats: []}
 model Player {
-  player_id   Int      @id @default(autoincrement())
-  player_name String
-  player_game_stats PlayerGameStats[]
+  player_id       Int          @id @default(autoincrement()) @map("player_id")
+  playerName      String       @map("player_name")
+  playerGameStats PlayerStat[]
+
+  @@map("players")
 }
 
+//
+// { game_id: 1, game_name: 'Mario Kart', game_stats: [], player_game_stats: [] }
 model Game {
-  game_id     Int      @id @default(autoincrement())
-  game_name   String
-  game_stats   GameStats[]
-  player_game_stats PlayerGameStats[]
+  gameID      Int          @id @default(autoincrement()) @map("game_id")
+  gameName    String       @map("game_name")
+  gameStats   GameStat[]
+  playerStats PlayerStat[]
+
+  @@map("games")
 }
 
-model GameStats {
-  stat_id     Int      @id @default(autoincrement())
-  game_id     Int
-  stat_name   String
-  stat_value  String
-  recorded_at DateTime @default(now())
-  game        Game     @relation(fields: [game_id], references: [game_id])
-  player_game_stats PlayerGameStats[]
+// { stat_id: 1, game_id: 1, stat_name: 'mk_first', stat_value: '0', date: 2024-10-23 12:00:00 }
+model GameStat {
+  statID            Int          @id @default(autoincrement()) @map("stat_id")
+  gameID            Int          @map("game_id")
+  statName          String       @map("stat_name")
+  statValue         String       @map("stat_value")
+  date              DateTime     @default(now()) // Date video posted
+  game              Game         @relation(fields: [gameID], references: [gameID])
+  player_game_stats PlayerStat[]
+
+  @@map("game_stats")
 }
 
-model PlayerGameStats {
-  player_game_stat_id Int      @id @default(autoincrement())
-  player_id           Int
-  game_id             Int
-  stat_id             Int
-  value               String
-  date_played         DateTime
-  player              Player   @relation(fields: [player_id], references: [player_id])
-  game                Game     @relation(fields: [game_id], references: [game_id])
-game_stats            GameStats @relation(fields: [stat_id], references: [stat_id])
+// { player_game_stat_id: 1, player_id: 1, game_id: 1, stat_id: 1, value: }
+model PlayerStat {
+  playerGameStatID Int      @id @default(autoincrement()) @map("player_game_stat_id")
+  playerID         Int      @map("player_id")
+  gameID           Int      @map("game_id")
+  statID           Int      @map("stat_id")
+  value            String
+  datePlayed       DateTime @map("date_play")
+  player           Player   @relation(fields: [playerID], references: [player_id])
+  game             Game     @relation(fields: [gameID], references: [gameID])
+  game_stats       GameStat @relation(fields: [statID], references: [statID])
+
+  @@map("player_stats")
 }
+
+// TODO: Consider Enum for RDC
