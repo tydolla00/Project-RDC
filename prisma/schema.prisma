@@ -25,7 +25,7 @@ datasource db {
 
 // {player_id: 1, player_name: "Mark", player_game_stats: []}
 model Player {
-  playerId       Int          @id @default(autoincrement()) @map("player_id")
+  playerId        Int          @id @default(autoincrement()) @map("player_id")
   playerName      String       @map("player_name")
   playerGameStats PlayerStat[]
 
@@ -35,7 +35,7 @@ model Player {
 //
 // { game_id: 1, game_name: 'Mario Kart', game_stats: [], player_game_stats: [] }
 model Game {
-  gameId    Int          @id @default(autoincrement()) @map("game_id")
+  gameId      Int          @id @default(autoincrement()) @map("game_id")
   gameName    String       @map("game_name")
   gameStats   GameStat[]
   playerStats PlayerStat[]
@@ -45,13 +45,13 @@ model Game {
 
 // { stat_id: 1, game_id: 1, stat_name: 'mk_first', stat_value: '0', date: 2024-10-23 12:00:00 }
 model GameStat {
-  statId            Int          @id @default(autoincrement()) @map("stat_id")
-  gameId            Int          @map("game_id")
-  statName          String       @map("stat_name")
-  statValue         String       @map("stat_value")
-  date              DateTime     @default(now()) // Date video posted
-  game              Game         @relation(fields: [gameId], references: [gameId])
-  player_game_stats PlayerStat[]
+  statId          Int          @id @default(autoincrement()) @map("stat_id")
+  gameId          Int          @map("game_id")
+  statName        String       @map("stat_name")
+  statValue       String       @map("stat_value")
+  date            DateTime     @default(now()) // Date video posted
+  game            Game         @relation(fields: [gameId], references: [gameId])
+  PlayerGameStats PlayerStat[]
 
   @@map("game_stats")
 }
@@ -63,10 +63,10 @@ model PlayerStat {
   gameId           Int      @map("game_id")
   statId           Int      @map("stat_id")
   value            String
-  datePlayed       DateTime @map("date_play")
+  datePlayed       DateTime @map("date_played")
   player           Player   @relation(fields: [playerId], references: [playerId])
   game             Game     @relation(fields: [gameId], references: [gameId])
-  game_stats       GameStat @relation(fields: [statId], references: [statId])
+  gameStat         GameStat @relation(fields: [statId], references: [statId])
 
   @@map("player_stats")
 }
