@@ -3,13 +3,31 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  const player = await prisma.player.create({
-    data: {
-      player_id: 1,
-      player_name: "Mark",
+  console.log("Ahhh!");
+  const gameSessions = await getMarioKartGameSession();
+  console.log("Mario Kart Game Sessions: ", gameSessions);
+}
+
+async function getAllRDCMembers() {
+  const rdcMembers = await prisma.player.findMany();
+  console.log("RDC MEmbers: ", rdcMembers);
+}
+
+async function getMarioKartGameSession() {
+  const gameSessions = await prisma.playerStat.findMany({
+    where: {
+      game: {
+        gameId: 1,
+      },
+    },
+    include: {
+      player: true,
+      game: true,
+      gameStat: true,
     },
   });
-  console.log(player);
+
+  return gameSessions;
 }
 
 main()
