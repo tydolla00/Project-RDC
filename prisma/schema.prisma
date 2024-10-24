@@ -12,7 +12,7 @@ datasource db {
 
 /////////////////////////
 // Project RDC Models   
-// Player IDS         
+// Player IdS         
 // 1. Mark 
 // 2. Aff
 // 3. Ben 
@@ -25,7 +25,7 @@ datasource db {
 
 // {player_id: 1, player_name: "Mark", player_game_stats: []}
 model Player {
-  player_id       Int          @id @default(autoincrement()) @map("player_id")
+  playerId       Int          @id @default(autoincrement()) @map("player_id")
   playerName      String       @map("player_name")
   playerGameStats PlayerStat[]
 
@@ -35,7 +35,7 @@ model Player {
 //
 // { game_id: 1, game_name: 'Mario Kart', game_stats: [], player_game_stats: [] }
 model Game {
-  gameID      Int          @id @default(autoincrement()) @map("game_id")
+  gameId    Int          @id @default(autoincrement()) @map("game_id")
   gameName    String       @map("game_name")
   gameStats   GameStat[]
   playerStats PlayerStat[]
@@ -45,12 +45,12 @@ model Game {
 
 // { stat_id: 1, game_id: 1, stat_name: 'mk_first', stat_value: '0', date: 2024-10-23 12:00:00 }
 model GameStat {
-  statID            Int          @id @default(autoincrement()) @map("stat_id")
-  gameID            Int          @map("game_id")
+  statId            Int          @id @default(autoincrement()) @map("stat_id")
+  gameId            Int          @map("game_id")
   statName          String       @map("stat_name")
   statValue         String       @map("stat_value")
   date              DateTime     @default(now()) // Date video posted
-  game              Game         @relation(fields: [gameID], references: [gameID])
+  game              Game         @relation(fields: [gameId], references: [gameId])
   player_game_stats PlayerStat[]
 
   @@map("game_stats")
@@ -58,15 +58,15 @@ model GameStat {
 
 // { player_game_stat_id: 1, player_id: 1, game_id: 1, stat_id: 1, value: }
 model PlayerStat {
-  playerGameStatID Int      @id @default(autoincrement()) @map("player_game_stat_id")
-  playerID         Int      @map("player_id")
-  gameID           Int      @map("game_id")
-  statID           Int      @map("stat_id")
+  playerGameStatId Int      @id @default(autoincrement()) @map("player_game_stat_id")
+  playerId         Int      @map("player_id")
+  gameId           Int      @map("game_id")
+  statId           Int      @map("stat_id")
   value            String
   datePlayed       DateTime @map("date_play")
-  player           Player   @relation(fields: [playerID], references: [player_id])
-  game             Game     @relation(fields: [gameID], references: [gameID])
-  game_stats       GameStat @relation(fields: [statID], references: [statID])
+  player           Player   @relation(fields: [playerId], references: [playerId])
+  game             Game     @relation(fields: [gameId], references: [gameId])
+  game_stats       GameStat @relation(fields: [statId], references: [statId])
 
   @@map("player_stats")
 }
