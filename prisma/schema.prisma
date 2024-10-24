@@ -25,9 +25,10 @@ datasource db {
 
 // {player_id: 1, player_name: "Mark", player_game_stats: []}
 model Player {
-  playerId        Int          @id @default(autoincrement()) @map("player_id")
-  playerName      String       @map("player_name")
+  playerId        Int                 @id @default(autoincrement()) @map("player_id")
+  playerName      String              @map("player_name")
   playerGameStats PlayerStat[]
+  gameSessions    GameSessionPlayer[]
 
   @@map("players")
 }
@@ -51,7 +52,7 @@ model GameStat {
   statValue       String       @map("stat_value")
   date            DateTime     @default(now()) // Date video posted
   game            Game         @relation(fields: [gameId], references: [gameId])
-  PlayerGameStats PlayerStat[]
+  playerGameStats PlayerStat[]
 
   @@map("game_stats")
 }
@@ -71,4 +72,20 @@ model PlayerStat {
   @@map("player_stats")
 }
 
-// TODO: Consider Enum for RDC
+model GameSession {
+  sessionId Int                 @id @default(autoincrement()) @map("session_id")
+  gameId    Int
+  players   GameSessionPlayer[]
+
+  @@map("game_sessions")
+}
+
+model GameSessionPlayer {
+  gameSessionPlayerId Int         @id @default(autoincrement()) @map("game_session_player_id")
+  sessionId           Int         @map("session_id")
+  playerId            Int         @map("player_id")
+  gameSession         GameSession @relation(fields: [sessionId], references: [sessionId])
+  player              Player      @relation(fields: [playerId], references: [playerId])
+
+  @@map("game_session_players")
+}
