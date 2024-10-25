@@ -12,7 +12,7 @@ datasource db {
 
 /////////////////////////
 // Project RDC Models   
-// Player IdS         
+// Player Ids      
 // 1. Mark 
 // 2. Aff
 // 3. Ben 
@@ -27,8 +27,8 @@ datasource db {
 model Player {
   playerId        Int                 @id @default(autoincrement()) @map("player_id")
   playerName      String              @map("player_name")
-  playerGameStats PlayerStat[]
   gameSessions    GameSessionPlayer[]
+  playerGameStats PlayerStat[]
 
   @@map("players")
 }
@@ -61,13 +61,13 @@ model GameStat {
 model PlayerStat {
   playerGameStatId Int      @id @default(autoincrement()) @map("player_game_stat_id")
   playerId         Int      @map("player_id")
+  player           Player   @relation(fields: [playerId], references: [playerId])
   gameId           Int      @map("game_id")
+  game             Game     @relation(fields: [gameId], references: [gameId])
+  gameStat         GameStat @relation(fields: [statId], references: [statId])
   statId           Int      @map("stat_id")
   value            String
   datePlayed       DateTime @map("date_played")
-  player           Player   @relation(fields: [playerId], references: [playerId])
-  game             Game     @relation(fields: [gameId], references: [gameId])
-  gameStat         GameStat @relation(fields: [statId], references: [statId])
 
   @@map("player_stats")
 }
@@ -83,8 +83,8 @@ model GameSession {
 model GameSessionPlayer {
   gameSessionPlayerId Int         @id @default(autoincrement()) @map("game_session_player_id")
   sessionId           Int         @map("session_id")
-  playerId            Int         @map("player_id")
   gameSession         GameSession @relation(fields: [sessionId], references: [sessionId])
+  playerId            Int         @map("player_id")
   player              Player      @relation(fields: [playerId], references: [playerId])
 
   @@map("game_session_players")
