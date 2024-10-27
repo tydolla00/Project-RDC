@@ -5,7 +5,9 @@ export default function Page() {
   return (
     <div className="m-16">
       <H1>Admin</H1>
-      <SubmissionForm />
+      <div className="flex justify-center">
+        <SubmissionForm />
+      </div>
     </div>
   );
 }
