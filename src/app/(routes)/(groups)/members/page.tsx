@@ -99,7 +99,7 @@ export default async function Page() {
       <H1>Games</H1>
       <div className="flex flex-wrap justify-center gap-10">
         {members.map(([member, { desc, stat1, stat2, stat3 }]) => (
-          <HoverCard openDelay={300}>
+          <HoverCard key={member} openDelay={300}>
             <HoverCardTrigger asChild>
               <Link
                 className="group/fill"

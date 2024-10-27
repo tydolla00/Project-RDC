@@ -25,5 +25,5 @@ export const FillText = ({
 type FillTextProps = {
   text: string;
   className?: string;
-  overrideGroup: boolean;
+  overrideGroup?: boolean;
 };
