@@ -25,9 +25,9 @@ datasource db {
 
 // {player_id: 1, player_name: "Mark", player_game_stats: []}
 model Player {
-  playerId        Int                 @id @default(autoincrement()) @map("player_id")
-  playerName      String              @map("player_name")
-  gameSessions    GameSessionPlayer[]
+  playerId        Int             @id @default(autoincrement()) @map("player_id")
+  playerName      String          @map("player_name")
+  sessions        SessionPlayer[]
   playerGameStats PlayerStat[]
 
   @@map("players")
@@ -66,26 +66,31 @@ model PlayerStat {
   game             Game     @relation(fields: [gameId], references: [gameId])
   gameStat         GameStat @relation(fields: [statId], references: [statId])
   statId           Int      @map("stat_id")
+  sessionId        Int      @map("session_id")
   value            String
   datePlayed       DateTime @map("date_played")
 
   @@map("player_stats")
 }
 
-model GameSession {
-  sessionId Int                 @id @default(autoincrement()) @map("session_id")
-  gameId    Int
-  players   GameSessionPlayer[]
+model Session {
+  sessionId   Int             @id @default(autoincrement()) @map("session_id")
+  sessionName String          @map("session_name")
+  sessionUrl  String          @map("session_url")
+  gameId      Int
+  players     SessionPlayer[]
 
-  @@map("game_sessions")
+  // TODO: playerStats PlayerStat[]      @relation(fields: [sessionId], references: [sessionId])
+  @@map("sessions")
 }
 
-model GameSessionPlayer {
-  gameSessionPlayerId Int         @id @default(autoincrement()) @map("game_session_player_id")
-  sessionId           Int         @map("session_id")
-  gameSession         GameSession @relation(fields: [sessionId], references: [sessionId])
-  playerId            Int         @map("player_id")
-  player              Player      @relation(fields: [playerId], references: [playerId])
+// Join Table between Session & Player
+model SessionPlayer {
+  sessionPlayerId Int     @id @default(autoincrement()) @map("game_session_player_id")
+  sessionId       Int     @map("session_id")
+  session         Session @relation(fields: [sessionId], references: [sessionId])
+  playerId        Int     @map("player_id")
+  player          Player  @relation(fields: [playerId], references: [playerId])
 
   @@map("game_session_players")
 }
