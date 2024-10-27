@@ -149,3 +149,42 @@ async function seedGames() {
     },
   });
 }
+
+// Seed game session with RDC Stream Five
+async function seedGameSession() {
+  const marioKartSession = await prisma.session.upsert({
+    where: { sessionId: 1 },
+    update: {},
+    create: {
+      sessionId: 1,
+      gameId: 1,
+      sessionName: "",
+      sessionUrl: "https://example.com",
+      players: {
+        connect: [
+          { sessionPlayerId: 1 },
+          { sessionPlayerId: 3 },
+          { sessionPlayerId: 4 },
+          { sessionPlayerId: 5 },
+          { sessionPlayerId: 6 },
+        ],
+      },
+    },
+  });
+
+  // Seed GameSessionPlayers
+  const mark = await prisma.sessionPlayer.upsert({
+    where: { sessionPlayerId: 1 },
+    update: {},
+    create: {
+      sessionPlayerId: 1,
+      playerId: 1,
+      sessionId: 1,
+    },
+  });
+
+  // Connect players to the session
+  const playerIds = await prisma.player.findMany({
+    select: { playerId: true },
+  });
+}
