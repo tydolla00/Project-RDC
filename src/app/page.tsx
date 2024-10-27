@@ -1,6 +1,6 @@
 "use client";
 
-import { H1 } from "@/components/headings";
+import { H1, H2 } from "@/components/headings";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,16 +19,21 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis } from "recharts";
 
 export default function Home() {
+  const router = useRouter();
   return (
     <>
-      <div className="m-10">
-        <H1>RDC Stat Tracker</H1>
-        <div className="grid grid-cols-2">
+      <div className="m-16">
+        <div
+          style={{ transitionDuration: "2000ms" }}
+          className="grid grid-cols-2"
+        >
           <div>
-            <p className="w-3/4 leading-7">
+            <H1>RDC Stat Tracker</H1>
+            <p className="w-3/4 leading-7 text-muted-foreground">
               This site is dedicated to tracking and celebrating the gaming
               stats and achievements of RDC (Real Dreams Change the World). As a
               fan of their incredible teamwork and drive, I created this space
@@ -43,15 +48,36 @@ export default function Home() {
                 Browse Games
               </Link>
             </Button>
+            <Button variant="outline" asChild>
+              <Link className="my-5 ml-5" href="/members">
+                Members
+              </Link>
+            </Button>
           </div>
           <PieChartRDC />
+          {/* <Chart /> */}
         </div>
-        {/* <Chart /> */}
-      </div>
-      <div className="bg-black p-4 text-white dark:bg-white dark:text-black">
-        <div className="mx-auto w-fit text-xl font-bold">
-          Real Dreams Change the World
+        <H2 className="mx-auto my-10 w-fit text-chart-4">Games</H2>
+        <div className="flex gap-10">
+          {[0, 0, 0, 0, 0, 0, 0, 0].map((c, i) => (
+            <Card key={i} className="h-64 w-64">
+              <CardHeader>
+                <CardTitle>Test</CardTitle>
+              </CardHeader>
+            </Card>
+          ))}
         </div>
+        <H2 className="mx-auto my-10 w-fit text-chart-4">Want to Help</H2>
+        <Card className="mx-auto h-64 w-1/2">
+          <CardHeader>
+            <CardTitle>Instructions</CardTitle>
+            <CardContent>
+              <Button onClick={() => router.push("/submission")}>
+                Submit new entry
+              </Button>
+            </CardContent>
+          </CardHeader>
+        </Card>
       </div>
     </>
   );
@@ -110,7 +136,7 @@ const PieChartRDC = () => {
   // TODO This Chart will rank the average of placements in each category.
   // TODO Reponsive not working. May need to mess with config or use grid resizing via css.
   return (
-    <Card className="h-fit min-w-fit max-w-4xl">
+    <Card className="h-fit min-w-fit max-w-3xl">
       <CardHeader>
         <CardTitle>Sorry scale</CardTitle>
         <CardDescription>

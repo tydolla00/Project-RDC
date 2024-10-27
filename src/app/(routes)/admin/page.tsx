@@ -1,6 +1,11 @@
-import { redirect } from "next/navigation";
+import { H1 } from "@/components/headings";
+import { SubmissionForm } from "../submission/_components/form";
 
 export default function Page() {
-  if (process.env.NODE_ENV !== "development") redirect("/admmin");
-  return <>Admin</>;
+  return (
+    <div className="m-16">
+      <H1>Admin</H1>
+      <SubmissionForm />
+    </div>
+  );
 }
