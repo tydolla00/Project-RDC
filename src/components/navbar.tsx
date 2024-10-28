@@ -14,6 +14,13 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Icon from "@/app/favicon.ico";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 export const Navbar = () => {
   const links = [
     { text: "Home", ref: "" },
@@ -62,6 +69,8 @@ export const Navbar = () => {
     { alt: "RDC Aff", name: "Aff", url: "/members/aff" },
     { alt: "", name: "Browse all members", url: "/members" },
   ];
+
+  const signedIn = false;
 
   return (
     <NavigationMenu className="sticky top-0 mx-auto">
@@ -117,6 +126,25 @@ export const Navbar = () => {
             <Link className={navigationMenuTriggerStyle()} href="/submission">
               <FillText className="text-chart-4" text="Submissions" />
             </Link>
+          )}
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          {process.env.NODE_ENV === "development" && !signedIn ? (
+            <Link className={navigationMenuTriggerStyle()} href="/signin">
+              <FillText className="text-chart-4" text="Sign In" />
+            </Link>
+          ) : (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Avatar>
+                    <AvatarImage src={Icon.src} />
+                    <AvatarFallback>Icon</AvatarFallback>
+                  </Avatar>
+                </TooltipTrigger>
+                <TooltipContent>User signed in</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </NavigationMenuItem>
         <NavigationMenuItem>

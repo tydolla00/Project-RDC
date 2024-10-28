@@ -70,9 +70,17 @@ export default function Home() {
         <H2 className="mx-auto my-10 w-fit text-chart-4">Want to Help</H2>
         <Card className="mx-auto h-64 w-1/2">
           <CardHeader>
-            <CardTitle>Instructions</CardTitle>
             <CardContent>
-              <Button onClick={() => router.push("/submission")}>
+              <p>
+                We could use some help keeping up scores. We have a place where
+                you can submit scores and we&apos;ll review them and compare
+                with other scores. In order to submit scores you must be signed
+                in.
+              </p>
+              <Button
+                className="mt-4"
+                onClick={() => router.push("/submission")}
+              >
                 Submit new entry
               </Button>
             </CardContent>
