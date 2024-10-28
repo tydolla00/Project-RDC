@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   await seedRDCMembers();
-  await seedGames();
+  await seedGameSession(1);
 
   console.log("Seeded RDC Members and Games");
 }
@@ -151,14 +151,15 @@ async function seedGames() {
 }
 
 // Seed game session with RDC Stream Five
-async function seedGameSession() {
+async function seedGameSession(sessionId: number) {
+  console.log(`Seeding Game Session ${sessionId}`);
   const marioKartSession = await prisma.session.upsert({
-    where: { sessionId: 1 },
+    where: { sessionId: sessionId },
     update: {},
     create: {
-      sessionId: 1,
+      sessionId: sessionId,
       gameId: 1,
-      sessionName: "",
+      sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",
       sessionUrl: "https://example.com",
       players: {
         connect: [
@@ -172,19 +173,43 @@ async function seedGameSession() {
     },
   });
 
-  // Seed GameSessionPlayers
-  const mark = await prisma.sessionPlayer.upsert({
-    where: { sessionPlayerId: 1 },
-    update: {},
-    create: {
-      sessionPlayerId: 1,
-      playerId: 1,
-      sessionId: 1,
-    },
-  });
-
-  // Connect players to the session
   const playerIds = await prisma.player.findMany({
     select: { playerId: true },
+  });
+
+  for (const player of playerIds) {
+    console.log(`Connecting player to session ${sessionId}`, player.playerId);
+    await prisma.sessionPlayer.create({
+      data: {
+        playerId: player.playerId,
+        sessionId: sessionId,
+      },
+    });
+  }
+
+  // // Seed Session Players
+  // const mark = await prisma.sessionPlayer.upsert({
+  //   where: { sessionPlayerId: 1 },
+  //   update: {},
+  //   create: {
+  //     sessionPlayerId: 1,
+  //     playerId: 1,
+  //     sessionId: 1,
+  //   },
+  // });
+
+  // Seed PlayerStat for Mark
+  const markFirst = await prisma.playerStat.upsert({
+    where: { playerStatId: 1 },
+    update: {},
+    create: {
+      playerStatId: 1,
+      playerId: 1,
+      statId: 1,
+      sessionId: 1,
+      gameId: 1,
+      value: "1",
+      datePlayed: new Date(),
+    },
   });
 }

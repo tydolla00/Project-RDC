@@ -59,16 +59,16 @@ model GameStat {
 
 // { player_game_stat_id: 1, player_id: 1, game_id: 1, stat_id: 1, value: }
 model PlayerStat {
-  playerGameStatId Int      @id @default(autoincrement()) @map("player_game_stat_id")
-  playerId         Int      @map("player_id")
-  player           Player   @relation(fields: [playerId], references: [playerId])
-  gameId           Int      @map("game_id")
-  game             Game     @relation(fields: [gameId], references: [gameId])
-  gameStat         GameStat @relation(fields: [statId], references: [statId])
-  statId           Int      @map("stat_id")
-  sessionId        Int      @map("session_id")
-  value            String
-  datePlayed       DateTime @map("date_played")
+  playerStatId Int      @id @default(autoincrement()) @map("player_game_stat_id")
+  playerId     Int      @map("player_id")
+  player       Player   @relation(fields: [playerId], references: [playerId])
+  gameId       Int      @map("game_id")
+  game         Game     @relation(fields: [gameId], references: [gameId])
+  gameStat     GameStat @relation(fields: [statId], references: [statId])
+  statId       Int      @map("stat_id")
+  sessionId    Int      @map("session_id")
+  value        String
+  datePlayed   DateTime @map("date_played")
 
   @@map("player_stats")
 }
@@ -94,3 +94,9 @@ model SessionPlayer {
 
   @@map("game_session_players")
 }
+
+// Set Table Conecpt 
+// model Set { 
+//   setId Int @id @default(autoincrement()) @map("set_id")
+//   games Game[] @relation(fields: [gameId], references: [gameId])
+//}
