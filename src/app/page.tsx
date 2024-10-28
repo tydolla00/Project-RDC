@@ -73,8 +73,9 @@ export default function Home() {
             <CardContent>
               <p>
                 We could use some help keeping up scores. We have a place where
-                you can submit scores and we'll review them and compare with
-                other scores. In order to submit scores you must be signed in.
+                you can submit scores and we&apos;ll review them and compare
+                with other scores. In order to submit scores you must be signed
+                in.
               </p>
               <Button
                 className="mt-4"
