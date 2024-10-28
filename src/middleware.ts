@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
+  // TODO If /submission and user not logged in redirect to signin
   if (
     (request.nextUrl.pathname === "/admin" ||
       request.nextUrl.pathname === "/submission") &&
