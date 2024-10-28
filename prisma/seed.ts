@@ -4,7 +4,10 @@ const prisma = new PrismaClient();
 
 async function main() {
   await seedRDCMembers();
-  await seedGameSession(1);
+  await seedGames();
+  await seedSession(1);
+  await seedPlayerSessions(1);
+  await seedPlayerStats();
 
   console.log("Seeded RDC Members and Games");
 }
@@ -94,6 +97,7 @@ async function seedRDCMembers() {
 }
 
 async function seedGames() {
+  console.log("Seeding Games");
   const marioKart = await prisma.game.upsert({
     where: { gameId: 1 },
     update: {},
@@ -105,6 +109,7 @@ async function seedGames() {
             statId: 1,
             statName: "First",
             statValue: "",
+            date: new Date(),
           },
           {
             statId: 2,
@@ -151,7 +156,7 @@ async function seedGames() {
 }
 
 // Seed game session with RDC Stream Five
-async function seedGameSession(sessionId: number) {
+async function seedSession(sessionId: number) {
   console.log(`Seeding Game Session ${sessionId}`);
   const marioKartSession = await prisma.session.upsert({
     where: { sessionId: sessionId },
@@ -161,43 +166,37 @@ async function seedGameSession(sessionId: number) {
       gameId: 1,
       sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",
       sessionUrl: "https://example.com",
-      players: {
-        connect: [
-          { sessionPlayerId: 1 },
-          { sessionPlayerId: 3 },
-          { sessionPlayerId: 4 },
-          { sessionPlayerId: 5 },
-          { sessionPlayerId: 6 },
-        ],
-      },
+      // players: {
+      //   connect: [
+      //     { playerSessionId: 1 },
+      //     { playerSessionId: 2 },
+      //     { playerSessionId: 4 },
+      //     { playerSessionId: 5 },
+      //     { playerSessionId: 6 },
+      //   ],
+      // },
     },
   });
-
+}
+async function seedPlayerSessions(sessionId: number) {
   const playerIds = await prisma.player.findMany({
     select: { playerId: true },
   });
 
   for (const player of playerIds) {
     console.log(`Connecting player to session ${sessionId}`, player.playerId);
-    await prisma.sessionPlayer.create({
-      data: {
-        playerId: player.playerId,
+    await prisma.playerSession.upsert({
+      where: { playerSessionId: player.playerId },
+      update: {},
+      create: {
+        playerSessionId: player.playerId,
         sessionId: sessionId,
+        playerId: player.playerId,
       },
     });
   }
-
-  // // Seed Session Players
-  // const mark = await prisma.sessionPlayer.upsert({
-  //   where: { sessionPlayerId: 1 },
-  //   update: {},
-  //   create: {
-  //     sessionPlayerId: 1,
-  //     playerId: 1,
-  //     sessionId: 1,
-  //   },
-  // });
-
+}
+async function seedPlayerStats() {
   // Seed PlayerStat for Mark
   const markFirst = await prisma.playerStat.upsert({
     where: { playerStatId: 1 },
@@ -206,10 +205,66 @@ async function seedGameSession(sessionId: number) {
       playerStatId: 1,
       playerId: 1,
       statId: 1,
-      sessionId: 1,
+      playerSessionId: 1,
       gameId: 1,
       value: "1",
-      datePlayed: new Date(),
+      date: new Date(),
+    },
+  });
+
+  const dylSecond = await prisma.playerStat.upsert({
+    where: { playerStatId: 2 },
+    update: {},
+    create: {
+      playerStatId: 2,
+      playerId: 6,
+      statId: 2,
+      playerSessionId: 2,
+      gameId: 1,
+      value: "1",
+      date: new Date(),
+    },
+  });
+
+  const benThird = await prisma.playerStat.upsert({
+    where: { playerStatId: 3 },
+    update: {},
+    create: {
+      playerStatId: 3,
+      playerId: 4,
+      statId: 3,
+      playerSessionId: 3,
+      gameId: 1,
+      value: "1",
+      date: new Date(),
+    },
+  });
+
+  const leeFourth = await prisma.playerStat.upsert({
+    where: { playerStatId: 4 },
+    update: {},
+    create: {
+      playerStatId: 4,
+      playerId: 5,
+      statId: 3,
+      playerSessionId: 4,
+      gameId: 1,
+      value: "1",
+      date: new Date(),
+    },
+  });
+
+  const desFifth = await prisma.playerStat.upsert({
+    where: { playerStatId: 5 },
+    update: {},
+    create: {
+      playerStatId: 5,
+      playerId: 3,
+      statId: 3,
+      playerSessionId: 5,
+      gameId: 1,
+      value: "1",
+      date: new Date(),
     },
   });
 }

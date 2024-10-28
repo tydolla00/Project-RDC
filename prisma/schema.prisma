@@ -25,10 +25,10 @@ datasource db {
 
 // {player_id: 1, player_name: "Mark", player_game_stats: []}
 model Player {
-  playerId        Int             @id @default(autoincrement()) @map("player_id")
-  playerName      String          @map("player_name")
-  sessions        SessionPlayer[]
-  playerGameStats PlayerStat[]
+  playerId       Int             @id @default(autoincrement()) @map("player_id")
+  playerName     String          @map("player_name")
+  playerSessions PlayerSession[]
+  playerStats    PlayerStat[]
 
   @@map("players")
 }
@@ -46,56 +46,58 @@ model Game {
 
 // { stat_id: 1, game_id: 1, stat_name: 'mk_first', stat_value: '0', date: 2024-10-23 12:00:00 }
 model GameStat {
-  statId          Int          @id @default(autoincrement()) @map("stat_id")
-  gameId          Int          @map("game_id")
-  statName        String       @map("stat_name")
-  statValue       String       @map("stat_value")
-  date            DateTime     @default(now()) // Date video posted
-  game            Game         @relation(fields: [gameId], references: [gameId])
-  playerGameStats PlayerStat[]
+  statId      Int          @id @default(autoincrement()) @map("stat_id") // TODO: MAKE ENUM
+  gameId      Int          @map("game_id")
+  statName    String       @map("stat_name")
+  statValue   String       @map("stat_value") // TODO: Don't think we need this value!
+  date        DateTime     @default(now()) // Date video posted
+  game        Game         @relation(fields: [gameId], references: [gameId])
+  playerStats PlayerStat[]
 
   @@map("game_stats")
 }
 
 // { player_game_stat_id: 1, player_id: 1, game_id: 1, stat_id: 1, value: }
 model PlayerStat {
-  playerStatId Int      @id @default(autoincrement()) @map("player_game_stat_id")
-  playerId     Int      @map("player_id")
-  player       Player   @relation(fields: [playerId], references: [playerId])
-  gameId       Int      @map("game_id")
-  game         Game     @relation(fields: [gameId], references: [gameId])
-  gameStat     GameStat @relation(fields: [statId], references: [statId])
-  statId       Int      @map("stat_id")
-  sessionId    Int      @map("session_id")
-  value        String
-  datePlayed   DateTime @map("date_played")
+  playerStatId    Int           @id @default(autoincrement()) @map("player_stat_id")
+  playerId        Int           @map("player_id")
+  player          Player        @relation(fields: [playerId], references: [playerId])
+  gameId          Int           @map("game_id")
+  game            Game          @relation(fields: [gameId], references: [gameId])
+  gameStat        GameStat      @relation(fields: [statId], references: [statId])
+  statId          Int           @map("stat_id")
+  playerSessionId Int           @map("player_session_id")
+  playerSession   PlayerSession @relation(fields: [playerSessionId], references: [playerSessionId])
+  value           String
+  date            DateTime      @default(now()) // Date video posted
 
   @@map("player_stats")
 }
 
 model Session {
-  sessionId   Int             @id @default(autoincrement()) @map("session_id")
-  sessionName String          @map("session_name")
-  sessionUrl  String          @map("session_url")
-  gameId      Int
-  players     SessionPlayer[]
+  sessionId      Int             @id @default(autoincrement()) @map("session_id")
+  sessionName    String          @map("session_name")
+  sessionUrl     String          @map("session_url")
+  gameId         Int
+  playerSessions PlayerSession[]
 
   // TODO: playerStats PlayerStat[]      @relation(fields: [sessionId], references: [sessionId])
   @@map("sessions")
 }
 
 // Join Table between Session & Player
-model SessionPlayer {
-  sessionPlayerId Int     @id @default(autoincrement()) @map("game_session_player_id")
-  sessionId       Int     @map("session_id")
-  session         Session @relation(fields: [sessionId], references: [sessionId])
-  playerId        Int     @map("player_id")
-  player          Player  @relation(fields: [playerId], references: [playerId])
+model PlayerSession {
+  playerSessionId Int          @id @default(autoincrement()) @map("player_session_id")
+  sessionId       Int          @map("session_id")
+  session         Session      @relation(fields: [sessionId], references: [sessionId])
+  playerId        Int          @map("player_id")
+  player          Player       @relation(fields: [playerId], references: [playerId])
+  playerStats     PlayerStat[]
 
-  @@map("game_session_players")
+  @@map("player_sessions")
 }
 
-// Set Table Conecpt 
+// Set Table Concept 
 // model Set { 
 //   setId Int @id @default(autoincrement()) @map("set_id")
 //   games Game[] @relation(fields: [gameId], references: [gameId])
