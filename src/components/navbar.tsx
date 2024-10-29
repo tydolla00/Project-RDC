@@ -12,10 +12,55 @@ import { FillText } from "./fill-text";
 import Link from "next/link";
 import React from "react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
+import Icon from "@/app/favicon.ico";
 export const Navbar = () => {
   const links = [
     { text: "Home", ref: "" },
     { text: "About", ref: "about" },
+  ];
+
+  const games: { desc?: string; url: string; name: string }[] = [
+    {
+      desc: "Stats from the most intense 3v3 battles.",
+      url: "/games/rocketleague",
+      name: "Rocket League",
+    },
+    {
+      desc: "Stats that tell you who touches the most paper.",
+      url: "/games/lethalcompany",
+      name: "Lethal Company",
+    },
+    {
+      desc: "Stats for FFA's and who sells the most online.",
+      url: "/games/callofduty",
+      name: "Call of Duty",
+    },
+    {
+      desc: "Stats that tell you who races the hardest.",
+      url: "/games/mariokart",
+      name: "Mario Kart",
+    },
+    {
+      desc: "Stats that tell you who races the hardest.",
+      url: "/games/speedrunners",
+      name: "Speedrunners",
+    },
+    {
+      url: "/games",
+      name: "Browse all games",
+    },
+  ];
+
+  const members = [
+    { alt: "RDC Mark", name: "Cash Money Mawk", url: "/members/mark" },
+    { alt: "RDC Leland", name: "Meland", url: "/members/leland" },
+    { alt: "RDC Des", name: "Big Booty Des", url: "/members/des" },
+    { alt: "RDC Ben", name: "LaBen James", url: "/members/ben" },
+    { alt: "Ippi", name: "Iceman Ip", url: "/members/ippi" },
+    { alt: "RDC John", name: "John", url: "/members/john" },
+    { alt: "RDC Aff", name: "Aff", url: "/members/aff" },
+    { alt: "", name: "Browse all members", url: "/members" },
   ];
 
   return (
@@ -37,23 +82,42 @@ export const Navbar = () => {
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              <ListItem href="/games/rocketleague" title="Rocket League">
-                Stats from the most intense 3v3 battles.
-              </ListItem>
-              <ListItem href="/games/lethalcompany" title="Lethal Company">
-                Stats that tell you who touches the most paper.
-              </ListItem>
-              <ListItem href="/games/callofduty" title="Call of Duty">
-                Stats for FFA&apos;s and who sells the most online.
-              </ListItem>
-              <ListItem href="/games/mariokart" title="Mario Kart">
-                Stats that tell you who races the hardest.
-              </ListItem>
-              <ListItem href="/games/speedrunners" title="Speedrunners">
-                Stats that tell you who races the hardest.
-              </ListItem>
+              {games.map((game) => (
+                <ListItem key={game.url} href={game.url} title={game.name}>
+                  {game.desc}
+                </ListItem>
+              ))}
             </ul>
           </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>
+            <FillText className="text-chart-4" text="Members" />
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+              {members.map((rdc) => (
+                <div key={rdc.url} className="flex gap-5">
+                  <Image alt={rdc.alt} src={Icon} height={60} width={60} />
+                  <ListItem href={rdc.url} title={rdc.name} />
+                </div>
+              ))}
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          {process.env.NODE_ENV === "development" && (
+            <Link className={navigationMenuTriggerStyle()} href="/admin">
+              <FillText className="text-chart-4" text="Admin" />
+            </Link>
+          )}
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          {process.env.NODE_ENV === "development" && (
+            <Link className={navigationMenuTriggerStyle()} href="/submission">
+              <FillText className="text-chart-4" text="Submissions" />
+            </Link>
+          )}
         </NavigationMenuItem>
         <NavigationMenuItem>
           <ModeToggle />

@@ -80,8 +80,8 @@ model Session {
   sessionUrl     String          @map("session_url")
   gameId         Int
   playerSessions PlayerSession[]
+  date           DateTime        @default(now()) // Date video posted
 
-  // TODO: playerStats PlayerStat[]      @relation(fields: [sessionId], references: [sessionId])
   @@map("sessions")
 }
 

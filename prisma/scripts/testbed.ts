@@ -1,35 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import { PlayerSession, PrismaClient, Session, Prisma } from "@prisma/client";
+import { parse } from "path";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const user = await prisma.player.findFirst({
-    include: {
-      playerStats: true,
-    },
-  });
-  // console.log(user);
-
-  const player = await prisma.player.findFirst({
-    include: {
-      playerSessions: {
-        include: {
-          session: {
-            select: {
-              sessionName: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  // Get All Session Names for a Player
-  const sessionNames = player?.playerSessions.map(
-    (playerSessions) => playerSessions.session.sessionName,
-  );
-  // console.log(sessionNames);
-  console.log(await getSessionWithPlayersAndStats(1));
+  console.log(await getLatestMarioKartSession());
 }
 
 // Query to get a single session including all players and their stats
@@ -40,7 +15,7 @@ async function getSessionWithPlayersAndStats(sessionId: number) {
       playerSessions: {
         include: {
           playerStats: {
-            select: {
+            include: {
               gameStat: true,
             },
           },
@@ -62,6 +37,57 @@ async function getSessionWithPlayersAndStats(sessionId: number) {
 
   return sessionData;
 }
+
+async function getLatestMarioKartSession() {
+  try {
+    const latestMKPlayerSessions = await prisma.session.findFirst({
+      where: {
+        gameId: 1,
+      },
+      include: {
+        playerSessions: {
+          include: {
+            playerStats: true,
+          },
+        },
+      },
+    });
+    console.log("Found Latest Mario Kart Session: ", latestMKPlayerSessions);
+    if (latestMKPlayerSessions) {
+      parseMarioKartPlayerSessions(latestMKPlayerSessions.playerSessions);
+    } else {
+      console.error("Latest Mario Kart Session not found");
+    }
+  } catch (error) {
+    console.error("Error Fetching Latest Mario Kart Session");
+  }
+}
+
+const playerSessionWithStats =
+  Prisma.validator<Prisma.PlayerSessionDefaultArgs>()({
+    include: {
+      playerStats: true,
+    },
+  });
+
+async function parseMarioKartPlayerSessions(playerSessions: PlayerSession[]) {
+  playerSessions.forEach((playerSession) => {
+    console.log(`Player Session: ${JSON.stringify(playerSession, null, 2)}`);
+  });
+}
+
+// async function parseMarioKartSessionResults(sessionData: PlayerSession[]) {
+//   for (const playerSession of sessionData) {
+//     console.log("Player Session: ", playerSession);
+
+//     const sessionStats = playerSession.playerStats.map((playerStat) => {
+//       console.log("Player Stat: ", playerStat);
+//     }
+//   }
+// }
+
+// Replace 'Session' with the actual model name from your schema.prisma
+// Make sure to import the model from "@prisma/client"
 
 main()
   .then(async () => {
