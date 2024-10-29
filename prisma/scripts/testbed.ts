@@ -1,5 +1,5 @@
-import { PlayerSession, PrismaClient, Session, Prisma } from "@prisma/client";
-import { parse } from "path";
+import { PrismaClient } from "@prisma/client";
+import { PlayerSessionWithStats } from "../types/playerSession";
 
 const prisma = new PrismaClient();
 
@@ -47,12 +47,21 @@ async function getLatestMarioKartSession() {
       include: {
         playerSessions: {
           include: {
-            playerStats: true,
+            player: {
+              select: {
+                playerName: true,
+              },
+            },
+            playerStats: {
+              include: {
+                gameStat: true,
+              },
+            },
           },
         },
       },
     });
-    console.log("Found Latest Mario Kart Session: ", latestMKPlayerSessions);
+    // console.log("Found Latest Mario Kart Session: ", latestMKPlayerSessions);
     if (latestMKPlayerSessions) {
       parseMarioKartPlayerSessions(latestMKPlayerSessions.playerSessions);
     } else {
@@ -63,31 +72,17 @@ async function getLatestMarioKartSession() {
   }
 }
 
-const playerSessionWithStats =
-  Prisma.validator<Prisma.PlayerSessionDefaultArgs>()({
-    include: {
-      playerStats: true,
-    },
-  });
-
-async function parseMarioKartPlayerSessions(playerSessions: PlayerSession[]) {
+async function parseMarioKartPlayerSessions(
+  playerSessions: PlayerSessionWithStats[],
+) {
   playerSessions.forEach((playerSession) => {
-    console.log(`Player Session: ${JSON.stringify(playerSession, null, 2)}`);
+    console.log("Player Session ", playerSession);
+
+    playerSession.playerStats.forEach((playerStat) => {
+      console.log("Game Stat: ", playerStat.gameStat.statName);
+    });
   });
 }
-
-// async function parseMarioKartSessionResults(sessionData: PlayerSession[]) {
-//   for (const playerSession of sessionData) {
-//     console.log("Player Session: ", playerSession);
-
-//     const sessionStats = playerSession.playerStats.map((playerStat) => {
-//       console.log("Player Stat: ", playerStat);
-//     }
-//   }
-// }
-
-// Replace 'Session' with the actual model name from your schema.prisma
-// Make sure to import the model from "@prisma/client"
 
 main()
   .then(async () => {

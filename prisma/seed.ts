@@ -107,28 +107,28 @@ async function seedGames() {
         create: [
           {
             statId: 1,
-            statName: "First",
+            statName: "MK8_FIRST",
             statValue: "",
             date: new Date(),
           },
           {
             statId: 2,
-            statName: "Second",
+            statName: "MK8_SECOND",
             statValue: "",
           },
           {
             statId: 3,
-            statName: "Third",
+            statName: "MK8_THIRD",
             statValue: "",
           },
           {
             statId: 4,
-            statName: "Fourth",
+            statName: "MK8_FOURTH",
             statValue: "",
           },
           {
             statId: 5,
-            statName: "Fifth",
+            statName: "MK8_FIFTH",
             statValue: "",
           },
         ],
@@ -204,7 +204,7 @@ async function seedPlayerStats() {
     create: {
       playerStatId: 1,
       playerId: 1,
-      statId: 1,
+      statId: 1, // MK_FIRST
       playerSessionId: 1,
       gameId: 1,
       value: "1",
@@ -218,7 +218,7 @@ async function seedPlayerStats() {
     create: {
       playerStatId: 2,
       playerId: 6,
-      statId: 2,
+      statId: 2, // MK_SECOND
       playerSessionId: 2,
       gameId: 1,
       value: "1",
@@ -232,7 +232,7 @@ async function seedPlayerStats() {
     create: {
       playerStatId: 3,
       playerId: 4,
-      statId: 3,
+      statId: 3, // MK_THIRD
       playerSessionId: 3,
       gameId: 1,
       value: "1",
@@ -246,7 +246,7 @@ async function seedPlayerStats() {
     create: {
       playerStatId: 4,
       playerId: 5,
-      statId: 3,
+      statId: 4, // MK_FOURTH
       playerSessionId: 4,
       gameId: 1,
       value: "1",
@@ -260,7 +260,7 @@ async function seedPlayerStats() {
     create: {
       playerStatId: 5,
       playerId: 3,
-      statId: 3,
+      statId: 5, // MK_FIFTH
       playerSessionId: 5,
       gameId: 1,
       value: "1",
