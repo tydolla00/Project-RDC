@@ -44,7 +44,11 @@ async function getLatestMarioKartSession() {
       where: {
         gameId: 1,
       },
+      orderBy: {
+        sessionId: "desc",
+      },
       include: {
+        sets: true,
         playerSessions: {
           include: {
             player: {

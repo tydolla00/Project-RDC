@@ -6,10 +6,9 @@ async function main() {
   await seedRDCMembers();
   await seedGames();
   await seedSession(1);
+  await seedSet();
   await seedPlayerSessions(1);
   await seedPlayerStats();
-
-  console.log("Seeded RDC Members and Games");
 }
 
 main()
@@ -24,6 +23,7 @@ main()
 
 // Seed RDC Members
 async function seedRDCMembers() {
+  console.log("--- Seeding RDC Members --\n");
   const mark = await prisma.player.upsert({
     where: { playerId: 1 },
     update: {},
@@ -97,7 +97,7 @@ async function seedRDCMembers() {
 }
 
 async function seedGames() {
-  console.log("Seeding Games");
+  console.log("---Seeding Games---\n");
   const marioKart = await prisma.game.upsert({
     where: { gameId: 1 },
     update: {},
@@ -135,6 +135,7 @@ async function seedGames() {
       },
     },
   });
+  console.log("Mario Kart Game Seeded");
 
   const callOfDuty = await prisma.game.upsert({
     where: { gameId: 2 },
@@ -145,6 +146,8 @@ async function seedGames() {
     },
   });
 
+  console.log("Call of Duty Game Seeded");
+
   const gangBeasts = await prisma.game.upsert({
     where: { gameId: 3 },
     update: {},
@@ -153,6 +156,8 @@ async function seedGames() {
       gameName: "Gang Beasts",
     },
   });
+
+  console.log("Gang Beasts Game Seeded");
 }
 
 // Seed game session with RDC Stream Five
@@ -166,18 +171,23 @@ async function seedSession(sessionId: number) {
       gameId: 1,
       sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",
       sessionUrl: "https://example.com",
-      // players: {
-      //   connect: [
-      //     { playerSessionId: 1 },
-      //     { playerSessionId: 2 },
-      //     { playerSessionId: 4 },
-      //     { playerSessionId: 5 },
-      //     { playerSessionId: 6 },
-      //   ],
-      // },
     },
   });
 }
+
+async function seedSet() {
+  const marioKartSet = await prisma.set.upsert({
+    where: { setId: 1 },
+    update: {},
+    create: {
+      setId: 1,
+      sessionId: 1,
+    },
+  });
+
+  console.log("Seeded Set");
+}
+
 async function seedPlayerSessions(sessionId: number) {
   const playerIds = await prisma.player.findMany({
     select: { playerId: true },
@@ -191,6 +201,7 @@ async function seedPlayerSessions(sessionId: number) {
       create: {
         playerSessionId: player.playerId,
         sessionId: sessionId,
+        setId: 1,
         playerId: player.playerId,
       },
     });

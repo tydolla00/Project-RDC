@@ -80,6 +80,7 @@ model Session {
   sessionUrl     String          @map("session_url")
   gameId         Int
   playerSessions PlayerSession[]
+  sets           Set[]
   date           DateTime        @default(now()) // Date video posted
 
   @@map("sessions")
@@ -93,12 +94,16 @@ model PlayerSession {
   playerId        Int          @map("player_id")
   player          Player       @relation(fields: [playerId], references: [playerId])
   playerStats     PlayerStat[]
+  setId           Int          @map("set_id")
+  set             Set          @relation(fields: [setId], references: [setId])
 
   @@map("player_sessions")
 }
 
 // Set Table Concept 
-// model Set { 
-//   setId Int @id @default(autoincrement()) @map("set_id")
-//   games Game[] @relation(fields: [gameId], references: [gameId])
-//}
+model Set {
+  setId          Int             @id @default(autoincrement()) @map("set_id")
+  sessionId      Int
+  session        Session         @relation(fields: [sessionId], references: [sessionId])
+  playerSessions PlayerSession[]
+}
