@@ -33,7 +33,6 @@ model Player {
   @@map("players")
 }
 
-//
 // { game_id: 1, game_name: 'Mario Kart', game_stats: [], player_game_stats: [] }
 model Game {
   gameId      Int          @id @default(autoincrement()) @map("game_id")
@@ -49,7 +48,6 @@ model GameStat {
   statId      Int          @id @default(autoincrement()) @map("stat_id") // TODO: MAKE ENUM
   gameId      Int          @map("game_id")
   statName    String       @map("stat_name")
-  statValue   String       @map("stat_value") // TODO: Don't think we need this value!
   date        DateTime     @default(now()) // Date video posted
   game        Game         @relation(fields: [gameId], references: [gameId])
   playerStats PlayerStat[]
@@ -75,13 +73,12 @@ model PlayerStat {
 }
 
 model Session {
-  sessionId      Int             @id @default(autoincrement()) @map("session_id")
-  sessionName    String          @map("session_name")
-  sessionUrl     String          @map("session_url")
-  gameId         Int
-  playerSessions PlayerSession[]
-  sets           Set[]
-  date           DateTime        @default(now()) // Date video posted
+  sessionId   Int      @id @default(autoincrement()) @map("session_id")
+  sessionName String   @map("session_name")
+  sessionUrl  String   @map("session_url")
+  gameId      Int
+  sets        Set[]
+  date        DateTime @default(now()) // Date video posted
 
   @@map("sessions")
 }
@@ -90,7 +87,6 @@ model Session {
 model PlayerSession {
   playerSessionId Int          @id @default(autoincrement()) @map("player_session_id")
   sessionId       Int          @map("session_id")
-  session         Session      @relation(fields: [sessionId], references: [sessionId])
   playerId        Int          @map("player_id")
   player          Player       @relation(fields: [playerId], references: [playerId])
   playerStats     PlayerStat[]

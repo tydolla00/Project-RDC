@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 const playerSessionWithPlayerStats =
   Prisma.validator<Prisma.PlayerSessionDefaultArgs>()({
     include: {
+      set: true,
       player: {
         select: {
           playerName: true,

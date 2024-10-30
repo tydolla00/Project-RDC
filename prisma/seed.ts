@@ -9,6 +9,7 @@ async function main() {
   await seedSet();
   await seedPlayerSessions(1);
   await seedPlayerStats();
+  await seedPlayerStats(5);
 }
 
 main()
@@ -38,7 +39,7 @@ async function seedRDCMembers() {
     update: {},
     create: {
       playerId: 2,
-      playerName: "Aff",
+      playerName: "Dylan",
     },
   });
 
@@ -47,7 +48,7 @@ async function seedRDCMembers() {
     update: {},
     create: {
       playerId: 3,
-      playerName: "Des",
+      playerName: "Ben",
     },
   });
 
@@ -56,7 +57,7 @@ async function seedRDCMembers() {
     update: {},
     create: {
       playerId: 4,
-      playerName: "Ben",
+      playerName: "Lee",
     },
   });
   const lee = await prisma.player.upsert({
@@ -64,7 +65,7 @@ async function seedRDCMembers() {
     update: {},
     create: {
       playerId: 5,
-      playerName: "Lee",
+      playerName: "Des",
     },
   });
 
@@ -73,7 +74,7 @@ async function seedRDCMembers() {
     update: {},
     create: {
       playerId: 6,
-      playerName: "Dylan",
+      playerName: "John",
     },
   });
 
@@ -82,7 +83,7 @@ async function seedRDCMembers() {
     update: {},
     create: {
       playerId: 7,
-      playerName: "John",
+      playerName: "Aff",
     },
   });
 
@@ -97,7 +98,7 @@ async function seedRDCMembers() {
 }
 
 async function seedGames() {
-  console.log("---Seeding Games---\n");
+  console.log("---Seeding Games---");
   const marioKart = await prisma.game.upsert({
     where: { gameId: 1 },
     update: {},
@@ -107,62 +108,19 @@ async function seedGames() {
         create: [
           {
             statId: 1,
-            statName: "MK8_FIRST",
-            statValue: "",
+            statName: "MK8_POS",
             date: new Date(),
-          },
-          {
-            statId: 2,
-            statName: "MK8_SECOND",
-            statValue: "",
-          },
-          {
-            statId: 3,
-            statName: "MK8_THIRD",
-            statValue: "",
-          },
-          {
-            statId: 4,
-            statName: "MK8_FOURTH",
-            statValue: "",
-          },
-          {
-            statId: 5,
-            statName: "MK8_FIFTH",
-            statValue: "",
           },
         ],
       },
     },
   });
-  console.log("Mario Kart Game Seeded");
-
-  const callOfDuty = await prisma.game.upsert({
-    where: { gameId: 2 },
-    update: {},
-    create: {
-      gameId: 2,
-      gameName: "Call of Duty",
-    },
-  });
-
-  console.log("Call of Duty Game Seeded");
-
-  const gangBeasts = await prisma.game.upsert({
-    where: { gameId: 3 },
-    update: {},
-    create: {
-      gameId: 3,
-      gameName: "Gang Beasts",
-    },
-  });
-
-  console.log("Gang Beasts Game Seeded");
+  console.log("Mario Kart Game Seeded.");
 }
 
 // Seed game session with RDC Stream Five
 async function seedSession(sessionId: number) {
-  console.log(`Seeding Game Session ${sessionId}`);
+  console.log(`\n--- Seeding Game Session ${sessionId} ---`);
   const marioKartSession = await prisma.session.upsert({
     where: { sessionId: sessionId },
     update: {},
@@ -173,6 +131,7 @@ async function seedSession(sessionId: number) {
       sessionUrl: "https://example.com",
     },
   });
+  console.log("Seeded MK8 Session Successfully.\n");
 }
 
 async function seedSet() {
@@ -189,12 +148,22 @@ async function seedSet() {
 }
 
 async function seedPlayerSessions(sessionId: number) {
-  const playerIds = await prisma.player.findMany({
-    select: { playerId: true },
+  const mk8Players = await prisma.player.findMany({
+    where: {
+      playerId: {
+        in: [1, 2, 3, 4, 5],
+      },
+    },
   });
 
-  for (const player of playerIds) {
-    console.log(`Connecting player to session ${sessionId}`, player.playerId);
+  console.log("Mario Kart Players:", mk8Players);
+
+  // First MK8 Set
+  for (let i = 0; i < 5; i++) {
+    const player = mk8Players[i];
+    console.log(
+      `Creating Player Session for Player: ${player.playerId} -> Session ${sessionId}`,
+    );
     await prisma.playerSession.upsert({
       where: { playerSessionId: player.playerId },
       update: {},
@@ -206,17 +175,39 @@ async function seedPlayerSessions(sessionId: number) {
       },
     });
   }
+
+  // Second MK8 Set
+  for (let i = 0; i < 5; i++) {
+    const player = mk8Players[i];
+    console.log(
+      `Creating Player Session for Player: ${player.playerId} -> Session ${sessionId}`,
+    );
+    await prisma.playerSession.upsert({
+      where: { playerSessionId: player.playerId + 5 }, // Second session Jump = +5
+      update: {},
+      create: {
+        playerSessionId: player.playerId + 5, // Second session Jump = +5
+        sessionId: sessionId,
+        setId: 1,
+        playerId: player.playerId,
+      },
+    });
+  }
 }
-async function seedPlayerStats() {
+/**
+ * Seed Player Stats
+ * @param idOffset - used to offset playerStatId and playerSessionId
+ */
+async function seedPlayerStats(idOffset: number = 0) {
   // Seed PlayerStat for Mark
   const markFirst = await prisma.playerStat.upsert({
-    where: { playerStatId: 1 },
+    where: { playerStatId: 1 + idOffset },
     update: {},
     create: {
-      playerStatId: 1,
+      playerStatId: 1 + idOffset,
       playerId: 1,
-      statId: 1, // MK_FIRST
-      playerSessionId: 1,
+      statId: 1, // MK_POS
+      playerSessionId: 1 + idOffset,
       gameId: 1,
       value: "1",
       date: new Date(),
@@ -224,57 +215,57 @@ async function seedPlayerStats() {
   });
 
   const dylSecond = await prisma.playerStat.upsert({
-    where: { playerStatId: 2 },
+    where: { playerStatId: 2 + idOffset },
     update: {},
     create: {
-      playerStatId: 2,
+      playerStatId: 2 + idOffset,
       playerId: 6,
-      statId: 2, // MK_SECOND
-      playerSessionId: 2,
+      statId: 1, // MK_POS
+      playerSessionId: 2 + idOffset,
       gameId: 1,
-      value: "1",
+      value: "2",
       date: new Date(),
     },
   });
 
   const benThird = await prisma.playerStat.upsert({
-    where: { playerStatId: 3 },
+    where: { playerStatId: 3 + idOffset },
     update: {},
     create: {
-      playerStatId: 3,
+      playerStatId: 3 + idOffset,
       playerId: 4,
-      statId: 3, // MK_THIRD
-      playerSessionId: 3,
+      statId: 1, // MK_POS
+      playerSessionId: 3 + idOffset,
       gameId: 1,
-      value: "1",
+      value: "3",
       date: new Date(),
     },
   });
 
   const leeFourth = await prisma.playerStat.upsert({
-    where: { playerStatId: 4 },
+    where: { playerStatId: 4 + idOffset },
     update: {},
     create: {
-      playerStatId: 4,
+      playerStatId: 4 + idOffset,
       playerId: 5,
-      statId: 4, // MK_FOURTH
-      playerSessionId: 4,
+      statId: 1, // MK_POS
+      playerSessionId: 4 + idOffset,
       gameId: 1,
-      value: "1",
+      value: "4",
       date: new Date(),
     },
   });
 
   const desFifth = await prisma.playerStat.upsert({
-    where: { playerStatId: 5 },
+    where: { playerStatId: 5 + idOffset },
     update: {},
     create: {
-      playerStatId: 5,
+      playerStatId: 5 + idOffset,
       playerId: 3,
-      statId: 5, // MK_FIFTH
-      playerSessionId: 5,
+      statId: 1, // MK_POS
+      playerSessionId: 5 + idOffset,
       gameId: 1,
-      value: "1",
+      value: "5",
       date: new Date(),
     },
   });
