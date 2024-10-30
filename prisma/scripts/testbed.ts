@@ -1,5 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { GameSet, PrismaClient } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
+import { EnrichedGameSet } from "../types/gameSet";
 
 const prisma = new PrismaClient();
 
@@ -81,8 +82,47 @@ async function showSetStatsByPlayerByRace(mkSession: EnrichedSession[]) {
         console.log(`\nPlayer: ${playerName}`);
         console.log(`Placements: ${playerStatsMap[playerName].join(", ")}`);
       }
+      console.log(getMK8RankingsFromSet(set));
     }
   }
+}
+
+// Given a MK8 Set, return the rankings for each player and the number of points they received
+async function getMK8RankingsFromSet(set: EnrichedGameSet) {
+  const pointsMap = [6, 4, 3, 2, 1];
+  const playerPoints: { [playerName: string]: number } = {};
+
+  for (const playerSession of set.playerSessions) {
+    console.log(`Looking at PlayerSession ${playerSession.playerSessionId}`);
+
+    const playerName = playerSession.player.playerName;
+
+    for (const playerStat of playerSession.playerStats) {
+      let totalPoints = 0;
+
+      const placement = parseInt(playerStat.value);
+      console.log(
+        "Looking at Placement: ",
+        placement,
+        "for Player: ",
+        playerName,
+      );
+      if (placement >= 1 && placement <= 5) {
+        totalPoints += pointsMap[placement - 1];
+      }
+      playerPoints[playerName] = totalPoints;
+    }
+  }
+
+  const rankings = Object.entries(playerPoints)
+    .sort(([, pointsA], [, pointsB]) => pointsB - pointsA)
+    .map(([playerName, points], index) => ({
+      rank: index + 1,
+      playerName,
+      points,
+    }));
+
+  return rankings;
 }
 
 main()
