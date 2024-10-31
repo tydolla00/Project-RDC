@@ -6,6 +6,8 @@ async function main() {
   await seedRDCMembers();
   await seedGames();
   await seedSession(1);
+
+  // Seed 1st set
   await seedSet();
   await seedPlayerSessions(1);
   await seedPlayerStats(); // Seed Player Stats for Race 1
@@ -136,20 +138,21 @@ async function seedSession(sessionId: number) {
   console.log("Seeded MK8 Session Successfully.\n");
 }
 
-async function seedSet() {
+async function seedSet(sessionId: number = 1) {
   const marioKartSet = await prisma.gameSet.upsert({
     where: { setId: 1 },
     update: {},
     create: {
       setId: 1,
-      sessionId: 1,
+      sessionId: sessionId,
     },
   });
 
   console.log("Seeded Set");
 }
 
-async function seedPlayerSessions(sessionId: number) {
+// TODO: This should take the set id?
+async function seedPlayerSessions(setId: number) {
   const mk8Players = await prisma.player.findMany({
     where: {
       playerId: {
@@ -164,15 +167,15 @@ async function seedPlayerSessions(sessionId: number) {
   for (let i = 0; i < 5; i++) {
     const player = mk8Players[i];
     console.log(
-      `Creating Player Session for Player: ${player.playerId} -> Session ${sessionId}`,
+      `Creating Player Session for Player: ${player.playerId} -> Set ${setId}`,
     );
     await prisma.playerSession.upsert({
       where: { playerSessionId: player.playerId },
       update: {},
       create: {
         playerSessionId: player.playerId,
-        sessionId: sessionId,
-        setId: 1,
+        sessionId: 1,
+        setId: setId,
         playerId: player.playerId,
       },
     });
@@ -182,14 +185,14 @@ async function seedPlayerSessions(sessionId: number) {
   for (let i = 0; i < 5; i++) {
     const player = mk8Players[i];
     console.log(
-      `Creating Player Session for Player: ${player.playerId} -> Session ${sessionId}`,
+      `Creating Player Session for Player: ${player.playerId} -> Session ${setId}`,
     );
     await prisma.playerSession.upsert({
       where: { playerSessionId: player.playerId + 5 }, // Second session Jump = +5
       update: {},
       create: {
         playerSessionId: player.playerId + 5, // Second session Jump = +5
-        sessionId: sessionId,
+        sessionId: 1,
         setId: 1,
         playerId: player.playerId,
       },
@@ -200,14 +203,14 @@ async function seedPlayerSessions(sessionId: number) {
   for (let i = 0; i < 5; i++) {
     const player = mk8Players[i];
     console.log(
-      `Creating Player Session for Player: ${player.playerId} -> Session ${sessionId}`,
+      `Creating Player Session for Player: ${player.playerId} -> Session ${setId}`,
     );
     await prisma.playerSession.upsert({
       where: { playerSessionId: player.playerId + 10 }, // Third session Jump = +10
       update: {},
       create: {
         playerSessionId: player.playerId + 10, // Third session Jump = +10
-        sessionId: sessionId,
+        sessionId: 1,
         setId: 1,
         playerId: player.playerId,
       },
@@ -218,20 +221,27 @@ async function seedPlayerSessions(sessionId: number) {
   for (let i = 0; i < 5; i++) {
     const player = mk8Players[i];
     console.log(
-      `Creating Player Session for Player: ${player.playerId} -> Session ${sessionId}`,
+      `Creating Player Session for Player: ${player.playerId} -> Session ${setId}`,
     );
     await prisma.playerSession.upsert({
       where: { playerSessionId: player.playerId + 15 }, // Fourth session Jump = +15
       update: {},
       create: {
         playerSessionId: player.playerId + 15, // Fourth session Jump = +15
-        sessionId: sessionId,
+        sessionId: 1,
         setId: 1,
         playerId: player.playerId,
       },
     });
   }
 }
+
+// Instead of creating playerSessions once per race manually, we should have a function that can create the playerSessions for the four races
+/**
+ *
+ * @param idOffset - used to offset playerSessionId
+ */
+async function createPlayerSessionsBatch(idOffset: number) {}
 
 /**
  * Upsert player stat assuming playerStatID and playerSessionId are the same

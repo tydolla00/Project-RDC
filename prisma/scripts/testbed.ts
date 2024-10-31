@@ -1,4 +1,4 @@
-import { GameSet, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
 import { EnrichedGameSet } from "../types/gameSet";
 
@@ -46,21 +46,13 @@ async function getLatestMarioKartSession() {
   }
 }
 
-async function showSetStatsByPlayer(mkSession: EnrichedSession[]) {
-  // Print Stats For A Set By Player
-  for (const session of mkSession) {
-    for (const set of session.sets) {
-      console.log(`--- Set ${set.setId} ---`);
-      for (const playerSession of set.playerSessions) {
-        console.log(`\nPlayer: ${playerSession.player.playerName}`);
-        for (const playerStat of playerSession.playerStats) {
-          console.log(`Stat: ${playerStat.statId} Value: ${playerStat.value}`);
-        }
-      }
-    }
-  }
-}
-
+/**
+ * Takes a mario kart session and prints out the stats for each player in each set grouped.
+ * Format:
+ * Player: playerName
+ * Rankings: []number
+ * @param mkSession
+ */
 async function showSetStatsByPlayerByRace(mkSession: EnrichedSession[]) {
   // Group Stats For A Set By Player
   for (const session of mkSession) {
@@ -87,30 +79,40 @@ async function showSetStatsByPlayerByRace(mkSession: EnrichedSession[]) {
   }
 }
 
-// Given a MK8 Set, return the rankings for each player and the number of points they received
+/**
+/* Given a MK8 Set, return the rankings for each player and the number of points they received
+ * @param set 
+ * @returns 
+ */
 async function getMK8RankingsFromSet(set: EnrichedGameSet) {
   const pointsMap = [6, 4, 3, 2, 1];
-  const playerPoints: { [playerName: string]: number } = {};
+  const playerPoints: { [playerName: string]: number } = {
+    Mark: 0,
+    Dylan: 0,
+    Ben: 0,
+    Lee: 0,
+    Des: 0,
+  };
 
+  // Leaving these comments logs in for debugging purposes TODO: Remove when done
   for (const playerSession of set.playerSessions) {
-    console.log(`Looking at PlayerSession ${playerSession.playerSessionId}`);
+    // console.log(`Looking at PlayerSession ${playerSession.playerSessionId}`);
 
     const playerName = playerSession.player.playerName;
 
     for (const playerStat of playerSession.playerStats) {
-      let totalPoints = 0;
+      // console.log(`\nLooking at statId${playerStat.statId}`);
 
       const placement = parseInt(playerStat.value);
-      console.log(
-        "Looking at Placement: ",
-        placement,
-        "for Player: ",
-        playerName,
-      );
+      // console.log(
+      //   `${playerName} placed ${placement} and received ${pointsMap[placement - 1]} points`,
+      // );
       if (placement >= 1 && placement <= 5) {
-        totalPoints += pointsMap[placement - 1];
+        const pointsWon = pointsMap[placement - 1];
+        // console.log(`Points Won: ${pointsWon}`);
+        playerPoints[playerName] += pointsWon;
+        // console.log("Player Points: ", playerPoints);
       }
-      playerPoints[playerName] = totalPoints;
     }
   }
 
