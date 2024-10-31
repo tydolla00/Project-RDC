@@ -178,7 +178,6 @@ async function seedSet(setId: number, sessionId: number = 1) {
   console.log(`Seeded Set ${setId} Successfully.\n`);
 }
 
-// TODO: This should take the set id?
 async function seedPlayerSessions(setId: number) {
   const mk8Players: Player[] = await prisma.player.findMany({
     where: {
@@ -214,12 +213,10 @@ async function seedPlayerSessions(setId: number) {
     throw new Error("Session not found");
   }
 
-  console.log("Mario Kart Players:", mk8Players);
-
   await createPlayerSessionsBatch(
     4,
     mk8Players,
-    mk8Session.sets[setId - 1], // Need to find better way to pass in set here
+    mk8Session.sets[setId - 1], // TODO: Need to find better way to pass in set here
     mk8Session.sessionId,
   );
 }
@@ -230,14 +227,14 @@ async function seedPlayerSessions(setId: number) {
  * @param idOffset - used to offset playerSessionId
  */
 async function createPlayerSessionsBatch(
-  numOfGames: number,
+  numGames: number,
   players: Player[],
   set: GameSet,
   sessionId: number,
 ) {
   console.log("\n--- Creating Batch of Player Sessions for Set ---", set.setId);
   // console.log("Players:", players);
-  for (let game = 0; game < numOfGames; game++) {
+  for (let game = 0; game < numGames; game++) {
     const setModifier = (set.setId - 1) * 20; // Every set assume there are 5 players * 4 races = 20 player sessions
     const idOffset = game * 5 + setModifier;
 
@@ -266,16 +263,18 @@ async function createPlayerSessionsBatch(
 /**
  * Upsert player stat assuming playerStatID and playerSessionId are the same
  * @param idOffset - used to offset playerStatId and playerSessionId
+ * @param positions - optional parameter to dictate positions (1-5) of players in the order of (Mark, Dyl, Ben, Lee, Des)
+ * @param setId - optional parameter to identify set number player stats should belong too
  */
 async function seedPlayerStats(
   idOffset: number = 0,
   positions: string[] = ["1", "2", "3", "4", "5"],
-  setNumber: number = 1,
+  setId: number = 1,
 ) {
-  idOffset = idOffset * setNumber;
-  console.log(`Id Offset In Player Stats ${idOffset}\n`);
-  // Seed PlayerStat for Mark
-  const markFirst = await prisma.playerStat.upsert({
+  idOffset = idOffset * setId;
+
+  // Seed PlayerStat for players (assume its the stream five)
+  const markRace = await prisma.playerStat.upsert({
     where: { playerStatId: 1 + idOffset },
     update: {},
     create: {
@@ -289,7 +288,7 @@ async function seedPlayerStats(
     },
   });
 
-  const dylSecond = await prisma.playerStat.upsert({
+  const dylRace = await prisma.playerStat.upsert({
     where: { playerStatId: 2 + idOffset },
     update: {},
     create: {
@@ -303,7 +302,7 @@ async function seedPlayerStats(
     },
   });
 
-  const benThird = await prisma.playerStat.upsert({
+  const benRace = await prisma.playerStat.upsert({
     where: { playerStatId: 3 + idOffset },
     update: {},
     create: {
@@ -317,7 +316,7 @@ async function seedPlayerStats(
     },
   });
 
-  const leeFourth = await prisma.playerStat.upsert({
+  const leeRace = await prisma.playerStat.upsert({
     where: { playerStatId: 4 + idOffset },
     update: {},
     create: {
@@ -331,7 +330,7 @@ async function seedPlayerStats(
     },
   });
 
-  const desFifth = await prisma.playerStat.upsert({
+  const desRace = await prisma.playerStat.upsert({
     where: { playerStatId: 5 + idOffset },
     update: {},
     create: {
@@ -344,4 +343,6 @@ async function seedPlayerStats(
       date: new Date(),
     },
   });
+
+  console.log(`Finished creating player stats for set ${setId}`);
 }
