@@ -3,6 +3,7 @@ import { GameSet, Player, PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  // TODO: Seed player stats in seedPlayerSessions
   await seedRDCMembers();
   await seedGames();
   await seedSession(1);
@@ -39,6 +40,9 @@ async function main() {
   await seedPlayerStats(50, ["5", "1", "2", "4", "3"]);
   await seedPlayerStats(70, ["4", "1", "5", "3", "2"]);
   await seedPlayerStats(75, ["1", "5", "2", "3", "4"]);
+
+  console.log("--- <> Seeded Mario Kart Session successfully <> ---");
+  console.log("Seeds have been sown. o7");
 }
 
 main()
@@ -129,7 +133,7 @@ async function seedRDCMembers() {
 }
 
 async function seedGames() {
-  console.log("---Seeding Games---");
+  console.log("--- Seeding Games ---");
   const marioKart = await prisma.game.upsert({
     where: { gameId: 1 },
     update: {},
@@ -165,6 +169,11 @@ async function seedSession(sessionId: number) {
   console.log("Seeded MK8 Session Successfully.\n");
 }
 
+/**
+ *
+ * @param setId - setId of the set to seed
+ * @param sessionId - sessionId of parent session of seeded set
+ */
 async function seedSet(setId: number, sessionId: number = 1) {
   const marioKartSet = await prisma.gameSet.upsert({
     where: { setId: setId },
@@ -223,8 +232,11 @@ async function seedPlayerSessions(setId: number) {
 
 // Instead of creating playerSessions once per race manually, we should have a function that can create the playerSessions for the four races
 /**
- *
- * @param idOffset - used to offset playerSessionId
+ * Create a batch of player sessions for a set number of games
+ * @param numgames - number of games in set
+ * @param players - array of players who participated in the set
+ * @param set - GameSet type that will contain batched sessions
+ * @param sessionId - Id of session that the set belongs too
  */
 async function createPlayerSessionsBatch(
   numGames: number,
@@ -233,7 +245,6 @@ async function createPlayerSessionsBatch(
   sessionId: number,
 ) {
   console.log("\n--- Creating Batch of Player Sessions for Set ---", set.setId);
-  // console.log("Players:", players);
   for (let game = 0; game < numGames; game++) {
     const setModifier = (set.setId - 1) * 20; // Every set assume there are 5 players * 4 races = 20 player sessions
     const idOffset = game * 5 + setModifier;
