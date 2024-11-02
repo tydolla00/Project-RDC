@@ -1,0 +1,28 @@
+name: Vercel Build
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch; adjust as needed
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Specify your Node.js version here
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Build with Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --token ${{ secrets.VERCEL_TOKEN }} --prod
