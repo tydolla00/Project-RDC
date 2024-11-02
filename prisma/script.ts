@@ -27,32 +27,6 @@ async function getMarioKartGameSession() {
   return gameSessions;
 }
 
-async function getPlayerStatsForGameSession(sessionId: number) {
-  const playerStats = await prisma.gameSessionPlayer.findMany({
-    where: {
-      sessionId: sessionId,
-    },
-    include: {
-      player: {
-        include: {
-          playerGameStats: {
-            where: {
-              gameId: sessionId, // Assuming gameId is the same as sessionId for simplicity
-            },
-            include: {
-              game: true,
-              gameStat: true,
-            },
-          },
-        },
-      },
-      gameSession: true,
-    },
-  });
-
-  return playerStats;
-}
-
 main()
   .then(async () => {
     await prisma.$disconnect();
