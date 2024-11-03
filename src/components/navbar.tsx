@@ -129,23 +129,25 @@ export const Navbar = () => {
           )}
         </NavigationMenuItem>
         <NavigationMenuItem>
-          {process.env.NODE_ENV === "development" && !signedIn ? (
-            <Link className={navigationMenuTriggerStyle()} href="/signin">
-              <FillText className="text-chart-4" text="Sign In" />
-            </Link>
-          ) : (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Avatar>
-                    <AvatarImage src={Icon.src} />
-                    <AvatarFallback>Icon</AvatarFallback>
-                  </Avatar>
-                </TooltipTrigger>
-                <TooltipContent>User signed in</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
+          {process.env.NODE_ENV === "development" ? (
+            signedIn ? (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Avatar>
+                      <AvatarImage src={Icon.src} />
+                      <AvatarFallback>Icon</AvatarFallback>
+                    </Avatar>
+                  </TooltipTrigger>
+                  <TooltipContent>User signed in</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : (
+              <Link className={navigationMenuTriggerStyle()} href="/signin">
+                <FillText className="text-chart-4" text="Sign In" />
+              </Link>
+            )
+          ) : null}
         </NavigationMenuItem>
         <NavigationMenuItem>
           <ModeToggle />

@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/sonner";
+import { CSPostHogProvider } from "@/lib/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,10 +29,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
-          <main>{children}</main>
-          <Toaster />
-          <Footer />
+          <CSPostHogProvider>
+            <Navbar />
+            <main>{children}</main>
+            <Toaster />
+            <Footer />
+          </CSPostHogProvider>
         </ThemeProvider>
       </body>
     </html>
