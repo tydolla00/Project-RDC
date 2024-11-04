@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npx shadcn@latest init -d -f && next build",
+    "build": "next build --legacy-peer-deps",
     "start": "next start",
     "lint": "next lint",
     "dbcrashout": "npx prisma db push --force-reset && npx prisma db push",
