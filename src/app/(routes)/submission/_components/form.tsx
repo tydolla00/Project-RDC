@@ -24,7 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { submitUpdates } from "@/app/_actions/action";
+import { getYTVid, submitUpdates } from "@/app/_actions/action";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -35,6 +35,8 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { useState } from "react";
+import Image from "next/image";
 
 const formSchema = z.object({
   video: z
@@ -43,7 +45,9 @@ const formSchema = z.object({
     .startsWith(
       "https://www.youtube.com",
       "Please paste in a valid youtube url.",
-    ),
+    )
+    .max(100)
+    .includes("v="),
   stat: z
     .object({
       member: z
@@ -60,6 +64,9 @@ const formSchema = z.object({
 });
 
 export const SubmissionForm = () => {
+  const [session, setSession] = useState<
+    Awaited<ReturnType<typeof getYTVid>> | undefined
+  >(undefined);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { video: "", stat: [{ member: [{ name: "" }] }] },
@@ -76,9 +83,22 @@ export const SubmissionForm = () => {
     console.log("Got here");
     submitUpdates(data);
   };
-  const nextButtonClicked = () => {
-    if (!isTouched) toast("Please submit a valid url.");
+  const saveBtnClicked = async () => {
+    if (!isTouched || invalid) {
+      toast("Please submit a valid url.");
+      return;
+    }
     if (isTouched && !invalid) toast("Changes saved");
+
+    let id = form.getValues().video.split("=")[1];
+    const trimEnd = id.indexOf("&");
+
+    if (trimEnd !== -1) id = id.slice(0, trimEnd);
+    const video = await getYTVid(id);
+    if (!video) {
+    } else {
+      setSession(video);
+    }
   };
   return (
     <Form {...form}>
@@ -101,6 +121,14 @@ export const SubmissionForm = () => {
                 </CardDescription>
                 <Separator />
                 <CardContent>
+                  {session && (
+                    <Image
+                      alt="Youtube Video"
+                      src={session.thumbnail.url}
+                      height={session.thumbnail.height}
+                      width={session.thumbnail.width}
+                    />
+                  )}
                   <FormField
                     control={form.control}
                     name="video"
@@ -124,7 +152,7 @@ export const SubmissionForm = () => {
                   <Separator />
                 </CardContent>
                 <CardFooter>
-                  <Button onClick={nextButtonClicked} type="button">
+                  <Button onClick={saveBtnClicked} type="button">
                     Save
                   </Button>
                 </CardFooter>
@@ -141,9 +169,8 @@ export const SubmissionForm = () => {
               </CardHeader>
               <CardContent>
                 {fields.map((f, i) => (
-                  <>
+                  <div key={f.id}>
                     <FormField
-                      key={i}
                       control={form.control}
                       name={`stat.${i}.statName`}
                       render={({ field }) => (
@@ -174,7 +201,7 @@ export const SubmissionForm = () => {
                     />
                     <Members index={i} />
                     <div className="my-5 h-0.5 bg-neutral-800"></div>
-                  </>
+                  </div>
                 ))}
               </CardContent>
               <CardFooter>
