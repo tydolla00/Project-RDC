@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "npx shadcn@latest init -d -f && next build",
     "start": "next start",
     "lint": "next lint",
-    "dbcrashout": "npx prisma db push --force-reset && npx prisma db push"
+    "dbcrashout": "npx prisma db push --force-reset && npx prisma db push",
+    "prodbuild": "npx shadcn@latest init -d -f && next build"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
