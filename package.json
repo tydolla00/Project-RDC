@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --legacy-peer-deps",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "dbcrashout": "npx prisma db push --force-reset && npx prisma db push",
