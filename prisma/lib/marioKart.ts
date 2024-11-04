@@ -5,7 +5,9 @@ const prisma = new PrismaClient();
 // --- Priorities ---
 
 // Get latest MK8 sessions
-const getLatestMarioKart8Session = async () => {
+export const getLatestMarioKart8Session: () => Promise<
+  EnrichedSession | undefined
+> = async () => {
   try {
     const latestMK8Session: EnrichedSession | null =
       await prisma.session.findFirst({
@@ -147,7 +149,7 @@ async function getPlayerRankingsByRace(race: PlayerSession[]) {}
 async function main() {
   const latestMK8Session = await getLatestMarioKart8Session();
 
-  findWinnerOfSet(1);
+  // findWinnerOfSet(1);
 }
 
 main()

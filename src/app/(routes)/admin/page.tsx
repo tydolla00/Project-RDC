@@ -3,6 +3,8 @@ import { SubmissionForm } from "../submission/_components/form";
 import { columns, DataTable, Submission } from "./_components/data-table";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getLatestMarioKart8Session } from "../../../../prisma/lib/marioKart";
+import { EnrichedSession } from "../../../../prisma/types/session";
 
 const getData = () => {
   const data: Submission[] = [
@@ -24,6 +26,13 @@ const getData = () => {
   });
 };
 
+const getLatestMK8Function: EnrichedSession | undefined =
+  await getLatestMarioKart8Session();
+
+if (getLatestMK8Function) {
+  console.log(getLatestMK8Function);
+}
+
 export default async function Page() {
   const data: Submission[] = await getData();
   return (
@@ -32,8 +41,11 @@ export default async function Page() {
       {/* <div className="flex justify-center">
         <SubmissionForm />
       </div> */}
+
       <Suspense fallback={<Skelly />}>
-        <DataTable columns={columns} data={data} />
+        {getLatestMK8Function && (
+          <DataTable columns={columns} data={[getLatestMK8Function]} />
+        )}
       </Suspense>
     </div>
   );
