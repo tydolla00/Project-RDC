@@ -7,13 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "dbcrashout": "npx prisma db push --force-reset && npx prisma db push",
-    "prodbuild": "npx shadcn@latest init -d -f && next build"
+    "dbcrashout": "npx prisma db push --force-reset && npx prisma db push"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.21.1",
     "@hookform/resolvers": "^3.9.0",
     "@prisma/client": "^5.21.1",
     "@radix-ui/react-avatar": "^1.1.1",
