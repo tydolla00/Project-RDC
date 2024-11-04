@@ -45,9 +45,7 @@ const getLatestMarioKart8Session = async () => {
 const getMarioKart8SetById = async (setId: number) => {
   try {
     const mk8Set = await prisma.gameSet.findUnique({
-      where: {
-        setId: setId,
-      },
+      where: { setId },
       include: {
         playerSessions: {
           include: {
@@ -159,3 +157,51 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
+// Chart Functions will make generic for all games afterwards
+
+export const getAveragePlacing = async () => {
+  console.log("AVERAGE PLACING RAN");
+  // Fetch from game where game.gameName is mario kart or gameId is 1
+  // and where gameStats.statName === MK8_POS or use statId (more efficient?)
+  // Then loop through and compute average for each player
+
+  // All player stats for the position stat (includes multiple sessions per user)
+  const totalPlayerStats = await prisma.playerStat.findMany({
+    where: { gameId: 1, AND: { statId: 1 } },
+    select: {
+      game: { select: { gameName: true } },
+      gameStat: { select: { statName: true } },
+      value: true,
+      player: { select: { playerId: true, playerName: true } },
+    },
+  });
+
+  const avgPlacingPerPlayer = new Map<string, { avg: number; count: number }>();
+  // Compute total per player
+  for (const playerStat of totalPlayerStats) {
+    const avg = Number(playerStat.value);
+    if (!avg) {
+      // TODO Log to Posthog/Sentry
+      console.log("Not a number");
+      continue;
+    }
+
+    let player = avgPlacingPerPlayer.get(playerStat.player.playerName);
+    if (!player)
+      avgPlacingPerPlayer.set(playerStat.player.playerName, {
+        avg,
+        count: 1,
+      });
+    else {
+      player.count += 1;
+      player.avg += avg;
+    }
+  }
+  // Compute average
+  for (const [key, val] of avgPlacingPerPlayer) {
+    val.avg = Math.round(val.avg / val.count);
+  }
+
+  return { avgPlacingPerPlayer, game: totalPlayerStats.at(0)?.game.gameName };
+};
