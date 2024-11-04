@@ -29,12 +29,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CSPostHogProvider>
-            <Navbar />
-            <main>{children}</main>
-            <Toaster />
-            <Footer />
-          </CSPostHogProvider>
+          {/* <CSPostHogProvider> */}
+          <Navbar />
+          <main>{children}</main>
+          <Toaster />
+          <Footer />
+          {/* </CSPostHogProvider> */}
         </ThemeProvider>
       </body>
     </html>

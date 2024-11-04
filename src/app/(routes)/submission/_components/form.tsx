@@ -141,9 +141,8 @@ export const SubmissionForm = () => {
               </CardHeader>
               <CardContent>
                 {fields.map((f, i) => (
-                  <>
+                  <div key={f.id}>
                     <FormField
-                      key={i}
                       control={form.control}
                       name={`stat.${i}.statName`}
                       render={({ field }) => (
@@ -174,7 +173,7 @@ export const SubmissionForm = () => {
                     />
                     <Members index={i} />
                     <div className="my-5 h-0.5 bg-neutral-800"></div>
-                  </>
+                  </div>
                 ))}
               </CardContent>
               <CardFooter>
