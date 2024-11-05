@@ -143,8 +143,6 @@ async function getPlayerRankingsByRace(race: PlayerSession[]) {}
 
 // Get All MK8 sessions (paginated)
 
-// --- Main Function Since Vercel won't let me merge ---
-
 // Testing Purposes Main Function (Comment out when not in use)
 async function main() {
   const latestMK8Session = await getLatestMarioKart8Session();

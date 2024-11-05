@@ -91,15 +91,24 @@ model PlayerSession {
   player          Player       @relation(fields: [playerId], references: [playerId])
   playerStats     PlayerStat[]
   setId           Int          @map("set_id")
-  set             GameSet      @relation(fields: [setId], references: [setId])
+  match           Match?       @relation(fields: [matchId], references: [matchId])
+  matchId         Int?
 
   @@map("player_sessions")
 }
 
 // Set Table Concept 
 model GameSet {
-  setId          Int             @id @default(autoincrement()) @map("set_id")
-  sessionId      Int             @map("session_id")
-  session        Session         @relation(fields: [sessionId], references: [sessionId])
+  setId     Int     @id @default(autoincrement()) @map("set_id")
+  sessionId Int     @map("session_id")
+  session   Session @relation(fields: [sessionId], references: [sessionId])
+  matches   Match[]
+}
+
+model Match {
+  matchId        Int             @id @default(autoincrement()) @map("match_id")
+  setId          Int             @map("set_id")
+  set            GameSet         @relation(fields: [setId], references: [setId])
   playerSessions PlayerSession[]
+  date           DateTime        @default(now()) // Date video posted
 }

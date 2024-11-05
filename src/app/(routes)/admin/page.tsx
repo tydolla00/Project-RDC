@@ -26,15 +26,16 @@ const getData = () => {
   });
 };
 
-const getLatestMK8Function: EnrichedSession | undefined =
-  await getLatestMarioKart8Session();
-
-if (getLatestMK8Function) {
-  console.log(getLatestMK8Function);
-}
-
 export default async function Page() {
   const data: Submission[] = await getData();
+
+  const getLatestMK8Function: EnrichedSession | undefined =
+    await getLatestMarioKart8Session();
+
+  if (getLatestMK8Function) {
+    console.log(getLatestMK8Function);
+    console.log(getLatestMK8Function.sets);
+  }
   return (
     <div className="m-16">
       <H1>Admin</H1>
