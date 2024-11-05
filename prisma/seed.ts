@@ -304,7 +304,7 @@ async function seedPlayerStats(
     update: {},
     create: {
       playerStatId: 2 + idOffset,
-      playerId: 6,
+      playerId: 2,
       statId: 1, // MK_POS
       playerSessionId: 2 + idOffset,
       gameId: 1,
