@@ -91,8 +91,8 @@ model PlayerSession {
   player          Player       @relation(fields: [playerId], references: [playerId])
   playerStats     PlayerStat[]
   setId           Int          @map("set_id")
-  match           Match?       @relation(fields: [matchId], references: [matchId])
-  matchId         Int?
+  match           Match        @relation(fields: [matchId], references: [matchId])
+  matchId         Int
 
   @@map("player_sessions")
 }
@@ -103,6 +103,8 @@ model GameSet {
   sessionId Int     @map("session_id")
   session   Session @relation(fields: [sessionId], references: [sessionId])
   matches   Match[]
+
+  @@map("sets")
 }
 
 model Match {
@@ -111,4 +113,6 @@ model Match {
   set            GameSet         @relation(fields: [setId], references: [setId])
   playerSessions PlayerSession[]
   date           DateTime        @default(now()) // Date video posted
+
+  @@map("matches")
 }

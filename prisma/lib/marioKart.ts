@@ -1,12 +1,13 @@
 import { PlayerSession, PrismaClient } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
+import { PlayerSessionWithStats } from "../types/playerSession";
 const prisma = new PrismaClient();
 
 // --- Priorities ---
 
 // Get latest MK8 sessions
 export const getLatestMarioKart8Session: () => Promise<
-  EnrichedSession | undefined
+  any | undefined
 > = async () => {
   try {
     const latestMK8Session: any | null = await prisma.session.findFirst({
@@ -19,15 +20,7 @@ export const getLatestMarioKart8Session: () => Promise<
       include: {
         sets: {
           include: {
-            matches: {
-              include: {
-                playerSessions: {
-                  include: {
-                    playerStats: true,
-                  },
-                },
-              },
-            },
+            matches: true,
           },
         },
       },
@@ -49,14 +42,18 @@ const getMarioKart8SetById = async (setId: number) => {
         setId: setId,
       },
       include: {
-        playerSessions: {
+        matches: {
           include: {
-            player: {
-              select: {
-                playerName: true,
+            playerSessions: {
+              include: {
+                player: {
+                  select: {
+                    playerName: true,
+                  },
+                },
+                playerStats: true,
               },
             },
-            playerStats: true,
           },
         },
       },
@@ -76,31 +73,22 @@ async function findWinnerOfSet(setId: number) {
         setId: setId,
       },
       include: {
-        playerSessions: {
+        matches: {
           include: {
-            player: {
-              select: {
-                playerName: true,
+            playerSessions: {
+              include: {
+                player: {
+                  select: {
+                    playerName: true,
+                  },
+                },
+                playerStats: true,
               },
             },
-            playerStats: true,
           },
         },
       },
     });
-
-    // Copilot suggested this - logic doesnt seem sound
-
-    if (mk8Set) {
-      let winner = mk8Set.playerSessions[0];
-      for (const playerSession of mk8Set.playerSessions) {
-        if (playerSession.playerStats[0].value > winner.playerStats[0].value) {
-          winner = playerSession;
-        }
-      }
-
-      console.log(`Winner of Set ${setId}: ${winner.player.playerName}`);
-    }
   } catch (error) {
     console.error("Error Fetching Winner of Set");
   }
@@ -117,11 +105,13 @@ function printPlayerStatsFromSet(
   if (latestMK8Session) {
     for (const set of latestMK8Session.sets) {
       console.log(`--- Set ${set.setId} ---`);
-      for (const playerSession of set.playerSessions) {
-        console.log(`Player: ${playerSession.player.playerName}`);
+      for (const match of set.matches) {
+        for (const playerSession of match.playerSessions as PlayerSessionWithStats[]) {
+          console.log(`Player: ${playerSession.player.playerName}`);
 
-        for (const playerStat of playerSession.playerStats) {
-          console.log(`Stat ID: ${playerStat.statId} ${playerStat.value}`);
+          for (const playerStat of playerSession.playerStats) {
+            console.log(`Stat ID: ${playerStat.statId} ${playerStat.value}`);
+          }
         }
       }
     }
