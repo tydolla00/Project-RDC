@@ -1,5 +1,6 @@
 import { PlayerSession, PrismaClient } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
+import { cache } from "react";
 const prisma = new PrismaClient();
 
 // --- Priorities ---
@@ -160,14 +161,9 @@ main()
 
 // Chart Functions will make generic for all games afterwards
 
-export const getAveragePlacing = async () => {
-  console.log("AVERAGE PLACING RAN");
-  // Fetch from game where game.gameName is mario kart or gameId is 1
-  // and where gameStats.statName === MK8_POS or use statId (more efficient?)
-  // Then loop through and compute average for each player
-
-  // All player stats for the position stat (includes multiple sessions per user)
-  const totalPlayerStats = await prisma.playerStat.findMany({
+const getAllPlayerStats_MK = cache(async () => {
+  console.log("Cached function ran");
+  return await prisma.playerStat.findMany({
     where: { gameId: 1, AND: { statId: 1 } },
     select: {
       game: { select: { gameName: true } },
@@ -176,6 +172,16 @@ export const getAveragePlacing = async () => {
       player: { select: { playerId: true, playerName: true } },
     },
   });
+});
+
+export const getAveragePlacing = async () => {
+  console.log("AVERAGE PLACING RAN");
+  // Fetch from game where game.gameName is mario kart or gameId is 1
+  // and where gameStats.statName === MK8_POS or use statId (more efficient?)
+  // Then loop through and compute average for each player
+
+  // All player stats for the position stat (includes multiple sessions per user)
+  const totalPlayerStats = await getAllPlayerStats_MK();
 
   const avgPlacingPerPlayer = new Map<string, { avg: number; count: number }>();
   // Compute total per player

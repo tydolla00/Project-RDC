@@ -158,13 +158,14 @@ export const Navbar = () => {
 };
 
 const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
+  React.ComponentRef<"a">,
   React.ComponentPropsWithoutRef<"a">
 >(({ className, title, children, href = "", ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
         <Link
+          prefetch={true}
           href={href}
           ref={ref}
           className={cn(

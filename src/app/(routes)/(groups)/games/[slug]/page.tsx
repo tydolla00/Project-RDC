@@ -5,6 +5,7 @@ import { Chart } from "./_components/charts";
 
 const getGame = (slug: string) => {
   const game = { name: slug };
+  console.log("In game");
   return getAveragePlacing();
 };
 
