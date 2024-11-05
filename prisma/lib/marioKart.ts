@@ -9,31 +9,29 @@ export const getLatestMarioKart8Session: () => Promise<
   EnrichedSession | undefined
 > = async () => {
   try {
-    const latestMK8Session: EnrichedSession | null =
-      await prisma.session.findFirst({
-        where: {
-          gameId: 1,
-        },
-        orderBy: {
-          sessionId: "desc",
-        },
-        include: {
-          sets: {
-            include: {
-              playerSessions: {
-                include: {
-                  player: {
-                    select: {
-                      playerName: true,
-                    },
+    const latestMK8Session: any | null = await prisma.session.findFirst({
+      where: {
+        gameId: 1,
+      },
+      orderBy: {
+        sessionId: "desc",
+      },
+      include: {
+        sets: {
+          include: {
+            matches: {
+              include: {
+                playerSessions: {
+                  include: {
+                    playerStats: true,
                   },
-                  playerStats: true,
                 },
               },
             },
           },
         },
-      });
+      },
+    });
 
     if (latestMK8Session != null) {
       return latestMK8Session;
