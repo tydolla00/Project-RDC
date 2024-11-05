@@ -21,11 +21,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+
 export const Navbar = () => {
   const links = [
     { text: "Home", ref: "" },
     { text: "About", ref: "about" },
   ];
+
+  // TODO Fetch Games and Members from DB.
 
   const games: { desc?: string; url: string; name: string }[] = [
     {

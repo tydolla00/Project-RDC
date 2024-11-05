@@ -1,7 +1,7 @@
 import { PlayerSession, PrismaClient } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
 import { cache } from "react";
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({ log: ["query"] });
 
 // --- Priorities ---
 
@@ -161,18 +161,18 @@ main()
 
 // Chart Functions will make generic for all games afterwards
 
-const getAllPlayerStats_MK = cache(async () => {
-  console.log("Cached function ran");
-  return await prisma.playerStat.findMany({
-    where: { gameId: 1, AND: { statId: 1 } },
-    select: {
-      game: { select: { gameName: true } },
-      gameStat: { select: { statName: true } },
-      value: true,
-      player: { select: { playerId: true, playerName: true } },
-    },
-  });
-});
+export const getAllPlayerStats_MK = cache(
+  async () =>
+    await prisma.playerStat.findMany({
+      where: { gameId: 1, AND: { statId: 1 } },
+      select: {
+        game: { select: { gameName: true } },
+        gameStat: { select: { statName: true } },
+        value: true,
+        player: { select: { playerId: true, playerName: true } },
+      },
+    }),
+);
 
 export const getAveragePlacing = async () => {
   console.log("AVERAGE PLACING RAN");
@@ -211,3 +211,9 @@ export const getAveragePlacing = async () => {
 
   return { avgPlacingPerPlayer, game: totalPlayerStats.at(0)?.game.gameName };
 };
+
+export const getMostSets = () => {};
+export const getMostDays = () => {};
+export const getMost1stPlaces = () => {};
+export const getMostLastPlaces = () => {};
+export const getMostWins = () => {};
