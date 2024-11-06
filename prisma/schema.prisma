@@ -46,11 +46,11 @@ model Game {
 // { stat_id: 1, game_id: 1, stat_name: 'mk_first', stat_value: '0', date: 2024-10-23 12:00:00 }
 model GameStat {
   statId      Int          @id @default(autoincrement()) @map("stat_id") // TODO: MAKE ENUM
-  gameId      Int          @map("game_id")
   statName    String       @map("stat_name")
-  date        DateTime     @default(now()) // Date video posted
+  gameId      Int          @map("game_id")
   game        Game         @relation(fields: [gameId], references: [gameId])
   playerStats PlayerStat[]
+  date        DateTime     @default(now()) // Date video posted
 
   @@map("game_stats")
 }
@@ -107,8 +107,8 @@ model PlayerStat {
   player          Player        @relation(fields: [playerId], references: [playerId])
   gameId          Int           @map("game_id")
   game            Game          @relation(fields: [gameId], references: [gameId])
-  gameStat        GameStat      @relation(fields: [statId], references: [statId])
   statId          Int           @map("stat_id")
+  gameStat        GameStat      @relation(fields: [statId], references: [statId])
   playerSessionId Int           @map("player_session_id")
   playerSession   PlayerSession @relation(fields: [playerSessionId], references: [playerSessionId])
   value           String
