@@ -14,12 +14,12 @@ datasource db {
 // Project RDC Models   
 // Player Ids      
 // 1. Mark 
-// 2. Aff
+// 2. Dylan
 // 3. Des 
 // 4. Ben
 // 5. Lee
-// 6. Dyl 
-// 7. John 
+// 6. John 
+// 7. Aff 
 // 8. Ippi 
 //////////////////////
 
@@ -55,23 +55,6 @@ model GameStat {
   @@map("game_stats")
 }
 
-// { player_game_stat_id: 1, player_id: 1, game_id: 1, stat_id: 1, value: }
-model PlayerStat {
-  playerStatId    Int           @id @default(autoincrement()) @map("player_stat_id")
-  playerId        Int           @map("player_id")
-  player          Player        @relation(fields: [playerId], references: [playerId])
-  gameId          Int           @map("game_id")
-  game            Game          @relation(fields: [gameId], references: [gameId])
-  gameStat        GameStat      @relation(fields: [statId], references: [statId])
-  statId          Int           @map("stat_id")
-  playerSessionId Int           @map("player_session_id")
-  playerSession   PlayerSession @relation(fields: [playerSessionId], references: [playerSessionId])
-  value           String
-  date            DateTime      @default(now()) // Date video posted
-
-  @@map("player_stats")
-}
-
 model Session {
   sessionId   Int       @id @default(autoincrement()) @map("session_id")
   sessionName String    @map("session_name")
@@ -81,20 +64,6 @@ model Session {
   date        DateTime  @default(now()) // Date video posted
 
   @@map("sessions")
-}
-
-// Join Table between Session & Player
-model PlayerSession {
-  playerSessionId Int          @id @default(autoincrement()) @map("player_session_id")
-  sessionId       Int          @map("session_id")
-  playerId        Int          @map("player_id")
-  player          Player       @relation(fields: [playerId], references: [playerId])
-  playerStats     PlayerStat[]
-  setId           Int          @map("set_id")
-  match           Match        @relation(fields: [matchId], references: [matchId])
-  matchId         Int
-
-  @@map("player_sessions")
 }
 
 // Set Table Concept 
@@ -115,4 +84,35 @@ model Match {
   date           DateTime        @default(now()) // Date video posted
 
   @@map("matches")
+}
+
+// Join Table between Session & Player
+model PlayerSession {
+  playerSessionId Int          @id @default(autoincrement()) @map("player_session_id")
+  sessionId       Int          @map("session_id")
+  playerId        Int          @map("player_id")
+  player          Player       @relation(fields: [playerId], references: [playerId])
+  playerStats     PlayerStat[]
+  setId           Int          @map("set_id")
+  matchId         Int
+  match           Match        @relation(fields: [matchId], references: [matchId])
+
+  @@map("player_sessions")
+}
+
+// { player_game_stat_id: 1, player_id: 1, game_id: 1, stat_id: 1, value: }
+model PlayerStat {
+  playerStatId    Int           @id @default(autoincrement()) @map("player_stat_id")
+  playerId        Int           @map("player_id")
+  player          Player        @relation(fields: [playerId], references: [playerId])
+  gameId          Int           @map("game_id")
+  game            Game          @relation(fields: [gameId], references: [gameId])
+  gameStat        GameStat      @relation(fields: [statId], references: [statId])
+  statId          Int           @map("stat_id")
+  playerSessionId Int           @map("player_session_id")
+  playerSession   PlayerSession @relation(fields: [playerSessionId], references: [playerSessionId])
+  value           String
+  date            DateTime      @default(now()) // Date video posted
+
+  @@map("player_stats")
 }
