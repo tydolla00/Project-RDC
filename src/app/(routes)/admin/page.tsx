@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getLatestMarioKart8Session } from "../../../../prisma/lib/marioKart";
 import { EnrichedSession } from "../../../../prisma/types/session";
+import EntryCreator from "./_components/EntryCreator";
 
 const getData = () => {
   const data: Submission[] = [
@@ -44,9 +45,8 @@ export default async function Page() {
       </div> */}
 
       <Suspense fallback={<Skelly />}>
-        {getLatestMK8Function && (
-          <DataTable columns={columns} data={[getLatestMK8Function]} />
-        )}
+        {/* <DataTable columns={columns} data={[]} /> */}
+        <EntryCreator />
       </Suspense>
     </div>
   );
