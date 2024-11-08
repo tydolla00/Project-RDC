@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getLatestMarioKart8Session } from "../../../../prisma/lib/marioKart";
 import { EnrichedSession } from "../../../../prisma/types/session";
 import EntryCreator from "./_components/EntryCreator";
+import { getRDCMembers } from "../../../../prisma/lib/admin";
 
 const getData = () => {
   const data: Submission[] = [
@@ -46,7 +47,7 @@ export default async function Page() {
 
       <Suspense fallback={<Skelly />}>
         {/* <DataTable columns={columns} data={[]} /> */}
-        <EntryCreator />
+        <EntryCreator rdcMembers={await getRDCMembers()} />
       </Suspense>
     </div>
   );
