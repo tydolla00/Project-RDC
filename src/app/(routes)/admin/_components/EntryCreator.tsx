@@ -6,13 +6,13 @@ const EntryCreator = () => {
 
   // Create a session
   // Create match
+  const createSession = () => {
+    console.log("Creating Session");
+  };
   return (
     <div>
       <p>This is where the admins of the site will create all entries. </p>
-      <button
-        className="rounded-sm border border-white p-2 hover:bg-gray-600"
-        onClick={() => {}}
-      >
+      <button className="rounded-sm border border-white p-2 hover:bg-gray-600">
         <p>Create Session</p>
         {/* Q: How are we going to get the next session id?  */}
         {}
