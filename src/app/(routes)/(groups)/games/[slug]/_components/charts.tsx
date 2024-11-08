@@ -18,14 +18,12 @@ import {
 } from "@/components/ui/chart";
 import { BarChart, YAxis } from "recharts";
 import { CartesianGrid, XAxis, Bar } from "recharts";
-import { getAveragePlacing } from "../../../../../../../prisma/lib/marioKart";
+import { getPlacings } from "../../../../../../../prisma/lib/marioKart";
 
 export const Chart = ({
   avgPlacing,
 }: {
-  avgPlacing: Awaited<
-    ReturnType<typeof getAveragePlacing>
-  >["avgPlacingPerPlayer"];
+  avgPlacing: Awaited<ReturnType<typeof getPlacings>>["placingPerPlayer"];
 }) => {
   const data = Array.from(avgPlacing, ([key, val]) => ({
     player: key,

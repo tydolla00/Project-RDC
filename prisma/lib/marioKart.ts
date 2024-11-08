@@ -164,7 +164,7 @@ main()
 export const getAllPlayerStats_MK = cache(
   async () =>
     await prisma.playerStat.findMany({
-      where: { gameId: 1, AND: { statId: 1 } },
+      where: { gameId: 1, AND: { statId: 1 } }, // might want to change to use the gameName and statName
       select: {
         game: { select: { gameName: true } },
         gameStat: { select: { statName: true } },
@@ -174,42 +174,55 @@ export const getAllPlayerStats_MK = cache(
     }),
 );
 
-export const getAveragePlacing = async () => {
-  console.log("AVERAGE PLACING RAN");
-  // Fetch from game where game.gameName is mario kart or gameId is 1
-  // and where gameStats.statName === MK8_POS or use statId (more efficient?)
-  // Then loop through and compute average for each player
+type MKPositions = {
+  [K in 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8]?: number;
+} & {
+  avg: number;
+  count: number;
+};
+/**
+ * Fetches the position stat for mario kart and keeps a tally of each player's positions
+ * @returns a promise containing the placings and avg of each player
+ */
+export const getPlacings = async () => {
+  console.log("GET PLACINGS RAN");
 
   // All player stats for the position stat (includes multiple sessions per user)
   const totalPlayerStats = await getAllPlayerStats_MK();
 
-  const avgPlacingPerPlayer = new Map<string, { avg: number; count: number }>();
+  const placingPerPlayer = new Map<string, MKPositions>();
   // Compute total per player
   for (const playerStat of totalPlayerStats) {
-    const avg = Number(playerStat.value);
-    if (!avg) {
+    const pos = Number(playerStat.value);
+    if (!pos) {
       // TODO Log to Posthog/Sentry
       console.log("Not a number");
       continue;
     }
 
-    let player = avgPlacingPerPlayer.get(playerStat.player.playerName);
-    if (!player)
-      avgPlacingPerPlayer.set(playerStat.player.playerName, {
-        avg,
-        count: 1,
+    let player = placingPerPlayer.get(playerStat.player.playerName);
+    if (!player) {
+      placingPerPlayer.set(playerStat.player.playerName, {
+        avg: 0, // Calculate total
+        count: 0,
       });
-    else {
-      player.count += 1;
-      player.avg += avg;
+      player = placingPerPlayer.get(playerStat.player.playerName)!;
     }
+
+    player.count += 1;
+    player.avg += pos; // Calculate total
+    player[pos as keyof typeof player] =
+      pos in player ? player[pos as keyof typeof player]! + 1 : 1;
   }
   // Compute average
-  for (const [key, val] of avgPlacingPerPlayer) {
+  for (const [key, val] of placingPerPlayer) {
     val.avg = Math.round(val.avg / val.count);
   }
 
-  return { avgPlacingPerPlayer, game: totalPlayerStats.at(0)?.game.gameName };
+  return {
+    placingPerPlayer,
+    game: totalPlayerStats.at(0)?.game.gameName,
+  };
 };
 
 export const getMostSets = () => {};
