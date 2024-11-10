@@ -88,7 +88,6 @@ export const SubmissionForm = () => {
       toast("Please submit a valid url.");
       return;
     }
-    if (isTouched && !invalid) toast("Changes saved");
 
     let id = form.getValues().video.split("=")[1];
     const trimEnd = id.indexOf("&");
@@ -96,7 +95,10 @@ export const SubmissionForm = () => {
     if (trimEnd !== -1) id = id.slice(0, trimEnd);
     const video = await getYTVid(id);
     if (!video) {
+      form.reset(undefined, { keepIsValid: true });
+      toast("Please upload a video by RDC Live");
     } else {
+      if (isTouched && !invalid) toast("Changes saved");
       setSession(video);
     }
   };

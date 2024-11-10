@@ -22,6 +22,8 @@ export const getYTVid = async (videoId: string) => {
       `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${config.YOUTUBE_LOCAL_API_KEY}`,
     );
     console.log(YTvideo, videoId);
+    !config.YOUTUBE_LOCAL_API_KEY &&
+      console.log("YOUTUBE API KEY NOT CONFIGURED");
 
     if (!YTvideo.ok) return undefined;
 
