@@ -1,38 +1,31 @@
 import { PlayerSession, PrismaClient } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
 import { cache } from "react";
+import { PlayerSessionWithStats } from "../types/playerSession";
 const prisma = new PrismaClient({ log: ["query"] });
 
 // --- Priorities ---
 
 // Get latest MK8 sessions
-const getLatestMarioKart8Session = async () => {
+export const getLatestMarioKart8Session: () => Promise<
+  any | undefined
+> = async () => {
   try {
-    const latestMK8Session: EnrichedSession | null =
-      await prisma.session.findFirst({
-        where: {
-          gameId: 1,
-        },
-        orderBy: {
-          sessionId: "desc",
-        },
-        include: {
-          sets: {
-            include: {
-              playerSessions: {
-                include: {
-                  player: {
-                    select: {
-                      playerName: true,
-                    },
-                  },
-                  playerStats: true,
-                },
-              },
-            },
+    const latestMK8Session: any | null = await prisma.session.findFirst({
+      where: {
+        gameId: 1,
+      },
+      orderBy: {
+        sessionId: "desc",
+      },
+      include: {
+        sets: {
+          include: {
+            matches: true,
           },
         },
-      });
+      },
+    });
 
     if (latestMK8Session != null) {
       return latestMK8Session;
@@ -48,14 +41,18 @@ const getMarioKart8SetById = async (setId: number) => {
     const mk8Set = await prisma.gameSet.findUnique({
       where: { setId },
       include: {
-        playerSessions: {
+        matches: {
           include: {
-            player: {
-              select: {
-                playerName: true,
+            playerSessions: {
+              include: {
+                player: {
+                  select: {
+                    playerName: true,
+                  },
+                },
+                playerStats: true,
               },
             },
-            playerStats: true,
           },
         },
       },
@@ -75,31 +72,22 @@ async function findWinnerOfSet(setId: number) {
         setId: setId,
       },
       include: {
-        playerSessions: {
+        matches: {
           include: {
-            player: {
-              select: {
-                playerName: true,
+            playerSessions: {
+              include: {
+                player: {
+                  select: {
+                    playerName: true,
+                  },
+                },
+                playerStats: true,
               },
             },
-            playerStats: true,
           },
         },
       },
     });
-
-    // Copilot suggested this - logic doesnt seem sound
-
-    if (mk8Set) {
-      let winner = mk8Set.playerSessions[0];
-      for (const playerSession of mk8Set.playerSessions) {
-        if (playerSession.playerStats[0].value > winner.playerStats[0].value) {
-          winner = playerSession;
-        }
-      }
-
-      console.log(`Winner of Set ${setId}: ${winner.player.playerName}`);
-    }
   } catch (error) {
     console.error("Error Fetching Winner of Set");
   }
@@ -116,11 +104,13 @@ function printPlayerStatsFromSet(
   if (latestMK8Session) {
     for (const set of latestMK8Session.sets) {
       console.log(`--- Set ${set.setId} ---`);
-      for (const playerSession of set.playerSessions) {
-        console.log(`Player: ${playerSession.player.playerName}`);
+      for (const match of set.matches) {
+        for (const playerSession of match.playerSessions as PlayerSessionWithStats[]) {
+          console.log(`Player: ${playerSession.player.playerName}`);
 
-        for (const playerStat of playerSession.playerStats) {
-          console.log(`Stat ID: ${playerStat.statId} ${playerStat.value}`);
+          for (const playerStat of playerSession.playerStats) {
+            console.log(`Stat ID: ${playerStat.statId} ${playerStat.value}`);
+          }
         }
       }
     }
@@ -140,13 +130,11 @@ async function getPlayerRankingsByRace(race: PlayerSession[]) {}
 
 // Get All MK8 sessions (paginated)
 
-// --- Main Function Since Vercel won't let me merge ---
-
 // Testing Purposes Main Function (Comment out when not in use)
 async function main() {
   const latestMK8Session = await getLatestMarioKart8Session();
 
-  findWinnerOfSet(1);
+  // findWinnerOfSet(1);
 }
 
 main()

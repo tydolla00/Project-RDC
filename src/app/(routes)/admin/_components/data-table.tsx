@@ -32,6 +32,7 @@ import {
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { EnrichedSession } from "../../../../../prisma/types/session";
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
@@ -45,7 +46,7 @@ export type Submission = {
   url: string;
 };
 
-export const columns: ColumnDef<Submission>[] = [
+export const columns: ColumnDef<EnrichedSession>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -68,7 +69,7 @@ export const columns: ColumnDef<Submission>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  { accessorKey: "stat", header: "Stat" },
+  { accessorKey: "session", header: "Session" },
   {
     accessorKey: "member",
     header: "Member",
@@ -104,7 +105,7 @@ export const columns: ColumnDef<Submission>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => {
-                navigator.clipboard.writeText(test.val);
+                navigator.clipboard.writeText(test.sessionId.toString());
                 toast("Copied to clipboard");
               }}
             >
