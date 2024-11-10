@@ -3,7 +3,7 @@
 import { PrismaClient } from "@prisma/client";
 import config from "@/lib/config";
 
-export const submitUpdates = (props: any) => {
+export const submitUpdates = async (props: any) => {
   console.log(props);
 };
 

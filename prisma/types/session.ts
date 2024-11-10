@@ -4,14 +4,13 @@ const enrichedSession = Prisma.validator<Prisma.SessionDefaultArgs>()({
   include: {
     sets: {
       include: {
-        playerSessions: {
+        matches: {
           include: {
-            player: {
-              select: {
-                playerName: true,
+            playerSessions: {
+              include: {
+                playerStats: true,
               },
             },
-            playerStats: true,
           },
         },
       },
