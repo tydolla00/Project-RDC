@@ -29,6 +29,8 @@ model Player {
   playerName     String          @map("player_name")
   playerSessions PlayerSession[]
   playerStats    PlayerStat[]
+  matchWins      Match[]         @relation("matchWinner")
+  setWins        GameSet[]       @relation("setWinner")
 
   @@map("players")
 }
@@ -39,6 +41,7 @@ model Game {
   gameName    String       @map("game_name")
   gameStats   GameStat[]
   playerStats PlayerStat[]
+  sessions    Session[]
 
   @@map("games")
 }
@@ -60,6 +63,7 @@ model Session {
   sessionName String    @map("session_name")
   sessionUrl  String    @map("session_url")
   gameId      Int       @map("game_id")
+  Game        Game      @relation(fields: [gameId], references: [gameId])
   sets        GameSet[]
   date        DateTime  @default(now()) // Date video posted
 
@@ -68,10 +72,12 @@ model Session {
 
 // Set Table Concept 
 model GameSet {
-  setId     Int     @id @default(autoincrement()) @map("set_id")
-  sessionId Int     @map("session_id")
-  session   Session @relation(fields: [sessionId], references: [sessionId])
-  matches   Match[]
+  setId          Int             @id @default(autoincrement()) @map("set_id")
+  setWinner      Player[]        @relation("setWinner")
+  sessionId      Int             @map("session_id")
+  session        Session         @relation(fields: [sessionId], references: [sessionId])
+  matches        Match[]
+  playerSessions PlayerSession[]
 
   @@map("sets")
 }
@@ -81,6 +87,8 @@ model Match {
   setId          Int             @map("set_id")
   set            GameSet         @relation(fields: [setId], references: [setId])
   playerSessions PlayerSession[]
+  matchWinner    Player[]        @relation("matchWinner")
+  winnerId       Int             @map("winner_id")
   date           DateTime        @default(now()) // Date video posted
 
   @@map("matches")
@@ -94,6 +102,7 @@ model PlayerSession {
   player          Player       @relation(fields: [playerId], references: [playerId])
   playerStats     PlayerStat[]
   setId           Int          @map("set_id")
+  set             GameSet      @relation(fields: [setId], references: [setId])
   matchId         Int
   match           Match        @relation(fields: [matchId], references: [matchId])
 
