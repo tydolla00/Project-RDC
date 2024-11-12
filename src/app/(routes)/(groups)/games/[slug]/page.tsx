@@ -4,6 +4,7 @@ import { getAveragePlacing } from "../../../../../../prisma/lib/marioKart";
 import { Chart } from "./_components/charts";
 import { getAllGames } from "../../../../../../prisma/lib/games";
 
+// ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,
 
 export async function generateStaticParams() {
