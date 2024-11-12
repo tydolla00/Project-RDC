@@ -2,14 +2,18 @@ import { Prisma } from "@prisma/client";
 
 const enrichedGameSet = Prisma.validator<Prisma.GameSetDefaultArgs>()({
   include: {
-    playerSessions: {
+    matches: {
       include: {
-        player: {
-          select: {
-            playerName: true,
+        playerSessions: {
+          include: {
+            playerStats: true,
+            player: {
+              select: {
+                playerName: true,
+              },
+            },
           },
         },
-        playerStats: true,
       },
     },
   },

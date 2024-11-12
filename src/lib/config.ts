@@ -1,10 +1,14 @@
 interface Config {
+  YOUTUBE_API_KEY: string | undefined;
+  YOUTUBE_LOCAL_API_KEY: string | undefined;
   NEXT_PUBLIC_POSTHOG_KEY: string | undefined;
   NEXT_PUBLIC_POSTHOG_HOST: string | undefined;
 }
 
 const getConfig = (): Config => {
   return {
+    YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY,
+    YOUTUBE_LOCAL_API_KEY: process.env.YOUTUBE_LOCAL_API_KEY,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
   };

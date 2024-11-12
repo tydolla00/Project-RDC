@@ -4,6 +4,8 @@ import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import config from "./config";
 
+import type { JSX } from "react";
+
 if (typeof window !== "undefined") {
   posthog.init(config.NEXT_PUBLIC_POSTHOG_KEY, {
     api_host: config.NEXT_PUBLIC_POSTHOG_HOST,

@@ -14,12 +14,12 @@ datasource db {
 // Project RDC Models   
 // Player Ids      
 // 1. Mark 
-// 2. Aff
+// 2. Dylan
 // 3. Des 
 // 4. Ben
 // 5. Lee
-// 6. Dyl 
-// 7. John 
+// 6. John 
+// 7. Aff 
 // 8. Ippi 
 //////////////////////
 
@@ -46,30 +46,13 @@ model Game {
 // { stat_id: 1, game_id: 1, stat_name: 'mk_first', stat_value: '0', date: 2024-10-23 12:00:00 }
 model GameStat {
   statId      Int          @id @default(autoincrement()) @map("stat_id") // TODO: MAKE ENUM
-  gameId      Int          @map("game_id")
   statName    String       @map("stat_name")
-  date        DateTime     @default(now()) // Date video posted
+  gameId      Int          @map("game_id")
   game        Game         @relation(fields: [gameId], references: [gameId])
   playerStats PlayerStat[]
+  date        DateTime     @default(now()) // Date video posted
 
   @@map("game_stats")
-}
-
-// { player_game_stat_id: 1, player_id: 1, game_id: 1, stat_id: 1, value: }
-model PlayerStat {
-  playerStatId    Int           @id @default(autoincrement()) @map("player_stat_id")
-  playerId        Int           @map("player_id")
-  player          Player        @relation(fields: [playerId], references: [playerId])
-  gameId          Int           @map("game_id")
-  game            Game          @relation(fields: [gameId], references: [gameId])
-  gameStat        GameStat      @relation(fields: [statId], references: [statId])
-  statId          Int           @map("stat_id")
-  playerSessionId Int           @map("player_session_id")
-  playerSession   PlayerSession @relation(fields: [playerSessionId], references: [playerSessionId])
-  value           String
-  date            DateTime      @default(now()) // Date video posted
-
-  @@map("player_stats")
 }
 
 model Session {
@@ -83,6 +66,26 @@ model Session {
   @@map("sessions")
 }
 
+// Set Table Concept 
+model GameSet {
+  setId     Int     @id @default(autoincrement()) @map("set_id")
+  sessionId Int     @map("session_id")
+  session   Session @relation(fields: [sessionId], references: [sessionId])
+  matches   Match[]
+
+  @@map("sets")
+}
+
+model Match {
+  matchId        Int             @id @default(autoincrement()) @map("match_id")
+  setId          Int             @map("set_id")
+  set            GameSet         @relation(fields: [setId], references: [setId])
+  playerSessions PlayerSession[]
+  date           DateTime        @default(now()) // Date video posted
+
+  @@map("matches")
+}
+
 // Join Table between Session & Player
 model PlayerSession {
   playerSessionId Int          @id @default(autoincrement()) @map("player_session_id")
@@ -91,15 +94,25 @@ model PlayerSession {
   player          Player       @relation(fields: [playerId], references: [playerId])
   playerStats     PlayerStat[]
   setId           Int          @map("set_id")
-  set             GameSet      @relation(fields: [setId], references: [setId])
+  matchId         Int
+  match           Match        @relation(fields: [matchId], references: [matchId])
 
   @@map("player_sessions")
 }
 
-// Set Table Concept 
-model GameSet {
-  setId          Int             @id @default(autoincrement()) @map("set_id")
-  sessionId      Int             @map("session_id")
-  session        Session         @relation(fields: [sessionId], references: [sessionId])
-  playerSessions PlayerSession[]
+// { player_game_stat_id: 1, player_id: 1, game_id: 1, stat_id: 1, value: }
+model PlayerStat {
+  playerStatId    Int           @id @default(autoincrement()) @map("player_stat_id")
+  playerId        Int           @map("player_id")
+  player          Player        @relation(fields: [playerId], references: [playerId])
+  gameId          Int           @map("game_id")
+  game            Game          @relation(fields: [gameId], references: [gameId])
+  statId          Int           @map("stat_id")
+  gameStat        GameStat      @relation(fields: [statId], references: [statId])
+  playerSessionId Int           @map("player_session_id")
+  playerSession   PlayerSession @relation(fields: [playerSessionId], references: [playerSessionId])
+  value           String
+  date            DateTime      @default(now()) // Date video posted
+
+  @@map("player_stats")
 }
