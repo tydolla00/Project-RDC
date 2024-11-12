@@ -1,117 +1,97 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PlayerSelector from "./PlayerSelector";
-import { getRDCMembers } from "../../../../../prisma/lib/admin";
-import { GameSet, Match, Player, Session } from "@prisma/client";
-import { EnrichedSession } from "../../../../../prisma/types/session";
+import { Match, Player } from "@prisma/client";
 import { EnrichedGameSet } from "../../../../../prisma/types/gameSet";
+import useAdminFormCreator from "@/lib/hooks/useAdminFormCreator";
+import MatchForm from "../../submission/_components/MatchForm";
+import * as Separator from "@radix-ui/react-separator";
 
 interface Props {
   rdcMembers: Player[];
 }
 
 const EntryCreator = ({ rdcMembers }: Props) => {
-  const [sessions, setSession] = useState<any[]>([]);
-  const [matches, setMatch] = useState<any[]>([]);
+  const {
+    session,
+    isInCreationFlow,
+    createSession,
+    addSetToSession,
+    addMatchToSet,
+  } = useAdminFormCreator();
 
   const [selectedPlayers, setSelectedPlayers] = useState<number[] | null>(null);
 
-  /**
-   * Click start new session -- > getLatestSessionId + 1
-   * populate sessionObject and assign Id, then create session form
-   * Custom Hook?
-   */
+  const [sessionIdCounter, setSessionIdCounter] = useState(0);
 
-  // Create a session
-  const createSession = () => {
-    console.log("Creating Session");
-    const newSession: EnrichedSession = {
-      sessionId: 0,
-      sessionName: "",
-      sessionUrl: "",
-      gameId: 0,
-      date: new Date(),
-      sets: [],
-    };
-    setSession([...sessions, newSession]);
+  // Should be called something like getLatestSessionId and be in hook?
+  // Should get latest session id from db
+  const getNextSessionId = () => {
+    setSessionIdCounter((prevId) => prevId + 1);
+    return sessionIdCounter;
   };
 
-  const addSetToSession = (sessionIndex: number) => {
-    console.log("Creating Set");
-    const newSet: GameSet = {
-      setId: 0,
-      sessionId: 0,
-    };
-
-    const updatedSessions = sessions.map((session, index) => {
-      if (index === sessionIndex) {
-        return {
-          ...session,
-          sets: [...(session.sets || []), newSet],
-        };
-      }
-      return session;
-    });
-    setSession(updatedSessions);
-  };
-
-  // Create match
-  const addMatchToSet = (setId: number) => {
-    console.log(`Creating Match for Set ${setId}`);
-    const newMatch = {};
-    const updatedSessions = sessions.map((session, index) => {
-      if (index === setId) {
-        return {
-          ...session,
-          matches: [...(session.matches || []), newMatch],
-        };
-      }
-      return session;
-    });
-    setSession(updatedSessions);
-  };
+  console.log("New Session", session);
 
   return (
     <div className="flex flex-col">
-      <h2 className="text-lg font-bold underline">Entry Creator</h2>
-      <p>This is where the admins of the site will create all entries. </p>
+      <h2 className="text-2xl font-bold underline">Entry Creator</h2>
+      <p className="text-md m-2">
+        This is where the admins of the site will create all entries to be
+        submitted to the database.{" "}
+      </p>
       <button
         className="w-52 rounded-sm border border-white p-2 hover:bg-gray-600"
         onClick={createSession}
       >
-        <p>Create Session</p>
+        Start New Session
         {/* Q: How are we going to get the next session id?  */}
       </button>
-      {sessions.map((session: EnrichedSession, sessionId: number) => (
+      {isInCreationFlow && (
         <div
           className="flex flex-col"
-          id={`session-${sessionId}-container`}
-          key={sessionId}
+          id={`session-${session.sessionId}-container`}
+          key={session.sessionId}
         >
-          <p>Session {sessionId}</p>
+          <p className="my-2 text-xl">Session {session.sessionId}</p>
           {/* Session Info */}
           <div
-            className="flex flex-row justify-around"
-            id={`session-${sessionId}-info`}
+            className="flex flex-row items-center justify-around"
+            id={`session-${session.sessionId}-info`}
           >
             {/* URL */}
-            <input type="text" placeholder="URL" className="w-80 border p-2" />
-            {/* Video Name */}
-            <input
-              type="text"
-              placeholder="Video Name"
-              className="w-80 border p-2"
-            />
+            <div className="flex flex-col items-center">
+              <label className="">Session URL</label>
+              <input
+                type="text"
+                placeholder="URL"
+                className="w-80 border p-2"
+              />
+            </div>
+
+            {/* Video Title */}
+            <div className="flex flex-col items-center">
+              <label className="">Video Title</label>
+
+              <input
+                type="text"
+                placeholder="Video Title"
+                className="w-80 border p-2"
+              />
+            </div>
             {/* Game Dropdown */}
-            <select className="w-40 border p-2">
-              <option value="" disabled>
-                Select Video Game
-              </option>
-              {/* TODO: Get These Dynamically */}
-              <option value="game1">Mario Kart</option>
-              <option value="game2">Call of Duty</option>
-              <option value="game3">Gang Beasts</option>
-            </select>
+            <div className="flex flex-col items-center">
+              <label className="">Game</label>
+              <select className="w-40 border p-2">
+                <option value="" disabled>
+                  Select Video Game
+                </option>
+                {/* TODO: Get These Dynamically */}
+                <option value="game1">Mario Kart</option>
+                <option value="game2">Call of Duty</option>
+                <option value="game3">Gang Beasts</option>
+              </select>
+            </div>
 
             {/* Players */}
             <PlayerSelector
@@ -124,16 +104,19 @@ const EntryCreator = ({ rdcMembers }: Props) => {
           {session.sets &&
             session.sets.map((set: EnrichedGameSet, setId: number) => (
               <div
-                className="m-2 flex flex-row justify-start"
-                id={`session-${sessionId}-set-${setId}-info`}
+                className="m-2 flex flex-col justify-start"
+                id={`session-${session.sessionId}-set-${setId}-info`}
                 key={setId}
               >
-                {/* URL */}
-                <input
-                  type="text"
-                  placeholder="setId"
-                  className="w-80 border p-2"
-                />
+                {/* Set Id Container*/}
+                <div className="flex items-center p-2">
+                  <p className="m-2 text-lg">Set {setId}</p>
+                  <input
+                    type="text"
+                    placeholder="setId"
+                    className="w-80 border p-2"
+                  />
+                </div>
                 <button
                   className="w-52 rounded-sm border border-white p-2 hover:bg-gray-600"
                   onClick={() => addMatchToSet(setId)}
@@ -145,31 +128,23 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                 {/* Match might need to be custom type to give access to relations */}
                 {set.matches &&
                   set.matches.map((match: Match, matchId: number) => (
-                    <div
-                      className="flex flex-row justify-around"
-                      id={`session-${sessionId}-set-${setId}-match-${matchId}-info`}
+                    <MatchForm
                       key={matchId}
-                    >
-                      {/* URL */}
-                      <input
-                        type="text"
-                        placeholder="matchId"
-                        className="w-80 border p-2"
-                      />
-                    </div>
+                      players={selectedPlayers}
+                    ></MatchForm>
                   ))}
               </div>
             ))}
           {/* Set Btn */}
           <button
-            className="w-52 rounded-sm border border-white p-2 hover:bg-gray-600"
-            onClick={() => addSetToSession(sessionId)}
+            className="m-2 w-56 rounded-sm border border-white p-2 hover:bg-gray-600"
+            onClick={() => addSetToSession(getNextSessionId())}
           >
             {" "}
-            Start New Set
+            Add Set to Session {session.sessionId}
           </button>
         </div>
-      ))}
+      )}
     </div>
   );
 };

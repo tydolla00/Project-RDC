@@ -30,7 +30,7 @@ export const getLatestMarioKart8Session: () => Promise<
       return latestMK8Session;
     }
   } catch (error) {
-    console.error("Error Fetching Latest Mario Kart Session");
+    console.error("Error Fetching Latest Mario Kart Session, ${error}");
   }
 };
 
