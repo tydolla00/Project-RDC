@@ -6,7 +6,7 @@ import { PlayerSessionWithStats } from "../types/playerSession";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log(await getLatestMarioKartSession());
+  console.log(await getAllTimeMKRankings());
 }
 
 /// Fetched Enriched Mario Kart Session
@@ -63,6 +63,23 @@ async function showSetResults(mkSet: EnrichedGameSet) {
       );
     }
   }
+}
+
+async function getAllTimeMKRankings() {
+  const playerStats = await prisma.playerStat.findMany({
+    where: {
+      gameId: 1,
+      statId: 1,
+    },
+    include: {
+      player: true,
+      game: true,
+      gameStat: true,
+      playerSession: true,
+    },
+  });
+
+  console.log("Player Stats", playerStats);
 }
 
 // async function showSetStatsByPlayerByRace(mkSession: EnrichedSession[]) {
