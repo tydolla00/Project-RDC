@@ -29,6 +29,8 @@ model Player {
   playerName     String          @map("player_name")
   playerSessions PlayerSession[]
   playerStats    PlayerStat[]
+  matchWins      Match[]
+  setWins        GameSet[]
 
   @@map("players")
 }
@@ -39,6 +41,7 @@ model Game {
   gameName    String       @map("game_name")
   gameStats   GameStat[]
   playerStats PlayerStat[]
+  sessions    Session[]
 
   @@map("games")
 }
@@ -60,6 +63,7 @@ model Session {
   sessionName String    @map("session_name")
   sessionUrl  String    @map("session_url")
   gameId      Int       @map("game_id")
+  Game        Game      @relation(fields: [gameId], references: [gameId])
   sets        GameSet[]
   date        DateTime  @default(now()) // Date video posted
 
@@ -68,19 +72,22 @@ model Session {
 
 // Set Table Concept 
 model GameSet {
-  setId     Int     @id @default(autoincrement()) @map("set_id")
-  sessionId Int     @map("session_id")
-  session   Session @relation(fields: [sessionId], references: [sessionId])
-  matches   Match[]
+  setId          Int             @id @default(autoincrement()) @map("set_id")
+  playerSessions PlayerSession[]
+  matches        Match[]
+  sessionId      Int             @map("session_id")
+  session        Session         @relation(fields: [sessionId], references: [sessionId])
+  setWinner      Player[]
 
   @@map("sets")
 }
 
 model Match {
   matchId        Int             @id @default(autoincrement()) @map("match_id")
+  matchWinner    Player[]
+  playerSessions PlayerSession[]
   setId          Int             @map("set_id")
   set            GameSet         @relation(fields: [setId], references: [setId])
-  playerSessions PlayerSession[]
   date           DateTime        @default(now()) // Date video posted
 
   @@map("matches")
@@ -89,13 +96,14 @@ model Match {
 // Join Table between Session & Player
 model PlayerSession {
   playerSessionId Int          @id @default(autoincrement()) @map("player_session_id")
-  sessionId       Int          @map("session_id")
   playerId        Int          @map("player_id")
   player          Player       @relation(fields: [playerId], references: [playerId])
   playerStats     PlayerStat[]
-  setId           Int          @map("set_id")
-  matchId         Int
+  sessionId       Int          @map("session_id")
+  matchId         Int          @map("match_id")
   match           Match        @relation(fields: [matchId], references: [matchId])
+  setId           Int          @map("set_id")
+  set             GameSet      @relation(fields: [setId], references: [setId])
 
   @@map("player_sessions")
 }
@@ -107,10 +115,10 @@ model PlayerStat {
   player          Player        @relation(fields: [playerId], references: [playerId])
   gameId          Int           @map("game_id")
   game            Game          @relation(fields: [gameId], references: [gameId])
-  statId          Int           @map("stat_id")
-  gameStat        GameStat      @relation(fields: [statId], references: [statId])
   playerSessionId Int           @map("player_session_id")
   playerSession   PlayerSession @relation(fields: [playerSessionId], references: [playerSessionId])
+  statId          Int           @map("stat_id")
+  gameStat        GameStat      @relation(fields: [statId], references: [statId])
   value           String
   date            DateTime      @default(now()) // Date video posted
 
