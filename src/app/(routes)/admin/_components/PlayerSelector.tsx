@@ -1,5 +1,6 @@
 import { Player } from "@prisma/client";
-import React, { useState } from "react";
+import * as Avatar from "@radix-ui/react-avatar";
+import React from "react";
 interface Props {
   rdcMembers: Player[];
   selectedPlayers: number[] | null;
@@ -25,30 +26,23 @@ const PlayerSelector = ({
   return (
     <div className="flex flex-col items-center" id="player-selector-container">
       <div className="text-lg">Player Selector</div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-around",
-          marginTop: "10px",
-        }}
-      >
+      <div className="mt-2 flex">
         {rdcMembers.map((player, index) => (
-          <div
-            className="mx-1 flex items-center justify-center"
-            key={index}
-            onClick={() => handlePlayerClick(index + 1)}
-            style={{
-              width: "30px",
-              height: "30px",
-              borderRadius: "50%",
-              backgroundColor: selectedPlayers?.includes(index + 1)
-                ? "blue"
-                : "gray",
-              cursor: "pointer",
-            }}
-          >
-            {player.playerName.slice(0, 2)}
-          </div>
+          <>
+            <Avatar.Root
+              className={`m-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full ${
+                selectedPlayers?.includes(player.playerId)
+                  ? "bg-blue-500"
+                  : "bg-slate-400"
+              }`}
+              onClick={() => handlePlayerClick(player.playerId)}
+              key={index}
+            >
+              <Avatar.Fallback className="AvatarFallback" delayMs={600}>
+                {player.playerName.slice(0, 2)}
+              </Avatar.Fallback>
+            </Avatar.Root>
+          </>
         ))}
       </div>
     </div>

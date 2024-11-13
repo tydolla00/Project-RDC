@@ -6,6 +6,7 @@ import { EnrichedGameSet } from "../../../../../prisma/types/gameSet";
 import useAdminFormCreator from "@/lib/hooks/useAdminFormCreator";
 import MatchForm from "../../submission/_components/MatchForm";
 import * as Separator from "@radix-ui/react-separator";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 interface Props {
   rdcMembers: Player[];
@@ -33,6 +34,33 @@ const EntryCreator = ({ rdcMembers }: Props) => {
 
   console.log("New Session", session);
 
+  const videoGameDropdown = (
+    <div className="flex flex-col items-center">
+      <label className="">Game</label>
+      <select className="w-40 border p-2">
+        <option value="" disabled>
+          Select Video Game
+        </option>
+        {/* TODO: Get These Dynamically */}
+        <option value="game1">Mario Kart</option>
+        <option value="game2">Call of Duty</option>
+        <option value="game3">Gang Beasts</option>
+      </select>
+    </div>
+  );
+
+  const videoGameDropdown2 = (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button className="w-40 border p-2">Select Video Game</button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.Item>Game 1</DropdownMenu.Item>
+        <DropdownMenu.Item>Game 2</DropdownMenu.Item>
+        <DropdownMenu.Item>Game 3</DropdownMenu.Item>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+  );
   return (
     <div className="flex flex-col">
       <h2 className="text-2xl font-bold underline">Entry Creator</h2>
@@ -80,18 +108,7 @@ const EntryCreator = ({ rdcMembers }: Props) => {
               />
             </div>
             {/* Game Dropdown */}
-            <div className="flex flex-col items-center">
-              <label className="">Game</label>
-              <select className="w-40 border p-2">
-                <option value="" disabled>
-                  Select Video Game
-                </option>
-                {/* TODO: Get These Dynamically */}
-                <option value="game1">Mario Kart</option>
-                <option value="game2">Call of Duty</option>
-                <option value="game3">Gang Beasts</option>
-              </select>
-            </div>
+            {videoGameDropdown2}
 
             {/* Players */}
             <PlayerSelector
@@ -109,21 +126,24 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                 key={setId}
               >
                 {/* Set Id Container*/}
-                <div className="flex items-center p-2">
-                  <p className="m-2 text-lg">Set {setId}</p>
-                  <input
-                    type="text"
-                    placeholder="setId"
-                    className="w-80 border p-2"
-                  />
+                <div className="flex items-center justify-between p-2">
+                  <div className="flex items-center">
+                    <p className="m-2 text-lg">Set {setId}</p>
+                    <input
+                      type="text"
+                      placeholder="setId"
+                      className="w-16 border p-2"
+                    />
+                  </div>
+                  <button
+                    className="mr-0 w-52 rounded-sm border border-white p-2 hover:bg-gray-600"
+                    onClick={() => addMatchToSet(setId)}
+                  >
+                    {" "}
+                    Add match to Set {setId}
+                  </button>
                 </div>
-                <button
-                  className="w-52 rounded-sm border border-white p-2 hover:bg-gray-600"
-                  onClick={() => addMatchToSet(setId)}
-                >
-                  {" "}
-                  Add match to set {setId}
-                </button>
+                <Separator.Root className="m-2 h-[1px] w-full bg-slate-800"></Separator.Root>
 
                 {/* Match might need to be custom type to give access to relations */}
                 {set.matches &&
