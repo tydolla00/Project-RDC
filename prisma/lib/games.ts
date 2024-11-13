@@ -36,10 +36,23 @@ export const getDaysPerPlayer = unstable_cache(
 
 // I want to get the video where the game is MK8 and the gameStat is MK_POS and include the matches so I can calculate the winsPerPlayer
 export const getWinsPerPlayer = unstable_cache(
-  async (gameId: number, statName: StatNames) =>
-    await prisma.playerStat.findMany({
-      where: { gameId, AND: { gameStat: { statName } } },
-      select: { value: true, player: true },
+  async (gameId: number) =>
+    await prisma.game.findFirst({
+      where: { gameId },
+      select: {
+        sessions: {
+          select: {
+            sessionName: true,
+            sessionUrl: true,
+            sets: {
+              select: {
+                matches: { select: { matchWinner: true } },
+                setWinner: true,
+              },
+            },
+          },
+        },
+      },
     }),
   undefined,
   { tags: ["getWinsPerPlayer"] },
