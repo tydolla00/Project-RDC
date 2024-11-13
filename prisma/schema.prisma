@@ -100,7 +100,7 @@ model PlayerSession {
   player          Player       @relation(fields: [playerId], references: [playerId])
   playerStats     PlayerStat[]
   sessionId       Int          @map("session_id")
-  matchId         Int
+  matchId         Int          @map("match_id")
   match           Match        @relation(fields: [matchId], references: [matchId])
   setId           Int          @map("set_id")
   set             GameSet      @relation(fields: [setId], references: [setId])
