@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import PlayerSelector from "./PlayerSelector";
-import { Match, Player } from "@prisma/client";
+import { Game, Match, Player } from "@prisma/client";
 import { EnrichedGameSet } from "../../../../../prisma/types/gameSet";
 import useAdminFormCreator from "@/lib/hooks/useAdminFormCreator";
 import MatchForm from "../../submission/_components/MatchForm";
@@ -21,8 +21,8 @@ const EntryCreator = ({ rdcMembers }: Props) => {
     addMatchToSet,
   } = useAdminFormCreator();
 
-  const [selectedPlayers, setSelectedPlayers] = useState<number[] | null>(null);
-
+  const [selectedPlayers, setSelectedPlayers] = useState<Player[] | null>(null);
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [sessionIdCounter, setSessionIdCounter] = useState(0);
 
   // Should be called something like getLatestSessionId and be in hook?
@@ -32,32 +32,38 @@ const EntryCreator = ({ rdcMembers }: Props) => {
     return sessionIdCounter;
   };
 
-  console.log("New Session", session);
-
-  const videoGameDropdown = (
-    <div className="flex flex-col items-center">
-      <label className="">Game</label>
-      <select className="w-40 border p-2">
-        <option value="" disabled>
-          Select Video Game
-        </option>
-        {/* TODO: Get These Dynamically */}
-        <option value="game1">Mario Kart</option>
-        <option value="game2">Call of Duty</option>
-        <option value="game3">Gang Beasts</option>
-      </select>
-    </div>
-  );
+  const testGames: Game[] = [
+    {
+      gameId: 1,
+      gameName: "Mario Kart",
+    },
+    {
+      gameId: 2,
+      gameName: "Call of Duty",
+    },
+    {
+      gameId: 3,
+      gameName: "Gang Beasts",
+    },
+  ];
 
   const videoGameDropdown2 = (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button className="w-40 border p-2">Select Video Game</button>
+        <button className="w-40 rounded-sm border p-2">
+          {selectedGame ? selectedGame.gameName : "Select Game"}
+        </button>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <DropdownMenu.Item>Game 1</DropdownMenu.Item>
-        <DropdownMenu.Item>Game 2</DropdownMenu.Item>
-        <DropdownMenu.Item>Game 3</DropdownMenu.Item>
+      <DropdownMenu.Content className="flex min-w-52 flex-col rounded-lg p-1.5 shadow-lg shadow-black transition duration-500 ease-in-out">
+        {testGames.map((game, index) => (
+          <DropdownMenu.Item
+            key={index}
+            className="w-full cursor-pointer rounded-lg p-2 text-center hover:bg-gray-600"
+            onSelect={() => setSelectedGame(game)}
+          >
+            {game.gameName}
+          </DropdownMenu.Item>
+        ))}
       </DropdownMenu.Content>
     </DropdownMenu.Root>
   );
@@ -96,7 +102,6 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                 className="w-80 border p-2"
               />
             </div>
-
             {/* Video Title */}
             <div className="flex flex-col items-center">
               <label className="">Video Title</label>
@@ -108,8 +113,11 @@ const EntryCreator = ({ rdcMembers }: Props) => {
               />
             </div>
             {/* Game Dropdown */}
-            {videoGameDropdown2}
+            <div className="flex flex-col items-center">
+              <label className="">Game</label>
 
+              {videoGameDropdown2}
+            </div>
             {/* Players */}
             <PlayerSelector
               rdcMembers={rdcMembers}
@@ -153,6 +161,20 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                       players={selectedPlayers}
                     ></MatchForm>
                   ))}
+
+                {/* Set Winner */}
+                <div className="flex flex-col items-center">
+                  <p className="text-2xl">Set Winner</p>
+                  <PlayerSelector
+                    rdcMembers={selectedPlayers ?? []}
+                    selectedPlayers={null}
+                    setSelectedPlayers={function (
+                      value: React.SetStateAction<
+                        { playerId: number; playerName: string }[] | null
+                      >,
+                    ): void {}}
+                  ></PlayerSelector>
+                </div>
               </div>
             ))}
           {/* Set Btn */}

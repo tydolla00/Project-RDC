@@ -1,32 +1,28 @@
-import { GameStat } from "@prisma/client";
+import { GameStat, Player } from "@prisma/client";
 import React from "react";
-
-interface Stat {
-  name: string;
-  value: string | number;
-}
+import PlayerAvatar from "../../admin/_components/PlayerAvatar";
 
 interface PlayerStatFormProps {
+  player: Player;
   stats: GameStat[];
 }
 
-const PlayerStatForm: React.FC<PlayerStatFormProps> = ({ stats }) => {
+const PlayerStatForm: React.FC<PlayerStatFormProps> = ({ player, stats }) => {
   return (
-    <form>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        {stats.map((stat, index) => (
-          <div key={index} className="mx-2">
-            <label className="block">{stat.statName}</label>
-            <input
-              type={typeof stat.type === "number" ? "number" : "text"}
-              value={""}
-              readOnly
-              className="rounded border px-2 py-1"
-            />
-          </div>
-        ))}
-      </div>
-    </form>
+    <div className="flex flex-row items-center">
+      <PlayerAvatar player={player} />
+      {stats.map((stat, index) => (
+        <div key={index} className="mx-2 flex flex-row items-center">
+          <label className="block">{stat.statName}</label>
+          <input
+            type={typeof stat.type === "number" ? "number" : "text"}
+            value={""}
+            readOnly
+            className="rounded border px-2 py-1"
+          />
+        </div>
+      ))}
+    </div>
   );
 };
 

@@ -18,7 +18,7 @@ import { Player } from "@prisma/client";
 
 // Need to get the game from Entry Creator/ Admin Form Hook
 interface Props {
-  players: any; // Define the type of players according to your needs
+  players: Player[] | null; // Define the type of players according to your needs
 }
 
 const MatchForm: React.FC<Props> = ({ players }) => {
@@ -42,6 +42,7 @@ const MatchForm: React.FC<Props> = ({ players }) => {
         {players?.map((player: Player, index: number) => (
           <PlayerStatForm
             key={index}
+            player={player}
             stats={[
               {
                 statName: "MK_POS",

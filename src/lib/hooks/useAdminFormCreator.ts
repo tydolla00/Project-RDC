@@ -68,6 +68,10 @@ const useAdminFormCreator = () => {
     });
   };
 
+  const updateSetWiners = (setId: number) => {
+    // Should take in a set ID and update the winner array
+  };
+
   /* Whenever a match is created we need to add playerSessions
    *based on the selected players and populate playerSession with appropriate stats based on game
    */
