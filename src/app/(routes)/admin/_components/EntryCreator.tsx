@@ -118,12 +118,16 @@ const EntryCreator = ({ rdcMembers }: Props) => {
 
               {videoGameDropdown2}
             </div>
-            {/* Players */}
-            <PlayerSelector
-              rdcMembers={rdcMembers}
-              selectedPlayers={selectedPlayers}
-              setSelectedPlayers={setSelectedPlayers}
-            />
+            {/* Player Selector */}
+            <div className="flex flex-col items-center">
+              <label className="">Player Selector </label>
+
+              <PlayerSelector
+                rdcMembers={rdcMembers}
+                selectedPlayers={selectedPlayers}
+                setSelectedPlayers={setSelectedPlayers}
+              />
+            </div>
           </div>
           {/* Set Info */}
           {session.sets &&

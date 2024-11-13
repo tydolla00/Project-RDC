@@ -26,8 +26,10 @@ const PlayerSelector = ({
   };
 
   return (
-    <div className="flex flex-col items-center" id="player-selector-container">
-      <div className="text-lg underline">Player Selector</div>
+    <div
+      className="flex flex-col items-center rounded-md border p-4"
+      id="player-selector-container"
+    >
       {rdcMembers.length !== 0 ? (
         <div className="mt-2 flex">
           {rdcMembers.map((player, index) => (
@@ -44,7 +46,7 @@ const PlayerSelector = ({
           ))}
         </div>
       ) : (
-        <div className="text-md">No Players in this context</div>
+        <div className="text-md">No Players in this context!</div>
       )}
     </div>
   );
