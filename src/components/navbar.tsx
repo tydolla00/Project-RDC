@@ -21,12 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 export const Navbar = () => {
-  const links = [
-    { text: "Home", ref: "" },
-    { text: "About", ref: "about" },
-  ];
-
   const games: { desc?: string; url: string; name: string }[] = [
     {
       desc: "Stats from the most intense 3v3 battles.",
@@ -60,31 +56,57 @@ export const Navbar = () => {
   ];
 
   const members = [
-    { alt: "RDC Mark", name: "Cash Money Mawk", url: "/members/mark" },
-    { alt: "RDC Leland", name: "Meland", url: "/members/leland" },
-    { alt: "RDC Des", name: "Big Booty Des", url: "/members/des" },
-    { alt: "RDC Ben", name: "LaBen James", url: "/members/ben" },
-    { alt: "Ippi", name: "Iceman Ip", url: "/members/ippi" },
-    { alt: "RDC John", name: "John", url: "/members/john" },
-    { alt: "RDC Aff", name: "Aff", url: "/members/aff" },
-    { alt: "", name: "Browse all members", url: "/members" },
+    {
+      alt: "RDC Mark",
+      name: "Cash Money Mawk",
+      url: "/members/mark",
+      src: "https://static.wikia.nocookie.net/rdcworld1/images/f/f2/Mark-Phillips.jpg/revision/latest/thumbnail/width/360/height/450?cb=20191004005953",
+    },
+    {
+      alt: "RDC Leland",
+      name: "Meland",
+      url: "/members/leland",
+      src: "https://static.wikia.nocookie.net/rdcworld1/images/e/ee/Leland-manigo-image.jpg/revision/latest?cb=20240119040253",
+    },
+    {
+      alt: "RDC Des",
+      name: "Big Booty Des",
+      url: "/members/des",
+      src: "https://static.wikia.nocookie.net/rdcworld1/images/6/62/Desmond-johnson-4.jpg/revision/latest?cb=20191004011638",
+    },
+    {
+      alt: "RDC Ben",
+      name: "LaBen James",
+      url: "/members/ben",
+      src: "https://static.wikia.nocookie.net/rdcworld1/images/0/0a/Ben.jpg/revision/latest?cb=20240119050707",
+    },
+    { alt: "Ippi", name: "Iceman Ip", url: "/members/ippi", src: "" },
+    { alt: "RDC John", name: "John", url: "/members/john", src: "" },
+    {
+      alt: "RDC Aff",
+      name: "Aff",
+      url: "/members/aff",
+      src: "https://static.wikia.nocookie.net/rdcworld1/images/f/f7/DtlKwRJW4AI3qrN_Aff.jpg/revision/latest?cb=20191004012842",
+    },
+    { alt: "", name: "Browse all members", url: "/members", src: "" },
   ];
-
   const signedIn = false;
 
   return (
     <NavigationMenu className="sticky top-0 mx-auto">
       <NavigationMenuList>
-        {links.map(({ text, ref }, i) => (
-          <NavigationMenuItem
-            className={navigationMenuTriggerStyle()}
-            key={ref}
-          >
-            <Link href={`/${ref}`}>
-              <FillText className="text-chart-4" text={text} />
-            </Link>
-          </NavigationMenuItem>
-        ))}
+        <NavigationMenuItem className={navigationMenuTriggerStyle()}>
+          <Link href="/">
+            <FillText text="Home" className="text-chart-4" />
+          </Link>
+        </NavigationMenuItem>
+        <NavigationMenuItem
+          className={cn(navigationMenuTriggerStyle(), "hidden md:block")}
+        >
+          <Link href="/about">
+            <FillText text="About" className="text-chart-4" />
+          </Link>
+        </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuTrigger>
             <FillText className="text-chart-4" text="Games" />
@@ -114,21 +136,21 @@ export const Navbar = () => {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
+        <NavigationMenuItem className="hidden md:block">
           {process.env.NODE_ENV === "development" && (
             <Link className={navigationMenuTriggerStyle()} href="/admin">
               <FillText className="text-chart-4" text="Admin" />
             </Link>
           )}
         </NavigationMenuItem>
-        <NavigationMenuItem>
+        <NavigationMenuItem className="hidden md:block">
           {process.env.NODE_ENV === "development" && (
             <Link className={navigationMenuTriggerStyle()} href="/submission">
               <FillText className="text-chart-4" text="Submissions" />
             </Link>
           )}
         </NavigationMenuItem>
-        <NavigationMenuItem>
+        <NavigationMenuItem className="hidden md:block">
           {process.env.NODE_ENV === "development" ? (
             signedIn ? (
               <TooltipProvider>
@@ -149,8 +171,22 @@ export const Navbar = () => {
             )
           ) : null}
         </NavigationMenuItem>
-        <NavigationMenuItem>
+        <NavigationMenuItem className="hidden md:block">
           <ModeToggle />
+        </NavigationMenuItem>
+        <NavigationMenuItem className="md:hidden">
+          <NavigationMenuTrigger>
+            <HamburgerMenuIcon />
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul>
+              <ListItem href="/about">About</ListItem>
+              <ListItem href="/admin">Admin</ListItem>
+              <ListItem href="/signin">Sign In</ListItem>
+              <ListItem href="/submission">Submissions</ListItem>
+              <ModeToggle />
+            </ul>
+          </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>

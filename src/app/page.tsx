@@ -31,9 +31,9 @@ export default function Home() {
           style={{ transitionDuration: "2000ms" }}
           className="grid grid-cols-2"
         >
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <H1>RDC Stat Tracker</H1>
-            <p className="w-3/4 leading-7 text-muted-foreground">
+            <p className="leading-7 text-muted-foreground md:w-3/4">
               This site is dedicated to tracking and celebrating the gaming
               stats and achievements of RDC (Real Dreams Change the World). As a
               fan of their incredible teamwork and drive, I created this space
