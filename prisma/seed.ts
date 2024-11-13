@@ -20,10 +20,10 @@ async function main() {
   // Seed 1st set
   await seedSet(1, 1);
   // Simulate Race (Seed Match, PlayerSessions, PlayerStats)
-  simulateRace(1, 1, set1Results[0]);
-  simulateRace(1, 1, set1Results[1]);
-  simulateRace(1, 1, set1Results[2]);
-  simulateRace(1, 1, set1Results[3]);
+  await simulateRace(1, 1, set1Results[0]);
+  await simulateRace(1, 2, set1Results[1]);
+  await simulateRace(1, 3, set1Results[2]);
+  await simulateRace(1, 4, set1Results[3]);
 
   // // Seed 2nd set
   // await seedSet(2, 1);
@@ -153,7 +153,6 @@ async function seedGames() {
           {
             statId: 1,
             statName: "MK8_POS",
-            date: new Date(),
           },
         ],
       },
@@ -196,19 +195,6 @@ async function seedSet(setId: number, sessionId: number = 1) {
   console.log(`Seeded Set ${setId} Successfully.\n`);
 }
 
-async function seedMatch(matchId: number, setId: number) {
-  const marioKartMatch = await prisma.match.upsert({
-    where: { matchId: matchId },
-    update: {},
-    create: {
-      matchId: matchId,
-      setId: setId,
-    },
-  });
-
-  console.log(`Seeded Match ${matchId} Successfully.\n`);
-}
-
 async function getStreamFive() {
   const mk8Players: Player[] = await prisma.player.findMany({
     where: {
@@ -220,24 +206,41 @@ async function getStreamFive() {
   return mk8Players;
 }
 
-// Simulates a race for a given set
-/**
- * @param setId - setId of the set to attach the match to
- * Every race there are n number of playerSessions created per player
- */
 async function simulateRace(
   setId: number,
   matchId: number,
   raceResults: number[] = [1, 2, 3, 4, 5],
 ) {
   const players = await getStreamFive();
+  // Create new match
+  seedMatch(matchId, setId);
+}
+
+async function seedMatch(matchId: number, setId: number, players: Player[]) {
+  const marioKartMatch = await prisma.match.upsert({
+    where: { matchId: matchId },
+    update: {},
+    create: {
+      matchId: matchId,
+      setId: setId,
+    },
+  });
+
+  // Should seed player sessions here
+  seedPlayerSessions(matchId, players, setId);
+
+  console.log(`Seeded Match ${matchId} Successfully.\n`);
+}
+
+async function seedPlayerSessions(
+  matchId: number,
+  players: Player[],
+  setId: number,
+) {
+  // Create player sessions and attach to match
   // Every race there are n number of playerSessions created per player
   // so we need to offset the playerSessionId by the number of previous player sessions
   const playerSessionIdOffset = (setId - 1) * players.length;
-  // Create new match
-  seedMatch(matchId, setId);
-
-  // Create player sessions and attach to match
   for (const player of players) {
     const playerSessionId = player.playerId + playerSessionIdOffset;
     const playerStatId = playerSessionId;
@@ -253,64 +256,49 @@ async function simulateRace(
         playerId: player.playerId,
       },
     });
-    // Create player stats and attach to player sessions
 
-    const playerResult = await prisma.playerStat.upsert({
-      where: { playerStatId: playerStatId },
-      update: {},
-      create: {
-        playerStatId: playerStatId,
-        playerId: player.playerId,
-        statId: 1,
-        playerSessionId: playerSessionId,
-        gameId: 1,
-        value: raceResults[player.playerId - 1].toString(),
-        date: new Date(),
-      },
-    });
+    // Create player stats and attach to player sessions
+    const playerResult = await seedPlayerStat(raceResults);
   }
+
+  // Simulates a race for a given set
+  /**
+   * @param setId - setId of the set to attach the match to
+   * Every race there are n number of playerSessions created per player
+   */
+
+  // FOR NOW ASSUME NO TIES
+  // const firstPlaceId = raceResults.indexOf(1) + 1;
+
+  // const firstPlacePlayer = await prisma.player.findUnique({
+  //   where: { playerId: firstPlaceId },
+  // });
+
+  // if (!firstPlacePlayer) {
+  //   throw new Error(`1st Place Player with ID ${firstPlaceId} not found`);
+  // }
+
+  // // Set Match Winner
+  // await prisma.match.update({
+  //   where: { matchId: matchId },
+  //   data: { matchWinner: { connect: { playerId: firstPlacePlayer.playerId } } },
+  // });
 }
 
-async function seedPlayerSessions(setId: number) {
-  const mk8Players: Player[] = await prisma.player.findMany({
-    where: {
-      playerId: {
-        in: [1, 2, 3, 4, 5],
-      },
-    },
-  });
-
-  const mk8Session: EnrichedSession | null = await prisma.session.findFirst({
-    where: {
+async function seedPlayerStat(raceResults: number[]) {
+  return await prisma.playerStat.upsert({
+    where: { playerStatId: playerStatId },
+    update: {},
+    create: {
+      playerStatId: playerStatId,
+      playerId: player.playerId,
+      statId: 1,
+      playerSessionId: playerSessionId,
       gameId: 1,
-    },
-    include: {
-      sets: {
-        include: {
-          matches: {
-            include: {
-              playerSessions: {
-                include: {
-                  playerStats: true,
-                },
-              },
-            },
-          },
-        },
-      },
+      value: raceResults[player.playerId - 1].toString(),
+      date: new Date(),
     },
   });
-
-  if (mk8Session === null) {
-    throw new Error("Session not found");
-  }
-
-  await createPlayerSessionsBatch(
-    4,
-    mk8Players,
-    mk8Session.sets[setId - 1], // TODO: Need to find better way to pass in set here
-    mk8Session.sessionId,
-  );
 }
 
 // Instead of creating playerSessions once per race manually, we should have a function that can create the playerSessions for the four races
@@ -332,7 +320,7 @@ async function createPlayerSessionsBatch(
     const matchId = (set.setId - 1) * game + 1;
 
     // Create new match
-    await seedMatch(matchId, set.setId);
+    await seedMatch(matchId, set.setId, players);
     const setModifier = (set.setId - 1) * 20; // Every set assume there are 5 players * 4 races = 20 player sessions
     const idOffset = game * 5 + setModifier;
 
