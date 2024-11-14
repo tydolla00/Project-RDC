@@ -39,6 +39,7 @@ main()
 // Seed RDC Members
 async function seedRDCMembers() {
   console.log("--- Seeding RDC Members ---");
+
   const mark = await prisma.player.upsert({
     where: { playerId: 1 },
     update: {},
@@ -74,6 +75,7 @@ async function seedRDCMembers() {
       playerName: "Lee",
     },
   });
+
   const lee = await prisma.player.upsert({
     where: { playerId: 5 },
     update: {},
@@ -283,52 +285,6 @@ async function seedPlayerStat(
     },
   });
 }
-
-// Instead of creating playerSessions once per race manually, we should have a function that can create the playerSessions for the four races
-/**
- * Create a batch of player sessions for a set number of games
- * @param numgames - number of games in set
- * @param players - array of players who participated in the set
- * @param set - GameSet type that will contain batched sessions
- * @param sessionId - Id of session that the set belongs too
- */
-// async function createPlayerSessionsBatch(
-//   numGames: number,
-//   players: Player[],
-//   set: GameSet,
-//   sessionId: number,
-// ) {
-//   console.log("\n--- Creating Batch of Player Sessions for Set ---", set.setId);
-//   for (let game = 0; game < numGames; game++) {
-//     const matchId = (set.setId - 1) * game + 1;
-
-//     // Create new match
-//     await seedMatch(matchId, set.setId, players);
-//     const setModifier = (set.setId - 1) * 20; // Every set assume there are 5 players * 4 races = 20 player sessions
-//     const idOffset = game * 5 + setModifier;
-
-//     // Creating Player Sessions per Race
-//     console.log(`\nCreating Sessions for Race ${game}`);
-//     for (let i = 0; i < players.length; i++) {
-//       const player = players[i];
-
-//       await prisma.playerSession.upsert({
-//         where: { playerSessionId: player.playerId + idOffset },
-//         update: {},
-//         create: {
-//           playerSessionId: player.playerId + idOffset,
-//           matchId: matchId,
-//           sessionId: sessionId,
-//           setId: set.setId,
-//           playerId: player.playerId,
-//         },
-//       });
-//       console.log(
-//         `Created Player Session ${player.playerId + idOffset} for Player: ${player.playerName}`,
-//       );
-//     }
-//    }
-//    }
 
 /**
  * Upsert player stat assuming playerStatID and playerSessionId are the same
