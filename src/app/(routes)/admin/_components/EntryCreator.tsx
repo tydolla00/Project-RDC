@@ -7,6 +7,22 @@ import useAdminFormCreator from "@/lib/hooks/useAdminFormCreator";
 import MatchForm from "../../submission/_components/MatchForm";
 import * as Separator from "@radix-ui/react-separator";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command";
+import { ChevronsUpDown, Check } from "lucide-react";
 
 interface Props {
   rdcMembers: Player[];
@@ -24,6 +40,8 @@ const EntryCreator = ({ rdcMembers }: Props) => {
   const [selectedPlayers, setSelectedPlayers] = useState<Player[] | null>(null);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [sessionIdCounter, setSessionIdCounter] = useState(0);
+
+  const [open, setOpen] = React.useState(false);
 
   // Should be called something like getLatestSessionId and be in hook?
   // Should get latest session id from db
@@ -66,6 +84,55 @@ const EntryCreator = ({ rdcMembers }: Props) => {
         ))}
       </DropdownMenu.Content>
     </DropdownMenu.Root>
+  );
+
+  const videoGameDropdown3 = (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[200px] justify-between"
+        >
+          {selectedGame?.gameId
+            ? testGames.find((game) => game.gameId === selectedGame.gameId)
+                ?.gameName
+            : "Select games..."}
+          <ChevronsUpDown className="opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
+        <Command>
+          <CommandInput placeholder="Search framework..." />
+          <CommandList>
+            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandGroup>
+              {testGames.map((game) => (
+                <CommandItem
+                  key={game.gameId}
+                  value={game.gameName}
+                  onSelect={(gameId) => {
+                    setSelectedGame(
+                      gameId === game.gameId.toString() ? null : game,
+                    );
+                    setOpen(false);
+                  }}
+                >
+                  {game.gameName}
+                  <Check
+                    className={cn(
+                      "ml-auto",
+                      game.gameId === game.gameId ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
   return (
     <div className="flex flex-col">
@@ -116,7 +183,7 @@ const EntryCreator = ({ rdcMembers }: Props) => {
             <div className="flex flex-col items-center">
               <label className="">Game</label>
 
-              {videoGameDropdown2}
+              {videoGameDropdown3}
             </div>
             {/* Player Selector */}
             <div className="flex flex-col items-center">

@@ -1,9 +1,14 @@
 import React from "react";
-import * as Collapsible from "@radix-ui/react-collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import PlayerStatForm from "./PlayerStatForm";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { Player } from "@prisma/client";
+import PlayerSelector from "../../admin/_components/PlayerSelector";
 
 /**
  * 
@@ -23,8 +28,8 @@ interface Props {
 
 const MatchForm: React.FC<Props> = ({ players }) => {
   return (
-    <Collapsible.Root className="m-2 w-full">
-      <Collapsible.Trigger asChild className="w-full">
+    <Collapsible className="m-2 w-full">
+      <CollapsibleTrigger asChild className="w-full">
         <Toolbar.Root className="rounded-t-md bg-gray-200 p-4 dark:bg-gray-900">
           <Toolbar.ToggleGroup type="single">
             <Toolbar.ToggleItem
@@ -36,8 +41,8 @@ const MatchForm: React.FC<Props> = ({ players }) => {
             </Toolbar.ToggleItem>
           </Toolbar.ToggleGroup>
         </Toolbar.Root>
-      </Collapsible.Trigger>
-      <Collapsible.Content className="rounded-b-md bg-gray-100 p-4 dark:bg-gray-800">
+      </CollapsibleTrigger>
+      <CollapsibleContent className="rounded-b-md bg-gray-100 p-4 dark:bg-gray-800">
         Match Content
         {players?.map((player: Player, index: number) => (
           <PlayerStatForm
@@ -59,8 +64,10 @@ const MatchForm: React.FC<Props> = ({ players }) => {
             ]}
           />
         ))}
-      </Collapsible.Content>
-    </Collapsible.Root>
+        Match Winner
+        <PlayerSelector rdcMembers={players ?? []} selectedPlayers={[]} />
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
 

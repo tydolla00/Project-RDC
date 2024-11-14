@@ -2,10 +2,11 @@ import { Player } from "@prisma/client";
 import * as Avatar from "@radix-ui/react-avatar";
 import React from "react";
 import PlayerAvatar from "./PlayerAvatar";
+import { set } from "react-hook-form";
 interface Props {
   rdcMembers: Player[];
   selectedPlayers: Player[] | null;
-  setSelectedPlayers: React.Dispatch<React.SetStateAction<Player[] | null>>;
+  setSelectedPlayers?: React.Dispatch<React.SetStateAction<Player[] | null>>;
 }
 const PlayerSelector = ({
   rdcMembers,
@@ -13,7 +14,9 @@ const PlayerSelector = ({
   setSelectedPlayers,
 }: Props) => {
   const handlePlayerClick = (player: Player) => {
+    if (setSelectedPlayers === undefined) return;
     console.log("Handle Player Click", player);
+
     setSelectedPlayers((prevSelected) => {
       if (prevSelected === null) {
         return [player];
