@@ -7,7 +7,26 @@ async function main() {
   await seedGames();
   await seedSession(1);
 
-  await race();
+  /**
+   * If you reaaaallllyy want to real data...
+   * Here is where you would put in match results. Each list is
+   * a match and the index is the playerId -1
+   * e.g Ben's results are all index 2
+   */
+  const set1Results = [
+    [1, 3, 2, 4, 5],
+    [2, 3, 1, 4, 5],
+    [2, 1, 4, 5, 3],
+    [4, 2, 1, 3, 5],
+  ];
+
+  // Seed 1st set
+  await seedSet(1, 1);
+  // Simulate Race (Seed Match, PlayerSessions, PlayerStats)
+  await simulateRace(1, 1, set1Results[0]);
+  await simulateRace(1, 2, set1Results[1]);
+  await simulateRace(1, 3, set1Results[2]);
+  await simulateRace(1, 4, set1Results[3]);
 
   await updateSetWinner(1);
 }
@@ -24,23 +43,6 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
-
-async function race() {
-  const set1Results = [
-    [1, 3, 2, 4, 5],
-    [2, 3, 1, 4, 5],
-    [2, 1, 4, 5, 3],
-    [4, 2, 1, 3, 5],
-  ];
-
-  // Seed 1st set
-  await seedSet(1, 1);
-  // Simulate Race (Seed Match, PlayerSessions, PlayerStats)
-  await simulateRace(1, 1, set1Results[0]);
-  await simulateRace(1, 2, set1Results[1]);
-  await simulateRace(1, 3, set1Results[2]);
-  await simulateRace(1, 4, set1Results[3]);
-}
 
 // Seed RDC Members
 async function seedRDCMembers() {
@@ -152,6 +154,7 @@ async function seedSession(sessionId: number) {
       gameId: 1,
       sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",
       sessionUrl: "https://example.com",
+      thumbnail: "https://example.com/thumbnail.jpg",
     },
   });
   console.log("Seeded MK8 Session Successfully.\n");
@@ -225,7 +228,7 @@ async function seedMatch(
     },
   });
 
-  // Insert matchWinner into match
+  // Update match with match winner
   if (matchWinner) {
     await prisma.match.update({
       where: { matchId: matchId },
@@ -307,7 +310,7 @@ const getSetWinner = async (setId: number) => {
 
   // console.log(`Set matches ${setMatches}`);
 
-  // TODO: Refactor this to be cleaner
+  // TODO: Refactor this to be cleaner O_O
   const matchWinners = setMatches
     .filter((match) => match.matchWinner)
     .map((match) => ({
