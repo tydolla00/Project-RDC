@@ -4,6 +4,7 @@ import { getAveragePlacing } from "../../../../../../prisma/lib/marioKart";
 import { Chart } from "./_components/charts";
 import {
   getAllGames,
+  getPositionStatsPerPlayer,
   getWinsPerPlayer,
 } from "../../../../../../prisma/lib/games";
 
@@ -28,11 +29,18 @@ export default async function Page({
     (game) =>
       game.gameName.replace(/\s/g, "").toLowerCase() === slug.toLowerCase(),
   );
-  const uncalculatedWins = await getWinsPerPlayer(game!.gameId);
+  const fns = await Promise.all([
+    getWinsPerPlayer(game!.gameId),
+    getAveragePlacing(),
+    getPositionStatsPerPlayer(game!.gameId, "MK8_POS"),
+  ]);
+  const uncalculatedWins = fns[0];
   const winsPerPlayer = calculateWinsPerPlayer(uncalculatedWins!);
-  console.log(uncalculatedWins, winsPerPlayer);
 
-  const allAvgPlacing = await getAveragePlacing();
+  const allAvgPlacing = fns[1];
+  const placingsPerPlayer = fns[2];
+  const firstDesc = calculateMost1st(placingsPerPlayer);
+  console.log(uncalculatedWins, winsPerPlayer, placingsPerPlayer, firstDesc);
 
   return (
     <div className="m-16">
@@ -72,5 +80,27 @@ const calculateWinsPerPlayer = (
       }
     }
   }
+  return members;
+};
+
+const calculateMost1st = (
+  placings: {
+    value: string;
+    player: { playerId: number; playerName: string };
+  }[],
+) => {
+  const members = new Map<string, number>();
+
+  for (const placing of placings) {
+    const val = Number(placing.value);
+    if (!val || val !== 1) {
+      console.log("Not a number");
+      continue;
+    }
+    let member = members.get(placing.player.playerName);
+    if (!member) members.set(placing.player.playerName, 1);
+    else member += 1;
+  }
+  console.log(members);
   return members;
 };

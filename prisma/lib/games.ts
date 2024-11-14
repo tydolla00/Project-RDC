@@ -25,16 +25,16 @@ export const getSetsPerPlayer = unstable_cache(
 );
 
 export const getDaysPerPlayer = unstable_cache(
-  async (gameId: number) =>
+  async (gameId: number, statName: StatNames) =>
     await prisma.gameStat.findFirst({
-      where: { statName: StatNames.MarioKartDays, gameId },
+      where: { statName, gameId },
       select: { playerStats: { select: { value: true, player: true } } },
     }),
   undefined,
   { tags: ["getDaysPerPlayer"], revalidate: false },
 );
 
-// I want to get the video where the game is MK8 and the gameStat is MK_POS and include the matches so I can calculate the winsPerPlayer
+// also used as getSetsPerPlayer
 export const getWinsPerPlayer = unstable_cache(
   async (gameId: number) =>
     await prisma.game.findFirst({
@@ -57,3 +57,27 @@ export const getWinsPerPlayer = unstable_cache(
   undefined,
   { tags: ["getWinsPerPlayer"] },
 );
+
+/**
+ * A function that can be used to calculate position stats, Most 1st, Most Last, Average Placing, etc.
+ * Works for Mario Kart, COD Gun Game.
+ */
+export const getPositionStatsPerPlayer = unstable_cache(
+  async <T extends StatNames = StatNames>(
+    gameId: number,
+    statName: StatNameValues<T>,
+    utils?: Parameters<PrismaClient["playerStat"]["findMany"]>[0],
+  ) =>
+    await prisma.playerStat.findMany({
+      where: { gameId, AND: { gameStat: { statName } } },
+      select: { player: true, value: true },
+    }),
+  undefined,
+  { tags: ["getPositionStatsPerPlayer"] },
+);
+
+type StatNameValues<T extends StatNames> = T extends StatNames
+  ? T extends `${infer u}_POS`
+    ? `${u}_POS`
+    : never
+  : never;
