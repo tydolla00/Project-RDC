@@ -65,6 +65,7 @@ model Session {
   gameId      Int       @map("game_id")
   Game        Game      @relation(fields: [gameId], references: [gameId])
   sets        GameSet[]
+  thumbnail   String
   date        DateTime  @default(now()) // Date video posted
 
   @@map("sessions")
