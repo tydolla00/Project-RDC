@@ -7,6 +7,25 @@ async function main() {
   await seedGames();
   await seedSession(1);
 
+  await race();
+
+  await updateSetWinner(1);
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+
+    console.log("<> ---  Seeded Mario Kart Session successfully  --- <>");
+    console.log("Seeds have been sown. o7");
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
+
+async function race() {
   const set1Results = [
     [1, 3, 2, 4, 5],
     [2, 3, 1, 4, 5],
@@ -21,20 +40,7 @@ async function main() {
   await simulateRace(1, 2, set1Results[1]);
   await simulateRace(1, 3, set1Results[2]);
   await simulateRace(1, 4, set1Results[3]);
-
-  console.log("--- <> Seeded Mario Kart Session successfully <> ---");
-  console.log("Seeds have been sown. o7");
 }
-
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
 
 // Seed RDC Members
 async function seedRDCMembers() {
@@ -187,7 +193,7 @@ async function simulateRace(
 ) {
   const streamFive = await getStreamFive();
   // Create new match
-  seedMatch(matchId, setId, streamFive, raceResults);
+  await seedMatch(matchId, setId, streamFive, raceResults);
 }
 
 async function seedMatch(
@@ -206,7 +212,7 @@ async function seedMatch(
   });
 
   // Should seed player sessions here
-  seedPlayerSessions(matchId, playersInMatch, setId, raceResults);
+  await seedPlayerSessions(matchId, playersInMatch, setId, raceResults);
 
   console.log(`Seeded Match ${matchId} Successfully.\n`);
 
@@ -237,16 +243,19 @@ async function seedPlayerSessions(
   // Create player sessions and attach to match
   // Every race there are n number of playerSessions created per player
   // so we need to offset the playerSessionId by the number of previous player sessions
-  const playerSessionIdOffset = (setId - 1) * players.length;
+  const playerSessionIdOffset = (matchId - 1) * players.length;
   for (const player of players) {
-    const playerSessionId = player.playerId + playerSessionIdOffset;
-    const playerStatId = playerSessionId;
+    const newPlayerSessionId = player.playerId + playerSessionIdOffset;
+
+    console.log(
+      `Seeding player session ${newPlayerSessionId} for player: ${player.playerName}`,
+    );
 
     const playerSession = await prisma.playerSession.upsert({
-      where: { playerSessionId: player.playerId + playerSessionIdOffset },
+      where: { playerSessionId: newPlayerSessionId },
       update: {},
       create: {
-        playerSessionId: playerSessionId,
+        playerSessionId: newPlayerSessionId,
         matchId: matchId,
         sessionId: 1,
         setId: setId,
@@ -286,89 +295,56 @@ async function seedPlayerStat(
   });
 }
 
-/**
- * Upsert player stat assuming playerStatID and playerSessionId are the same
- * @param idOffset - used to offset playerStatId and playerSessionId
- * @param positions - optional parameter to dictate positions (1-5) of players in the order of (Mark, Dyl, Ben, Lee, Des)
- * @param setId - optional parameter to identify set number player stats should belong too
- */
-async function seedPlayerStats(
-  idOffset: number = 0,
-  positions: string[] = ["1", "2", "3", "4", "5"],
-  setId: number = 1,
-) {
-  idOffset = idOffset * setId;
-
-  // Seed PlayerStat for players (assume its the stream five)
-  const markRace = await prisma.playerStat.upsert({
-    where: { playerStatId: 1 + idOffset },
-    update: {},
-    create: {
-      playerStatId: 1 + idOffset,
-      playerId: 1,
-      statId: 1, // MK_POS
-      playerSessionId: 1 + idOffset,
-      gameId: 1,
-      value: positions[0],
-      date: new Date(),
+const getSetWinner = async (setId: number) => {
+  const setMatches = await prisma.match.findMany({
+    where: {
+      setId: setId,
+    },
+    include: {
+      matchWinner: true,
     },
   });
 
-  const dylRace = await prisma.playerStat.upsert({
-    where: { playerStatId: 2 + idOffset },
-    update: {},
-    create: {
-      playerStatId: 2 + idOffset,
-      playerId: 2,
-      statId: 1, // MK_POS
-      playerSessionId: 2 + idOffset,
-      gameId: 1,
-      value: positions[1],
-      date: new Date(),
-    },
+  // console.log(`Set matches ${setMatches}`);
+
+  // TODO: Refactor this to be cleaner
+  const matchWinners = setMatches
+    .filter((match) => match.matchWinner)
+    .map((match) => ({
+      playerId: match.matchWinner[0].playerId,
+      playerName: match.matchWinner[0].playerName,
+    }));
+
+  const winnerCount: { [playerId: number]: number } = {};
+
+  matchWinners.forEach((winner) => {
+    if (winnerCount[winner.playerId]) {
+      winnerCount[winner.playerId]++;
+    } else {
+      winnerCount[winner.playerId] = 1;
+    }
   });
 
-  const benRace = await prisma.playerStat.upsert({
-    where: { playerStatId: 3 + idOffset },
-    update: {},
-    create: {
-      playerStatId: 3 + idOffset,
-      playerId: 4,
-      statId: 1, // MK_POS
-      playerSessionId: 3 + idOffset,
-      gameId: 1,
-      value: positions[2],
-      date: new Date(),
-    },
-  });
+  const maxWins = Math.max(...Object.values(winnerCount));
+  const setWinner = Object.keys(winnerCount).find(
+    (playerId) => winnerCount[Number(playerId)] === maxWins,
+  );
 
-  const leeRace = await prisma.playerStat.upsert({
-    where: { playerStatId: 4 + idOffset },
-    update: {},
-    create: {
-      playerStatId: 4 + idOffset,
-      playerId: 5,
-      statId: 1, // MK_POS
-      playerSessionId: 4 + idOffset,
-      gameId: 1,
-      value: positions[3],
-      date: new Date(),
-    },
-  });
+  const setWinnerPlayer = matchWinners.find(
+    (winner) => winner.playerId === Number(setWinner),
+  );
 
-  const desRace = await prisma.playerStat.upsert({
-    where: { playerStatId: 5 + idOffset },
-    update: {},
-    create: {
-      playerStatId: 5 + idOffset,
-      playerId: 3,
-      statId: 1, // MK_POS
-      playerSessionId: 5 + idOffset,
-      gameId: 1,
-      value: positions[4],
-      date: new Date(),
-    },
-  });
+  console.log(`Set ${setId} Winner: ${setWinnerPlayer?.playerName}`);
 
-  console.log(`Finished creating player stats for set ${setId}`);
-}
+  return setWinnerPlayer;
+};
+
+const updateSetWinner = async (setId: number) => {
+  const setWinner = await getSetWinner(setId);
+  if (setWinner) {
+    await prisma.gameSet.update({
+      where: { setId: setId },
+      data: { setWinner: { connect: { playerId: setWinner.playerId } } },
+    });
+  }
+};
