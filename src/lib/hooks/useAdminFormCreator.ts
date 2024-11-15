@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { EnrichedSession } from "../../../prisma/types/session";
 import { EnrichedGameSet } from "../../../prisma/types/gameSet";
-import { Match } from "@prisma/client";
 import { EnrichedMatch } from "../../../prisma/types/match";
 
 const useAdminFormCreator = () => {
@@ -12,27 +11,35 @@ const useAdminFormCreator = () => {
     gameId: 0,
     date: new Date(),
     sets: [],
+    thumbnail: "",
   });
+
+  const [sessionIdCounter, setSessionIdCounter] = useState(1);
+  const [setIdCounter, setSetIdCounter] = useState(1);
+  const [matchIdCounter, setMatchIdCounter] = useState(1);
+  const [playerSessionCounter, setPlayerSessionCounter] = useState(1);
+  const [playerStatCounter, setPlayerStatCounter] = useState(1);
 
   const [isInCreationFlow, setIsInCreationFlow] = useState(false);
 
-  const createSession = () => {
+  const createSession = (sessionId: number) => {
     console.log("Creating Session");
     setSession({
-      sessionId: 0,
+      sessionId: sessionId,
       sessionName: "",
       sessionUrl: "",
       gameId: 0,
       date: new Date(),
       sets: [],
+      thumbnail: "",
     });
     setIsInCreationFlow(true);
   };
 
-  const addSetToSession = (setIndex: number) => {
+  const addSetToSession = (setId: number, sessionID: number) => {
     console.log("Creating Set");
     const newSet: EnrichedGameSet = {
-      setId: setIndex,
+      setId: setId,
       sessionId: 0,
       matches: [],
     };
@@ -75,6 +82,31 @@ const useAdminFormCreator = () => {
   /* Whenever a match is created we need to add playerSessions
    *based on the selected players and populate playerSession with appropriate stats based on game
    */
+
+  const getNextTempSessionId = () => {
+    setSessionIdCounter((prev) => prev + 1);
+    return sessionIdCounter;
+  };
+
+  const getNextTempSetId = () => {
+    setSetIdCounter((prev) => prev + 1);
+    return setIdCounter;
+  };
+
+  const getNextTempMatchId = () => {
+    setMatchIdCounter((prev) => prev + 1);
+    return matchIdCounter;
+  };
+
+  const getNextTempPlayerSessionId = () => {
+    setPlayerSessionCounter((prev) => prev + 1);
+    return playerSessionCounter;
+  };
+
+  const getNextTempPlayerStatId = () => {
+    setPlayerStatCounter((prev) => prev + 1);
+    return playerStatCounter;
+  };
 
   return {
     session,

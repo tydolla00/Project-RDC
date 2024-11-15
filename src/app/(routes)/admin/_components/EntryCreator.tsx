@@ -6,7 +6,6 @@ import { EnrichedGameSet } from "../../../../../prisma/types/gameSet";
 import useAdminFormCreator from "@/lib/hooks/useAdminFormCreator";
 import MatchForm from "../../submission/_components/MatchForm";
 import * as Separator from "@radix-ui/react-separator";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -39,16 +38,13 @@ const EntryCreator = ({ rdcMembers }: Props) => {
 
   const [selectedPlayers, setSelectedPlayers] = useState<Player[] | null>(null);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-  const [sessionIdCounter, setSessionIdCounter] = useState(0);
+  const [sessionIdCounter, setSessionIdCounter] = useState(1);
+  const [setIdCounter, setSetIdCounter] = useState(1);
+  const [matchIdCounter, setMatchIdCounter] = useState(1);
+  const [playerSessionCounter, setPlayerSessionCounter] = useState(1);
+  const [playerStatCounter, setPlayerStatCounter] = useState(1);
 
   const [open, setOpen] = React.useState(false);
-
-  // Should be called something like getLatestSessionId and be in hook?
-  // Should get latest session id from db
-  const getNextSessionId = () => {
-    setSessionIdCounter((prevId) => prevId + 1);
-    return sessionIdCounter;
-  };
 
   const testGames: Game[] = [
     {
@@ -64,27 +60,6 @@ const EntryCreator = ({ rdcMembers }: Props) => {
       gameName: "Gang Beasts",
     },
   ];
-
-  const videoGameDropdown2 = (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild>
-        <button className="w-40 rounded-sm border p-2">
-          {selectedGame ? selectedGame.gameName : "Select Game"}
-        </button>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content className="flex min-w-52 flex-col rounded-lg p-1.5 shadow-lg shadow-black transition duration-500 ease-in-out">
-        {testGames.map((game, index) => (
-          <DropdownMenu.Item
-            key={index}
-            className="w-full cursor-pointer rounded-lg p-2 text-center hover:bg-gray-600"
-            onSelect={() => setSelectedGame(game)}
-          >
-            {game.gameName}
-          </DropdownMenu.Item>
-        ))}
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
-  );
 
   const videoGameDropdown3 = (
     <Popover open={open} onOpenChange={setOpen}>
@@ -143,7 +118,7 @@ const EntryCreator = ({ rdcMembers }: Props) => {
       </p>
       <button
         className="w-52 rounded-sm border border-white p-2 hover:bg-gray-600"
-        onClick={createSession}
+        onClick={() => createSession(1)}
       >
         Start New Session
         {/* Q: How are we going to get the next session id?  */}
@@ -251,7 +226,7 @@ const EntryCreator = ({ rdcMembers }: Props) => {
           {/* Set Btn */}
           <button
             className="m-2 w-56 rounded-sm border border-white p-2 hover:bg-gray-600"
-            onClick={() => addSetToSession(getNextSessionId())}
+            onClick={async () => addSetToSession(1, 1)}
           >
             {" "}
             Add Set to Session {session.sessionId}

@@ -5,6 +5,16 @@ const prisma = new PrismaClient();
 
 // --- Priorities ---
 
+export const getNextSessionId = async () => {
+  const latestSession = await prisma.session.findFirst({
+    orderBy: {
+      sessionId: "desc",
+    },
+  });
+  const nextSessionId = latestSession ? latestSession.sessionId + 1 : 1;
+  return nextSessionId;
+};
+
 // Get latest MK8 sessions
 export const getLatestMarioKart8Session: () => Promise<
   any | undefined
