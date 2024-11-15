@@ -7,7 +7,7 @@ import {
 import * as Toolbar from "@radix-ui/react-toolbar";
 import PlayerStatForm from "./PlayerStatForm";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { Player } from "@prisma/client";
+import { GameStat, Player } from "@prisma/client";
 import PlayerSelector from "../../admin/_components/PlayerSelector";
 
 /**
@@ -24,9 +24,10 @@ import PlayerSelector from "../../admin/_components/PlayerSelector";
 // Need to get the game from Entry Creator/ Admin Form Hook
 interface Props {
   players: Player[] | null; // Define the type of players according to your needs
+  getGameStats: (gameId: number) => Promise<GameStat[]>;
 }
 
-const MatchForm: React.FC<Props> = ({ players }) => {
+const MatchForm: React.FC<Props> = ({ players, getGameStats }) => {
   return (
     <Collapsible className="m-2 w-full">
       <CollapsibleTrigger asChild className="w-full">
@@ -44,28 +45,20 @@ const MatchForm: React.FC<Props> = ({ players }) => {
       </CollapsibleTrigger>
       <CollapsibleContent className="rounded-b-md bg-gray-100 p-4 dark:bg-gray-800">
         Match Content
-        {players?.map((player: Player, index: number) => (
+        {players?.map(async (player: Player, index: number) => (
           <PlayerStatForm
             key={index}
             player={player}
-            stats={[
-              {
-                statName: "MK_POS",
-                statId: 0,
-                gameId: 0,
-                type: "Number",
-              },
-              {
-                statName: "MK_POS_TEST",
-                statId: 0,
-                gameId: 0,
-                type: "Number",
-              },
-            ]}
+            stats={await getGameStats(1)}
           />
         ))}
-        Match Winner
-        <PlayerSelector rdcMembers={players ?? []} selectedPlayers={[]} />
+        <div
+          className="flex flex-col items-center"
+          id="match-winner-selector-container"
+        >
+          Match Winner
+          <PlayerSelector rdcMembers={players ?? []} selectedPlayers={[]} />
+        </div>
       </CollapsibleContent>
     </Collapsible>
   );

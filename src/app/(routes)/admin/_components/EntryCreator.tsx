@@ -34,15 +34,16 @@ const EntryCreator = ({ rdcMembers }: Props) => {
     createSession,
     addSetToSession,
     addMatchToSet,
+    getNextTempSessionId,
+    getNextTempSetId,
+    getNextTempMatchId,
+    getNextTempPlayerSessionId,
+    getNextTempPlayerStatId,
+    getGameStats,
   } = useAdminFormCreator();
 
   const [selectedPlayers, setSelectedPlayers] = useState<Player[] | null>(null);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-  const [sessionIdCounter, setSessionIdCounter] = useState(1);
-  const [setIdCounter, setSetIdCounter] = useState(1);
-  const [matchIdCounter, setMatchIdCounter] = useState(1);
-  const [playerSessionCounter, setPlayerSessionCounter] = useState(1);
-  const [playerStatCounter, setPlayerStatCounter] = useState(1);
 
   const [open, setOpen] = React.useState(false);
 
@@ -79,9 +80,9 @@ const EntryCreator = ({ rdcMembers }: Props) => {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
+          <CommandInput placeholder="Search games..." />
           <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandEmpty>No game found.</CommandEmpty>
             <CommandGroup>
               {testGames.map((game) => (
                 <CommandItem
@@ -118,7 +119,7 @@ const EntryCreator = ({ rdcMembers }: Props) => {
       </p>
       <button
         className="w-52 rounded-sm border border-white p-2 hover:bg-gray-600"
-        onClick={() => createSession(1)}
+        onClick={() => createSession(getNextTempSessionId())}
       >
         Start New Session
         {/* Q: How are we going to get the next session id?  */}
@@ -173,16 +174,16 @@ const EntryCreator = ({ rdcMembers }: Props) => {
           </div>
           {/* Set Info */}
           {session.sets &&
-            session.sets.map((set: EnrichedGameSet, setId: number) => (
+            session.sets.map((set: EnrichedGameSet) => (
               <div
                 className="m-2 flex flex-col justify-start"
-                id={`session-${session.sessionId}-set-${setId}-info`}
-                key={setId}
+                id={`session-${session.sessionId}-set-${set.setId}-info`}
+                key={set.setId}
               >
                 {/* Set Id Container*/}
                 <div className="flex items-center justify-between p-2">
                   <div className="flex items-center">
-                    <p className="m-2 text-lg">Set {setId}</p>
+                    <p className="m-2 text-lg">Set {set.setId}</p>
                     <input
                       type="text"
                       placeholder="setId"
@@ -191,10 +192,10 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                   </div>
                   <button
                     className="mr-0 w-52 rounded-sm border border-white p-2 hover:bg-gray-600"
-                    onClick={() => addMatchToSet(setId)}
+                    onClick={() => addMatchToSet(set.setId)}
                   >
                     {" "}
-                    Add match to Set {setId}
+                    Add match to Set {set.setId}
                   </button>
                 </div>
                 <Separator.Root className="m-2 h-[1px] w-full bg-slate-800"></Separator.Root>
@@ -205,6 +206,7 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                     <MatchForm
                       key={matchId}
                       players={selectedPlayers}
+                      getGameStats={getGameStats}
                     ></MatchForm>
                   ))}
 
@@ -226,7 +228,7 @@ const EntryCreator = ({ rdcMembers }: Props) => {
           {/* Set Btn */}
           <button
             className="m-2 w-56 rounded-sm border border-white p-2 hover:bg-gray-600"
-            onClick={async () => addSetToSession(1, 1)}
+            onClick={async () => addSetToSession(session.sessionId)}
           >
             {" "}
             Add Set to Session {session.sessionId}

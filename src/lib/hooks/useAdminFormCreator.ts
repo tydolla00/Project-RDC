@@ -2,6 +2,8 @@ import { useState } from "react";
 import { EnrichedSession } from "../../../prisma/types/session";
 import { EnrichedGameSet } from "../../../prisma/types/gameSet";
 import { EnrichedMatch } from "../../../prisma/types/match";
+import { GameStat } from "@prisma/client";
+import { fetchGameStats } from "../../../prisma/lib/admin";
 
 const useAdminFormCreator = () => {
   const [session, setSession] = useState<EnrichedSession>({
@@ -36,11 +38,11 @@ const useAdminFormCreator = () => {
     setIsInCreationFlow(true);
   };
 
-  const addSetToSession = (setId: number, sessionID: number) => {
+  const addSetToSession = (sessionId: number) => {
     console.log("Creating Set");
     const newSet: EnrichedGameSet = {
-      setId: setId,
-      sessionId: 0,
+      setId: getNextTempSetId(),
+      sessionId: sessionId,
       matches: [],
     };
 
@@ -54,7 +56,7 @@ const useAdminFormCreator = () => {
     console.log(`Creating Match for ${setId}`);
     // TODO: Add match winner
     const newMatch: EnrichedMatch = {
-      matchId: 0,
+      matchId: getNextTempMatchId(),
       setId: setId,
       date: new Date(),
       playerSessions: [],
@@ -108,12 +110,22 @@ const useAdminFormCreator = () => {
     return playerStatCounter;
   };
 
+  const getGameStats = async (gameId: number): Promise<GameStat[]> => {
+    return await fetchGameStats(gameId);
+  };
+
   return {
     session,
     isInCreationFlow,
     createSession,
     addSetToSession,
     addMatchToSet,
+    getNextTempSessionId,
+    getNextTempSetId,
+    getNextTempMatchId,
+    getNextTempPlayerSessionId,
+    getNextTempPlayerStatId,
+    getGameStats,
   };
 };
 

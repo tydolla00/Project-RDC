@@ -7,6 +7,7 @@ import { getLatestMarioKart8Session } from "../../../../prisma/lib/marioKart";
 import { EnrichedSession } from "../../../../prisma/types/session";
 import EntryCreator from "./_components/EntryCreator";
 import { getRDCMembers } from "../../../../prisma/lib/admin";
+import { GameStat, PrismaClient } from "@prisma/client";
 
 const getData = () => {
   const data: Submission[] = [
@@ -26,6 +27,17 @@ const getData = () => {
   return new Promise<Submission[]>((resolve, reject) => {
     resolve(data);
   });
+};
+
+const pageFetchGameStats = async (gameId: number): Promise<GameStat[]> => {
+  const prisma = new PrismaClient();
+  const gameStats = await prisma.gameStat.findMany({
+    where: {
+      gameId: gameId,
+    },
+  });
+
+  return gameStats;
 };
 
 export default async function Page() {
