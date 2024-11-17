@@ -1,7 +1,7 @@
 import { PlayerSession, PrismaClient } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
 import { PlayerSessionWithStats } from "../types/playerSession";
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({ log: ["query"] });
 
 // --- Priorities ---
 
@@ -38,9 +38,7 @@ export const getLatestMarioKart8Session: () => Promise<
 const getMarioKart8SetById = async (setId: number) => {
   try {
     const mk8Set = await prisma.gameSet.findUnique({
-      where: {
-        setId: setId,
-      },
+      where: { setId },
       include: {
         matches: {
           include: {

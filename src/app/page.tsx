@@ -1,29 +1,15 @@
-"use client";
-
+import { PieChartRDC } from "@/components/charts";
 import { H1, H2 } from "@/components/headings";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { type ChartConfig } from "@/components/ui/chart";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis } from "recharts";
+import { getAllGames } from "../../prisma/lib/games";
+import { FeatureFlag } from "@/lib/featureflag";
 
-export default function Home() {
-  const router = useRouter();
+export default async function Home() {
+  const games = await getAllGames();
+
   return (
     <>
       <div className="m-16">
@@ -54,38 +40,41 @@ export default function Home() {
               </Link>
             </Button>
           </div>
-          <PieChartRDC />
-          {/* <Chart /> */}
+          <PieChartRDC config={config} data={data} />
         </div>
         <H2 className="mx-auto my-10 w-fit text-chart-4">Games</H2>
         <div className="flex gap-10">
-          {[0, 0, 0, 0, 0, 0, 0, 0].map((c, i) => (
-            <Card key={i} className="h-64 w-64">
+          {games.map((game) => (
+            <Card key={game.gameId} className="h-64 w-64">
               <CardHeader>
-                <CardTitle>Test</CardTitle>
+                <CardTitle>{game.gameName}</CardTitle>
               </CardHeader>
             </Card>
           ))}
         </div>
-        <H2 className="mx-auto my-10 w-fit text-chart-4">Want to Help</H2>
-        <Card className="mx-auto h-64 w-1/2">
-          <CardHeader>
-            <CardContent>
-              <p>
-                We could use some help keeping up scores. We have a place where
-                you can submit scores and we&apos;ll review them and compare
-                with other scores. In order to submit scores you must be signed
-                in.
-              </p>
-              <Button
-                className="mt-4"
-                onClick={() => router.push("/submission")}
-              >
-                Submit new entry
-              </Button>
-            </CardContent>
-          </CardHeader>
-        </Card>
+        <FeatureFlag
+          devOnly
+          flagName="SUBMISSION_FORM"
+          user={{}}
+          shouldRedirect={false}
+        >
+          <H2 className="mx-auto my-10 w-fit text-chart-4">Want to Help</H2>
+          <Card className="mx-auto h-64 w-1/2">
+            <CardHeader>
+              <CardContent>
+                <p>
+                  We could use some help keeping up scores. We have a place
+                  where you can submit scores and we&apos;ll review them and
+                  compare with other scores. In order to submit scores you must
+                  be signed in.
+                </p>
+                <Button asChild className="mt-4">
+                  <Link href="/submissions">Submit new entry</Link>
+                </Button>
+              </CardContent>
+            </CardHeader>
+          </Card>
+        </FeatureFlag>
       </div>
     </>
   );
@@ -139,58 +128,3 @@ const config = {
   aff: { label: "Aff", color: "hsl(var(--chart-5))" },
   dylan: { label: "Dylan", color: "green" },
 } satisfies ChartConfig;
-
-const PieChartRDC = () => {
-  // TODO This Chart will rank the average of placements in each category.
-  // TODO Reponsive not working. May need to mess with config or use grid resizing via css.
-  return (
-    <Card className="h-fit min-w-fit max-w-3xl">
-      <CardHeader>
-        <CardTitle>Sorry scale</CardTitle>
-        <CardDescription>
-          This chart represents the average ranking of each member across all
-          games. AKA who is the sorriest
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer className="min-h-32" config={config}>
-          <PieChart>
-            <Pie data={data} dataKey="sorryScale" nameKey="player" />
-            <ChartLegend content={<ChartLegendContent />} />
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-          </PieChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
-  );
-};
-
-const Chart = () => {
-  return (
-    <Card className="w-fit">
-      <CardHeader>
-        <CardTitle>3v3 Rocket League</CardTitle>
-        <CardDescription>July - Now</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={config} className="min-h-60 w-full">
-          <BarChart accessibilityLayer data={data}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="player"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-            />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent nameKey="player" />} />
-            <Bar dataKey="sorryCounter" fill="hsl(var(--chart-1))" radius={4} />
-          </BarChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter>
-        <p>Trending up by 5%</p>
-      </CardFooter>
-    </Card>
-  );
-};

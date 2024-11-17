@@ -23,6 +23,13 @@ import {
 } from "./ui/tooltip";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 export const Navbar = () => {
+  const links = [
+    { text: "Home", ref: "" },
+    { text: "About", ref: "about" },
+  ];
+
+  // TODO Fetch Games and Members from DB.
+
   const games: { desc?: string; url: string; name: string }[] = [
     {
       desc: "Stats from the most intense 3v3 battles.",
@@ -194,13 +201,14 @@ export const Navbar = () => {
 };
 
 const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
+  React.ComponentRef<"a">,
   React.ComponentPropsWithoutRef<"a">
 >(({ className, title, children, href = "", ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
         <Link
+          prefetch={true}
           href={href}
           ref={ref}
           className={cn(
