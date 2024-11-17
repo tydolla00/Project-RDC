@@ -18,45 +18,51 @@ import {
 } from "@/components/ui/chart";
 import { BarChart, YAxis } from "recharts";
 import { CartesianGrid, XAxis, Bar } from "recharts";
-import { getAveragePlacing } from "../../../../../../../prisma/lib/marioKart";
-
-export const Chart = ({
-  avgPlacing,
+// TODO Add config and data and namekey props
+export const CustomChart = ({
+  data,
+  nameKey,
+  config,
+  dataKey,
+  title,
+  description,
+  type = "bar",
 }: {
-  avgPlacing: Awaited<
-    ReturnType<typeof getAveragePlacing>
-  >["avgPlacingPerPlayer"];
+  data: { [key: string]: any }[];
+  nameKey: keyof (typeof data)[0];
+  config: ChartConfig;
+  dataKey: keyof (typeof data)[0];
+  title: string;
+  description: string;
+  type?: "pie" | "bar";
 }) => {
-  const data = Array.from(avgPlacing, ([key, val]) => ({
-    player: key,
-    placing: val.avg,
-    played: val.count,
-  }));
-  const config = {
-    player: { label: "Player" },
-    placing: { label: "Avg Placing" },
-    played: { label: "# of Races" },
-  } satisfies ChartConfig;
+  if (data.some((d) => d[nameKey] === undefined))
+    console.error("NameKey not present in data passed to chart.");
+  if (data.some((d) => d[dataKey] === undefined))
+    console.error("DataKey not present in data passed to chart");
+
   return (
     <Card className="w-fit">
       <CardHeader>
-        <CardTitle>Average Placing</CardTitle>
-        <CardDescription>July - Now</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={config} className="min-h-60 w-full">
           <BarChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="player"
+              dataKey={nameKey}
               tickLine={false}
               axisLine={false}
               tickMargin={10}
             />
             <YAxis />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent nameKey="player" />} />
-            <Bar dataKey="placing" fill="hsl(var(--chart-1))" radius={4} />
+            <ChartLegend
+              content={<ChartLegendContent nameKey={nameKey.toString()} />}
+            />
+            <Bar dataKey={dataKey} fill="hsl(var(--chart-1))" radius={4} />
             {/* <Bar dataKey="played" fill="hsl(var(--chart-2))" radius={4} /> */}
           </BarChart>
         </ChartContainer>

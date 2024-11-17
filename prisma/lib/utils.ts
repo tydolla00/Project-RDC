@@ -3,4 +3,5 @@ export enum StatNames {
   MarioKartPosition = "MK8_POS",
   CodDays = "COD_DAY",
   CodPosition = "COD_POS",
+  RLScore = "RL_SCORE",
 }
