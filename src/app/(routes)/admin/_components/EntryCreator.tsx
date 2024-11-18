@@ -1,27 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import PlayerSelector from "./PlayerSelector";
 import { Game, Match, Player } from "@prisma/client";
 import { EnrichedGameSet } from "../../../../../prisma/types/gameSet";
 import useAdminFormCreator from "@/lib/hooks/useAdminFormCreator";
 import MatchForm from "../../submission/_components/MatchForm";
 import * as Separator from "@radix-ui/react-separator";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import {
-  Command,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-} from "@/components/ui/command";
-import { ChevronsUpDown, Check } from "lucide-react";
+import AdminGameDropDown from "./AdminGameDropDown";
 
 interface Props {
   rdcMembers: Player[];
@@ -35,80 +20,8 @@ const EntryCreator = ({ rdcMembers }: Props) => {
     addSetToSession,
     addMatchToSet,
     getNextTempSessionId,
-    getNextTempSetId,
-    getNextTempMatchId,
-    getNextTempPlayerSessionId,
-    getNextTempPlayerStatId,
   } = useAdminFormCreator();
 
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[] | null>(null);
-  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-
-  const [open, setOpen] = React.useState(false);
-
-  const testGames: Game[] = [
-    {
-      gameId: 1,
-      gameName: "Mario Kart",
-    },
-    {
-      gameId: 2,
-      gameName: "Call of Duty",
-    },
-    {
-      gameId: 3,
-      gameName: "Gang Beasts",
-    },
-  ];
-
-  const videoGameDropdown3 = (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[200px] justify-between"
-        >
-          {selectedGame?.gameId
-            ? testGames.find((game) => game.gameId === selectedGame.gameId)
-                ?.gameName
-            : "Select games..."}
-          <ChevronsUpDown className="opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder="Search games..." />
-          <CommandList>
-            <CommandEmpty>No game found.</CommandEmpty>
-            <CommandGroup>
-              {testGames.map((game) => (
-                <CommandItem
-                  key={game.gameId}
-                  value={game.gameName}
-                  onSelect={(gameId) => {
-                    setSelectedGame(
-                      gameId === game.gameId.toString() ? null : game,
-                    );
-                    setOpen(false);
-                  }}
-                >
-                  {game.gameName}
-                  <Check
-                    className={cn(
-                      "ml-auto",
-                      game.gameId === game.gameId ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
   return (
     <div className="flex flex-col">
       <h2 className="text-2xl font-bold underline">Entry Creator</h2>
@@ -158,17 +71,13 @@ const EntryCreator = ({ rdcMembers }: Props) => {
             <div className="flex flex-col items-center">
               <label className="">Game</label>
 
-              {videoGameDropdown3}
+              <AdminGameDropDown />
             </div>
             {/* Player Selector */}
             <div className="flex flex-col items-center">
               <label className="">Player Selector </label>
 
-              <PlayerSelector
-                rdcMembers={rdcMembers}
-                selectedPlayers={selectedPlayers}
-                setSelectedPlayers={setSelectedPlayers}
-              />
+              <PlayerSelector rdcMembers={rdcMembers} />
             </div>
           </div>
           {/* Set Info */}
@@ -202,24 +111,13 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                 {/* Match might need to be custom type to give access to relations */}
                 {set.matches &&
                   set.matches.map((match: Match, matchId: number) => (
-                    <MatchForm
-                      key={matchId}
-                      players={selectedPlayers}
-                    ></MatchForm>
+                    <MatchForm key={matchId} players={[]}></MatchForm>
                   ))}
 
                 {/* Set Winner */}
                 <div className="flex flex-col items-center">
                   <p className="text-2xl">Set Winner</p>
-                  <PlayerSelector
-                    rdcMembers={selectedPlayers ?? []}
-                    selectedPlayers={null}
-                    setSelectedPlayers={function (
-                      value: React.SetStateAction<
-                        { playerId: number; playerName: string }[] | null
-                      >,
-                    ): void {}}
-                  ></PlayerSelector>
+                  <PlayerSelector rdcMembers={[]} />
                 </div>
               </div>
             ))}

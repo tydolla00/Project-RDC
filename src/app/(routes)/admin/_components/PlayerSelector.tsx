@@ -1,18 +1,13 @@
+"use client";
 import { Player } from "@prisma/client";
-import * as Avatar from "@radix-ui/react-avatar";
-import React from "react";
+import React, { useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
-import { set } from "react-hook-form";
 interface Props {
   rdcMembers: Player[];
-  selectedPlayers: Player[] | null;
-  setSelectedPlayers?: React.Dispatch<React.SetStateAction<Player[] | null>>;
 }
-const PlayerSelector = ({
-  rdcMembers,
-  selectedPlayers,
-  setSelectedPlayers,
-}: Props) => {
+const PlayerSelector = ({ rdcMembers }: Props) => {
+  const [selectedPlayers, setSelectedPlayers] = useState<Player[] | null>(null);
+
   const handlePlayerClick = (player: Player) => {
     if (setSelectedPlayers === undefined) return;
     console.log("Handle Player Click", player);
@@ -56,10 +51,3 @@ const PlayerSelector = ({
 };
 
 export default PlayerSelector;
-
-/**
- * 
- * `m-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full ${
-              selectedPlayers?.includes(player) ? "bg-blue-500" : "bg-slate-400"
-            }`
- */

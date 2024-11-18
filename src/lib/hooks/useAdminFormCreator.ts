@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { EnrichedSession } from "../../../prisma/types/session";
 import { EnrichedGameSet } from "../../../prisma/types/gameSet";

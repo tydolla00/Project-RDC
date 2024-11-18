@@ -9,6 +9,7 @@ import PlayerStatForm from "./PlayerStatForm";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { GameStat, Player } from "@prisma/client";
 import PlayerSelector from "../../admin/_components/PlayerSelector";
+import prisma from "../../../../../prisma/db";
 
 // Need to get the game from Entry Creator/ Admin Form Hook
 interface Props {
@@ -52,7 +53,7 @@ const MatchForm: React.FC<Props> = ({ players }) => {
           id="match-winner-selector-container"
         >
           Match Winner
-          <PlayerSelector rdcMembers={players ?? []} selectedPlayers={[]} />
+          <PlayerSelector rdcMembers={players ?? []} />
         </div>
       </CollapsibleContent>
     </Collapsible>
