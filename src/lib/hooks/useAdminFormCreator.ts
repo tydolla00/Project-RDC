@@ -2,8 +2,6 @@ import { useState } from "react";
 import { EnrichedSession } from "../../../prisma/types/session";
 import { EnrichedGameSet } from "../../../prisma/types/gameSet";
 import { EnrichedMatch } from "../../../prisma/types/match";
-import { GameStat } from "@prisma/client";
-import { fetchGameStats } from "../../../prisma/lib/admin";
 
 const useAdminFormCreator = () => {
   const [session, setSession] = useState<EnrichedSession>({
@@ -110,10 +108,6 @@ const useAdminFormCreator = () => {
     return playerStatCounter;
   };
 
-  const getGameStats = async (gameId: number): Promise<GameStat[]> => {
-    return await fetchGameStats(gameId);
-  };
-
   return {
     session,
     isInCreationFlow,
@@ -125,7 +119,6 @@ const useAdminFormCreator = () => {
     getNextTempMatchId,
     getNextTempPlayerSessionId,
     getNextTempPlayerStatId,
-    getGameStats,
   };
 };
 

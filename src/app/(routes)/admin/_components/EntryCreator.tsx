@@ -39,7 +39,6 @@ const EntryCreator = ({ rdcMembers }: Props) => {
     getNextTempMatchId,
     getNextTempPlayerSessionId,
     getNextTempPlayerStatId,
-    getGameStats,
   } = useAdminFormCreator();
 
   const [selectedPlayers, setSelectedPlayers] = useState<Player[] | null>(null);
@@ -206,7 +205,6 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                     <MatchForm
                       key={matchId}
                       players={selectedPlayers}
-                      getGameStats={getGameStats}
                     ></MatchForm>
                   ))}
 

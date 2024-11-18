@@ -7,14 +7,3 @@ export const getRDCMembers = async () => {
 
   return members;
 };
-
-export const fetchGameStats = async (gameId: number) => {
-  const prisma = new PrismaClient();
-  const gameStats = await prisma.gameStat.findMany({
-    where: {
-      gameId: gameId,
-    },
-  });
-
-  return gameStats;
-};
