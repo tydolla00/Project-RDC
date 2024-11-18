@@ -7,6 +7,7 @@ import useAdminFormCreator from "@/lib/hooks/useAdminFormCreator";
 import MatchForm from "../../submission/_components/MatchForm";
 import * as Separator from "@radix-ui/react-separator";
 import AdminGameDropDown from "./AdminGameDropDown";
+import { useSearchParams } from "next/navigation";
 
 interface Props {
   rdcMembers: Player[];
@@ -21,6 +22,36 @@ const EntryCreator = ({ rdcMembers }: Props) => {
     addMatchToSet,
     getNextTempSessionId,
   } = useAdminFormCreator();
+
+  const searchParams = useSearchParams();
+
+  const selectedPlayerIds = searchParams
+    .getAll("selectedPlayers")
+    .join(",")
+    .split(",");
+
+  const getSelectedPlayers = (
+    selectedPlayerIds: string[],
+    rdcMembers: Player[],
+  ) => {
+    return rdcMembers.filter((player) =>
+      selectedPlayerIds.includes(player.playerId.toString()),
+    );
+  };
+
+  const selectedPlayers: Player[] = getSelectedPlayers(
+    selectedPlayerIds,
+    rdcMembers,
+  );
+
+  // LOGGING
+  selectedPlayers.forEach((player) => {
+    console.log(
+      `Selected Players: ${selectedPlayers
+        .map((player) => `${player.playerId}:${player.playerName}`)
+        .join(" ")}`,
+    );
+  });
 
   return (
     <div className="flex flex-col">

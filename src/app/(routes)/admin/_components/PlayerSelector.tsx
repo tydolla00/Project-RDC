@@ -1,26 +1,43 @@
 "use client";
 import { Player } from "@prisma/client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 interface Props {
   rdcMembers: Player[];
 }
 const PlayerSelector = ({ rdcMembers }: Props) => {
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[] | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams(); // Do we need to debounce?
+
+  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+
+  useEffect(() => {
+    const selectedPlayerIds = searchParams.get("selectedPlayers");
+    if (selectedPlayerIds) {
+      const ids = selectedPlayerIds.split(",").map(Number);
+      const initialSelectedPlayers = rdcMembers.filter((player) =>
+        ids.includes(player.playerId),
+      );
+      setSelectedPlayers(initialSelectedPlayers);
+    }
+  }, [searchParams, rdcMembers]);
 
   const handlePlayerClick = (player: Player) => {
-    if (setSelectedPlayers === undefined) return;
-    console.log("Handle Player Click", player);
+    const isSelected = selectedPlayers.some(
+      (p) => p.playerId === player.playerId,
+    );
+    const updatedPlayers = isSelected
+      ? selectedPlayers.filter((p) => p.playerId !== player.playerId)
+      : [...selectedPlayers, player];
 
-    setSelectedPlayers((prevSelected) => {
-      if (prevSelected === null) {
-        return [player];
-      }
-      if (prevSelected.some((p) => p.playerId === player.playerId)) {
-        return prevSelected.filter((p) => p.playerId !== player.playerId);
-      }
-      return [...prevSelected, player];
-    });
+    setSelectedPlayers(updatedPlayers);
+
+    const updatedPlayerIds = updatedPlayers.map((p) => p.playerId).join(",");
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set("selectedPlayers", updatedPlayerIds);
+    router.push(`?${newSearchParams.toString()}`);
   };
 
   return (
