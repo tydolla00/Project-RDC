@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -7,16 +8,30 @@ import {
 import * as Toolbar from "@radix-ui/react-toolbar";
 import PlayerStatForm from "./PlayerStatForm";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { GameStat, Player } from "@prisma/client";
-import PlayerSelector from "../../admin/_components/PlayerSelector";
-import prisma from "../../../../../prisma/db";
+import { Player } from "@prisma/client";
+import PlayerSelector from "./PlayerSelector";
 
 // Need to get the game from Entry Creator/ Admin Form Hook
 interface Props {
-  players: Player[] | null;
+  matchPlayers: Player[] | null;
 }
 
-const MatchForm: React.FC<Props> = ({ players }) => {
+const MatchForm: React.FC<Props> = ({ matchPlayers }) => {
+  const [matchWinners, setMatchWinners] = useState<Player[]>([]);
+  console.log("Match Winners: ", matchWinners);
+
+  const handleMatchPlayerClick = (player: Player) => {
+    setMatchWinners((prevWinners) => {
+      if (prevWinners.includes(player)) {
+        return prevWinners.filter(
+          (winner) => winner.playerId !== player.playerId,
+        );
+      } else {
+        return [...prevWinners, player];
+      }
+    });
+  };
+
   return (
     <Collapsible className="m-2 w-full">
       <CollapsibleTrigger asChild className="w-full">
@@ -34,7 +49,7 @@ const MatchForm: React.FC<Props> = ({ players }) => {
       </CollapsibleTrigger>
       <CollapsibleContent className="rounded-b-md bg-gray-100 p-4 dark:bg-gray-800">
         Match Content
-        {players?.map((player: Player, index: number) => (
+        {matchPlayers?.map((player: Player, index: number) => (
           <PlayerStatForm
             key={index}
             player={player}
@@ -53,7 +68,11 @@ const MatchForm: React.FC<Props> = ({ players }) => {
           id="match-winner-selector-container"
         >
           Match Winner
-          <PlayerSelector rdcMembers={players ?? []} />
+          <PlayerSelector
+            optionalHandlePlayerClickMethod={handleMatchPlayerClick}
+            referencePlayers={matchWinners}
+            rdcMembers={matchPlayers ?? []}
+          />
         </div>
       </CollapsibleContent>
     </Collapsible>

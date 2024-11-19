@@ -6,8 +6,14 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 interface Props {
   rdcMembers: Player[];
+  referencePlayers?: Player[];
+  optionalHandlePlayerClickMethod?: (player: Player) => void;
 }
-const PlayerSelector = ({ rdcMembers }: Props) => {
+const PlayerSelector = ({
+  optionalHandlePlayerClickMethod,
+  referencePlayers,
+  rdcMembers,
+}: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams(); // Do we need to debounce?
 
@@ -40,6 +46,21 @@ const PlayerSelector = ({ rdcMembers }: Props) => {
     router.push(`?${newSearchParams.toString()}`);
   };
 
+  const getPlayerAvatarClassName = (player: Player) => {
+    const isSelected = selectedPlayers.includes(player);
+    const isReferencePlayer = referencePlayers?.some(
+      (refPlayer) => refPlayer.playerId === player.playerId,
+    );
+
+    if (isReferencePlayer && isSelected) {
+      return "bg-green-500";
+    } else if (isSelected) {
+      return "bg-blue-500";
+    } else {
+      return "bg-slate-400";
+    }
+  };
+
   return (
     <div
       className="flex flex-col items-center rounded-md border p-4"
@@ -51,12 +72,18 @@ const PlayerSelector = ({ rdcMembers }: Props) => {
             <PlayerAvatar
               key={index}
               player={player}
-              handleOnClick={() => handlePlayerClick(player)}
-              optionalClassName={`m-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full ${
-                selectedPlayers?.includes(player)
-                  ? "bg-blue-500"
-                  : "bg-slate-400"
-              }`}
+              handleOnClick={
+                optionalHandlePlayerClickMethod
+                  ? () => optionalHandlePlayerClickMethod(player)
+                  : () => handlePlayerClick(player)
+              }
+              optionalClassName={`m-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full ${getPlayerAvatarClassName(
+                player,
+              )}`}
+              //   selectedPlayers?.includes(player)
+              //     ? "bg-blue-500"
+              //     : "bg-slate-400"
+              // }`}
             />
           ))}
         </div>

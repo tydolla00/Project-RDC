@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import PlayerSelector from "./PlayerSelector";
-import { Game, Match, Player } from "@prisma/client";
+import { Match, Player } from "@prisma/client";
 import { EnrichedGameSet } from "../../../../../prisma/types/gameSet";
 import useAdminFormCreator from "@/lib/hooks/useAdminFormCreator";
-import MatchForm from "../../submission/_components/MatchForm";
+import MatchForm from "./MatchForm";
 import * as Separator from "@radix-ui/react-separator";
 import AdminGameDropDown from "./AdminGameDropDown";
 import { useSearchParams } from "next/navigation";
@@ -142,13 +142,16 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                 {/* Match might need to be custom type to give access to relations */}
                 {set.matches &&
                   set.matches.map((match: Match, matchId: number) => (
-                    <MatchForm key={matchId} players={[]}></MatchForm>
+                    <MatchForm
+                      key={matchId}
+                      matchPlayers={selectedPlayers}
+                    ></MatchForm>
                   ))}
 
                 {/* Set Winner */}
                 <div className="flex flex-col items-center">
                   <p className="text-2xl">Set Winner</p>
-                  <PlayerSelector rdcMembers={[]} />
+                  <PlayerSelector rdcMembers={selectedPlayers} />
                 </div>
               </div>
             ))}

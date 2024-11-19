@@ -23,7 +23,7 @@ const PlayerAvatar = ({
       }
       onClick={handleOnClick}
     >
-      <Avatar.Fallback className="AvatarFallback" delayMs={600}>
+      <Avatar.Fallback className="AvatarFallback" delayMs={200}>
         {player.playerName.slice(0, 2)}
       </Avatar.Fallback>
     </Avatar.Root>
