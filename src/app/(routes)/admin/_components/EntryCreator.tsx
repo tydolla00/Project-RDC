@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import PlayerSelector from "./PlayerSelector";
 import { Match, Player } from "@prisma/client";
 import { EnrichedGameSet } from "../../../../../prisma/types/gameSet";
@@ -27,10 +27,9 @@ const EntryCreator = ({ rdcMembers }: Props) => {
 
   const searchParams = useSearchParams();
 
-  const selectedPlayerIds = searchParams
-    .getAll("selectedPlayers")
-    .join(",")
-    .split(",");
+  const selectedPlayerIds = useMemo(() => {
+    return searchParams.getAll("selectedPlayers").join(",").split(",");
+  }, [searchParams]);
 
   const getSelectedPlayers = (
     selectedPlayerIds: string[],
@@ -46,10 +45,9 @@ const EntryCreator = ({ rdcMembers }: Props) => {
     [selectedPlayerIds, rdcMembers],
   );
 
-  // // TODO: THis doesn't work!
-  // useEffect(() => {
-  //   setSessionPlayers(selectedPlayers);
-  // }, []);
+  useEffect(() => {
+    setSessionPlayers(selectedPlayers);
+  }, [selectedPlayers, setSessionPlayers]);
 
   // LOGGING
   selectedPlayers.forEach((player) => {

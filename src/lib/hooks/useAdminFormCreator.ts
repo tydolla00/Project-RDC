@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EnrichedSession } from "../../../prisma/types/session";
 import { EnrichedGameSet } from "../../../prisma/types/gameSet";
 import { EnrichedMatch } from "../../../prisma/types/match";
@@ -39,6 +39,8 @@ const useAdminFormCreator = () => {
     });
     setIsInCreationFlow(true);
   };
+
+  useEffect(() => {}, [playerSessionCounter]);
 
   const addSetToSession = (sessionId: number) => {
     console.log("Creating Set");
@@ -88,7 +90,7 @@ const useAdminFormCreator = () => {
     });
   };
 
-  const updateSetWiners = (setId: number) => {
+  const updateSetWinners = (setId: number) => {
     // Should take in a set ID and update the winner array
   };
 
@@ -102,10 +104,12 @@ const useAdminFormCreator = () => {
     setId: number,
   ) => {
     const playerSessions: EnrichedPlayerSession[] = players.map((player) => {
+      const playerSessionId = getNextTempMatchId();
+
       return {
         sessionId: session.sessionId,
         setId: setId, // TODO: ????
-        playerSessionId: getNextTempPlayerSessionId(),
+        playerSessionId: playerSessionId,
         matchId: matchId,
         playerId: player.playerId,
         playerStats: [],
@@ -121,7 +125,9 @@ const useAdminFormCreator = () => {
       };
     });
 
-    console.log("Player Sessions: ", playerSessions);
+    console.log(
+      `Created Player Sessions for Match${matchId}: ${playerSessions}`,
+    );
     return playerSessions;
   };
 
@@ -144,7 +150,6 @@ const useAdminFormCreator = () => {
     setPlayerSessionCounter((prev) => prev + 1);
     return playerSessionCounter;
   };
-
   const getNextTempPlayerStatId = () => {
     setPlayerStatCounter((prev) => prev + 1);
     return playerStatCounter;
