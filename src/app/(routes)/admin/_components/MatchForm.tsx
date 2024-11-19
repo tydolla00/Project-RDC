@@ -69,7 +69,7 @@ const MatchForm: React.FC<Props> = ({ matchPlayers }) => {
         >
           Match Winner
           <PlayerSelector
-            optionalHandlePlayerClickMethod={handleMatchPlayerClick}
+            handlePlayerClick={handleMatchPlayerClick}
             referencePlayers={matchWinners}
             rdcMembers={matchPlayers ?? []}
           />

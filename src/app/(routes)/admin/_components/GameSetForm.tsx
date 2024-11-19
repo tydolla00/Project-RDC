@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import MatchForm from "./MatchForm";
 import PlayerSelector from "./PlayerSelector";
-import useAdminFormCreator from "@/lib/hooks/useAdminFormCreator";
 import { EnrichedGameSet } from "../../../../../prisma/types/gameSet";
 import { Match, Player } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
@@ -11,10 +10,27 @@ import { Separator } from "@/components/ui/separator";
 interface Props {
   set: EnrichedGameSet;
   setPlayers: Player[];
+  addMatchToSet: (setId: number) => void;
 }
 
-const GameSetForm = ({ set, setPlayers }: Props) => {
-  const { addMatchToSet } = useAdminFormCreator();
+const GameSetForm = ({ set, setPlayers, addMatchToSet }: Props) => {
+  const [setWinners, setSetWinners] = useState<Player[]>([]);
+
+  const handleSetWinnerClick = (player: Player) => {
+    console.log("Set Player Clicked: ", player);
+    setSetWinners((prevWinners) => {
+      if (prevWinners.includes(player)) {
+        return prevWinners.filter(
+          (winner) => winner.playerId !== player.playerId,
+        );
+      } else {
+        return [...prevWinners, player];
+      }
+    });
+  };
+
+  console.log("SET: ", set);
+
   return (
     <div
       className="m-2 flex flex-col justify-start"
@@ -39,14 +55,17 @@ const GameSetForm = ({ set, setPlayers }: Props) => {
 
       {/* Match might need to be custom type to give access to relations */}
       {set.matches &&
-        set.matches.map((match: Match, matchId: number) => (
-          <MatchForm key={matchId} matchPlayers={setPlayers}></MatchForm>
+        set.matches.map((match: Match) => (
+          <MatchForm key={match.matchId} matchPlayers={setPlayers}></MatchForm>
         ))}
 
       {/* Set Winner */}
       <div className="flex flex-col items-center">
         <p className="text-2xl">Set Winner</p>
-        <PlayerSelector rdcMembers={setPlayers} />
+        <PlayerSelector
+          rdcMembers={setPlayers}
+          handlePlayerClick={handleSetWinnerClick}
+        />
       </div>
     </div>
   );

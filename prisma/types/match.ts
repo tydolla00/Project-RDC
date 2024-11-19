@@ -4,11 +4,7 @@ const enrichedMatch = Prisma.validator<Prisma.MatchArgs>()({
   include: {
     playerSessions: {
       include: {
-        player: {
-          select: {
-            playerName: true,
-          },
-        },
+        player: true,
         playerStats: true,
       },
     },

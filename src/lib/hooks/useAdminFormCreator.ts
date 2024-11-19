@@ -3,6 +3,8 @@ import { useState } from "react";
 import { EnrichedSession } from "../../../prisma/types/session";
 import { EnrichedGameSet } from "../../../prisma/types/gameSet";
 import { EnrichedMatch } from "../../../prisma/types/match";
+import { Player } from "@prisma/client";
+import { EnrichedPlayerSession } from "../../../prisma/types/playerSession";
 
 const useAdminFormCreator = () => {
   const [session, setSession] = useState<EnrichedSession>({
@@ -16,6 +18,7 @@ const useAdminFormCreator = () => {
   });
 
   const [sessionIdCounter, setSessionIdCounter] = useState(1);
+  const [sessionPlayers, setSessionPlayers] = useState<Player[]>([]);
   const [setIdCounter, setSetIdCounter] = useState(1);
   const [matchIdCounter, setMatchIdCounter] = useState(1);
   const [playerSessionCounter, setPlayerSessionCounter] = useState(1);
@@ -51,6 +54,8 @@ const useAdminFormCreator = () => {
     });
   };
 
+  console.log("Session: ", session);
+
   const addMatchToSet = (setId: number) => {
     console.log(`Creating Match for ${setId}`);
     // TODO: Add match winner
@@ -58,8 +63,16 @@ const useAdminFormCreator = () => {
       matchId: getNextTempMatchId(),
       setId: setId,
       date: new Date(),
-      playerSessions: [],
+      playerSessions: [], // Need to populate playerSessions here
     };
+
+    newMatch.playerSessions = createPlayerSessionsForMatch(
+      newMatch.matchId,
+      sessionPlayers,
+      setId,
+    );
+
+    console.log("New Match: ", newMatch);
 
     setSession((prevSession) => {
       const updatedSets = prevSession.sets.map((set) => {
@@ -83,6 +96,35 @@ const useAdminFormCreator = () => {
   /* Whenever a match is created we need to add playerSessions
    *based on the selected players and populate playerSession with appropriate stats based on game
    */
+
+  const createPlayerSessionsForMatch = (
+    matchId: number,
+    players: Player[],
+    setId: number,
+  ) => {
+    const playerSessions: EnrichedPlayerSession[] = players.map((player) => {
+      return {
+        sessionId: session.sessionId,
+        setId: setId, // TODO: ????
+        playerSessionId: getNextTempPlayerSessionId(),
+        matchId: matchId,
+        playerId: player.playerId,
+        playerStats: [],
+        match: {
+          date: new Date(),
+          setId: 0,
+          matchId: matchId,
+        },
+        player: {
+          playerId: player.playerId,
+          playerName: player.playerName,
+        },
+      };
+    });
+
+    console.log("Player Sessions: ", playerSessions);
+    return playerSessions;
+  };
 
   const getNextTempSessionId = () => {
     setSessionIdCounter((prev) => prev + 1);
@@ -120,6 +162,7 @@ const useAdminFormCreator = () => {
     getNextTempMatchId,
     getNextTempPlayerSessionId,
     getNextTempPlayerStatId,
+    setSessionPlayers,
   };
 };
 

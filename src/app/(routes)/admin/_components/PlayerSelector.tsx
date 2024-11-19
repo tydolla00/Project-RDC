@@ -7,10 +7,10 @@ import { useSearchParams } from "next/navigation";
 interface Props {
   rdcMembers: Player[];
   referencePlayers?: Player[];
-  optionalHandlePlayerClickMethod?: (player: Player) => void;
+  handlePlayerClick?: (player: Player) => void;
 }
 const PlayerSelector = ({
-  optionalHandlePlayerClickMethod,
+  handlePlayerClick,
   referencePlayers,
   rdcMembers,
 }: Props) => {
@@ -30,7 +30,7 @@ const PlayerSelector = ({
     }
   }, [searchParams, rdcMembers]);
 
-  const handlePlayerClick = (player: Player) => {
+  const defaultHandlePlayerClick = (player: Player) => {
     const isSelected = selectedPlayers.some(
       (p) => p.playerId === player.playerId,
     );
@@ -52,12 +52,21 @@ const PlayerSelector = ({
       (refPlayer) => refPlayer.playerId === player.playerId,
     );
 
-    if (isReferencePlayer && isSelected) {
-      return "bg-green-500";
-    } else if (isSelected) {
-      return "bg-blue-500";
+    // If there is a reference player array, we want the bg to be a diff color whe selected but
+    // still gray if not selected
+    // if no reference player array default is blue background gray
+    if (isReferencePlayer) {
+      if (isSelected) {
+        return "bg-green-500";
+      } else {
+        return "bg-slate-400";
+      }
     } else {
-      return "bg-slate-400";
+      if (isSelected && isReferencePlayer == null) {
+        return "bg-blue-500";
+      } else {
+        return "bg-slate-400";
+      }
     }
   };
 
@@ -73,9 +82,9 @@ const PlayerSelector = ({
               key={index}
               player={player}
               handleOnClick={
-                optionalHandlePlayerClickMethod
-                  ? () => optionalHandlePlayerClickMethod(player)
-                  : () => handlePlayerClick(player)
+                handlePlayerClick
+                  ? () => handlePlayerClick(player)
+                  : () => defaultHandlePlayerClick(player)
               }
               optionalClassName={`m-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full ${getPlayerAvatarClassName(
                 player,
