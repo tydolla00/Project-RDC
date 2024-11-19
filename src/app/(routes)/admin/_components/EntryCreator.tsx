@@ -127,45 +127,6 @@ const EntryCreator = ({ rdcMembers }: Props) => {
                 setPlayers={selectedPlayers}
                 addMatchToSet={addMatchToSet}
               />
-              // <div
-              //   className="m-2 flex flex-col justify-start"
-              //   id={`session-${session.sessionId}-set-${set.setId}-info`}
-              //   key={set.setId}
-              // >
-              //   {/* Set Id Container*/}
-              //   <div className="flex items-center justify-between p-2">
-              //     <div className="flex items-center">
-              //       <p className="m-2 text-lg">Set {set.setId}</p>
-              //       <input
-              //         type="text"
-              //         placeholder="setId"
-              //         className="w-16 border p-2"
-              //       />
-              //     </div>
-              //     <button
-              //       className="mr-0 w-52 rounded-sm border border-white p-2 hover:bg-gray-600"
-              //       onClick={() => addMatchToSet(set.setId)}
-              //     >
-              //       {" "}
-              //       Add match to Set {set.setId}
-              //     </button>
-              //   </div>
-              //   <Separator.Root className="m-2 h-[1px] w-full bg-slate-800"></Separator.Root>
-
-              //   {set.matches &&
-              //     set.matches.map((match: Match) => (
-              //       <MatchForm
-              //         key={match.matchId}
-              //         matchPlayers={selectedPlayers}
-              //       ></MatchForm>
-              //     ))}
-
-              //   {/* Set Winner */}
-              //   <div className="flex flex-col items-center">
-              //     <p className="text-2xl">Set Winner</p>
-              //     <PlayerSelector rdcMembers={selectedPlayers} />
-              //   </div>
-              // </div>
             ))}
           {/* Set Btn */}
           <button
