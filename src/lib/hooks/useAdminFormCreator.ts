@@ -59,18 +59,17 @@ const useAdminFormCreator = () => {
   const addMatchToSet = (setId: number) => {
     console.log(`Creating Match for ${setId}`);
     // TODO: Add match winner
+    const matchId = getNextTempMatchId();
     const newMatch: EnrichedMatch = {
-      matchId: getNextTempMatchId(),
+      matchId: matchId,
       setId: setId,
       date: new Date(),
-      playerSessions: [], // Need to populate playerSessions here
+      playerSessions: createPlayerSessionsForMatch(
+        matchId,
+        sessionPlayers,
+        setId,
+      ), // Need to poulate playerSessions here
     };
-
-    newMatch.playerSessions = createPlayerSessionsForMatch(
-      newMatch.matchId,
-      sessionPlayers,
-      setId,
-    );
 
     console.log("New Match: ", newMatch);
 
@@ -112,7 +111,7 @@ const useAdminFormCreator = () => {
         playerStats: [],
         match: {
           date: new Date(),
-          setId: 0,
+          setId: setId,
           matchId: matchId,
         },
         player: {
