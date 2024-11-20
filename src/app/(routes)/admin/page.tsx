@@ -9,6 +9,7 @@ import EntryCreator from "./_components/EntryCreator";
 import { getRDCMembers } from "../../../../prisma/lib/admin";
 import prisma from "../../../../prisma/db";
 import { Session } from "@prisma/client";
+import EntryCreatorForm from "./_components/EntryCreatorForm";
 
 const getData = () => {
   const data: Submission[] = [
@@ -50,6 +51,7 @@ export default async function Page() {
       <Suspense fallback={<Skelly />}>
         {/* <DataTable columns={columns} data={[]} /> */}
         <EntryCreator rdcMembers={await getRDCMembers()} />
+        <EntryCreatorForm />
       </Suspense>
     </div>
   );
