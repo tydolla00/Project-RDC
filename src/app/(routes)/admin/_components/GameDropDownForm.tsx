@@ -85,7 +85,7 @@ const GameDropDownForm = () => {
                         value={game.gameName}
                         key={game.gameId}
                         onSelect={() => {
-                          form.setValue("language", game.gameName);
+                          form.setValue("game", game.gameName);
                         }}
                       >
                         {game.gameName}
