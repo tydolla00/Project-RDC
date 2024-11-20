@@ -1,10 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { EnrichedSession } from "../../../prisma/types/session";
 import { EnrichedGameSet } from "../../../prisma/types/gameSet";
 import { EnrichedMatch } from "../../../prisma/types/match";
 import { Player } from "@prisma/client";
-import { EnrichedPlayerSession } from "../../../prisma/types/playerSession";
 
 const useAdminFormCreator = () => {
   const [session, setSession] = useState<EnrichedSession>({
@@ -40,8 +39,6 @@ const useAdminFormCreator = () => {
     setIsInCreationFlow(true);
   };
 
-  useEffect(() => {}, [playerSessionCounter]);
-
   const addSetToSession = (sessionId: number) => {
     console.log("Creating Set");
     const newSet: EnrichedGameSet = {
@@ -66,12 +63,23 @@ const useAdminFormCreator = () => {
       matchId: matchId,
       setId: setId,
       date: new Date(),
-      playerSessions: createPlayerSessionsForMatch(
-        matchId,
-        sessionPlayers,
-        setId,
-      ), // Need to poulate playerSessions here
+      playerSessions: [],
+      // Need to poulate playerSessions here
     };
+
+    for (let i = 0; i < sessionPlayers.length; i++) {
+      const playerSessionIdOffset = (matchId - 1) * sessionPlayers.length;
+      const adjustedPlayerSessionId = i + 1 + playerSessionIdOffset; // This is a hacky way to get the playerSessionId need to rework across the board
+
+      newMatch.playerSessions.push(
+        addPlayerSessionToMatch(
+          matchId,
+          setId,
+          sessionPlayers[i],
+          adjustedPlayerSessionId,
+        ),
+      );
+    }
 
     console.log("New Match: ", newMatch);
 
@@ -98,37 +106,29 @@ const useAdminFormCreator = () => {
    *based on the selected players and populate playerSession with appropriate stats based on game
    */
 
-  const createPlayerSessionsForMatch = (
+  const addPlayerSessionToMatch = (
     matchId: number,
-    players: Player[],
     setId: number,
+    player: Player,
+    playerSessionId: number,
   ) => {
-    const playerSessions: EnrichedPlayerSession[] = players.map((player) => {
-      const playerSessionId = getNextTempMatchId();
-
-      return {
-        sessionId: session.sessionId,
-        setId: setId, // TODO: ????
-        playerSessionId: playerSessionId,
+    return {
+      sessionId: session.sessionId,
+      setId: setId, // TODO: ????
+      playerSessionId: playerSessionId,
+      matchId: matchId,
+      playerId: player.playerId,
+      playerStats: [],
+      match: {
+        date: new Date(),
+        setId: setId,
         matchId: matchId,
+      },
+      player: {
         playerId: player.playerId,
-        playerStats: [],
-        match: {
-          date: new Date(),
-          setId: setId,
-          matchId: matchId,
-        },
-        player: {
-          playerId: player.playerId,
-          playerName: player.playerName,
-        },
-      };
-    });
-
-    console.log(
-      `Created Player Sessions for Match${matchId}: ${playerSessions}`,
-    );
-    return playerSessions;
+        playerName: player.playerName,
+      },
+    };
   };
 
   const getNextTempSessionId = () => {
