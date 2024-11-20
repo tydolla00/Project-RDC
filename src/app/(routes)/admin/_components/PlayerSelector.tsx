@@ -4,18 +4,33 @@ import React, { useEffect, useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import {
+  Control,
+  useController,
+  useFieldArray,
+  useFormContext,
+} from "react-hook-form";
+import { z } from "zod";
+import { formSchema } from "./EntryCreatorForm";
 interface Props {
   rdcMembers: Player[];
   referencePlayers?: Player[];
   handlePlayerClick?: (player: Player) => void;
+  control?: Control<z.infer<typeof formSchema>>;
 }
 const PlayerSelector = ({
   handlePlayerClick,
   referencePlayers,
   rdcMembers,
+  control,
 }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams(); // Do we need to debounce?
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "players",
+  });
 
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
 
@@ -44,6 +59,23 @@ const PlayerSelector = ({
     const newSearchParams = new URLSearchParams(searchParams.toString());
     newSearchParams.set("selectedPlayers", updatedPlayerIds);
     router.push(`?${newSearchParams.toString()}`);
+  };
+
+  const { field, fieldState } = useController({
+    control,
+    name: "players",
+  });
+
+  const reactHookFormHandlePlayerClick = (player: Player) => {
+    const isSelected = selectedPlayers.some(
+      (p) => p.playerId === player.playerId,
+    );
+    const updatedPlayers = isSelected
+      ? selectedPlayers.filter((p) => p.playerId !== player.playerId)
+      : [...selectedPlayers, player];
+
+    setSelectedPlayers(updatedPlayers);
+    field.onChange(updatedPlayers);
   };
 
   const getPlayerAvatarClassName = (player: Player) => {
@@ -84,7 +116,7 @@ const PlayerSelector = ({
               handleOnClick={
                 handlePlayerClick
                   ? () => handlePlayerClick(player)
-                  : () => defaultHandlePlayerClick(player)
+                  : () => reactHookFormHandlePlayerClick(player)
               }
               optionalClassName={`m-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full ${getPlayerAvatarClassName(
                 player,

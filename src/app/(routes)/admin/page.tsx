@@ -51,7 +51,7 @@ export default async function Page() {
       <Suspense fallback={<Skelly />}>
         {/* <DataTable columns={columns} data={[]} /> */}
         <EntryCreator rdcMembers={await getRDCMembers()} />
-        <EntryCreatorForm />
+        <EntryCreatorForm rdcMembers={await getRDCMembers()} />
       </Suspense>
     </div>
   );
