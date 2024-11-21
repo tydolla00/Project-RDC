@@ -10,8 +10,8 @@ interface Props {
 }
 
 const PlayerSessionManager = (props: Props) => {
-  const { setIndex, matchIndex } = props;
-  const { register, control } = useFormContext();
+  const { setIndex, matchIndex, players } = props;
+  const { register, control, getValues } = useFormContext();
   const { append, remove, fields } = useFieldArray({
     name: `sets.${setIndex}.matches${matchIndex}.playerSessions`,
     control,
@@ -21,13 +21,36 @@ const PlayerSessionManager = (props: Props) => {
   );
 
   React.useEffect(() => {
-    props.players.forEach((player) => {
-      append({
-        playerId: player.playerId,
-        playerSessionName: player.playerName,
-      });
+    const finalPlayerSessionValues = getValues(
+      `sets.${setIndex}.matches${matchIndex}.playerSessions`,
+    );
+    console.log(`FinalPlayerSessionValues ${finalPlayerSessionValues} `);
+
+    players.forEach((player) => {
+      const playerExists = finalPlayerSessionValues.some(
+        (session: any) => player.playerId === session.playerId,
+      );
+      if (!playerExists) {
+        append({
+          playerId: player.playerId,
+          playerSessionName: player.playerName,
+        });
+      }
     });
+    // props.players.forEach((player) => {
+    //   const playerExists = fields.some(
+    //     (field) => field.id === player.playerId.toString(),
+    //   );
+    //   if (!playerExists) {
+    //     append({
+    //       playerId: player.playerId,
+    //       playerSessionName: player.playerName,
+    //     });
+    //   }
+    // });
   }, [props.players, append]);
+
+  console.log("Fields: ", fields);
 
   return (
     <div>

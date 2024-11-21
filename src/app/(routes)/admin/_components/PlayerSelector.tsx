@@ -25,7 +25,6 @@ const PlayerSelector = ({
   control,
 }: Props) => {
   const router = useRouter();
-  const searchParams = useSearchParams(); // Do we need to debounce?
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -33,33 +32,6 @@ const PlayerSelector = ({
   });
 
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
-
-  useEffect(() => {
-    const selectedPlayerIds = searchParams.get("selectedPlayers");
-    if (selectedPlayerIds) {
-      const ids = selectedPlayerIds.split(",").map(Number);
-      const initialSelectedPlayers = rdcMembers.filter((player) =>
-        ids.includes(player.playerId),
-      );
-      setSelectedPlayers(initialSelectedPlayers);
-    }
-  }, [searchParams, rdcMembers]);
-
-  const defaultHandlePlayerClick = (player: Player) => {
-    const isSelected = selectedPlayers.some(
-      (p) => p.playerId === player.playerId,
-    );
-    const updatedPlayers = isSelected
-      ? selectedPlayers.filter((p) => p.playerId !== player.playerId)
-      : [...selectedPlayers, player];
-
-    setSelectedPlayers(updatedPlayers);
-
-    const updatedPlayerIds = updatedPlayers.map((p) => p.playerId).join(",");
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set("selectedPlayers", updatedPlayerIds);
-    router.push(`?${newSearchParams.toString()}`);
-  };
 
   const { field, fieldState } = useController({
     control,
