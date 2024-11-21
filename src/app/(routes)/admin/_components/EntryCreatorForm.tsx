@@ -36,7 +36,13 @@ export const formSchema = z.object({
       matches: z.array(
         z.object({
           matchId: z.number(),
-          // Add other Match fields as needed
+          matchWinner: z.custom(),
+          playerSessions: z.array(
+            z.object({
+              playerId: z.number(),
+              playerSessionName: z.string(),
+            }),
+          ),
         }),
       ),
     }),
@@ -86,29 +92,11 @@ const EntryCreatorForm = (props: Props) => {
             />
           </div>
           <SetManager control={control} />
-          {/* <button
-            onClick={() => {
-              form.setValue("sets", [
-                ...form.getValues("sets"),
-                {
-                  setId: form.getValues("sets").length + 1,
-                  matches: [],
-                  setWinner: 0,
-                },
-              ]);
-            }}
-          >
-            {" "}
-            Add Set
-          </button> */}
 
-          {/* <GameDropDownForm /> */}
-          {/* <Controller name="players" render={({ field }) => <PlayerSelector />} /> */}
           <input
             className="rounded-md border border-white p-2 hover:cursor-pointer"
             type="submit"
           />
-          {/* register your input into the hook by invoking the "register" function */}
         </form>
       </Form>
     </FormProvider>

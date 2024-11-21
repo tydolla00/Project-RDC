@@ -2,6 +2,7 @@ import React from "react";
 import { Control, useFieldArray, useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./EntryCreatorForm";
+import MatchManager from "./MatchManager";
 
 interface Props {
   control: Control<z.infer<typeof formSchema>>;
@@ -49,18 +50,13 @@ const SetManager = (props: Props) => {
                 {/* {formState.errors.chapters?.[setIndex]?.title?.message} */}
               </div>
             </label>
-            {/* <ManageNotes setIndex={setIndex} /> */}
-            <div className="mt-1 text-sm text-red-600">
-              {/* Error: Chapter notes */}
-              {/* {formState.errors.sets?.[setIndex]?.notes?.message} */}
-            </div>
+            <MatchManager setIndex={setIndex} />
           </div>
         );
       })}
       <button
         type="button"
         onClick={() => {
-          // Append: notes
           append({ setId: fields.length + 1, matches: [] });
         }}
         className="w-full py-2 text-center text-gray-600 underline underline-offset-4"
