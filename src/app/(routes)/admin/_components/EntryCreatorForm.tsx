@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import PlayerSelector from "./PlayerSelector";
 import { Player } from "@prisma/client";
+import SetManager from "./SetManager";
 
 interface Props {
   rdcMembers: Player[];
@@ -26,6 +27,18 @@ export const formSchema = z.object({
       playerId: z.number(),
       playerName: z.string(),
       // Add other Player fields as needed
+    }),
+  ),
+  sets: z.array(
+    z.object({
+      setId: z.number(),
+      setWinner: z.custom(),
+      matches: z.array(
+        z.object({
+          matchId: z.number(),
+          // Add other Match fields as needed
+        }),
+      ),
     }),
   ),
 });
@@ -72,10 +85,29 @@ const EntryCreatorForm = (props: Props) => {
               )}
             />
           </div>
+          <SetManager control={control} />
+          {/* <button
+            onClick={() => {
+              form.setValue("sets", [
+                ...form.getValues("sets"),
+                {
+                  setId: form.getValues("sets").length + 1,
+                  matches: [],
+                  setWinner: 0,
+                },
+              ]);
+            }}
+          >
+            {" "}
+            Add Set
+          </button> */}
 
           {/* <GameDropDownForm /> */}
           {/* <Controller name="players" render={({ field }) => <PlayerSelector />} /> */}
-          <input className="rounded-md border border-white p-2" type="submit" />
+          <input
+            className="rounded-md border border-white p-2 hover:cursor-pointer"
+            type="submit"
+          />
           {/* register your input into the hook by invoking the "register" function */}
         </form>
       </Form>
