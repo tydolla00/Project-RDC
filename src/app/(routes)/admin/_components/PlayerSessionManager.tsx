@@ -1,7 +1,8 @@
 "use client";
 import { Player } from "@prisma/client";
 import React from "react";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { FieldValues, useFieldArray, useFormContext } from "react-hook-form";
+import { formSchema } from "./EntryCreatorForm";
 
 interface Props {
   setIndex: number;
@@ -9,10 +10,24 @@ interface Props {
   players: Player[];
 }
 
+interface PlayerSessionField {
+  playerId: number;
+  playerSessionName: string;
+}
+
+interface Name {
+  name: string;
+  required: boolean;
+}
+export type FormValuesWithNamesArray = {
+  namesArray: Name[];
+  [key: string]: any;
+};
+
 const PlayerSessionManager = (props: Props) => {
   const { setIndex, matchIndex, players } = props;
   const { register, control, getValues } = useFormContext();
-  const { append, remove, fields } = useFieldArray({
+  const { append, remove, fields } = useFieldArray<FieldValues, any>({
     name: `sets.${setIndex}.matches${matchIndex}.playerSessions`,
     control,
   });
@@ -26,9 +41,10 @@ const PlayerSessionManager = (props: Props) => {
     );
     console.log(`FinalPlayerSessionValues ${finalPlayerSessionValues} `);
 
+    // Adding new player sessions for each layer
     players.forEach((player) => {
       const playerExists = finalPlayerSessionValues.some(
-        (session: any) => player.playerId === session.playerId,
+        (playerSession: any) => player.playerId === playerSession.playerId,
       );
       if (!playerExists) {
         append({
@@ -37,28 +53,29 @@ const PlayerSessionManager = (props: Props) => {
         });
       }
     });
-    // props.players.forEach((player) => {
-    //   const playerExists = fields.some(
-    //     (field) => field.id === player.playerId.toString(),
-    //   );
-    //   if (!playerExists) {
-    //     append({
-    //       playerId: player.playerId,
-    //       playerSessionName: player.playerName,
-    //     });
-    //   }
-    // });
-  }, [props.players, append]);
+
+    // Remove player sessions for players that are no longer in the players array
+    finalPlayerSessionValues.forEach((session: any, index: number) => {
+      const playerExists = players.some(
+        (player) => player.playerId === session.playerId,
+      );
+      if (!playerExists) {
+        remove(index);
+      }
+    });
+  }, [props.players, append, getValues, setIndex, matchIndex, players, remove]);
 
   console.log("Fields: ", fields);
 
   return (
     <div>
       Player Sessions
-      {fields.map((session, sessionIndex) => {
+      {fields.map((field, sessionIndex) => {
         return (
-          <div key={session.id}>
-            <label>PlayerSession {sessionIndex + 1}</label>
+          <div key={field.id}>
+            <label>
+              PlayerSession {sessionIndex + 1} Player ID: {field.playerId}
+            </label>
             <input
               type="text"
               {...register(`sets.${setIndex}.matches.${matchIndex}.matchId`)}
