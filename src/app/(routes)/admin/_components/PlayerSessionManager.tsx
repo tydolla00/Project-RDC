@@ -20,14 +20,14 @@ interface Name {
   required: boolean;
 }
 export type FormValuesWithNamesArray = {
-  namesArray: Name[];
+  playerId: number;
   [key: string]: any;
 };
 
 const PlayerSessionManager = (props: Props) => {
   const { setIndex, matchIndex, players } = props;
   const { register, control, getValues } = useFormContext();
-  const { append, remove, fields } = useFieldArray<FieldValues, any>({
+  const { append, remove, fields } = useFieldArray<FieldValues>({
     name: `sets.${setIndex}.matches${matchIndex}.playerSessions`,
     control,
   });
@@ -39,7 +39,11 @@ const PlayerSessionManager = (props: Props) => {
     const finalPlayerSessionValues = getValues(
       `sets.${setIndex}.matches${matchIndex}.playerSessions`,
     );
-    console.log(`FinalPlayerSessionValues ${finalPlayerSessionValues} `);
+
+    finalPlayerSessionValues?.forEach((element: any) => {
+      console.log("Element: ", element);
+    });
+    // console.log(`FinalPlayerSessionValues ${finalPlayerSessionValues} `);
 
     // Adding new player sessions for each layer
     players.forEach((player) => {
@@ -67,28 +71,37 @@ const PlayerSessionManager = (props: Props) => {
 
   console.log("Fields: ", fields);
 
+  const isSamePlayer = (obj1: any): boolean => {
+    return obj1?.playerSessionName ?? 0;
+  };
+
   return (
     <div>
       Player Sessions
       {fields.map((field, sessionIndex) => {
         return (
-          <div key={field.id}>
+          <div className="flex justify-between" key={field.id}>
             <label>
-              PlayerSession {sessionIndex + 1} Player ID: {field.playerId}
+              PlayerSession {sessionIndex + 1} Player ID: {isSamePlayer(field)}
             </label>
             <input
               type="text"
               {...register(`sets.${setIndex}.matches.${matchIndex}.matchId`)}
             />
             <input
+              placeholder="Match Winner"
               type="text"
               {...register(
                 `sets.${setIndex}.matches.${matchIndex}.matchWinner`,
               )}
             />
 
-            <button type="button" onClick={() => remove(sessionIndex)}>
-              Remove Player Session
+            <button
+              className="ml-2 text-red-500"
+              type="button"
+              onClick={() => remove(sessionIndex)}
+            >
+              X
             </button>
           </div>
         );

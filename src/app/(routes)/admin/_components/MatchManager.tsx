@@ -31,7 +31,7 @@ const MatchManager = (props: Props) => {
     <div>
       {fields.map((match, matchIndex) => {
         return (
-          <div key={match.id}>
+          <div key={match.id} className="flex justify-between">
             <label>Match {matchIndex + 1}</label>
             <input
               type="text"
