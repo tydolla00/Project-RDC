@@ -2,27 +2,13 @@
 import { Player } from "@prisma/client";
 import React from "react";
 import { FieldValues, useFieldArray, useFormContext } from "react-hook-form";
-import { formSchema } from "./EntryCreatorForm";
+import PlayerStatManager from "./PlayerStatManager";
 
 interface Props {
   setIndex: number;
   matchIndex: number;
   players: Player[];
 }
-
-interface PlayerSessionField {
-  playerId: number;
-  playerSessionName: string;
-}
-
-interface Name {
-  name: string;
-  required: boolean;
-}
-export type FormValuesWithNamesArray = {
-  playerId: number;
-  [key: string]: any;
-};
 
 const PlayerSessionManager = (props: Props) => {
   const { setIndex, matchIndex, players } = props;
@@ -43,9 +29,8 @@ const PlayerSessionManager = (props: Props) => {
     finalPlayerSessionValues?.forEach((element: any) => {
       console.log("Element: ", element);
     });
-    // console.log(`FinalPlayerSessionValues ${finalPlayerSessionValues} `);
 
-    // Adding new player sessions for each layer
+    // Adding new player sessions for each player
     players.forEach((player) => {
       const playerExists = finalPlayerSessionValues.some(
         (playerSession: any) => player.playerId === playerSession.playerId,
@@ -54,6 +39,7 @@ const PlayerSessionManager = (props: Props) => {
         append({
           playerId: player.playerId,
           playerSessionName: player.playerName,
+          playerStats: [],
         });
       }
     });
@@ -71,19 +57,21 @@ const PlayerSessionManager = (props: Props) => {
 
   console.log("Fields: ", fields);
 
-  const isSamePlayer = (obj1: any): boolean => {
-    return obj1?.playerSessionName ?? 0;
+  const getPlayerNameFromField = (field: any): boolean => {
+    return field?.playerSessionName ?? 0;
   };
+
+  players.forEach((player) => {
+    console.log("Player: ", player.playerName);
+  });
 
   return (
     <div>
       Player Sessions
       {fields.map((field, sessionIndex) => {
         return (
-          <div className="flex justify-between" key={field.id}>
-            <label>
-              PlayerSession {sessionIndex + 1} Player ID: {isSamePlayer(field)}
-            </label>
+          <div className="flex flex-col" key={field.id}>
+            <label>{getPlayerNameFromField(field)}</label>
             <input
               type="text"
               {...register(`sets.${setIndex}.matches.${matchIndex}.matchId`)}
@@ -96,13 +84,18 @@ const PlayerSessionManager = (props: Props) => {
               )}
             />
 
-            <button
+            {/* <button
               className="ml-2 text-red-500"
               type="button"
               onClick={() => remove(sessionIndex)}
             >
               X
-            </button>
+            </button> */}
+            <PlayerStatManager
+              {...props}
+              playerSessionIndex={sessionIndex}
+              player={{ playerId: 0, playerName: "Scott" }}
+            />
           </div>
         );
       })}

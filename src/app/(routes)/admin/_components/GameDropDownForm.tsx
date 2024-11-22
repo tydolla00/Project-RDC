@@ -32,9 +32,6 @@ import { useState, useEffect } from "react";
 import { formSchema } from "./EntryCreatorForm";
 import { z } from "zod";
 
-type GameValues = {
-  game: string;
-};
 const GameDropDownForm = ({
   control,
 }: {

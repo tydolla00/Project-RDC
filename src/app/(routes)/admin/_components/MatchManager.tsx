@@ -31,9 +31,9 @@ const MatchManager = (props: Props) => {
     <div>
       {fields.map((match, matchIndex) => {
         return (
-          <div key={match.id} className="flex justify-between">
+          <div key={match.id} className="flex flex-col justify-between">
             <label>Match {matchIndex + 1}</label>
-            <input
+            {/* <input
               type="text"
               {...register(`sets.${setIndex}.matches.${matchIndex}.matchId`)}
             />
@@ -42,7 +42,7 @@ const MatchManager = (props: Props) => {
               {...register(
                 `sets.${setIndex}.matches.${matchIndex}.matchWinner`,
               )}
-            />
+            /> */}
 
             <button type="button" onClick={() => remove(matchIndex)}>
               Remove Match

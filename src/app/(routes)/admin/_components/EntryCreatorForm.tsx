@@ -41,6 +41,7 @@ export const formSchema = z.object({
             z.object({
               playerId: z.number(),
               playerSessionName: z.string(),
+              playerStats: z.array(z.object({ stat: z.string() })),
             }),
           ),
         }),
@@ -48,6 +49,9 @@ export const formSchema = z.object({
     }),
   ),
 });
+
+// TODO: How to handle type to get the form values more reliably
+export type FormValues = z.infer<typeof formSchema>;
 
 const EntryCreatorForm = (props: Props) => {
   const { rdcMembers } = props;
