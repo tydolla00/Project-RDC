@@ -72,25 +72,7 @@ const PlayerSessionManager = (props: Props) => {
         return (
           <div className="flex flex-col" key={field.id}>
             <label>{getPlayerNameFromField(field)}</label>
-            <input
-              type="text"
-              {...register(`sets.${setIndex}.matches.${matchIndex}.matchId`)}
-            />
-            <input
-              placeholder="Match Winner"
-              type="text"
-              {...register(
-                `sets.${setIndex}.matches.${matchIndex}.matchWinner`,
-              )}
-            />
 
-            {/* <button
-              className="ml-2 text-red-500"
-              type="button"
-              onClick={() => remove(sessionIndex)}
-            >
-              X
-            </button> */}
             <PlayerStatManager
               {...props}
               playerSessionIndex={sessionIndex}

@@ -29,11 +29,21 @@ const PlayerStatManager = (props: Props) => {
       console.log("Game Stats: ", gameStats);
 
       gameStats.forEach((stat) => {
+        console.log("Appending: ", stat.statName);
         append({ stat: stat.statName });
       });
     };
     fetchGameStats();
   }, []);
+
+  const getPlayerStats = () => {
+    const values = getValues();
+    return values.sets.flatMap((set) =>
+      set.matches.flatMap((match) =>
+        match.playerSessions.flatMap((session) => session.playerStats),
+      ),
+    );
+  };
 
   return (
     <div>

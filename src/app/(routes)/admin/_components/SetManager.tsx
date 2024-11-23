@@ -24,7 +24,7 @@ const SetManager = (props: Props) => {
       {fields.map((set, setIndex) => {
         return (
           <div
-            className="space-y-3 rounded-lg bg-gray-800 p-6 shadow-lg"
+            className="flex flex-col space-y-3 rounded-lg bg-gray-800 p-6 shadow-lg"
             key={set.setId}
           >
             <div className="flex justify-between">

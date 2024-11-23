@@ -35,7 +35,6 @@ export const formSchema = z.object({
       setWinner: z.custom(),
       matches: z.array(
         z.object({
-          matchId: z.number(),
           matchWinner: z.custom(),
           playerSessions: z.array(
             z.object({
