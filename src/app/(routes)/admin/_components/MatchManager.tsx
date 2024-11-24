@@ -1,15 +1,18 @@
 import { Player } from "@prisma/client";
 import React from "react";
-import { useFieldArray } from "react-hook-form";
+import { Controller, useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
+import { Separator } from "@/components/ui/separator";
 import PlayerSessionManager from "./PlayerSessionManager";
+import PlayerSelector from "./PlayerSelector";
+import { FormValues } from "./EntryCreatorForm";
 
 interface Props {
   setIndex: number;
 }
 
 const MatchManager = (props: Props) => {
-  const { register, control, getValues } = useFormContext();
+  const { register, control, getValues } = useFormContext<FormValues>();
   const { setIndex } = props;
   const { append, remove, fields } = useFieldArray({
     name: `sets.${setIndex}.matches`,
@@ -22,9 +25,13 @@ const MatchManager = (props: Props) => {
     const playerSessions = players.map((player: Player) => ({
       playerId: player.playerId,
       playerSessionName: player.playerName,
+      playerStats: [],
     }));
     console.log("Player Sessions: ", playerSessions);
-    append({ matchId: "", matchWinner: "", playerSessions: playerSessions });
+    append({
+      matchWinner: { playerId: 0, playerName: "" },
+      playerSessions: playerSessions,
+    });
   };
   console.log("Match Fields: ", fields);
   return (
@@ -32,25 +39,33 @@ const MatchManager = (props: Props) => {
       {fields.map((match, matchIndex) => {
         return (
           <div key={match.id} className="flex flex-col justify-between">
-            <label>Match {matchIndex + 1}</label>
-            {/* <input
-              type="text"
-              {...register(`sets.${setIndex}.matches.${matchIndex}.matchId`)}
-            />
-            <input
-              type="text"
-              {...register(
-                `sets.${setIndex}.matches.${matchIndex}.matchWinner`,
-              )}
-            /> */}
-
-            <button type="button" onClick={() => remove(matchIndex)}>
-              Remove Match
-            </button>
+            <div id="match-manager-header" className="flex justify-between">
+              <label>Match {matchIndex + 1}</label>
+              <button
+                className="text-red-400 underline underline-offset-2"
+                type="button"
+                onClick={() => remove(matchIndex)}
+              >
+                Remove Match
+              </button>
+            </div>
+            <Separator className="my-4 h-[1px] bg-slate-400" />
             <PlayerSessionManager
               setIndex={setIndex}
               matchIndex={matchIndex}
               players={players}
+            />
+            Match Winner for Match {matchIndex + 1}
+            <Controller
+              name={`sets.${setIndex}.matches.${matchIndex}.matchWinner`}
+              control={control}
+              render={({ field }) => (
+                <PlayerSelector
+                  rdcMembers={players}
+                  control={control}
+                  field={field}
+                />
+              )}
             />
           </div>
         );

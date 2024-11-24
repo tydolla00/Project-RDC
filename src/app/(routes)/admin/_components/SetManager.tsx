@@ -1,8 +1,14 @@
 import React from "react";
-import { Control, useFieldArray, useFormContext } from "react-hook-form";
+import {
+  Control,
+  Controller,
+  useFieldArray,
+  useFormContext,
+} from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./EntryCreatorForm";
 import MatchManager from "./MatchManager";
+import PlayerSelector from "./PlayerSelector";
 
 interface Props {
   control: Control<z.infer<typeof formSchema>>;
@@ -15,7 +21,10 @@ const SetManager = (props: Props) => {
     control,
   });
 
-  const { register, formState } = useFormContext<z.infer<typeof formSchema>>();
+  const { register, formState, getValues } =
+    useFormContext<z.infer<typeof formSchema>>();
+
+  const players = getValues(`players`);
   return (
     <div className="space-y-4">
       {/* Loop through chapter fields */}
@@ -42,18 +51,30 @@ const SetManager = (props: Props) => {
                 Remove Set
               </button>
             </div>
-
             <label title={"Title"}>
               <div className="mb-1">Set Details</div>
-              <div className="text-red-600">
+              <div className="text-red-400">
                 {/* Error: Chapter title */}
                 {/* {formState.errors.chapters?.[setIndex]?.title?.message} */}
               </div>
             </label>
             <MatchManager setIndex={setIndex} />
+            Set Winner for Set {setIndex + 1}
+            <Controller
+              name={`sets.${setIndex}.setWinner`}
+              control={control}
+              render={({ field }) => (
+                <PlayerSelector
+                  rdcMembers={players}
+                  control={control}
+                  field={field}
+                />
+              )}
+            />
           </div>
         );
       })}
+
       <button
         type="button"
         onClick={() => {

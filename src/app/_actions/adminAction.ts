@@ -14,6 +14,7 @@ export async function getGames(): Promise<Game[]> {
 }
 
 export async function getGameStats(gameName: string): Promise<GameStat[]> {
+  console.log("Lookign for gameStats for ", gameName);
   const game = await prisma.game.findFirst({
     where: {
       gameName: gameName,

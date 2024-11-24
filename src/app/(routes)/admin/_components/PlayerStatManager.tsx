@@ -3,6 +3,7 @@ import { Game, Player } from "@prisma/client";
 import { useFormContext, useFieldArray, FieldValues } from "react-hook-form";
 import { getGameStats } from "@/app/_actions/adminAction";
 import { FormValues } from "./EntryCreatorForm";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   player: Player;
@@ -16,47 +17,76 @@ interface Props {
 const PlayerStatManager = (props: Props) => {
   const { player, matchIndex, setIndex, playerSessionIndex } = props;
   const { register, control, getValues } = useFormContext<FormValues>();
-  const { append, remove, fields } = useFieldArray<FormValues>({
-    name: `sets.${setIndex}.matches${matchIndex}.playerSessions.${playerSessionIndex}.playerStats`,
+  const { append, remove, fields } = useFieldArray({
+    name: `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats`,
     control,
   });
 
+  console.log("Player Session ", playerSessionIndex);
+
   // TODO: Move to PlayerSessionManager or above
   useEffect(() => {
+    console.log(
+      "All Player Sessions: ",
+      getValues(`sets.${setIndex}.matches.${matchIndex}.playerSessions`),
+    );
+
+    const getPlayerSessionStats = () => {
+      const values = getValues();
+      const playerSession =
+        values.sets[setIndex].matches[matchIndex].playerSessions[
+          playerSessionIndex
+        ];
+      return playerSession.playerStats;
+    };
+
     const fetchGameStats = async () => {
       const game: string = getValues(`game`);
-      const gameStats = await getGameStats(game);
-      console.log("Game Stats: ", gameStats);
+      let gameStats: {
+        type: string | null;
+        statId: number;
+        statName: string;
+        gameId: number;
+      }[] = [];
+
+      if (game) {
+        console.log("Fetched Game: ", game);
+
+        gameStats = await getGameStats(game);
+        console.log("Found Game Stats: ", gameStats);
+      }
+
+      const existingStats = getPlayerSessionStats();
+      console.log("PlayerStats", existingStats);
 
       gameStats.forEach((stat) => {
-        console.log("Appending: ", stat.statName);
-        append({ stat: stat.statName });
+        const statExists = existingStats.some(
+          (existingStat) => existingStat.stat === stat.statName,
+        );
+        // Ducttape fix to stop useEffect double render from
+        // doubling playerStat fields
+        if (!statExists) {
+          append({ statId: uuidv4(), stat: stat.statName, statValue: "" });
+        }
       });
     };
     fetchGameStats();
-  }, []);
+  }, [append, getValues, matchIndex, playerSessionIndex, setIndex]);
 
-  const getPlayerStats = () => {
-    const values = getValues();
-    return values.sets.flatMap((set) =>
-      set.matches.flatMap((match) =>
-        match.playerSessions.flatMap((session) => session.playerStats),
-      ),
-    );
-  };
+  console.log("Fields: ", fields);
 
   return (
     <div>
-      Player Stats:
-      {fields.map((field, index) => {
+      {fields.map((field, index: number) => {
         return (
-          <div key={field.id}>
-            <span>{field.statName}</span>
-            <label>Stat {index + 1}</label>
+          <div key={field.id} className="flex">
+            <span className="m-2 ml-0">{field.stat}</span>
             <input
+              className="rounded-md p-2"
+              placeholder="Enter Stat"
               type="text"
               {...register(
-                `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats.${index}.stat`,
+                `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats.${index}.statValue`,
               )}
             />
           </div>

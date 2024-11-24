@@ -1,30 +1,36 @@
 "use client";
 import { Player } from "@prisma/client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 import {
   Control,
+  ControllerRenderProps,
+  FieldValues,
   useController,
   useFieldArray,
-  useFormContext,
 } from "react-hook-form";
 import { z } from "zod";
-import { formSchema } from "./EntryCreatorForm";
+import { formSchema, FormValues } from "./EntryCreatorForm";
 interface Props {
   rdcMembers: Player[];
   referencePlayers?: Player[];
   handlePlayerClick?: (player: Player) => void;
   control?: Control<z.infer<typeof formSchema>>;
+  fieldName?: string;
+  field: ControllerRenderProps<FormValues>;
 }
 const PlayerSelector = ({
   handlePlayerClick,
   referencePlayers,
   rdcMembers,
   control,
+  fieldName,
+  field,
 }: Props) => {
-  const router = useRouter();
+  // Should require this component to be wrapped in Controller?
+  // make control and name required props?
+  // Or refactor later
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -33,10 +39,10 @@ const PlayerSelector = ({
 
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
 
-  const { field, fieldState } = useController({
-    control,
-    name: "players",
-  });
+  // const { field, fieldState } = useController({
+  //   control,
+  //   name: "players",
+  // });
 
   const reactHookFormHandlePlayerClick = (player: Player) => {
     const isSelected = selectedPlayers.some(
@@ -93,10 +99,6 @@ const PlayerSelector = ({
               optionalClassName={`m-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full ${getPlayerAvatarClassName(
                 player,
               )}`}
-              //   selectedPlayers?.includes(player)
-              //     ? "bg-blue-500"
-              //     : "bg-slate-400"
-              // }`}
             />
           ))}
         </div>

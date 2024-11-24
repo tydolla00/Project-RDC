@@ -35,12 +35,21 @@ export const formSchema = z.object({
       setWinner: z.custom(),
       matches: z.array(
         z.object({
-          matchWinner: z.custom(),
+          matchWinner: z.object({
+            playerId: z.number(),
+            playerName: z.string(),
+          }),
           playerSessions: z.array(
             z.object({
               playerId: z.number(),
               playerSessionName: z.string(),
-              playerStats: z.array(z.object({ stat: z.string() })),
+              playerStats: z.array(
+                z.object({
+                  statId: z.string(),
+                  stat: z.string(),
+                  statValue: z.string(),
+                }),
+              ),
             }),
           ),
         }),
@@ -54,20 +63,20 @@ export type FormValues = z.infer<typeof formSchema>;
 
 const EntryCreatorForm = (props: Props) => {
   const { rdcMembers } = props;
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
 
   const { register, handleSubmit, control, watch } = form;
 
-  console.log(watch());
+  console.log("Watch", watch());
 
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = (data: any) => console.log("Data Submitted", data);
 
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={() => handleSubmit(onSubmit)}>
           {/* <NestedInput /> */}
           <div className="flex justify-around">
             <input
@@ -80,7 +89,7 @@ const EntryCreatorForm = (props: Props) => {
               name="game"
               control={control}
               render={({ field }) => (
-                <GameDropDownForm control={form.control} />
+                <GameDropDownForm field={field} control={form.control} />
               )}
             />
             <Controller
@@ -90,16 +99,19 @@ const EntryCreatorForm = (props: Props) => {
                 <PlayerSelector
                   rdcMembers={rdcMembers}
                   control={form.control}
+                  field={field}
                 />
               )}
             />
           </div>
           <SetManager control={control} />
 
-          <input
+          <button
             className="rounded-md border border-white p-2 hover:cursor-pointer"
-            type="submit"
-          />
+            onClick={() => handleSubmit(onSubmit)}
+          >
+            Submit Here!
+          </button>
         </form>
       </Form>
     </FormProvider>

@@ -14,7 +14,7 @@ const PlayerSessionManager = (props: Props) => {
   const { setIndex, matchIndex, players } = props;
   const { register, control, getValues } = useFormContext();
   const { append, remove, fields } = useFieldArray<FieldValues>({
-    name: `sets.${setIndex}.matches${matchIndex}.playerSessions`,
+    name: `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
     control,
   });
   console.log(
@@ -23,7 +23,7 @@ const PlayerSessionManager = (props: Props) => {
 
   React.useEffect(() => {
     const finalPlayerSessionValues = getValues(
-      `sets.${setIndex}.matches${matchIndex}.playerSessions`,
+      `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
     );
 
     finalPlayerSessionValues?.forEach((element: any) => {
@@ -55,7 +55,7 @@ const PlayerSessionManager = (props: Props) => {
     });
   }, [props.players, append, getValues, setIndex, matchIndex, players, remove]);
 
-  console.log("Fields: ", fields);
+  console.log("Player Session Fields: ", fields);
 
   const getPlayerNameFromField = (field: any): boolean => {
     return field?.playerSessionName ?? 0;
@@ -66,17 +66,18 @@ const PlayerSessionManager = (props: Props) => {
   });
 
   return (
-    <div>
-      Player Sessions
+    <div className="flex flex-col items-center">
+      Player Sessions for Match {matchIndex + 1}
       {fields.map((field, sessionIndex) => {
+        console.log("Session Index: ", sessionIndex);
         return (
-          <div className="flex flex-col" key={field.id}>
+          <div className="m-2 flex w-full flex-col" key={field.id}>
             <label>{getPlayerNameFromField(field)}</label>
 
             <PlayerStatManager
               {...props}
               playerSessionIndex={sessionIndex}
-              player={{ playerId: 0, playerName: "Scott" }}
+              player={players[sessionIndex]}
             />
           </div>
         );

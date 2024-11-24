@@ -1,6 +1,11 @@
 "use client";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useController, Control, useForm } from "react-hook-form";
+import {
+  useController,
+  Control,
+  useForm,
+  ControllerRenderProps,
+} from "react-hook-form";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,7 +18,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import {
-  Form,
   FormControl,
   FormDescription,
   FormField,
@@ -29,13 +33,14 @@ import {
 import { getGames } from "@/app/_actions/adminAction";
 import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
-import { formSchema } from "./EntryCreatorForm";
-import { z } from "zod";
+import { FormValues } from "./EntryCreatorForm";
 
 const GameDropDownForm = ({
   control,
+  field,
 }: {
-  control: Control<z.infer<typeof formSchema>>;
+  control: Control<FormValues>;
+  field: ControllerRenderProps<FormValues>;
 }) => {
   const [testGames, setTestGames] = useState<Game[]>([]);
 
