@@ -26,7 +26,7 @@ const SetManager = (props: Props) => {
 
   const players = getValues(`players`);
   return (
-    <div className="space-y-4">
+    <div className="w-full space-y-4">
       {/* Loop through chapter fields */}
       <div className="font-2xl m-2 text-center font-bold"> Sets </div>
 
@@ -59,7 +59,7 @@ const SetManager = (props: Props) => {
               </div>
             </label>
             <MatchManager setIndex={setIndex} />
-            Set Winner for Set {setIndex + 1}
+            <div>Set Winner for Set {setIndex + 1}</div>
             <Controller
               name={`sets.${setIndex}.setWinner`}
               control={control}

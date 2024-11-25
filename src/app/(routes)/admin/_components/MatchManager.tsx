@@ -55,7 +55,9 @@ const MatchManager = (props: Props) => {
               matchIndex={matchIndex}
               players={players}
             />
-            Match Winner for Match {matchIndex + 1}
+            <div className="flex justify-center text-lg">
+              Match Winner for Match {matchIndex + 1}{" "}
+            </div>
             <Controller
               name={`sets.${setIndex}.matches.${matchIndex}.matchWinner`}
               control={control}
@@ -71,7 +73,7 @@ const MatchManager = (props: Props) => {
         );
       })}
       <button
-        className="bg-slate-100"
+        className="bg-gray-700"
         type="button"
         onClick={handleNewMatchClick}
       >

@@ -67,7 +67,7 @@ const PlayerSessionManager = (props: Props) => {
 
   return (
     <div className="flex flex-col items-center">
-      Player Sessions for Match {matchIndex + 1}
+      <div className="text-lg">Player Sessions for Match {matchIndex + 1}</div>
       {fields.map((field, sessionIndex) => {
         console.log("Session Index: ", sessionIndex);
         return (
