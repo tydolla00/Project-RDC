@@ -13,6 +13,7 @@ import { z } from "zod";
 import PlayerSelector from "./PlayerSelector";
 import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
+import { insertNewSessionFromAdmin } from "@/app/_actions/adminAction";
 
 interface Props {
   rdcMembers: Player[];
@@ -21,24 +22,26 @@ interface Props {
 export const formSchema = z.object({
   game: z.string(),
   sessionName: z.string(),
-  sessionTitle: z.string(),
+  sessionUrl: z.string(),
+  thumbnail: z.string(),
   players: z.array(
     z.object({
       playerId: z.number(),
       playerName: z.string(),
-      // Add other Player fields as needed
     }),
   ),
   sets: z.array(
     z.object({
       setId: z.number(),
-      setWinner: z.custom(),
+      setWinner: z.custom(), // TODO: make object
       matches: z.array(
         z.object({
-          matchWinner: z.object({
-            playerId: z.number(),
-            playerName: z.string(),
-          }),
+          matchWinner: z.array(
+            z.object({
+              playerId: z.number(),
+              playerName: z.string(),
+            }),
+          ),
           playerSessions: z.array(
             z.object({
               playerId: z.number(),
@@ -71,49 +74,64 @@ const EntryCreatorForm = (props: Props) => {
 
   console.log("Watch", watch());
 
-  const onSubmit = (data: any) => console.log("Data Submitted", data);
+  const onSubmit = (data: FormValues) => {
+    console.log("ON SUBMIT CALLED");
+    console.log("Form Data:", data);
+    // Handle form submission logic here
+    insertNewSessionFromAdmin(data);
+  };
+
+  const onError = (errors: any) => {
+    console.error("Form Errors:", errors);
+  };
 
   return (
     <FormProvider {...form}>
-      <Form {...form}>
-        <form onSubmit={() => handleSubmit(onSubmit)}>
-          {/* <NestedInput /> */}
-          <div className="flex justify-around">
-            <input
-              className="my-2 w-80 rounded-md border p-2"
-              defaultValue=""
-              placeholder="Session Title"
-              {...register("sessionTitle", { required: true })}
-            />
-            <Controller
-              name="game"
-              control={control}
-              render={({ field }) => (
-                <GameDropDownForm field={field} control={form.control} />
-              )}
-            />
-            <Controller
-              name="players"
-              control={control}
-              render={({ field }) => (
-                <PlayerSelector
-                  rdcMembers={rdcMembers}
-                  control={form.control}
-                  field={field}
-                />
-              )}
-            />
-          </div>
-          <SetManager control={control} />
+      <form onSubmit={handleSubmit(onSubmit, onError)}>
+        <div className="flex justify-around">
+          <input
+            className="my-2 w-80 rounded-md border p-2"
+            defaultValue=""
+            placeholder="Session Name"
+            {...register("sessionName", { required: true })}
+          />
+          <input
+            className="my-2 w-80 rounded-md border p-2"
+            defaultValue=""
+            placeholder="Session URL"
+            {...register("sessionUrl", { required: false })}
+          />
+          <input
+            className="my-2 w-80 rounded-md border p-2"
+            defaultValue=""
+            placeholder="Thumbnail"
+            {...register("thumbnail", { required: false })}
+          />
+          <Controller
+            name="game"
+            control={control}
+            render={({ field }) => (
+              <GameDropDownForm field={field} control={form.control} />
+            )}
+          />
+          <Controller
+            name="players"
+            control={control}
+            render={({ field }) => (
+              <PlayerSelector
+                rdcMembers={rdcMembers}
+                control={form.control}
+                field={field}
+              />
+            )}
+          />
+        </div>
+        <SetManager control={control} />
 
-          <button
-            className="rounded-md border border-white p-2 hover:cursor-pointer"
-            onClick={() => handleSubmit(onSubmit)}
-          >
-            Submit Here!
-          </button>
-        </form>
-      </Form>
+        <button type="submit" className="my-2 w-80 rounded-md border p-2">
+          Submit
+        </button>
+      </form>
     </FormProvider>
   );
 };

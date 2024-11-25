@@ -29,7 +29,7 @@ const MatchManager = (props: Props) => {
     }));
     console.log("Player Sessions: ", playerSessions);
     append({
-      matchWinner: { playerId: 0, playerName: "" },
+      matchWinner: [],
       playerSessions: playerSessions,
     });
   };
@@ -70,7 +70,11 @@ const MatchManager = (props: Props) => {
           </div>
         );
       })}
-      <button type="button" onClick={handleNewMatchClick}>
+      <button
+        className="bg-slate-100"
+        type="button"
+        onClick={handleNewMatchClick}
+      >
         Add Match
       </button>
     </div>

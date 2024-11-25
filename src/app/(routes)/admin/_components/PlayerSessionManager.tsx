@@ -72,7 +72,7 @@ const PlayerSessionManager = (props: Props) => {
         console.log("Session Index: ", sessionIndex);
         return (
           <div className="m-2 flex w-full flex-col" key={field.id}>
-            <label>{getPlayerNameFromField(field)}</label>
+            <label className="font-bold">{getPlayerNameFromField(field)}</label>
 
             <PlayerStatManager
               {...props}
