@@ -46,6 +46,8 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
 
   const newSessionId = latestSession ? latestSession.sessionId + 1 : 1;
 
+  console.log("Trying new sessio ID: ", newSessionId);
+
   const sessionGame = await prisma.game.findFirst({
     where: {
       gameName: session.game,

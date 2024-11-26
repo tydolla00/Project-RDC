@@ -111,12 +111,12 @@ async function seedRDCMembers() {
     },
   });
 
-  const ippi = await prisma.player.upsert({
+  const ipi = await prisma.player.upsert({
     where: { playerId: 8 },
     update: {},
     create: {
       playerId: 8,
-      playerName: "Ippi",
+      playerName: "Ipi",
     },
   });
 

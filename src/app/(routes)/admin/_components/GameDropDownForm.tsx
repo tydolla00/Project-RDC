@@ -111,9 +111,9 @@ const GameDropDownForm = ({
               </Command>
             </PopoverContent>
           </Popover>
-          <FormDescription>
+          {/* <FormDescription>
             Game of the session. This will be used to categorize the session.
-          </FormDescription>
+          </FormDescription> */}
           <FormMessage />
         </FormItem>
       )}

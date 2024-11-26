@@ -2,49 +2,25 @@
 import { Player } from "@prisma/client";
 import React, { useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
-import { useRouter } from "next/navigation";
-import {
-  Control,
-  ControllerRenderProps,
-  FieldValues,
-  useController,
-  useFieldArray,
-} from "react-hook-form";
+import { Control, ControllerRenderProps } from "react-hook-form";
 import { z } from "zod";
 import { formSchema, FormValues } from "./EntryCreatorForm";
 interface Props {
   rdcMembers: Player[];
-  referencePlayers?: Player[];
   handlePlayerClick?: (player: Player) => void;
   control?: Control<z.infer<typeof formSchema>>;
   fieldName?: string;
   field: ControllerRenderProps<FormValues>;
 }
-const PlayerSelector = ({
-  handlePlayerClick,
-  referencePlayers,
-  rdcMembers,
-  control,
-  fieldName,
-  field,
-}: Props) => {
+const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
   // Should require this component to be wrapped in Controller?
   // make control and name required props?
   // Or refactor later
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "players",
-  });
-
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
 
-  // const { field, fieldState } = useController({
-  //   control,
-  //   name: "players",
-  // });
-
   const reactHookFormHandlePlayerClick = (player: Player) => {
+    console.log("Handling react hook form player click");
     const isSelected = selectedPlayers.some(
       (p) => p.playerId === player.playerId,
     );
@@ -58,25 +34,10 @@ const PlayerSelector = ({
 
   const getPlayerAvatarClassName = (player: Player) => {
     const isSelected = selectedPlayers.includes(player);
-    const isReferencePlayer = referencePlayers?.some(
-      (refPlayer) => refPlayer.playerId === player.playerId,
-    );
-
-    // If there is a reference player array, we want the bg to be a diff color whe selected but
-    // still gray if not selected
-    // if no reference player array default is blue background gray
-    if (isReferencePlayer) {
-      if (isSelected) {
-        return "bg-green-500";
-      } else {
-        return "bg-slate-400";
-      }
+    if (isSelected) {
+      return "border-2 border-purple-700";
     } else {
-      if (isSelected && isReferencePlayer == null) {
-        return "bg-blue-500";
-      } else {
-        return "bg-slate-400";
-      }
+      return "";
     }
   };
 
@@ -85,9 +46,9 @@ const PlayerSelector = ({
       className="flex flex-col items-center rounded-md border p-4"
       id="player-selector-container"
     >
-      {rdcMembers.length !== 0 ? (
+      {rdcMembers?.length !== 0 ? (
         <div className="mt-2 flex">
-          {rdcMembers.map((player, index) => (
+          {rdcMembers?.map((player, index) => (
             <PlayerAvatar
               key={index}
               player={player}
@@ -96,7 +57,7 @@ const PlayerSelector = ({
                   ? () => handlePlayerClick(player)
                   : () => reactHookFormHandlePlayerClick(player)
               }
-              optionalClassName={`m-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full ${getPlayerAvatarClassName(
+              optionalClassName={`m-1 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full ${getPlayerAvatarClassName(
                 player,
               )}`}
             />

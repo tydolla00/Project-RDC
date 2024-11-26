@@ -14,7 +14,8 @@ import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
 import { insertNewSessionFromAdmin } from "@/app/_actions/adminAction";
 import { Input } from "@/components/ui/input";
-import { Form } from "@/components/ui/form";
+import { Form, FormItem, FormLabel } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   rdcMembers: Player[];
@@ -80,6 +81,7 @@ const EntryCreatorForm = (props: Props) => {
    * in EntryCreator form
    */
   const onSubmit = (data: FormValues) => {
+    console.log("---Admin Form Submission Data---: ", data);
     insertNewSessionFromAdmin(data);
   };
 
@@ -97,26 +99,39 @@ const EntryCreatorForm = (props: Props) => {
         <form onSubmit={handleSubmit(onSubmit, onError)}>
           <div
             id="entry-creator-form-info-header"
-            className="flex justify-around"
+            className="flex items-center justify-between"
           >
-            <Input
-              className="my-2 w-80 rounded-md border p-2"
-              defaultValue=""
-              placeholder="Session Name"
-              {...register("sessionName", { required: true })}
-            />
-            <input
-              className="my-2 w-80 rounded-md border p-2"
-              defaultValue=""
-              placeholder="Session URL"
-              {...register("sessionUrl", { required: false })}
-            />
-            <input
-              className="my-2 w-80 rounded-md border p-2"
-              defaultValue=""
-              placeholder="Thumbnail"
-              {...register("thumbnail", { required: false })}
-            />
+            <FormItem className="text-center">
+              <FormLabel>Session Name</FormLabel>
+              <Input
+                className="my-2 w-80 rounded-md border p-2"
+                defaultValue=""
+                placeholder="Session Name"
+                {...register("sessionName", { required: true })}
+              />
+            </FormItem>
+
+            <FormItem className="text-center">
+              <FormLabel>Session URL</FormLabel>
+              <Input
+                className="my-2 w-80 rounded-md border p-2"
+                defaultValue=""
+                placeholder="Session URL"
+                {...register("sessionUrl", { required: false })}
+              />
+            </FormItem>
+
+            <FormItem className="text-center">
+              <FormLabel>Thumbnail</FormLabel>
+
+              <Input
+                className="my-2 w-80 rounded-md border p-2"
+                defaultValue=""
+                placeholder="Thumbnail"
+                {...register("thumbnail", { required: false })}
+              />
+            </FormItem>
+
             <Controller
               name="game"
               control={control}
@@ -124,26 +139,30 @@ const EntryCreatorForm = (props: Props) => {
                 <GameDropDownForm field={field} control={form.control} />
               )}
             />
-            <Controller
-              name="players"
-              control={control}
-              render={({ field }) => (
-                <PlayerSelector
-                  rdcMembers={rdcMembers}
-                  control={form.control}
-                  field={field}
-                />
-              )}
-            />
+
+            <FormItem className="text-center">
+              <FormLabel>Session Players</FormLabel>
+              <Controller
+                name="players"
+                control={control}
+                render={({ field }) => (
+                  <PlayerSelector
+                    rdcMembers={rdcMembers}
+                    control={form.control}
+                    field={field}
+                  />
+                )}
+              />
+            </FormItem>
           </div>
           <SetManager control={control} />
 
-          <button
+          <Button
             type="submit"
             className="my-2 w-80 rounded-md border bg-green-800 p-2"
           >
             Submit
-          </button>
+          </Button>
         </form>
       </Form>
     </FormProvider>

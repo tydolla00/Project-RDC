@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import PlayerSessionManager from "./PlayerSessionManager";
 import PlayerSelector from "./PlayerSelector";
 import { FormValues } from "./EntryCreatorForm";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   setIndex: number;
@@ -45,13 +46,13 @@ const MatchManager = (props: Props) => {
           <div key={match.id} className="flex flex-col justify-between">
             <div id="match-manager-header" className="flex justify-between">
               <label>Match {matchIndex + 1}</label>
-              <button
-                className="text-red-400 underline underline-offset-2"
+              <Button
+                className="bg-red-400 text-white hover:bg-red-300"
                 type="button"
                 onClick={() => remove(matchIndex)}
               >
-                Remove Match
-              </button>
+                - Remove Match
+              </Button>
             </div>
             <Separator className="my-4 h-[1px] bg-slate-400" />
             <PlayerSessionManager
@@ -76,13 +77,13 @@ const MatchManager = (props: Props) => {
           </div>
         );
       })}
-      <button
-        className="rounded-md bg-purple-900 p-1 hover:bg-purple-950"
+      <Button
+        className="rounded-md bg-purple-900 p-1 font-semibold text-white hover:bg-purple-950"
         type="button"
         onClick={handleNewMatchClick}
       >
-        Add Match
-      </button>
+        + Add Match
+      </Button>
     </div>
   );
 };

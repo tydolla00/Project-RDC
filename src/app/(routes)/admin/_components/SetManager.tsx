@@ -9,6 +9,7 @@ import { z } from "zod";
 import { formSchema } from "./EntryCreatorForm";
 import MatchManager from "./MatchManager";
 import PlayerSelector from "./PlayerSelector";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   control: Control<z.infer<typeof formSchema>>;
@@ -39,26 +40,31 @@ const SetManager = (props: Props) => {
               <div className="mb-2 text-lg font-semibold">
                 Set {setIndex + 1}
               </div>{" "}
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   // Remove: chapter index
                   remove(setIndex);
                 }}
-                className="text-xs text-red-400 underline underline-offset-4"
+                className="bg-red-400 text-xs"
               >
-                Remove Set
-              </button>
+                - Remove Set
+              </Button>
             </div>
             <label title={"Title"}>
-              <div className="mb-1">Set Details</div>
+              <div className="mb-1 flex justify-between">
+                Set Details <div>Game: {getValues("game")}</div>
+              </div>
+
               <div className="text-red-400">
                 {/* Error: Chapter title */}
                 {/* {formState.errors.chapters?.[setIndex]?.title?.message} */}
               </div>
             </label>
             <MatchManager setIndex={setIndex} />
-            <div>Set Winner for Set {setIndex + 1}</div>
+            <div className="text-center text-lg font-semibold">
+              Set Winner for Set {setIndex + 1}
+            </div>
             <Controller
               name={`sets.${setIndex}.setWinner`}
               control={control}
@@ -74,15 +80,16 @@ const SetManager = (props: Props) => {
         );
       })}
 
-      <button
+      <Button
         type="button"
+        // disabled={!players || players.length === 0} TODO: Add validation
         onClick={() => {
           append({ setId: fields.length + 1, matches: [] });
         }}
-        className="rounded-md bg-purple-900 p-1 py-2 text-center hover:bg-purple-950"
+        className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"
       >
-        Add Set
-      </button>
+        + Add Set
+      </Button>
     </div>
   );
 };
