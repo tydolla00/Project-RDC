@@ -13,13 +13,9 @@ interface Props {
   field: ControllerRenderProps<FormValues>;
 }
 const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
-  // Should require this component to be wrapped in Controller?
-  // make control and name required props?
-  // Or refactor later
-
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
 
-  const reactHookFormHandlePlayerClick = (player: Player) => {
+  const reactHookFormHandlePlayerClick = (player: Player): void => {
     console.log("Handling react hook form player click");
     const isSelected = selectedPlayers.some(
       (p) => p.playerId === player.playerId,
@@ -32,7 +28,7 @@ const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
     field.onChange(updatedPlayers);
   };
 
-  const getPlayerAvatarClassName = (player: Player) => {
+  const getPlayerAvatarClassName = (player: Player): string => {
     const isSelected = selectedPlayers.includes(player);
     if (isSelected) {
       return "border-2 border-purple-700";

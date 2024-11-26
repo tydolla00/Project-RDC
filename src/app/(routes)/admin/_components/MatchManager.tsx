@@ -7,6 +7,12 @@ import PlayerSessionManager from "./PlayerSessionManager";
 import PlayerSelector from "./PlayerSelector";
 import { FormValues } from "./EntryCreatorForm";
 import { Button } from "@/components/ui/button";
+import { MinusCircledIcon } from "@radix-ui/react-icons";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface Props {
   setIndex: number;
@@ -41,49 +47,56 @@ const MatchManager = (props: Props) => {
 
   return (
     <div>
-      {fields.map((match, matchIndex) => {
-        return (
-          <div key={match.id} className="flex flex-col justify-between">
-            <div id="match-manager-header" className="flex justify-between">
-              <label>Match {matchIndex + 1}</label>
-              <Button
-                className="bg-red-400 text-white hover:bg-red-300"
-                type="button"
-                onClick={() => remove(matchIndex)}
-              >
-                - Remove Match
-              </Button>
+      {(fields.length === 0 && (
+        <div className="text-center text-gray-500">
+          No Matches! Click Add Match to start!
+        </div>
+      )) ||
+        fields.map((match, matchIndex) => {
+          return (
+            <div key={match.id} className="m-2 flex flex-col justify-between">
+              <div id="match-manager-header" className="flex justify-between">
+                <label>Match {matchIndex + 1}</label>
+                <Button
+                  className="bg-red-500 text-xs text-white hover:bg-red-400"
+                  type="button"
+                  onClick={() => remove(matchIndex)}
+                >
+                  <MinusCircledIcon /> Remove Match
+                </Button>
+              </div>
+              <Separator className="my-4 h-[1px] bg-slate-400" />
+              <PlayerSessionManager
+                setIndex={setIndex}
+                matchIndex={matchIndex}
+                players={players}
+              />
+              <div className="text-center text-lg font-semibold">
+                Match Winner for Match {matchIndex + 1}{" "}
+              </div>
+              <Controller
+                name={`sets.${setIndex}.matches.${matchIndex}.matchWinner`}
+                control={control}
+                render={({ field }) => (
+                  <PlayerSelector
+                    rdcMembers={players}
+                    control={control}
+                    field={field}
+                  />
+                )}
+              />
             </div>
-            <Separator className="my-4 h-[1px] bg-slate-400" />
-            <PlayerSessionManager
-              setIndex={setIndex}
-              matchIndex={matchIndex}
-              players={players}
-            />
-            <div className="flex justify-center text-lg">
-              Match Winner for Match {matchIndex + 1}{" "}
-            </div>
-            <Controller
-              name={`sets.${setIndex}.matches.${matchIndex}.matchWinner`}
-              control={control}
-              render={({ field }) => (
-                <PlayerSelector
-                  rdcMembers={players}
-                  control={control}
-                  field={field}
-                />
-              )}
-            />
-          </div>
-        );
-      })}
-      <Button
-        className="rounded-md bg-purple-900 p-1 font-semibold text-white hover:bg-purple-950"
-        type="button"
-        onClick={handleNewMatchClick}
-      >
-        + Add Match
-      </Button>
+          );
+        })}
+      <div className="flex justify-center">
+        <Button
+          className="my-2 rounded-md bg-purple-900 p-1 font-semibold text-white hover:bg-purple-950"
+          type="button"
+          onClick={handleNewMatchClick}
+        >
+          + Add Match
+        </Button>
+      </div>
     </div>
   );
 };

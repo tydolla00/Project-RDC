@@ -1,11 +1,6 @@
 "use client";
 import { Check, ChevronsUpDown } from "lucide-react";
-import {
-  useController,
-  Control,
-  useForm,
-  ControllerRenderProps,
-} from "react-hook-form";
+import { Control, ControllerRenderProps } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -19,7 +14,6 @@ import {
 } from "@/components/ui/command";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -37,7 +31,6 @@ import { FormValues } from "./EntryCreatorForm";
 
 const GameDropDownForm = ({
   control,
-  field,
 }: {
   control: Control<FormValues>;
   field: ControllerRenderProps<FormValues>;
@@ -111,9 +104,7 @@ const GameDropDownForm = ({
               </Command>
             </PopoverContent>
           </Popover>
-          {/* <FormDescription>
-            Game of the session. This will be used to categorize the session.
-          </FormDescription> */}
+
           <FormMessage />
         </FormItem>
       )}
