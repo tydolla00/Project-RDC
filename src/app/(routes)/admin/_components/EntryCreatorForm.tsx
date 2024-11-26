@@ -12,7 +12,7 @@ import { z } from "zod";
 import PlayerSelector from "./PlayerSelector";
 import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
-import { insertNewSessionFromAdmin } from "@/app/_actions/adminAction";
+import { insertNewSessionFromAdmin } from "@/app/actions/adminAction";
 import { Input } from "@/components/ui/input";
 import { Form, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";

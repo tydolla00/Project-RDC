@@ -24,7 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { getYTVid, submitUpdates } from "@/app/_actions/action";
+import { getYTVid, submitUpdates } from "@/app/actions/action";
 import { Input } from "@/components/ui/input";
 import {
   Select,

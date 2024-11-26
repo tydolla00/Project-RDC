@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Game, Player } from "@prisma/client";
 import { useFormContext, useFieldArray, FieldValues } from "react-hook-form";
-import { getGameStats } from "@/app/_actions/adminAction";
+import { getGameStats } from "@/app/actions/adminAction";
 import { FormValues } from "./EntryCreatorForm";
 import { v4 as uuidv4 } from "uuid";
 

@@ -30,7 +30,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getGames } from "@/app/_actions/adminAction";
+import { getGames } from "@/app/actions/adminAction";
 import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { FormValues } from "./EntryCreatorForm";

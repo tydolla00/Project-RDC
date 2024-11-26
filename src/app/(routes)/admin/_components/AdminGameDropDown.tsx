@@ -17,7 +17,7 @@ import {
 import { ChevronsUpDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Game } from "@prisma/client";
-import { getGames } from "@/app/_actions/adminAction";
+import { getGames } from "@/app/actions/adminAction";
 
 const AdminGameDropDown = () => {
   const [open, setOpen] = useState(false);
