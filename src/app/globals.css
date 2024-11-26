@@ -66,4 +66,11 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  ::view-transition-old(rdcmember) {
+    animation: sink-up 1s linear forwards;
+  }
+  ::view-transition-new(rdcmember) {
+    animation: sink-down 5s linear forwards;
+  }
 }
