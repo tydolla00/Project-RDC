@@ -1,7 +1,7 @@
 import { PieChartRDC } from "@/components/charts";
 import { H1, H2 } from "@/components/headings";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { type ChartConfig } from "@/components/ui/chart";
 import Link from "next/link";
 import { getAllGames } from "../../prisma/lib/games";
@@ -42,8 +42,10 @@ export default async function Home() {
           </div>
           <PieChartRDC config={config} data={data} />
         </div>
-        <H2 className="mx-auto my-10 w-fit text-chart-4">Games</H2>
-        <div className="flex gap-10">
+        <H2 className="mx-auto mb-6 mt-40 w-fit text-chart-4 md:my-10">
+          Games
+        </H2>
+        <div className="flex flex-wrap justify-center gap-10">
           {games.map((game) => (
             <Card key={game.gameId} className="h-64 w-64">
               <CardHeader>
@@ -59,20 +61,20 @@ export default async function Home() {
           shouldRedirect={false}
         >
           <H2 className="mx-auto my-10 w-fit text-chart-4">Want to Help</H2>
-          <Card className="mx-auto h-64 w-1/2">
+          <Card className="mx-auto w-1/2">
             <CardHeader>
-              <CardContent>
-                <p>
-                  We could use some help keeping up scores. We have a place
-                  where you can submit scores and we&apos;ll review them and
-                  compare with other scores. In order to submit scores you must
-                  be signed in.
-                </p>
-                <Button asChild className="mt-4">
-                  <Link href="/submissions">Submit new entry</Link>
-                </Button>
-              </CardContent>
+              <p>
+                We could use some help keeping up scores. We have a place where
+                you can submit scores and we&apos;ll review them and compare
+                with other scores. In order to submit scores you must be signed
+                in.
+              </p>
             </CardHeader>
+            <CardFooter>
+              <Button asChild className="mt-4">
+                <Link href="/submissions">Submit new entry</Link>
+              </Button>
+            </CardFooter>
           </Card>
         </FeatureFlag>
       </div>

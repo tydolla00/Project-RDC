@@ -35,10 +35,11 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const memberName = slug.slice(0, 1).toUpperCase() + slug.slice(1);
 
   return (
     <div className="m-16">
-      <H1>{slug}</H1>
+      <H1>{memberName}</H1>
       <Card className="h-64 flex-1">
         <CardHeader>
           <CardTitle>Chart</CardTitle>

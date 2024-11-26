@@ -2,18 +2,7 @@ import { H1 } from "@/components/headings";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-
-const getAllGames = () => {
-  return new Promise<string[]>((resolve, reject) => {
-    resolve([
-      "MarioKart",
-      "Call of Duty",
-      "Lethal Company",
-      "Rocket League",
-      "Speedrunners",
-    ]);
-  });
-};
+import { getAllGames } from "../../../../../prisma/lib/games";
 
 export default async function Page() {
   const games = await getAllGames();
@@ -23,10 +12,12 @@ export default async function Page() {
       <div className="flex flex-wrap gap-10">
         {games.map((game) => (
           <Card
-            key={game}
+            key={game.gameId}
             className="group relative w-full overflow-hidden transition-transform duration-700 sm:h-52 sm:w-52"
           >
-            <Link href="/games">
+            <Link
+              href={`/games/${game.gameName.replace(/\s/g, "").toLowerCase()}`}
+            >
               <Image
                 className="h-100 absolute w-full object-cover transition-transform duration-500 group-hover:scale-125"
                 fill
@@ -35,7 +26,7 @@ export default async function Page() {
               />
               <CardHeader className="relative h-1/4 bg-black bg-opacity-50">
                 <CardTitle className="absolute font-extrabold text-white opacity-100">
-                  {game}
+                  {game.gameName}
                 </CardTitle>
               </CardHeader>
             </Link>

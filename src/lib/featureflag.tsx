@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 
 export const FEATURE_FLAGS = {
   SUBMISSION_FORM: { roles: ["admin"] },
-} as const satisfies Record<string, { roles: Roles[] }>;
+  ADMIN_FORM: { roles: ["admin"] },
+  AUTH: { roles: ["admin", "tester"] },
+} as const satisfies Record<string, { roles: [Roles, ...Roles[]] }>;
 
 export type FeatureFlagName = keyof typeof FEATURE_FLAGS;
 
@@ -30,6 +32,8 @@ export const FeatureFlag = ({
     )
       redirect("/");
   }
+
+  if (devOnly && process.env.NODE_ENV !== "development") return;
 
   return <>{children}</>;
 };

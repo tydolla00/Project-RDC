@@ -22,6 +22,8 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import { games, RDCMembers } from "@/lib/constants";
+import { FeatureFlag } from "@/lib/featureflag";
 export const Navbar = () => {
   const links = [
     { text: "Home", ref: "" },
@@ -29,78 +31,14 @@ export const Navbar = () => {
   ];
 
   // TODO Fetch Games and Members from DB.
+  // TODO Memoize this component, so it doesn't ever rerender? Which it never should.
 
-  const games: { desc?: string; url: string; name: string }[] = [
-    {
-      desc: "Stats from the most intense 3v3 battles.",
-      url: "/games/rocketleague",
-      name: "Rocket League",
-    },
-    {
-      desc: "Stats that tell you who touches the most paper.",
-      url: "/games/lethalcompany",
-      name: "Lethal Company",
-    },
-    {
-      desc: "Stats for FFA's and who sells the most online.",
-      url: "/games/callofduty",
-      name: "Call of Duty",
-    },
-    {
-      desc: "Stats that tell you who races the hardest.",
-      url: "/games/mariokart",
-      name: "Mario Kart",
-    },
-    {
-      desc: "Stats that tell you who races the hardest.",
-      url: "/games/speedrunners",
-      name: "Speedrunners",
-    },
-    {
-      url: "/games",
-      name: "Browse all games",
-    },
-  ];
+  const members = Array.from(RDCMembers.entries());
 
-  const members = [
-    {
-      alt: "RDC Mark",
-      name: "Cash Money Mawk",
-      url: "/members/mark",
-      src: "https://static.wikia.nocookie.net/rdcworld1/images/f/f2/Mark-Phillips.jpg/revision/latest/thumbnail/width/360/height/450?cb=20191004005953",
-    },
-    {
-      alt: "RDC Leland",
-      name: "Meland",
-      url: "/members/leland",
-      src: "https://static.wikia.nocookie.net/rdcworld1/images/e/ee/Leland-manigo-image.jpg/revision/latest?cb=20240119040253",
-    },
-    {
-      alt: "RDC Des",
-      name: "Big Booty Des",
-      url: "/members/des",
-      src: "https://static.wikia.nocookie.net/rdcworld1/images/6/62/Desmond-johnson-4.jpg/revision/latest?cb=20191004011638",
-    },
-    {
-      alt: "RDC Ben",
-      name: "LaBen James",
-      url: "/members/ben",
-      src: "https://static.wikia.nocookie.net/rdcworld1/images/0/0a/Ben.jpg/revision/latest?cb=20240119050707",
-    },
-    { alt: "Ippi", name: "Iceman Ip", url: "/members/ippi", src: "" },
-    { alt: "RDC John", name: "John", url: "/members/john", src: "" },
-    {
-      alt: "RDC Aff",
-      name: "Aff",
-      url: "/members/aff",
-      src: "https://static.wikia.nocookie.net/rdcworld1/images/f/f7/DtlKwRJW4AI3qrN_Aff.jpg/revision/latest?cb=20191004012842",
-    },
-    { alt: "", name: "Browse all members", url: "/members", src: "" },
-  ];
   const signedIn = false;
 
   return (
-    <NavigationMenu className="sticky top-0 mx-auto">
+    <NavigationMenu className="sticky top-0 mx-auto w-screen bg-inherit">
       <NavigationMenuList>
         <NavigationMenuItem className={navigationMenuTriggerStyle()}>
           <Link href="/">
@@ -134,32 +72,58 @@ export const Navbar = () => {
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              {members.map((rdc) => (
+              {members.map(([_, { nav: rdc }]) => (
                 <div key={rdc.url} className="flex gap-5">
-                  <Image alt={rdc.alt} src={Icon} height={60} width={60} />
-                  <ListItem href={rdc.url} title={rdc.name} />
+                  <Avatar>
+                    <Image
+                      alt={rdc.alt}
+                      src={rdc.src || Icon}
+                      height={60}
+                      width={60}
+                    />
+                  </Avatar>
+                  <ListItem
+                    className="flex-shrink-0"
+                    href={rdc.url}
+                    title={rdc.name}
+                  />
                 </div>
               ))}
+              <ListItem
+                className="col-span-full"
+                href="/members"
+                title="Browse all members"
+              />
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem className="hidden md:block">
-          {process.env.NODE_ENV === "development" && (
+          <FeatureFlag
+            devOnly
+            shouldRedirect={false}
+            user={{}}
+            flagName="ADMIN_FORM"
+          >
             <Link className={navigationMenuTriggerStyle()} href="/admin">
               <FillText className="text-chart-4" text="Admin" />
             </Link>
-          )}
+          </FeatureFlag>
         </NavigationMenuItem>
         <NavigationMenuItem className="hidden md:block">
-          {process.env.NODE_ENV === "development" && (
+          <FeatureFlag
+            devOnly
+            shouldRedirect={false}
+            flagName="SUBMISSION_FORM"
+            user={{}}
+          >
             <Link className={navigationMenuTriggerStyle()} href="/submission">
               <FillText className="text-chart-4" text="Submissions" />
             </Link>
-          )}
+          </FeatureFlag>
         </NavigationMenuItem>
         <NavigationMenuItem className="hidden md:block">
-          {process.env.NODE_ENV === "development" ? (
-            signedIn ? (
+          <FeatureFlag shouldRedirect={false} flagName="AUTH" user={{}} devOnly>
+            {signedIn ? (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
@@ -175,8 +139,8 @@ export const Navbar = () => {
               <Link className={navigationMenuTriggerStyle()} href="/signin">
                 <FillText className="text-chart-4" text="Sign In" />
               </Link>
-            )
-          ) : null}
+            )}
+          </FeatureFlag>
         </NavigationMenuItem>
         <NavigationMenuItem className="hidden md:block">
           <ModeToggle />
@@ -205,7 +169,7 @@ const ListItem = React.forwardRef<
   React.ComponentPropsWithoutRef<"a">
 >(({ className, title, children, href = "", ...props }, ref) => {
   return (
-    <li>
+    <li className="flex-grow">
       <NavigationMenuLink asChild>
         <Link
           prefetch={true}
