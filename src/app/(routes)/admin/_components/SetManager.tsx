@@ -21,8 +21,7 @@ const SetManager = (props: Props) => {
     control,
   });
 
-  const { register, formState, getValues } =
-    useFormContext<z.infer<typeof formSchema>>();
+  const { getValues } = useFormContext<z.infer<typeof formSchema>>();
 
   const players = getValues(`players`);
   return (
@@ -80,7 +79,7 @@ const SetManager = (props: Props) => {
         onClick={() => {
           append({ setId: fields.length + 1, matches: [] });
         }}
-        className="w-full py-2 text-center text-gray-600 underline underline-offset-4"
+        className="rounded-md bg-purple-900 p-1 py-2 text-center hover:bg-purple-950"
       >
         Add Set
       </button>

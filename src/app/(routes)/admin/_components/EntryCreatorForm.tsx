@@ -6,7 +6,6 @@ import {
   Controller,
   FormProvider,
 } from "react-hook-form";
-import { Form } from "@/components/ui/form";
 import GameDropDownForm from "./GameDropDownForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,11 +13,14 @@ import PlayerSelector from "./PlayerSelector";
 import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
 import { insertNewSessionFromAdmin } from "@/app/_actions/adminAction";
+import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 
 interface Props {
   rdcMembers: Player[];
 }
 
+// TODO: Move this somewhere else
 export const formSchema = z.object({
   game: z.string(),
   sessionName: z.string(),
@@ -72,66 +74,78 @@ const EntryCreatorForm = (props: Props) => {
 
   const { register, handleSubmit, control, watch } = form;
 
-  console.log("Watch", watch());
-
+  /**
+   * Submit method called when EntryCreatorForm submit button clicked
+   * @param data entire "Admin" Session object constructed from values
+   * in EntryCreator form
+   */
   const onSubmit = (data: FormValues) => {
-    console.log("ON SUBMIT CALLED");
-    console.log("Form Data:", data);
-    // Handle form submission logic here
     insertNewSessionFromAdmin(data);
   };
 
+  /**
+   *
+   * @param errors
+   */
   const onError = (errors: any) => {
-    console.error("Form Errors:", errors);
+    console.error("Admin Form Submission Errors:", errors);
   };
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={handleSubmit(onSubmit, onError)}>
-        <div className="flex justify-around">
-          <input
-            className="my-2 w-80 rounded-md border p-2"
-            defaultValue=""
-            placeholder="Session Name"
-            {...register("sessionName", { required: true })}
-          />
-          <input
-            className="my-2 w-80 rounded-md border p-2"
-            defaultValue=""
-            placeholder="Session URL"
-            {...register("sessionUrl", { required: false })}
-          />
-          <input
-            className="my-2 w-80 rounded-md border p-2"
-            defaultValue=""
-            placeholder="Thumbnail"
-            {...register("thumbnail", { required: false })}
-          />
-          <Controller
-            name="game"
-            control={control}
-            render={({ field }) => (
-              <GameDropDownForm field={field} control={form.control} />
-            )}
-          />
-          <Controller
-            name="players"
-            control={control}
-            render={({ field }) => (
-              <PlayerSelector
-                rdcMembers={rdcMembers}
-                control={form.control}
-                field={field}
-              />
-            )}
-          />
-        </div>
-        <SetManager control={control} />
+      <Form {...form}>
+        <form onSubmit={handleSubmit(onSubmit, onError)}>
+          <div
+            id="entry-creator-form-info-header"
+            className="flex justify-around"
+          >
+            <Input
+              className="my-2 w-80 rounded-md border p-2"
+              defaultValue=""
+              placeholder="Session Name"
+              {...register("sessionName", { required: true })}
+            />
+            <input
+              className="my-2 w-80 rounded-md border p-2"
+              defaultValue=""
+              placeholder="Session URL"
+              {...register("sessionUrl", { required: false })}
+            />
+            <input
+              className="my-2 w-80 rounded-md border p-2"
+              defaultValue=""
+              placeholder="Thumbnail"
+              {...register("thumbnail", { required: false })}
+            />
+            <Controller
+              name="game"
+              control={control}
+              render={({ field }) => (
+                <GameDropDownForm field={field} control={form.control} />
+              )}
+            />
+            <Controller
+              name="players"
+              control={control}
+              render={({ field }) => (
+                <PlayerSelector
+                  rdcMembers={rdcMembers}
+                  control={form.control}
+                  field={field}
+                />
+              )}
+            />
+          </div>
+          <SetManager control={control} />
 
-        <button type="submit" className="my-2 w-80 rounded-md border p-2">
-          Submit
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="my-2 w-80 rounded-md border bg-green-800 p-2"
+          >
+            Submit
+          </button>
+        </form>
+      </Form>
     </FormProvider>
   );
 };

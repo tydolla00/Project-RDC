@@ -12,7 +12,7 @@ interface Props {
 }
 
 const MatchManager = (props: Props) => {
-  const { register, control, getValues } = useFormContext<FormValues>();
+  const { control, getValues } = useFormContext<FormValues>();
   const { setIndex } = props;
   const { append, remove, fields } = useFieldArray({
     name: `sets.${setIndex}.matches`,
@@ -20,6 +20,10 @@ const MatchManager = (props: Props) => {
   });
   const players = getValues(`players`);
 
+  /**
+   *  Handles create new match button click.
+   * Creates a new child Match under parent set
+   */
   const handleNewMatchClick = () => {
     console.log("Handling New Match click", players);
     const playerSessions = players.map((player: Player) => ({
@@ -33,7 +37,7 @@ const MatchManager = (props: Props) => {
       playerSessions: playerSessions,
     });
   };
-  console.log("Match Fields: ", fields);
+
   return (
     <div>
       {fields.map((match, matchIndex) => {
@@ -73,7 +77,7 @@ const MatchManager = (props: Props) => {
         );
       })}
       <button
-        className="bg-gray-700"
+        className="rounded-md bg-purple-900 p-1 hover:bg-purple-950"
         type="button"
         onClick={handleNewMatchClick}
       >

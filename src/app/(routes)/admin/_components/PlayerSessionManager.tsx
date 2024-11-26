@@ -1,4 +1,3 @@
-"use client";
 import { Player } from "@prisma/client";
 import React from "react";
 import { FieldValues, useFieldArray, useFormContext } from "react-hook-form";
@@ -12,25 +11,23 @@ interface Props {
 
 const PlayerSessionManager = (props: Props) => {
   const { setIndex, matchIndex, players } = props;
-  const { register, control, getValues } = useFormContext();
+  const { control, getValues } = useFormContext();
   const { append, remove, fields } = useFieldArray<FieldValues>({
     name: `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
     control,
   });
-  console.log(
-    `PlayerSessionManager: Set ${setIndex} Match ${matchIndex} Fields:  ${fields}`,
-  );
 
   React.useEffect(() => {
     const finalPlayerSessionValues = getValues(
       `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
     );
 
-    finalPlayerSessionValues?.forEach((element: any) => {
-      console.log("Element: ", element);
-    });
+    // -- Logging --
+    // finalPlayerSessionValues?.forEach((element: any) => {
+    //   console.log("Element: ", element);
+    // });
 
-    // Adding new player sessions for each player
+    // Add new PlayerSession for each Player
     players.forEach((player) => {
       const playerExists = finalPlayerSessionValues.some(
         (playerSession: any) => player.playerId === playerSession.playerId,
@@ -45,9 +42,9 @@ const PlayerSessionManager = (props: Props) => {
     });
 
     // Remove player sessions for players that are no longer in the players array
-    finalPlayerSessionValues.forEach((session: any, index: number) => {
+    finalPlayerSessionValues.forEach((playerSession: any, index: number) => {
       const playerExists = players.some(
-        (player) => player.playerId === session.playerId,
+        (player) => player.playerId === playerSession.playerId,
       );
       if (!playerExists) {
         remove(index);
