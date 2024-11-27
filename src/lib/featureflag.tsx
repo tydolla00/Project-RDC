@@ -1,3 +1,4 @@
+import { Session } from "next-auth";
 import { redirect } from "next/navigation";
 
 export const FEATURE_FLAGS = {
@@ -22,13 +23,14 @@ export const FeatureFlag = ({
   devOnly?: boolean;
   shouldRedirect: boolean;
   flagName: FeatureFlagName;
-  user: {};
+  user: Session | null;
 }) => {
+  // TODO Add necessary checks for if user has a particular role.
   const flag = FEATURE_FLAGS[flagName];
   if (shouldRedirect) {
     if (
       (devOnly && process.env.NODE_ENV !== "development") ||
-      flag.roles.some((s) => s === user) // user isn't admin
+      flag.roles.some((s) => s === user?.user?.name) // user isn't admin
     )
       redirect("/");
   }

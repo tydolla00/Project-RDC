@@ -2,9 +2,15 @@
 
 import { PrismaClient } from "@prisma/client";
 import config from "@/lib/config";
+import { Session } from "next-auth";
+import { signOut, signIn } from "@/auth";
 
 export const submitUpdates = async (props: any) => {
   console.log(props);
+};
+
+export const updateAuthStatus = async (session: Session | null) => {
+  session ? await signOut({ redirectTo: "/" }) : await signIn("github");
 };
 
 export const getYTVid = async (videoId: string) => {
