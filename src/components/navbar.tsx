@@ -24,8 +24,8 @@ import {
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { games, RDCMembers } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
-import { Button } from "./ui/button";
-import { auth, signIn } from "@/auth";
+import { auth } from "@/auth";
+import { AuthButton } from "./client-buttons";
 
 export const Navbar = async () => {
   const session = await auth();
@@ -124,9 +124,30 @@ export const Navbar = async () => {
             </Link>
           </FeatureFlag>
         </NavigationMenuItem>
-        <NavigationMenuItem className="hidden md:block">
-          <FeatureFlag shouldRedirect={false} flagName="AUTH" user={{}} devOnly>
-            {session ? (
+        <NavigationMenuItem className="mr-4 hidden sm:block">
+          <ModeToggle />
+        </NavigationMenuItem>
+        {/* MOBILE */}
+        <NavigationMenuItem className="md:hidden">
+          <NavigationMenuTrigger>
+            <HamburgerMenuIcon />
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul>
+              <ListItem href="/about">About</ListItem>
+              <ListItem href="/admin">Admin</ListItem>
+              <ListItem href="/submission">Submissions</ListItem>
+              {/* add client component that will handle triggering the animation. */}
+              {/* TODO MOBILE ONLY Animate up from the bottom of the screen and add dismiss option. */}
+              <ModeToggle />
+              <AuthButton session={session} />
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        {/* Causing spacing problems because of space-x-1 */}
+        <FeatureFlag shouldRedirect={false} flagName="AUTH" user={{}} devOnly>
+          <NavigationMenuItem className="hidden sm:block">
+            {session && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
@@ -138,38 +159,10 @@ export const Navbar = async () => {
                   <TooltipContent>{session.user?.name}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            ) : (
-              <form
-                action={async () => {
-                  "use server";
-                  await signIn("github");
-                }}
-              >
-                <Button>Sign In</Button>
-              </form>
-              // <Link className={navigationMenuTriggerStyle()} href="/signin">
-              //   <FillText className="text-chart-4" text="Sign In" />
-              // </Link>
             )}
-          </FeatureFlag>
-        </NavigationMenuItem>
-        <NavigationMenuItem className="hidden md:block">
-          <ModeToggle />
-        </NavigationMenuItem>
-        <NavigationMenuItem className="md:hidden">
-          <NavigationMenuTrigger>
-            <HamburgerMenuIcon />
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul>
-              <ListItem href="/about">About</ListItem>
-              <ListItem href="/admin">Admin</ListItem>
-              <ListItem href="/signin">Sign In</ListItem>
-              <ListItem href="/submission">Submissions</ListItem>
-              <ModeToggle />
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
+          </NavigationMenuItem>
+        </FeatureFlag>
+        <AuthButton session={session} />
       </NavigationMenuList>
     </NavigationMenu>
   );
