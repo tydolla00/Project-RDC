@@ -21,8 +21,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { Button } from "./ui/button";
+import { auth, signIn } from "@/auth";
 
-export const Navbar = () => {
+export const Navbar = async () => {
+  const session = await auth();
+  console.log(session);
   const links = [
     { text: "Home", ref: "" },
     { text: "About", ref: "about" },
@@ -72,8 +76,6 @@ export const Navbar = () => {
     { alt: "RDC Aff", name: "Aff", url: "/members/aff" },
     { alt: "", name: "Browse all members", url: "/members" },
   ];
-
-  const signedIn = false;
 
   return (
     <NavigationMenu className="sticky top-0 mx-auto">
@@ -133,22 +135,30 @@ export const Navbar = () => {
         </NavigationMenuItem>
         <NavigationMenuItem>
           {process.env.NODE_ENV === "development" ? (
-            signedIn ? (
+            session ? (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
                     <Avatar>
-                      <AvatarImage src={Icon.src} />
+                      <AvatarImage src={session.user?.image || Icon.src} />
                       <AvatarFallback>Icon</AvatarFallback>
                     </Avatar>
                   </TooltipTrigger>
-                  <TooltipContent>User signed in</TooltipContent>
+                  <TooltipContent>{session.user?.name}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             ) : (
-              <Link className={navigationMenuTriggerStyle()} href="/signin">
-                <FillText className="text-chart-4" text="Sign In" />
-              </Link>
+              <form
+                action={async () => {
+                  "use server";
+                  await signIn("github");
+                }}
+              >
+                <Button>Sign In</Button>
+              </form>
+              // <Link className={navigationMenuTriggerStyle()} href="/signin">
+              //   <FillText className="text-chart-4" text="Sign In" />
+              // </Link>
             )
           ) : null}
         </NavigationMenuItem>

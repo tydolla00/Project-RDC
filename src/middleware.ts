@@ -17,3 +17,6 @@ export const config = {
     "/submission",
   ],
 };
+
+// this will update the session expiry every time its called.
+// export { auth as middleware } from "@/auth"
