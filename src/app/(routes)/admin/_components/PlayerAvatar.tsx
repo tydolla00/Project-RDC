@@ -31,7 +31,6 @@ const PlayerAvatar = ({
       ["Ipi", "ipi_rdc.jpg"],
     ]);
 
-    console.log("Player Avatar Map: ", playerAvatarMap.get(playerName));
     return playerAvatarMap.get(playerName) || "default_avatar.jpg";
   };
 

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { AdminDatePicker } from "./AdminDatePicker";
 
 interface Props {
   rdcMembers: Player[];
@@ -30,6 +31,7 @@ export const formSchema = z.object({
     )
     .max(100)
     .includes("v="),
+  date: z.date(),
   thumbnail: z.string(),
   players: z.array(
     z.object({
@@ -41,7 +43,7 @@ export const formSchema = z.object({
     .array(
       z.object({
         setId: z.number(),
-        setWinner: z
+        setWinners: z
           .array(
             z.object({
               playerId: z.number(),
@@ -106,7 +108,7 @@ const EntryCreatorForm = (props: Props) => {
     formState: { errors },
   } = form;
 
-  console.log("Watch: ", watch());
+  console.log("Watch: ", watch("sets.0.setWinners.0"));
 
   /**
    * Submit method called when EntryCreatorForm submit button clicked
@@ -152,7 +154,7 @@ const EntryCreatorForm = (props: Props) => {
               name="sessionName"
               render={({ field }) => (
                 <FormItem className="text-center">
-                  <FormLabel>Session Name</FormLabel>
+                  <FormLabel className="text-base">Session Name</FormLabel>
                   <Input
                     className="my-2 w-80 rounded-md border p-2"
                     placeholder="Session Name"
@@ -182,6 +184,7 @@ const EntryCreatorForm = (props: Props) => {
                 </FormItem>
               )}
             />
+            <AdminDatePicker />
 
             <FormField
               control={form.control}

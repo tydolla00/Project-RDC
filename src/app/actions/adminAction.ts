@@ -64,6 +64,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
         sessionName: session.sessionName,
         sessionUrl: session.sessionUrl,
         thumbnail: session.thumbnail,
+        date: session.date,
         // date: Date.now(), // TODO: Add Date Picker or get date from youtube video
       },
     });

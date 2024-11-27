@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Control,
   Controller,
@@ -18,23 +18,50 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { join } from "path";
 
 interface Props {
   control: Control<z.infer<typeof formSchema>>;
 }
 
 const SetManager = (props: Props) => {
-  const { control } = props;
+  const { watch, formState, control } =
+    useFormContext<z.infer<typeof formSchema>>();
   const { append, remove, fields } = useFieldArray({
     name: "sets",
     control,
   });
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [openSets, setOpenSets] = useState<boolean[]>(fields.map(() => false));
+  console.log("open sets", openSets);
+  const toggleSet = (index: number) => {
+    console.log("toggling set", index);
+
+    setOpenSets((prevOpenSets) =>
+      prevOpenSets.map((isOpen, i) => (i === index ? !isOpen : isOpen)),
+    );
+  };
 
   const { getValues } = useFormContext<z.infer<typeof formSchema>>();
 
-  const players = getValues(`players`);
+  const players = watch(`players`);
+
+  useEffect(() => {
+    const watchSetWinnersString = () => {
+      const sets = watch("sets");
+      return sets
+        .map((set, index) => {
+          const winners = set.setWinners
+            .map((winner) => winner.playerName)
+            .join(", ");
+          return `Set ${index + 1}: ${winners}`;
+        })
+        .join(" | ");
+    };
+    const setWinnersString = watchSetWinnersString();
+    console.log(setWinnersString);
+  }, [watch]);
+
   return (
     <div className="w-full space-y-4">
       {/* Loop through chapter fields */}
@@ -52,22 +79,41 @@ const SetManager = (props: Props) => {
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
                   </div>{" "}
-                  <div className="text-lg">
-                    <h6 className="text-md mb-2"> Set Winner </h6>
-                    {set.setWinner.length > 0 ? (
+                  <div
+                    id={`set.${setIndex}-set-winner-container`}
+                    className="text-center"
+                  >
+                    <h6 className="mb-2 text-base"> Set Winner </h6>
+
+                    {set.setWinners.length > 0 ? (
                       <div>
-                        {set.setWinner.map((setWinner) => {
-                          return setWinner.playerName;
-                        })}
+                        {watch(`sets`)?.[setIndex]?.setWinners?.map(
+                          (player) => {
+                            return (
+                              <div key={player.playerId}>
+                                {player.playerName}
+                              </div>
+                            );
+                          },
+                        )}
                       </div>
                     ) : (
-                      <p> No Players found! </p>
+                      <p className="text-sm text-red-400">
+                        {" "}
+                        No set winners selected{" "}
+                      </p>
                     )}
                   </div>
                   <div className="flex">
                     <TrashIcon
                       className="text-sm text-red-500 hover:cursor-pointer hover:text-red-400"
                       onClick={() => {
+                        // Collapse set before removing
+                        setOpenSets((prevOpenSets) =>
+                          prevOpenSets.map((isOpen, i) =>
+                            i === setIndex ? false : isOpen,
+                          ),
+                        );
                         remove(setIndex);
                       }}
                       width={24}
@@ -87,7 +133,7 @@ const SetManager = (props: Props) => {
                     Set Winner for Set {setIndex + 1}
                   </div>
                   <Controller
-                    name={`sets.${setIndex}.setWinner`}
+                    name={`sets.${setIndex}.setWinners`}
                     control={control}
                     render={({ field }) => (
                       <PlayerSelector
@@ -99,9 +145,13 @@ const SetManager = (props: Props) => {
                   />
                 </CollapsibleContent>
                 <CardFooter className="flex flex-row-reverse pb-0">
-                  <CollapsibleTrigger>
+                  <CollapsibleTrigger onClick={() => toggleSet(setIndex)}>
                     {" "}
-                    <ChevronDown />{" "}
+                    <ChevronDown
+                      className={`transition-transform duration-300 ${
+                        openSets[setIndex] ? "rotate-180" : ""
+                      }`}
+                    />{" "}
                   </CollapsibleTrigger>
                 </CardFooter>
               </Card>
@@ -112,7 +162,8 @@ const SetManager = (props: Props) => {
         <Button
           type="button"
           onClick={() => {
-            append({ setId: fields.length + 1, matches: [], setWinner: [] });
+            append({ setId: fields.length + 1, matches: [], setWinners: [] });
+            setOpenSets([...openSets, false]);
           }}
           className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"
         >
