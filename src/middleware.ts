@@ -1,11 +1,12 @@
 import type { NextRequest } from "next/server";
+import { auth } from "./auth";
 
-export function middleware(request: NextRequest) {
-  // TODO If /submission and user not logged in redirect to signin
+export async function middleware(request: NextRequest) {
+  const session = await auth();
   if (
     (request.nextUrl.pathname === "/admin" ||
       request.nextUrl.pathname === "/submission") &&
-    process.env.NODE_ENV !== "development"
+    !session
   )
     return Response.redirect(new URL("/", request.url));
 }
@@ -17,3 +18,6 @@ export const config = {
     "/submission",
   ],
 };
+
+// this will update the session expiry every time its called.
+// export { auth as middleware } from "@/auth"

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/chart";
 import { BarChart, YAxis } from "recharts";
 import { CartesianGrid, XAxis, Bar } from "recharts";
-// TODO Add config and data and namekey props
+
 export const CustomChart = ({
   data,
   nameKey,

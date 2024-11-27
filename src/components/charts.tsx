@@ -28,7 +28,7 @@ export const PieChartRDC = ({
   // TODO This Chart will rank the average of placements in each category.
   // TODO Reponsive not working. May need to mess with config or use grid resizing via css.
   return (
-    <Card className="h-fit min-w-fit max-w-3xl">
+    <Card className="-ml-16 h-fit w-screen min-w-fit max-w-3xl transition-colors duration-500 hover:border-white md:m-auto md:w-72 lg:ml-0 lg:w-max">
       <CardHeader>
         <CardTitle>Sorry scale</CardTitle>
         <CardDescription>

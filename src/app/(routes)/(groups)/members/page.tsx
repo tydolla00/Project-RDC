@@ -1,5 +1,6 @@
 import { H1, H3 } from "@/components/headings";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
+import Image from "next/image";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import Icon from "@/app/favicon.ico";
 import Link from "next/link";
@@ -9,106 +10,35 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { RDCMembers } from "@/lib/constants";
+import { Members3D } from "./_client/interactive-members";
 
-const getAllMembers = () => {
-  const members = new Map<string, MembersProps>([
-    [
-      "Mark",
-      {
-        desc: "Director, animator, Mark is the founder and creator of RDC. He is one of the better gamers in RDC and plays as such.",
-        stat1: { prop: "Best Rocket League Player", val: "#1" },
-        stat2: { prop: "Dragon Ball Sparking Zero", val: "#2" },
-        stat3: { prop: "Scariest Gamer", val: "Most deaths in Lethal Company" },
-      },
-    ],
-    [
-      "Ippi",
-      {
-        desc: "Ippi is a newcomer in the eyes of RDC, while not yet an official member of RDC yet, one can assume that it's only a matter of time as he has been beating down the crew in Golf and Mario Kart.",
-        stat1: { prop: "", val: "" },
-        stat2: { prop: "", val: "" },
-        stat3: { prop: "", val: "" },
-      },
-    ],
-    [
-      "John",
-      {
-        desc: "If you've ever seen or been to Dreamcon, this man has had a hand in it. Don't let his sorry gaming skills fool you, John is very valuable in the backend and his contributions should not go unnoticed. Don't forget his immaculate singing ability, John is clearly the best singer in RDC.",
-        stat1: { prop: "", val: "" },
-        stat2: { prop: "", val: "" },
-        stat3: { prop: "", val: "" },
-      },
-    ],
-    [
-      "Aff",
-      {
-        desc: "Aff and his turtle bring a lot to RDC. Give aff for giving us all the laughs, memes, and behind the scenes work that he contributes to.",
-        stat1: { prop: "", val: "" },
-        stat2: { prop: "", val: "" },
-        stat3: { prop: "", val: "" },
-      },
-    ],
-    [
-      "Leland",
-      {
-        desc: "I love it when you talk to me, my cash machine, my cash machine. The old man laugh always get us. While Leland is really sorry at most games, don't try to play him in any fighting game. You are most likely to get beat up.",
-        stat1: { prop: "", val: "" },
-        stat2: { prop: "", val: "" },
-        stat3: { prop: "", val: "" },
-      },
-    ],
-    [
-      "Dylan",
-      {
-        desc: "The tech guru, the thriller in manilla, el luchador. Dylan is a huge component in the puzzle that is RDC. The flawless streams are thanks to Dylan. He is one of the top gamers in the group although recently he has been falling lower in the ranking of rdc members.",
-        stat1: { prop: "", val: "" },
-        stat2: { prop: "", val: "" },
-        stat3: { prop: "", val: "" },
-      },
-    ],
-    [
-      "Ben",
-      {
-        desc: "Ben is a very average gamer. Somethings he is good at and other's hes not. It's hard to explain. Ben gets it done. He works well and if he leaves again he's dead to us.",
-        stat1: { prop: "", val: "" },
-        stat2: { prop: "", val: "" },
-        stat3: { prop: "", val: "" },
-      },
-    ],
-    [
-      "Desmond",
-      {
-        desc: "How greeeeeeeat is our God. Ranking as the 2nd best singer in RDC Desmond is surprisingly a very good gamer. You would think the dementia would affect Des but the rage and enthusiasm he plays with always uplifts him in the end. Also Desmond, how is Crystal?",
-        stat1: { prop: "", val: "" },
-        stat2: { prop: "", val: "" },
-        stat3: { prop: "", val: "" },
-      },
-    ],
-  ]);
-  return new Promise<ReturnType<(typeof members)["entries"]>>(
-    (resolve, reject) => {
-      resolve(members.entries());
-    },
-  );
-};
+// TODO Revalidate Stats Once Per Week
+// TODO Show all button that displays all Members. Default is centered 3D circular card that pops up from the 'ground'
 
 export default async function Page() {
-  const members = Array.from(await getAllMembers());
+  const members = Array.from(RDCMembers.entries());
+  // return <Members3D />;
   return (
     <div className="m-16">
-      <H1>Games</H1>
+      <H1>Members</H1>
       <div className="flex flex-wrap justify-center gap-10">
-        {members.map(([member, { desc, stat1, stat2, stat3 }]) => (
-          <HoverCard key={member} openDelay={300}>
+        {members.map(([member, { desc, stat1, stat2, stat3, nav: rdc }]) => (
+          <HoverCard key={member} openDelay={200} closeDelay={200}>
             <HoverCardTrigger asChild>
               <Link
-                className="group/fill"
+                className="group/fill overflow-hidden"
                 href={`/members/${member}`}
                 key={member}
               >
                 <Avatar className="h-32 w-32">
-                  <AvatarImage src={Icon.src} />
-                  <AvatarFallback>{member}</AvatarFallback>
+                  <Image
+                    className="transition-transform duration-500 group-hover/fill:scale-125"
+                    alt={rdc.alt}
+                    src={rdc.src || Icon}
+                    height={128}
+                    width={128}
+                  />
                 </Avatar>
                 <div className="mx-auto w-fit">
                   <FillText
@@ -147,10 +77,3 @@ export default async function Page() {
     </div>
   );
 }
-
-type MembersProps = {
-  desc: string;
-  stat1: { prop: string; val: string };
-  stat2: { prop: string; val: string };
-  stat3: { prop: string; val: string };
-};

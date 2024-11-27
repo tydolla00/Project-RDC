@@ -1,16 +1,22 @@
 interface Config {
-  YOUTUBE_API_KEY: string | undefined;
   YOUTUBE_LOCAL_API_KEY: string | undefined;
   NEXT_PUBLIC_POSTHOG_KEY: string | undefined;
   NEXT_PUBLIC_POSTHOG_HOST: string | undefined;
+  AUTH_GITHUB_ID: string | undefined;
+  AUTH_GITHUB_SECRET: string | undefined;
+  AUTH_TRUST_HOST: string | undefined;
+  AUTH_SECRET: string | undefined;
 }
 
 const getConfig = (): Config => {
   return {
-    YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY,
     YOUTUBE_LOCAL_API_KEY: process.env.YOUTUBE_LOCAL_API_KEY,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID,
+    AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
+    AUTH_TRUST_HOST: process.env.AUTH_TRUST_HOST,
+    AUTH_SECRET: process.env.AUTH_SECRET,
   };
 };
 

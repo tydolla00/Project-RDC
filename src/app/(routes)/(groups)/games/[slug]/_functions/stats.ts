@@ -39,7 +39,7 @@ export const getAllStats = async (game: {
  * @param playerStats @external getScoreStatsPerPlayer
  * @returns Array of Object containing info about the player their placing and matches played.
  */
-export const getAverage = (
+export const calcAvgPerPlayer = (
   playerStats: Awaited<ReturnType<typeof getScoreStatsPerPlayer>>,
 ) => {
   const avgPlacingPerPlayer = new Map<string, { avg: number; count: number }>();
@@ -107,15 +107,16 @@ export const calculateWinsPerPlayer = (
       }
     }
   }
-  return members;
+  const data = Array.from(members);
+  return data;
 };
 
 /**
- * Computes the amount of times a player has made first and returns it.
+ * Computes the sum per player for a given statName
  * @param placings info about a players placings
  * @returns A map containing a player's amount of 1st place finishes.
  */
-export const calculateMost1st = (
+export const calcMostPerStat = (
   placings: {
     value: string;
     player: { playerId: number; playerName: string };
@@ -133,25 +134,40 @@ export const calculateMost1st = (
     members.set(placing.player.playerName, ++member);
   }
 
-  return members;
+  const data = Array.from(members);
+
+  return data;
 };
 
+type MembersPerPosition = {
+  first: number;
+  second: number;
+  third: number;
+  last: number;
+} & {
+  [K in 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8]?: number;
+};
 /**
- * Computes per player, their second and last place finishes and returns it.
+ * Computes per player, the amount of times they've placed first, second, third, and last. Also includes their placing 1 - 8.
  * @param gameId id of the game record.
- * @returns Array of objects containing info about the amount of a player's second and last place finishes.
+ * @returns Array of objects containing info about the amount of a player's placings.
  */
-export const calculateMostSecondAndLast = async (gameId: number) => {
+export const calcMostPerPlacing = async (gameId: number) => {
+  // I calculate it this way because there is a dynamic amount of players in a match,  know how many players are in a mat
   let stat: StatNameValues<StatNames, "POS"> | undefined;
   switch (gameId) {
     case 1:
       stat = "MK8_POS";
+      break;
+    case 2:
+      stat = "COD_POS";
+      break;
   }
 
   if (!stat) return null;
 
   const sessions = await getMatchesPerGame(gameId, stat!);
-  const members = new Map<string, { last: number; second: number }>();
+  const members = new Map<string, MembersPerPosition>();
 
   for (const session of sessions) {
     for (const set of session.sets) {
@@ -163,28 +179,52 @@ export const calculateMostSecondAndLast = async (gameId: number) => {
             !pos && console.log("Not a number", pos);
             continue;
           }
+          if (!members.has(ps.player.playerName))
+            members.set(ps.player.playerName, {
+              first: 0,
+              second: 0,
+              third: 0,
+              last: 0,
+            });
+          let member = members.get(ps.player.playerName)!;
+          member[pos as keyof MembersPerPosition] ??= 0;
+          member[pos as keyof MembersPerPosition] += 1;
           race.push({ player: ps.player.playerName, pos });
         }
         const sorted = race.sort((a, b) => a.pos - b.pos);
-        const lastPlace = sorted[sorted.length - 1].player;
+        const firstPlace = sorted[0].player;
         const secondPlace = sorted[1].player;
+        const thirdPlace = sorted[2].player;
+        const lastPlace = sorted[sorted.length - 1].player;
 
-        if (!members.has(lastPlace))
-          members.set(lastPlace, { last: 0, second: 0 });
-        let member = members.get(lastPlace)!;
-        member.last += 1;
+        let member = members.get(firstPlace)!;
+        member.first += 1;
 
-        if (!members.has(secondPlace))
-          members.set(secondPlace, { last: 0, second: 0 });
         member = members.get(secondPlace)!;
         member.second += 1;
+
+        member = members.get(thirdPlace)!;
+        member.third += 1;
+
+        member = members.get(lastPlace)!;
+        member.last += 1;
       }
     }
   }
   const data = Array.from(members, ([key, val]) => ({
     player: key,
-    last: val.last,
+    first: val.first,
     second: val.second,
+    third: val.third,
+    last: val.last,
+    1: val[1] || 0,
+    2: val[2] || 0,
+    3: val[3] || 0,
+    4: val[4] || 0,
+    5: val[5] || 0,
+    6: val[6] || 0,
+    7: val[7] || 0,
+    8: val[8] || 0,
   }));
   return data;
 };
