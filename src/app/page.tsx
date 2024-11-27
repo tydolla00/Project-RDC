@@ -6,9 +6,11 @@ import { type ChartConfig } from "@/components/ui/chart";
 import Link from "next/link";
 import { getAllGames } from "../../prisma/lib/games";
 import { FeatureFlag } from "@/lib/featureflag";
+import { auth } from "@/auth";
 
 export default async function Home() {
   const games = await getAllGames();
+  const session = await auth();
 
   return (
     <>
@@ -57,11 +59,11 @@ export default async function Home() {
         <FeatureFlag
           devOnly
           flagName="SUBMISSION_FORM"
-          user={{}}
+          user={session}
           shouldRedirect={false}
         >
           <H2 className="mx-auto my-10 w-fit text-chart-4">Want to Help</H2>
-          <Card className="mx-auto w-1/2">
+          <Card className="mx-auto md:w-1/2">
             <CardHeader>
               <p>
                 We could use some help keeping up scores. We have a place where
@@ -71,7 +73,7 @@ export default async function Home() {
               </p>
             </CardHeader>
             <CardFooter>
-              <Button asChild className="mt-4">
+              <Button asChild className="mt-4 w-full sm:w-auto">
                 <Link href="/submissions">Submit new entry</Link>
               </Button>
             </CardFooter>
