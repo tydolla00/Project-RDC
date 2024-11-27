@@ -6,9 +6,11 @@ import { type ChartConfig } from "@/components/ui/chart";
 import Link from "next/link";
 import { getAllGames } from "../../prisma/lib/games";
 import { FeatureFlag } from "@/lib/featureflag";
+import { auth } from "@/auth";
 
 export default async function Home() {
   const games = await getAllGames();
+  const session = await auth();
 
   return (
     <>
@@ -57,7 +59,7 @@ export default async function Home() {
         <FeatureFlag
           devOnly
           flagName="SUBMISSION_FORM"
-          user={{}}
+          user={session}
           shouldRedirect={false}
         >
           <H2 className="mx-auto my-10 w-fit text-chart-4">Want to Help</H2>
