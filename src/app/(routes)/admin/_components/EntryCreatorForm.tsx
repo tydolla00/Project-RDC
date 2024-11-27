@@ -135,10 +135,17 @@ const EntryCreatorForm = (props: Props) => {
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit, onError)}>
+        <div className="m-2 text-center text-2xl font-bold dark:text-purple-500">
+          {" "}
+          Entry Creator Form
+        </div>
+        <form
+          className="rounded-md border p-4"
+          onSubmit={handleSubmit(onSubmit, onError)}
+        >
           <div
             id="entry-creator-form-info-header"
-            className="flex items-center justify-between"
+            className="flex flex-wrap items-center justify-between"
           >
             <FormField
               control={form.control}
@@ -195,7 +202,11 @@ const EntryCreatorForm = (props: Props) => {
                 </FormItem>
               )}
             />
-
+          </div>
+          <div
+            id="entry-creator-form-info-subheader"
+            className="my-2 flex flex-row items-center justify-around"
+          >
             <Controller
               name="game"
               control={control}

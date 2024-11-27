@@ -10,13 +10,14 @@ import { formSchema } from "./EntryCreatorForm";
 import MatchManager from "./MatchManager";
 import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { MinusCircledIcon } from "@radix-ui/react-icons";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
+import { TrashIcon } from "@radix-ui/react-icons";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 interface Props {
   control: Control<z.infer<typeof formSchema>>;
@@ -46,33 +47,39 @@ const SetManager = (props: Props) => {
         fields.map((set, setIndex) => {
           return (
             <Collapsible key={set.setId}>
-              <Card className="flex flex-col space-y-3 rounded-lg p-6 shadow-lg">
-                <div className="flex justify-between">
+              <Card className="flex flex-col space-y-3 rounded-lg p-6 pt-1 shadow-lg">
+                <CardHeader className="flex flex-row justify-between pb-0 pr-0">
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
                   </div>{" "}
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      // Remove: chapter index
-                      remove(setIndex);
-                    }}
-                    className="bg-red-500 text-sm text-white hover:bg-red-400"
-                  >
-                    <MinusCircledIcon />
-                    Remove Set
-                  </Button>
-                </div>
-                <CollapsibleTrigger>Collapse</CollapsibleTrigger>
+                  <div className="text-lg">
+                    <h6 className="text-md mb-2"> Set Winner </h6>
+                    {set.setWinner.length > 0 ? (
+                      <div>
+                        {set.setWinner.map((setWinner) => {
+                          return setWinner.playerName;
+                        })}
+                      </div>
+                    ) : (
+                      <p> No Players found! </p>
+                    )}
+                  </div>
+                  <div className="flex">
+                    <TrashIcon
+                      className="text-sm text-red-500 hover:cursor-pointer hover:text-red-400"
+                      onClick={() => {
+                        remove(setIndex);
+                      }}
+                      width={24}
+                      height={24}
+                    />
+                  </div>
+                </CardHeader>
+
                 <CollapsibleContent>
                   <label title={"Title"}>
                     <div className="mb-1 flex justify-between">
-                      Set Details <div>Game: {getValues("game")}</div>
-                    </div>
-
-                    <div className="text-red-400">
-                      {/* Error: Chapter title */}
-                      {/* {formState.errors.chapters?.[setIndex]?.title?.message} */}
+                      Set Details <p>Game: {getValues("game")}</p>
                     </div>
                   </label>
                   <MatchManager setIndex={setIndex} />
@@ -91,20 +98,27 @@ const SetManager = (props: Props) => {
                     )}
                   />
                 </CollapsibleContent>
+                <CardFooter className="flex flex-row-reverse pb-0">
+                  <CollapsibleTrigger>
+                    {" "}
+                    <ChevronDown />{" "}
+                  </CollapsibleTrigger>
+                </CardFooter>
               </Card>
             </Collapsible>
           );
         })}
-
-      <Button
-        type="button"
-        onClick={() => {
-          append({ setId: fields.length + 1, matches: [], setWinner: [] });
-        }}
-        className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"
-      >
-        + Add Set
-      </Button>
+      <div className="flex justify-center">
+        <Button
+          type="button"
+          onClick={() => {
+            append({ setId: fields.length + 1, matches: [], setWinner: [] });
+          }}
+          className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"
+        >
+          + Add Set
+        </Button>
+      </div>
     </div>
   );
 };
