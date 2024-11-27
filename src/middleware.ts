@@ -2,7 +2,6 @@ import type { NextRequest } from "next/server";
 import { auth } from "./auth";
 
 export async function middleware(request: NextRequest) {
-  // TODO If /submission and user not logged in redirect to signin
   const session = await auth();
   if (
     (request.nextUrl.pathname === "/admin" ||

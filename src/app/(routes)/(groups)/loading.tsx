@@ -1,7 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
-  // TODO Shadcn Skeleton
   return (
     <div className="m-16">
       <div className="flex flex-wrap justify-center gap-10">
