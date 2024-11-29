@@ -52,23 +52,16 @@ const PlayerSessionManager = (props: Props) => {
     });
   }, [props.players, append, getValues, setIndex, matchIndex, players, remove]);
 
-  console.log("Player Session Fields: ", fields);
-
   const getPlayerNameFromField = (field: any): boolean => {
     return field?.playerSessionName ?? 0;
   };
-
-  players.forEach((player) => {
-    console.log("Player: ", player.playerName);
-  });
 
   return (
     <div className="flex flex-col items-center">
       <div className="text-lg">Player Sessions for Match {matchIndex + 1}</div>
       {fields.map((field, sessionIndex) => {
-        console.log("Session Index: ", sessionIndex);
         return (
-          <div className="m-2 flex w-full flex-col" key={field.id}>
+          <div className="m-2 flex w-full flex-col border-b" key={field.id}>
             <label className="font-bold">{getPlayerNameFromField(field)}</label>
 
             <PlayerStatManager

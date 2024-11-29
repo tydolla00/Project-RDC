@@ -1,6 +1,5 @@
 import { PlayerSession, PrismaClient } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
-import { PlayerSessionWithStats } from "../types/playerSession";
 const prisma = new PrismaClient();
 
 // --- Priorities ---
@@ -116,13 +115,12 @@ function printPlayerStatsFromSet(
     for (const set of latestMK8Session.sets) {
       console.log(`--- Set ${set.setId} ---`);
       for (const match of set.matches) {
-        for (const playerSession of match.playerSessions as PlayerSessionWithStats[]) {
-          console.log(`Player: ${playerSession.player.playerName}`);
-
-          for (const playerStat of playerSession.playerStats) {
-            console.log(`Stat ID: ${playerStat.statId} ${playerStat.value}`);
-          }
-        }
+        // for (const playerSession of match.playerSessions) {
+        //   console.log(`Player: ${playerSession.player.playerName}`);
+        //   for (const playerStat of playerSession.playerStats) {
+        //     console.log(`Stat ID: ${playerStat.statId} ${playerStat.value}`);
+        //   }
+        // }
       }
     }
   }

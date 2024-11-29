@@ -108,6 +108,7 @@ const EntryCreatorForm = (props: Props) => {
     formState: { errors },
   } = form;
 
+  console.log("Admin Form", watch());
   console.log("Watch: ", watch("sets.0.setWinners.0"));
 
   /**
@@ -184,7 +185,6 @@ const EntryCreatorForm = (props: Props) => {
                 </FormItem>
               )}
             />
-            <AdminDatePicker />
 
             <FormField
               control={form.control}
@@ -205,10 +205,11 @@ const EntryCreatorForm = (props: Props) => {
                 </FormItem>
               )}
             />
+            <AdminDatePicker />
           </div>
           <div
             id="entry-creator-form-info-subheader"
-            className="my-2 flex flex-row items-center justify-around"
+            className="my-2 flex flex-row flex-wrap items-center justify-around"
           >
             <Controller
               name="game"

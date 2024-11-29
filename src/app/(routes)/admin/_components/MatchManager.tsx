@@ -8,11 +8,6 @@ import PlayerSelector from "./PlayerSelector";
 import { FormValues } from "./EntryCreatorForm";
 import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 
 interface Props {
   setIndex: number;
@@ -90,7 +85,7 @@ const MatchManager = (props: Props) => {
         })}
       <div className="flex justify-center">
         <Button
-          className="my-2 rounded-md bg-purple-900 p-1 font-semibold text-white hover:bg-purple-950"
+          className="my-2 rounded-md bg-purple-900 p-2 font-semibold text-white hover:bg-purple-950"
           type="button"
           onClick={handleNewMatchClick}
         >

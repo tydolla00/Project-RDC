@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { Game, Player } from "@prisma/client";
-import { useFormContext, useFieldArray, FieldValues } from "react-hook-form";
+import { Player } from "@prisma/client";
+import { useFormContext, useFieldArray } from "react-hook-form";
 import { getGameStats } from "@/app/actions/adminAction";
 import { FormValues } from "./EntryCreatorForm";
 import { v4 as uuidv4 } from "uuid";
@@ -79,7 +79,7 @@ const PlayerStatManager = (props: Props) => {
     <div>
       {fields.map((field, index: number) => {
         return (
-          <div key={field.id} className="flex">
+          <div key={field.id} className="m-1 flex">
             <span className="m-2 ml-0">{field.stat}</span>
             <input
               className="rounded-md p-2"

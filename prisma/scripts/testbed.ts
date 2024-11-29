@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
 import { EnrichedGameSet } from "../types/gameSet";
-import { PlayerSessionWithStats } from "../types/playerSession";
 
 const prisma = new PrismaClient();
 
@@ -54,7 +53,7 @@ async function getLatestMarioKartSession() {
 async function showSetResults(mkSet: EnrichedGameSet) {
   for (const match of mkSet.matches) {
     console.log("Looking at match: ", match);
-    for (const playerSession of match.playerSessions as PlayerSessionWithStats[]) {
+    for (const playerSession of match.playerSessions) {
       console.log(
         `Looking at PlayerSession: , ${playerSession} for ${playerSession.player}`,
       );

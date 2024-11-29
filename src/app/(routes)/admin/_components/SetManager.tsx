@@ -4,6 +4,7 @@ import {
   Controller,
   useFieldArray,
   useFormContext,
+  useWatch,
 } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./EntryCreatorForm";
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { join } from "path";
+import WinnerDisplay from "./WinnerDisplay";
 
 interface Props {
   control: Control<z.infer<typeof formSchema>>;
@@ -27,6 +29,7 @@ interface Props {
 const SetManager = (props: Props) => {
   const { watch, formState, control } =
     useFormContext<z.infer<typeof formSchema>>();
+
   const { append, remove, fields } = useFieldArray({
     name: "sets",
     control,
@@ -45,22 +48,12 @@ const SetManager = (props: Props) => {
   const { getValues } = useFormContext<z.infer<typeof formSchema>>();
 
   const players = watch(`players`);
+  const sets = useWatch({ name: "setWinners" });
+  const testSets = useWatch({ control, name: "sets" });
 
   useEffect(() => {
-    const watchSetWinnersString = () => {
-      const sets = watch("sets");
-      return sets
-        .map((set, index) => {
-          const winners = set.setWinners
-            .map((winner) => winner.playerName)
-            .join(", ");
-          return `Set ${index + 1}: ${winners}`;
-        })
-        .join(" | ");
-    };
-    const setWinnersString = watchSetWinnersString();
-    console.log(setWinnersString);
-  }, [watch]);
+    console.log("Set Rerenders: ", sets);
+  }, [fields, sets, testSets]);
 
   return (
     <div className="w-full space-y-4">
@@ -79,31 +72,7 @@ const SetManager = (props: Props) => {
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
                   </div>{" "}
-                  <div
-                    id={`set.${setIndex}-set-winner-container`}
-                    className="text-center"
-                  >
-                    <h6 className="mb-2 text-base"> Set Winner </h6>
-
-                    {set.setWinners.length > 0 ? (
-                      <div>
-                        {watch(`sets`)?.[setIndex]?.setWinners?.map(
-                          (player) => {
-                            return (
-                              <div key={player.playerId}>
-                                {player.playerName}
-                              </div>
-                            );
-                          },
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-red-400">
-                        {" "}
-                        No set winners selected{" "}
-                      </p>
-                    )}
-                  </div>
+                  <WinnerDisplay setIndex={setIndex} />
                   <div className="flex">
                     <TrashIcon
                       className="text-sm text-red-500 hover:cursor-pointer hover:text-red-400"
@@ -124,12 +93,12 @@ const SetManager = (props: Props) => {
 
                 <CollapsibleContent>
                   <label title={"Title"}>
-                    <div className="mb-1 flex justify-between">
+                    <div className="mx-4 mb-1 flex justify-between text-sm">
                       Set Details <p>Game: {getValues("game")}</p>
                     </div>
                   </label>
                   <MatchManager setIndex={setIndex} />
-                  <div className="text-center text-lg font-semibold">
+                  <div className="m-2 text-center text-lg font-semibold">
                     Set Winner for Set {setIndex + 1}
                   </div>
                   <Controller
