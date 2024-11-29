@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { unstable_cache } from "next/cache";
 import { StatNames } from "./utils";
-
-const prisma = new PrismaClient();
+import prisma from "../db";
 
 // ! Tags takes an array of tags if you invalidate a tag any method with that tag will also be invalidated.
 // ! So I need to figure out in which scenarios do I want to invalidate only a function or a whole game.
