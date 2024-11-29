@@ -140,6 +140,37 @@ async function seedGames() {
       },
     },
   });
+
+  const rocketLeague = await prisma.game.upsert({
+    where: { gameId: 2 },
+    update: {},
+    create: {
+      gameName: "Rocket League",
+    },
+  });
+
+  const callOfDuty = await prisma.game.upsert({
+    where: { gameId: 3 },
+    update: {},
+    create: {
+      gameName: "Call of Duty",
+    },
+  });
+  const lethalCompany = await prisma.game.upsert({
+    where: { gameId: 4 },
+    update: {},
+    create: {
+      gameName: "Lethal Company",
+    },
+  });
+  const speedRunners = await prisma.game.upsert({
+    where: { gameId: 5 },
+    update: {},
+    create: {
+      gameName: "Speedrunners",
+    },
+  });
+
   console.log("Mario Kart Game Seeded.");
 }
 

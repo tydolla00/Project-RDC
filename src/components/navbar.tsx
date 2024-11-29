@@ -21,70 +21,35 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-export const Navbar = () => {
-  const links = [
-    { text: "Home", ref: "" },
-    { text: "About", ref: "about" },
-  ];
+import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import { games, RDCMembers } from "@/lib/constants";
+import { FeatureFlag } from "@/lib/featureflag";
+import { auth } from "@/auth";
+import { AuthButton } from "./client-buttons";
 
-  const games: { desc?: string; url: string; name: string }[] = [
-    {
-      desc: "Stats from the most intense 3v3 battles.",
-      url: "/games/rocketleague",
-      name: "Rocket League",
-    },
-    {
-      desc: "Stats that tell you who touches the most paper.",
-      url: "/games/lethalcompany",
-      name: "Lethal Company",
-    },
-    {
-      desc: "Stats for FFA's and who sells the most online.",
-      url: "/games/callofduty",
-      name: "Call of Duty",
-    },
-    {
-      desc: "Stats that tell you who races the hardest.",
-      url: "/games/mariokart",
-      name: "Mario Kart",
-    },
-    {
-      desc: "Stats that tell you who races the hardest.",
-      url: "/games/speedrunners",
-      name: "Speedrunners",
-    },
-    {
-      url: "/games",
-      name: "Browse all games",
-    },
-  ];
+export const Navbar = async () => {
+  const session = await auth();
 
-  const members = [
-    { alt: "RDC Mark", name: "Cash Money Mawk", url: "/members/mark" },
-    { alt: "RDC Leland", name: "Meland", url: "/members/leland" },
-    { alt: "RDC Des", name: "Big Booty Des", url: "/members/des" },
-    { alt: "RDC Ben", name: "LaBen James", url: "/members/ben" },
-    { alt: "Ippi", name: "Iceman Ip", url: "/members/ippi" },
-    { alt: "RDC John", name: "John", url: "/members/john" },
-    { alt: "RDC Aff", name: "Aff", url: "/members/aff" },
-    { alt: "", name: "Browse all members", url: "/members" },
-  ];
+  // TODO Fetch Games and Members from DB.
+  // TODO Memoize this component, so it doesn't ever rerender? Which it never should.
 
-  const signedIn = false;
+  const members = Array.from(RDCMembers.entries());
 
   return (
-    <NavigationMenu className="sticky top-0 mx-auto">
+    <NavigationMenu className="sticky top-0 mx-auto w-screen bg-inherit">
       <NavigationMenuList>
-        {links.map(({ text, ref }, i) => (
-          <NavigationMenuItem
-            className={navigationMenuTriggerStyle()}
-            key={ref}
-          >
-            <Link href={`/${ref}`}>
-              <FillText className="text-chart-4" text={text} />
-            </Link>
-          </NavigationMenuItem>
-        ))}
+        <NavigationMenuItem className={navigationMenuTriggerStyle()}>
+          <Link href="/">
+            <FillText text="Home" className="text-chart-4" />
+          </Link>
+        </NavigationMenuItem>
+        <NavigationMenuItem
+          className={cn(navigationMenuTriggerStyle(), "hidden md:block")}
+        >
+          <Link href="/about">
+            <FillText text="About" className="text-chart-4" />
+          </Link>
+        </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuTrigger>
             <FillText className="text-chart-4" text="Games" />
@@ -105,66 +70,113 @@ export const Navbar = () => {
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              {members.map((rdc) => (
+              {members.map(([_, { nav: rdc }]) => (
                 <div key={rdc.url} className="flex gap-5">
-                  <Image alt={rdc.alt} src={Icon} height={60} width={60} />
-                  <ListItem href={rdc.url} title={rdc.name} />
+                  <Avatar>
+                    <Image
+                      alt={rdc.alt}
+                      src={rdc.src || Icon}
+                      height={60}
+                      width={60}
+                    />
+                  </Avatar>
+                  <ListItem
+                    className="flex-shrink-0"
+                    href={rdc.url}
+                    title={rdc.name}
+                  />
                 </div>
               ))}
+              <ListItem
+                className="col-span-full"
+                href="/members"
+                title="Browse all members"
+              />
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
-          {process.env.NODE_ENV === "development" && (
+        <NavigationMenuItem className="hidden md:block">
+          <FeatureFlag
+            devOnly
+            shouldRedirect={false}
+            user={session}
+            flagName="ADMIN_FORM"
+          >
             <Link className={navigationMenuTriggerStyle()} href="/admin">
               <FillText className="text-chart-4" text="Admin" />
             </Link>
-          )}
+          </FeatureFlag>
         </NavigationMenuItem>
-        <NavigationMenuItem>
-          {process.env.NODE_ENV === "development" && (
+        <NavigationMenuItem className="hidden md:block">
+          <FeatureFlag
+            devOnly
+            shouldRedirect={false}
+            flagName="SUBMISSION_FORM"
+            user={session}
+          >
             <Link className={navigationMenuTriggerStyle()} href="/submission">
               <FillText className="text-chart-4" text="Submissions" />
             </Link>
-          )}
+          </FeatureFlag>
         </NavigationMenuItem>
-        <NavigationMenuItem>
-          {process.env.NODE_ENV === "development" ? (
-            signedIn ? (
+        <NavigationMenuItem className="mr-4 hidden sm:block">
+          <ModeToggle />
+        </NavigationMenuItem>
+        {/* MOBILE */}
+        <NavigationMenuItem className="md:hidden">
+          <NavigationMenuTrigger>
+            <HamburgerMenuIcon />
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul>
+              <ListItem href="/about">About</ListItem>
+              <ListItem href="/admin">Admin</ListItem>
+              <ListItem href="/submission">Submissions</ListItem>
+              {/* add client component that will handle triggering the animation. */}
+              {/* TODO MOBILE ONLY Animate up from the bottom of the screen and add dismiss option. */}
+              <ModeToggle />
+              <AuthButton session={session} />
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        {/* Causing spacing problems because of space-x-1 */}
+        <FeatureFlag
+          shouldRedirect={false}
+          flagName="AUTH"
+          user={session}
+          devOnly
+        >
+          <NavigationMenuItem className="hidden sm:block">
+            {session && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
                     <Avatar>
-                      <AvatarImage src={Icon.src} />
+                      <AvatarImage src={session.user?.image || Icon.src} />
                       <AvatarFallback>Icon</AvatarFallback>
                     </Avatar>
                   </TooltipTrigger>
-                  <TooltipContent>User signed in</TooltipContent>
+                  <TooltipContent>{session.user?.name}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            ) : (
-              <Link className={navigationMenuTriggerStyle()} href="/signin">
-                <FillText className="text-chart-4" text="Sign In" />
-              </Link>
-            )
-          ) : null}
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <ModeToggle />
-        </NavigationMenuItem>
+            )}
+          </NavigationMenuItem>
+        </FeatureFlag>
+        <AuthButton session={session} />
       </NavigationMenuList>
     </NavigationMenu>
   );
 };
 
 const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
+  React.ComponentRef<"a">,
   React.ComponentPropsWithoutRef<"a">
 >(({ className, title, children, href = "", ...props }, ref) => {
   return (
-    <li>
+    <li className="flex-grow">
       <NavigationMenuLink asChild>
         <Link
+          prefetch={true}
           href={href}
           ref={ref}
           className={cn(

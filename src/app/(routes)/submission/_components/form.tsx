@@ -77,7 +77,9 @@ export const SubmissionForm = () => {
     name: "stat",
     control: form.control,
   });
-  console.log(invalid, error, isTouched);
+  console.log(
+    `Form Status ${invalid}, Errors ${error}, Form Touched ${isTouched}`,
+  );
 
   const submitForm = (data: z.infer<typeof formSchema>) => {
     console.log("Got here");

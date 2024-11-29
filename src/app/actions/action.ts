@@ -2,12 +2,19 @@
 
 import { PrismaClient } from "@prisma/client";
 import config from "@/lib/config";
+import { Session } from "next-auth";
+import { signOut, signIn } from "@/auth";
 
 export const submitUpdates = async (props: any) => {
   console.log(props);
 };
 
+export const updateAuthStatus = async (session: Session | null) => {
+  session ? await signOut({ redirectTo: "/" }) : await signIn("github");
+};
+
 export const getYTVid = async (videoId: string) => {
+  // TODO use API Key based off env.
   const prisma = new PrismaClient();
   const sessions = await prisma.session.findMany();
   const sessionURL = sessions.find(
