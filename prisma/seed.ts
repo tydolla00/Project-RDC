@@ -1,6 +1,5 @@
-import { Player, PlayerSession, PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Player, PlayerSession } from "@prisma/client";
+import prisma from "./db";
 
 async function main() {
   await seedRDCMembers();

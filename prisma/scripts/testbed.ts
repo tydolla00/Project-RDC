@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../db";
 import { EnrichedSession } from "../types/session";
 import { EnrichedGameSet } from "../types/gameSet";
-
-const prisma = new PrismaClient();
 
 async function main() {
   console.log(await getAllTimeMKRankings());

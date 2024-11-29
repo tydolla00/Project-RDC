@@ -1,7 +1,6 @@
-import { PlayerSession, PrismaClient } from "@prisma/client";
+import { PlayerSession } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
-const prisma = new PrismaClient({ log: ["query"] });
-
+import prisma from "../db";
 // --- Priorities ---
 
 export const getNextSessionId = async () => {
