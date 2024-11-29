@@ -1,9 +1,17 @@
-import { PlayerSession, PrismaClient } from "@prisma/client";
+import { PlayerSession } from "@prisma/client";
 import { EnrichedSession } from "../types/session";
-import { PlayerSessionWithStats } from "../types/playerSession";
-const prisma = new PrismaClient({ log: ["query"] });
-
+import prisma from "../db";
 // --- Priorities ---
+
+export const getNextSessionId = async () => {
+  const latestSession = await prisma.session.findFirst({
+    orderBy: {
+      sessionId: "desc",
+    },
+  });
+  const nextSessionId = latestSession ? latestSession.sessionId + 1 : 1;
+  return nextSessionId;
+};
 
 // Get latest MK8 sessions
 export const getLatestMarioKart8Session: () => Promise<
@@ -30,7 +38,7 @@ export const getLatestMarioKart8Session: () => Promise<
       return latestMK8Session;
     }
   } catch (error) {
-    console.error("Error Fetching Latest Mario Kart Session");
+    console.error("Error Fetching Latest Mario Kart Session, ${error}");
   }
 };
 
@@ -104,13 +112,12 @@ function printPlayerStatsFromSet(
     for (const set of latestMK8Session.sets) {
       console.log(`--- Set ${set.setId} ---`);
       for (const match of set.matches) {
-        for (const playerSession of match.playerSessions as PlayerSessionWithStats[]) {
-          console.log(`Player: ${playerSession.player.playerName}`);
-
-          for (const playerStat of playerSession.playerStats) {
-            console.log(`Stat ID: ${playerStat.statId} ${playerStat.value}`);
-          }
-        }
+        // for (const playerSession of match.playerSessions) {
+        //   console.log(`Player: ${playerSession.player.playerName}`);
+        //   for (const playerStat of playerSession.playerStats) {
+        //     console.log(`Stat ID: ${playerStat.statId} ${playerStat.value}`);
+        //   }
+        // }
       }
     }
   }

@@ -53,7 +53,7 @@ model GameStat {
   gameId      Int          @map("game_id")
   game        Game         @relation(fields: [gameId], references: [gameId])
   playerStats PlayerStat[]
-  date        DateTime     @default(now()) // Date video posted
+  type        String?      @map("type")
 
   @@map("game_stats")
 }

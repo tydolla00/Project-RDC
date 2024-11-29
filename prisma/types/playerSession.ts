@@ -6,15 +6,11 @@ const playerSessionWithPlayerStats =
   Prisma.validator<Prisma.PlayerSessionDefaultArgs>()({
     include: {
       match: true,
-      player: {
-        select: {
-          playerName: true,
-        },
-      },
+      player: true,
       playerStats: true,
     },
   });
 
-export type PlayerSessionWithStats = Prisma.PlayerSessionGetPayload<
+export type EnrichedPlayerSession = Prisma.PlayerSessionGetPayload<
   typeof playerSessionWithPlayerStats
 >;
