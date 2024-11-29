@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Session } from "next-auth";
 import { Button } from "./ui/button";
 import { navigationMenuTriggerStyle } from "./ui/navigation-menu";
-import { updateAuthStatus } from "@/app/_actions/action";
+import { updateAuthStatus } from "@/app/actions/action";
 import { ModeToggle } from "./modetoggle";
 import { useState } from "react";
 

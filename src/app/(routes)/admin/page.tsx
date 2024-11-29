@@ -1,11 +1,9 @@
 import { H1 } from "@/components/headings";
-import { SubmissionForm } from "../submission/_components/form";
-import { columns, DataTable, Submission } from "./_components/data-table";
+import { Submission } from "./_components/data-table";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getLatestMarioKart8Session } from "../../../../prisma/lib/marioKart";
-import { EnrichedSession } from "../../../../prisma/types/session";
-import EntryCreator from "./_components/EntryCreator";
+import { getRDCMembers } from "../../../../prisma/lib/admin";
+import EntryCreatorForm from "./_components/EntryCreatorForm";
 
 const getData = () => {
   const data: Submission[] = [
@@ -30,23 +28,12 @@ const getData = () => {
 export default async function Page() {
   const data: Submission[] = await getData();
 
-  const getLatestMK8Function: EnrichedSession | undefined =
-    await getLatestMarioKart8Session();
-
-  if (getLatestMK8Function) {
-    console.log(getLatestMK8Function);
-    console.log(getLatestMK8Function.sets);
-  }
   return (
     <div className="m-16">
       <H1>Admin</H1>
-      {/* <div className="flex justify-center">
-        <SubmissionForm />
-      </div> */}
 
       <Suspense fallback={<Skelly />}>
-        {/* <DataTable columns={columns} data={[]} /> */}
-        <EntryCreator />
+        <EntryCreatorForm rdcMembers={await getRDCMembers()} />
       </Suspense>
     </div>
   );
