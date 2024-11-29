@@ -35,6 +35,10 @@ const config = {
             height: "0",
           },
         },
+        floatup: {
+          from: { transform: "translateY(calc(-100%))" },
+          to: { transform: "translateY(calc(300px))" },
+        },
         "sink-down": {
           "50%": { transform: "rotateY(80deg)", opacity: "1" },
           "65%": { transform: "rotateY(80deg) translateY(400px)" },
@@ -51,6 +55,7 @@ const config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "float-up": "floatup 5s ease-out both alternate",
         "sink-down": "sink-down 2s linear forwards",
         "sink-up": "sink-up 1s linear forwards",
       },
