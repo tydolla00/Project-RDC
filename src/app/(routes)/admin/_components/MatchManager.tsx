@@ -35,7 +35,7 @@ const MatchManager = (props: Props) => {
     }));
     console.log("Player Sessions: ", playerSessions);
     append({
-      matchWinner: [],
+      matchWinners: [],
       playerSessions: playerSessions,
     });
   };
@@ -70,7 +70,7 @@ const MatchManager = (props: Props) => {
                 Match Winner for Match {matchIndex + 1}{" "}
               </div>
               <Controller
-                name={`sets.${setIndex}.matches.${matchIndex}.matchWinner`}
+                name={`sets.${setIndex}.matches.${matchIndex}.matchWinners`}
                 control={control}
                 render={({ field }) => (
                   <PlayerSelector

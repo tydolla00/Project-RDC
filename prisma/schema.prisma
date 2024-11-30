@@ -78,14 +78,14 @@ model GameSet {
   matches        Match[]
   sessionId      Int             @map("session_id")
   session        Session         @relation(fields: [sessionId], references: [sessionId])
-  setWinner      Player[]
+  setWinners     Player[]
 
   @@map("sets")
 }
 
 model Match {
   matchId        Int             @id @default(autoincrement()) @map("match_id")
-  matchWinner    Player[]
+  matchWinners   Player[]
   playerSessions PlayerSession[]
   setId          Int             @map("set_id")
   set            GameSet         @relation(fields: [setId], references: [setId])

@@ -53,7 +53,7 @@ export const formSchema = z.object({
           .min(1, "At least one set winner is required."),
         matches: z.array(
           z.object({
-            matchWinner: z
+            matchWinners: z
               .array(
                 z.object({
                   playerId: z.number(),
