@@ -13,20 +13,28 @@ export const updateAuthStatus = async (session: Session | null) => {
   session ? await signOut({ redirectTo: "/" }) : await signIn("github");
 };
 
-export const getYTVid = async (videoId: string) => {
+type FindManySessions = Awaited<ReturnType<typeof prisma.session.findMany>>[0];
+
+export const getYTVid = async (
+  videoId: string,
+): Promise<
+  | FindManySessions
+  | (Pick<FindManySessions, "date" | "sessionName" | "sessionUrl"> & {
+      thumbnail: Thumbnail;
+    })
+  | undefined
+> => {
   const sessions = await prisma.session.findMany();
-  const sessionURL = sessions.find(
-    (session) => session.sessionUrl.split("=")[1] === videoId,
-  );
-  console.log(sessionURL);
-  if (!sessionURL) {
-    const YTvideo = await fetch(
-      `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${config.YOUTUBE_LOCAL_API_KEY}`,
-    );
-    console.log(
-      `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${config.YOUTUBE_LOCAL_API_KEY}`,
-    );
-    console.log(YTvideo, videoId);
+
+  // TODO only store videoId in the db.
+  const session = sessions.find((session) => session.sessionUrl === videoId);
+
+  console.log(session);
+  if (!session) {
+    const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${config.YOUTUBE_LOCAL_API_KEY}`;
+    const YTvideo = await fetch(apiUrl);
+    console.log({ YTvideo }, { videoId }, { apiUrl });
+
     !config.YOUTUBE_LOCAL_API_KEY &&
       console.log("YOUTUBE API KEY NOT CONFIGURED");
 
@@ -38,18 +46,17 @@ export const getYTVid = async (videoId: string) => {
 
     if (video.snippet.channelTitle !== "RDC Live") return undefined;
 
+    // TODO do something with the height and width.
+
     const session = {
       sessionUrl: `https://youtube.com/watch?v=${video.id}`,
       date: video.snippet.publishedAt,
       sessionName: video.snippet.title,
       thumbnail:
         video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
-    };
+    } as unknown as Awaited<ReturnType<typeof getYTVid>>;
     return session;
-  }
-  await prisma.$disconnect();
-
-  return undefined;
+  } else return session;
 };
 
 type YouTubeVideoListResponse = {
