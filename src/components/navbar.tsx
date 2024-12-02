@@ -119,9 +119,6 @@ export const Navbar = async () => {
             </Link>
           </FeatureFlag>
         </NavigationMenuItem>
-        <NavigationMenuItem className="mr-4 hidden sm:block">
-          <ModeToggle />
-        </NavigationMenuItem>
         {/* MOBILE */}
         <NavigationMenuItem className="md:hidden">
           <NavigationMenuTrigger>
@@ -163,6 +160,9 @@ export const Navbar = async () => {
           </NavigationMenuItem>
         </FeatureFlag>
         <AuthButton session={session} />
+        <NavigationMenuItem className="hidden sm:block">
+          <ModeToggle />
+        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );

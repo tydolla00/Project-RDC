@@ -3,11 +3,10 @@ import { auth } from "./auth";
 
 export async function middleware(request: NextRequest) {
   const session = await auth();
-  if (
-    (request.nextUrl.pathname === "/admin" ||
-      request.nextUrl.pathname === "/submission") &&
-    !session
-  )
+  const path = request.nextUrl.pathname;
+  if (session && path === "/signin")
+    return Response.redirect(new URL("/", request.url));
+  if ((path === "/admin" || path === "/submission") && !session)
     return Response.redirect(new URL("/", request.url));
 }
 

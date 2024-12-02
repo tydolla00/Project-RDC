@@ -28,14 +28,19 @@ export const getYTVid = async (
 
   // TODO only store videoId in the db.
   const session = sessions.find((session) => session.sessionUrl === videoId);
+  const apiKey =
+    process.env.NODE_ENV === "production"
+      ? config.YOUTUBE_API_KEY
+      : config.YOUTUBE_LOCAL_API_KEY;
 
   console.log(session);
   if (!session) {
-    const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${config.YOUTUBE_LOCAL_API_KEY}`;
+    const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${apiKey}`;
     const YTvideo = await fetch(apiUrl);
     console.log({ YTvideo }, { videoId }, { apiUrl });
 
-    !config.YOUTUBE_LOCAL_API_KEY &&
+    process.env.NODE_ENV === "development" &&
+      !config.YOUTUBE_LOCAL_API_KEY &&
       console.log("YOUTUBE API KEY NOT CONFIGURED");
 
     if (!YTvideo.ok) return undefined;
