@@ -5,6 +5,7 @@ import PlayerAvatar from "./PlayerAvatar";
 import { Control, ControllerRenderProps } from "react-hook-form";
 import { z } from "zod";
 import { formSchema, FormValues } from "./EntryCreatorForm";
+import { cn } from "@/lib/utils";
 interface Props {
   rdcMembers: Player[];
   handlePlayerClick?: (player: Player) => void;
@@ -28,8 +29,10 @@ const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
     field.onChange(updatedPlayers);
   };
 
+  const getIsSelected = (player: Player) => selectedPlayers.includes(player);
+
   const getPlayerAvatarClassName = (player: Player): string => {
-    const isSelected = selectedPlayers.includes(player);
+    const isSelected = getIsSelected(player);
     if (isSelected) {
       return "border-2 border-purple-700";
     } else {
@@ -37,26 +40,35 @@ const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
     }
   };
 
+  // TODO Add Container Query
   return (
     <div
-      className="flex flex-col items-center rounded-md border p-4"
+      className="mb-10 w-fit rounded-md border p-4"
       id="player-selector-container"
     >
       {rdcMembers?.length !== 0 ? (
-        <div className="mt-2 flex">
-          {rdcMembers?.map((player, index) => (
-            <PlayerAvatar
-              key={index}
-              player={player}
-              handleOnClick={
-                handlePlayerClick
-                  ? () => handlePlayerClick(player)
-                  : () => reactHookFormHandlePlayerClick(player)
-              }
-              optionalClassName={`m-1 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full ${getPlayerAvatarClassName(
-                player,
-              )}`}
-            />
+        <div className="mt-2 grid grid-cols-8">
+          {rdcMembers.map((player, index) => (
+            <div key={player.playerId} className="relative">
+              <div
+                className={cn(
+                  "absolute -top-2 left-1/2 right-1/2 h-2 w-2 rounded-full bg-gray-500 transition-colors",
+                  getIsSelected(player) && "bg-green-500",
+                )}
+              ></div>
+              <PlayerAvatar
+                key={index}
+                player={player}
+                handleOnClick={
+                  handlePlayerClick
+                    ? () => handlePlayerClick(player)
+                    : () => reactHookFormHandlePlayerClick(player)
+                }
+                optionalClassName={`m-1 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full ${getPlayerAvatarClassName(
+                  player,
+                )}`}
+              />
+            </div>
           ))}
         </div>
       ) : (

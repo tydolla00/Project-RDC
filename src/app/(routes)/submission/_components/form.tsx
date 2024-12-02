@@ -125,12 +125,25 @@ export const SubmissionForm = () => {
                 </CardDescription>
                 <Separator />
                 <CardContent>
+                  {/* TODO WHY ISN'T THIS WORKING */}
                   {session && (
                     <Image
-                      alt="Youtube Video"
-                      src={session.thumbnail.url}
-                      height={session.thumbnail.height}
-                      width={session.thumbnail.width}
+                      src={
+                        typeof session.thumbnail === "string"
+                          ? session.thumbnail
+                          : session.thumbnail.url
+                      }
+                      height={
+                        typeof session.thumbnail === "string"
+                          ? 9
+                          : session.thumbnail.height
+                      } // 16:9 aspect ratio
+                      width={
+                        typeof session.thumbnail === "string"
+                          ? 16
+                          : session.thumbnail.width
+                      }
+                      alt="RDC Youtube Video Thumbnail"
                     />
                   )}
                   <FormField

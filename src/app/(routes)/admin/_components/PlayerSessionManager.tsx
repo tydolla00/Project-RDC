@@ -57,11 +57,10 @@ const PlayerSessionManager = (props: Props) => {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="text-lg">Player Sessions for Match {matchIndex + 1}</div>
+    <div className="flex flex-wrap gap-5">
       {fields.map((field, sessionIndex) => {
         return (
-          <div className="m-2 flex w-full flex-col border-b" key={field.id}>
+          <div className="flex flex-col" key={field.id}>
             <label className="font-bold">{getPlayerNameFromField(field)}</label>
 
             <PlayerStatManager
