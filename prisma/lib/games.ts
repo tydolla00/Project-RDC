@@ -78,8 +78,8 @@ export const getWinsPerPlayer = function (gameId: number) {
               sessionUrl: true,
               sets: {
                 select: {
-                  matches: { select: { matchWinner: true } },
-                  setWinner: true,
+                  matches: { select: { matchWinners: true } },
+                  setWinners: true,
                 },
               },
             },
@@ -134,10 +134,10 @@ export const getMatchesPerGame = function <T extends StatNames = StatNames>(
         select: {
           sets: {
             select: {
-              setWinner: true,
+              setWinners: true,
               matches: {
                 select: {
-                  matchWinner: true,
+                  matchWinners: true,
                   date: true,
                   playerSessions: {
                     select: {
