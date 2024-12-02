@@ -12,15 +12,22 @@ const WinnerDisplay = (props: Props) => {
   const { watch } = useFormContext<z.infer<typeof formSchema>>();
   const winners = watch(`sets.${setIndex}.setWinners`);
   return (
-    <div id={`set.${setIndex}-set-winner-container`} className="text-center">
+    <div
+      id={`set.${setIndex}-set-winner-container`}
+      className="self-start text-center"
+    >
       <h6 className="mb-2 text-base"> Set Winner </h6>
 
       {winners.length > 0 ? (
-        <div>
+        <>
           {winners.map((player) => {
-            return <div key={player.playerId}>{player.playerName}</div>;
+            return (
+              <div className="mx-2 inline-block w-fit" key={player.playerId}>
+                {player.playerName}
+              </div>
+            );
           })}
-        </div>
+        </>
       ) : (
         <p className="text-sm text-red-400"> No set winners selected </p>
       )}

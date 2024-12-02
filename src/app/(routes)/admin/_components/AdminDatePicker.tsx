@@ -29,10 +29,11 @@ export function AdminDatePicker() {
 
   return (
     <FormField
+      disabled
       control={form.control}
       name="date"
       render={({ field }) => (
-        <FormItem className="flex flex-col text-center">
+        <FormItem className="pointer-events-none flex cursor-not-allowed flex-col">
           <FormLabel className="p-1">Session Date</FormLabel>
           <Popover>
             <PopoverTrigger asChild>

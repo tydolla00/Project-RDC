@@ -49,7 +49,7 @@ const MatchManager = (props: Props) => {
       )) ||
         fields.map((match, matchIndex) => {
           return (
-            <div key={match.id} className="m-2 flex flex-col justify-between">
+            <div key={match.id} className="my-5 flex flex-col justify-between">
               <div id="match-manager-header" className="flex justify-between">
                 <label>Match {matchIndex + 1}</label>
                 <Button
@@ -60,15 +60,7 @@ const MatchManager = (props: Props) => {
                   <MinusCircledIcon /> Remove Match
                 </Button>
               </div>
-              <Separator className="my-4 h-[1px] bg-slate-400" />
-              <PlayerSessionManager
-                setIndex={setIndex}
-                matchIndex={matchIndex}
-                players={players}
-              />
-              <div className="text-center text-lg font-semibold">
-                Match Winner for Match {matchIndex + 1}{" "}
-              </div>
+              <div className="text-muted-foreground">Match Winner</div>
               <Controller
                 name={`sets.${setIndex}.matches.${matchIndex}.matchWinners`}
                 control={control}
@@ -80,16 +72,26 @@ const MatchManager = (props: Props) => {
                   />
                 )}
               />
+              <div className="my-4 text-center text-lg">
+                Player Sessions for Match {matchIndex + 1}
+              </div>
+              {/* TODO Potentially move StatName here. Don't need to specify it for each control. */}
+              <PlayerSessionManager
+                setIndex={setIndex}
+                matchIndex={matchIndex}
+                players={players}
+              />
+              {/* <Separator className="my-4 h-px bg-slate-400" /> */}
             </div>
           );
         })}
-      <div className="flex justify-center">
+      <div>
         <Button
           className="my-2 rounded-md bg-purple-900 p-2 font-semibold text-white hover:bg-purple-950"
           type="button"
           onClick={handleNewMatchClick}
         >
-          + Add Match
+          Add Match
         </Button>
       </div>
     </div>
