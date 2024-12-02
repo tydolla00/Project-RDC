@@ -1,20 +1,27 @@
 import { H2 } from "@/components/headings";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
 import { Suspense } from "react";
 
 const Loader = () => <Skeleton className="h-[315px] w-[560px]" />;
-export default async function NotFound() {
+export default async function NotFound({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  let msg =
+    "Sorry we couldn't find the page you were looking for. While you're here, enjoy this video of Leland singing Cash Machine";
+
+  const error = (await searchParams)?.error;
+  if (error?.toString() === "AccessDenied")
+    msg =
+      "You're not permitted to sign in to this site just yet. Don't worry we're working on exciting features but in the meantime here's a rendition of Cash Machine by Leland.";
   return (
     <div className="mx-auto h-[95vh] w-fit">
-      <H2>Page Not Found</H2>
-      <p className="my-6">
-        Sorry we couldn&apos;t find the page you were looking. While you&apos;re
-        here enjoy this video of Leland singing Cash Machine
-      </p>
+      {!error && <H2>Page Not Found</H2>}
+      <p className="my-6">{msg}</p>
       <Suspense fallback={<Loader />}>
         <iframe
+          className="mx-auto"
           width="560"
           height="315"
           src="https://www.youtube.com/embed/ij2AxfZanRE?si=B3l9M6O1RjFTYyvE"
@@ -25,9 +32,6 @@ export default async function NotFound() {
           allowFullScreen
         ></iframe>
       </Suspense>
-      <Button className="my-10" asChild>
-        <Link href="/">Return Home</Link>
-      </Button>
     </div>
   );
 }

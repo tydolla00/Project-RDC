@@ -35,10 +35,24 @@ const config = {
             height: "0",
           },
         },
+        "sink-down": {
+          "50%": { transform: "rotateY(80deg)", opacity: "1" },
+          "65%": { transform: "rotateY(80deg) translateY(400px)" },
+          "80%": { transform: "rotateY(0deg) translateY(400px)" },
+          to: { transform: "rotateY(0deg) translateY(400px)", opacity: "0" },
+        },
+        "sink-up": {
+          from: {},
+          // "50%": { transform: "rotateY(1turn)" },
+          // "60%": { transform: "rotateY(.75turn" },
+          to: { transform: "rotateY(1turn) translateY(-1000px)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "sink-down": "sink-down 2s linear forwards",
+        "sink-up": "sink-up 1s linear forwards",
       },
       borderRadius: {
         lg: "var(--radius)",

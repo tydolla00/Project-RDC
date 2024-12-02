@@ -1,6 +1,5 @@
-import { Player, PlayerSession, PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Player, PlayerSession } from "@prisma/client";
+import prisma from "./db";
 
 async function main() {
   await seedRDCMembers();
@@ -111,12 +110,12 @@ async function seedRDCMembers() {
     },
   });
 
-  const ippi = await prisma.player.upsert({
+  const ipi = await prisma.player.upsert({
     where: { playerId: 8 },
     update: {},
     create: {
       playerId: 8,
-      playerName: "Ippi",
+      playerName: "Ipi",
     },
   });
 
