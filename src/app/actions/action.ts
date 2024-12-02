@@ -49,7 +49,7 @@ export const getYTVid = async (
     console.log(json);
     const video = json.items[0];
 
-    if (video.snippet.channelTitle !== "RDC Live") return undefined;
+    if (video?.snippet.channelTitle !== "RDC Live") return undefined;
 
     // TODO do something with the height and width.
 
