@@ -262,7 +262,7 @@ async function seedMatch(
   if (matchWinner) {
     await prisma.match.update({
       where: { matchId: matchId },
-      data: { matchWinner: { connect: { playerId: matchWinner.playerId } } },
+      data: { matchWinners: { connect: { playerId: matchWinner.playerId } } },
     });
   }
 }
@@ -334,7 +334,7 @@ const getSetWinner = async (setId: number) => {
       setId: setId,
     },
     include: {
-      matchWinner: true,
+      matchWinners: true,
     },
   });
 
@@ -342,10 +342,10 @@ const getSetWinner = async (setId: number) => {
 
   // TODO: Refactor this to be cleaner O_O
   const matchWinners = setMatches
-    .filter((match) => match.matchWinner)
+    .filter((match) => match.matchWinners)
     .map((match) => ({
-      playerId: match.matchWinner[0].playerId,
-      playerName: match.matchWinner[0].playerName,
+      playerId: match.matchWinners[0].playerId,
+      playerName: match.matchWinners[0].playerName,
     }));
 
   const winnerCount: { [playerId: number]: number } = {};
@@ -377,7 +377,7 @@ const updateSetWinner = async (setId: number) => {
   if (setWinner) {
     await prisma.gameSet.update({
       where: { setId: setId },
-      data: { setWinner: { connect: { playerId: setWinner.playerId } } },
+      data: { setWinners: { connect: { playerId: setWinner.playerId } } },
     });
   }
 };
