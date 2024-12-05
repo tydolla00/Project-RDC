@@ -4,18 +4,26 @@ import { useFormContext, useFieldArray } from "react-hook-form";
 import { getGameStats } from "@/app/actions/adminAction";
 import { FormValues } from "./EntryCreatorForm";
 import { v4 as uuidv4 } from "uuid";
+import { Input } from "@/components/ui/input";
 
 interface Props {
   player: Player;
   matchIndex: number;
   setIndex: number;
   playerSessionIndex: number;
+  statName: string;
 }
 
 // Need to get the stats of each game and then display appropriate input field for each stat
 
 const PlayerStatManager = (props: Props) => {
-  const { player, matchIndex, setIndex, playerSessionIndex } = props;
+  const {
+    player,
+    matchIndex,
+    setIndex,
+    playerSessionIndex,
+    statName: gameStat,
+  } = props;
   const { register, control, getValues } = useFormContext<FormValues>();
   const { append, remove, fields } = useFieldArray({
     name: `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats`,
@@ -76,14 +84,14 @@ const PlayerStatManager = (props: Props) => {
   console.log("Fields: ", fields);
 
   return (
-    <div>
+    <>
       {fields.map((field, index: number) => {
         return (
-          <div key={field.id} className="m-1 flex">
-            <span className="m-2 ml-0">{field.stat}</span>
-            <input
-              className="rounded-md p-2"
-              placeholder="Enter Stat"
+          <div key={field.id} className="my-4 flex gap-3">
+            {/* <span className="self-end">{field.stat}</span> */}
+            <Input
+              className="h-full max-w-xs"
+              placeholder={gameStat}
               type="text"
               {...register(
                 `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats.${index}.statValue`,
@@ -92,7 +100,7 @@ const PlayerStatManager = (props: Props) => {
           </div>
         );
       })}
-    </div>
+    </>
   );
 };
 

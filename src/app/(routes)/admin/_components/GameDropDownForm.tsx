@@ -39,6 +39,7 @@ const GameDropDownForm = ({
 
   useEffect(() => {
     const fetchGames = async () => {
+      // TODO Maybe bring in Tanstack Query?
       const games = await getGames();
       setTestGames(games);
     };
@@ -50,7 +51,7 @@ const GameDropDownForm = ({
       control={control}
       name="game"
       render={({ field }) => (
-        <FormItem className="flex flex-col items-center">
+        <FormItem className="flex flex-col">
           <FormLabel>Game</FormLabel>
           <Popover>
             <PopoverTrigger asChild>

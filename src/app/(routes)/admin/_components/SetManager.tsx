@@ -21,6 +21,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { join } from "path";
 import WinnerDisplay from "./WinnerDisplay";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   control: Control<z.infer<typeof formSchema>>;
@@ -56,24 +57,24 @@ const SetManager = (props: Props) => {
   }, [fields, sets, testSets]);
 
   return (
-    <div className="w-full space-y-4">
+    <div className="col-span-2 w-full space-y-4">
       {/* Loop through chapter fields */}
       <div className="font-2xl m-2 text-center font-bold"> Sets </div>
       {(fields.length === 0 && (
-        <div className="text-center text-gray-500">
+        <div className="text-center text-muted-foreground">
           No Sets! Click Add Set to start!
         </div>
       )) ||
         fields.map((set, setIndex) => {
           return (
             <Collapsible key={set.setId}>
-              <Card className="flex flex-col space-y-3 rounded-lg p-6 pt-1 shadow-lg">
-                <CardHeader className="flex flex-row justify-between pb-0 pr-0">
+              <Card className="flex flex-col space-y-3 rounded-lg p-6 shadow-lg">
+                <CardHeader className="flex flex-row justify-between space-y-0 pb-0 pl-0 pr-0">
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
                   </div>{" "}
                   <WinnerDisplay setIndex={setIndex} />
-                  <div className="flex">
+                  <div className="flex" title={`Delete Set ${setIndex + 1}`}>
                     <TrashIcon
                       className="text-sm text-red-500 hover:cursor-pointer hover:text-red-400"
                       onClick={() => {
@@ -88,19 +89,20 @@ const SetManager = (props: Props) => {
                       width={24}
                       height={24}
                     />
+                    <span className="sr-only">Delete Set {setIndex}</span>
                   </div>
                 </CardHeader>
 
                 <CollapsibleContent>
-                  <label title={"Title"}>
-                    <div className="mx-4 mb-1 flex justify-between text-sm">
+                  {/* TODO Is this title needed? */}
+                  {/* <label title="Title">
+                    <div className="mb-1 flex justify-between text-sm">
                       Set Details <p>Game: {getValues("game")}</p>
                     </div>
-                  </label>
-                  <MatchManager setIndex={setIndex} />
-                  <div className="m-2 text-center text-lg font-semibold">
-                    Set Winner for Set {setIndex + 1}
-                  </div>
+                  </label> */}
+                  <Label className="my-2 block text-muted-foreground">
+                    Set Winner
+                  </Label>
                   <Controller
                     name={`sets.${setIndex}.setWinners`}
                     control={control}
@@ -112,6 +114,7 @@ const SetManager = (props: Props) => {
                       />
                     )}
                   />
+                  <MatchManager setIndex={setIndex} />
                 </CollapsibleContent>
                 <CardFooter className="flex flex-row-reverse pb-0">
                   <CollapsibleTrigger onClick={() => toggleSet(setIndex)}>
@@ -127,7 +130,7 @@ const SetManager = (props: Props) => {
             </Collapsible>
           );
         })}
-      <div className="flex justify-center">
+      <div className="ml-auto w-fit">
         <Button
           type="button"
           onClick={() => {
@@ -136,7 +139,7 @@ const SetManager = (props: Props) => {
           }}
           className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"
         >
-          + Add Set
+          Add Set
         </Button>
       </div>
     </div>

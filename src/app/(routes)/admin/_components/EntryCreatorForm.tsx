@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import GameDropDownForm from "./GameDropDownForm";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,9 @@ import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { AdminDatePicker } from "./AdminDatePicker";
+import { getRDCVideoDetails } from "@/app/actions/action";
+import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Props {
   rdcMembers: Player[];
@@ -21,7 +24,10 @@ interface Props {
 // TODO: Move this somewhere else
 export const formSchema = z.object({
   game: z.string(),
-  sessionName: z.string().min(4, "Session Name must be at least 4 characters"),
+  sessionName: z
+    .string()
+    .min(4, "Session Name must be at least 4 characters")
+    .readonly(),
   sessionUrl: z
     .string()
     .toLowerCase()
@@ -30,9 +36,9 @@ export const formSchema = z.object({
       "Please paste in a valid youtube url.",
     )
     .max(100)
-    .includes("v="),
-  date: z.date(),
-  thumbnail: z.string(),
+    .includes("dummy", { message: "Invalid URL" }),
+  date: z.date().readonly(),
+  thumbnail: z.string().readonly(),
   players: z.array(
     z.object({
       playerId: z.number(),
@@ -53,7 +59,7 @@ export const formSchema = z.object({
           .min(1, "At least one set winner is required."),
         matches: z.array(
           z.object({
-            matchWinner: z
+            matchWinners: z
               .array(
                 z.object({
                   playerId: z.number(),
@@ -84,9 +90,15 @@ export const formSchema = z.object({
 });
 
 // TODO: How to handle type to get the form values more reliably
+// TODO Do we want to conditionally apply input types/validations based on the stat name? Most will be numbers
 export type FormValues = z.infer<typeof formSchema>;
 
 const EntryCreatorForm = (props: Props) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [session, setSession] = useState<
+    Awaited<ReturnType<typeof getRDCVideoDetails>> | undefined
+  >(undefined);
+
   const { rdcMembers } = props;
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -105,8 +117,11 @@ const EntryCreatorForm = (props: Props) => {
     handleSubmit,
     control,
     watch,
-    formState: { errors },
+    formState: { errors, defaultValues, isValid: formIsValid },
+    setValue,
   } = form;
+
+  const url = watch("sessionUrl");
 
   console.log("Admin Form", watch());
   console.log("Watch: ", watch("sets.0.setWinners.0"));
@@ -120,7 +135,7 @@ const EntryCreatorForm = (props: Props) => {
     console.log("---Admin Form Submission Data---: ", data);
     insertNewSessionFromAdmin(data);
     console.log("TOasted");
-    toast("Session successfully created.");
+    toast.success("Session successfully created.", { richColors: true });
   };
 
   /**
@@ -132,9 +147,56 @@ const EntryCreatorForm = (props: Props) => {
    */
   const onError = (errors: any) => {
     console.log("Admin Form Submission Errors:", errors);
-    toast(`Error creating session please check all fields.`);
+    toast.error(`Error creating session please check all fields.`, {
+      richColors: true,
+    });
   };
 
+  const handleUrlUpdated = async () => {
+    // TODO Debounce/Rate limit
+    const queryParams = url.substring(url.indexOf("v="));
+    const extraParams = queryParams.indexOf("&");
+    const end = extraParams === -1 ? undefined : extraParams;
+    const newUrl = queryParams.substring(2, end);
+
+    // See if url is valid.
+    // TODO Invalid not working
+    if (
+      defaultValues?.sessionUrl === url ||
+      control.getFieldState("sessionUrl").invalid ||
+      newUrl.length === 0
+    ) {
+      toast.error("Invalid url", { richColors: true });
+      return;
+    }
+
+    setIsFetching(true);
+
+    // Get v=
+
+    const video = await getRDCVideoDetails(newUrl);
+    if (!video) {
+      form.reset(undefined, { keepIsValid: true });
+      toast.error("Please upload a video by RDC Live", { richColors: true });
+    } else {
+      setValue("sessionName", video.sessionName);
+      setValue(
+        "thumbnail",
+        typeof video.thumbnail === "string"
+          ? video.thumbnail
+          : video.thumbnail.url,
+      );
+      setValue("date", video.date);
+      setSession(video);
+      toast.success("Youtube video successfully linked.", { richColors: true });
+    }
+
+    console.log(video);
+
+    setIsFetching(false);
+  };
+
+  //! TODO May need to refactor ID's. Not sure what they were being used for.
   return (
     <FormProvider {...form}>
       <Form {...form}>
@@ -142,37 +204,17 @@ const EntryCreatorForm = (props: Props) => {
           {" "}
           Entry Creator Form
         </div>
+
         <form
-          className="rounded-md border p-4"
+          className="grid grid-cols-2 rounded-md border p-4"
           onSubmit={handleSubmit(onSubmit, onError)}
         >
-          <div
-            id="entry-creator-form-info-header"
-            className="flex flex-wrap items-center justify-between"
-          >
-            <FormField
-              control={form.control}
-              name="sessionName"
-              render={({ field }) => (
-                <FormItem className="text-center">
-                  <FormLabel className="text-base">Session Name</FormLabel>
-                  <Input
-                    className="my-2 w-80 rounded-md border p-2"
-                    placeholder="Session Name"
-                    {...field}
-                  />
-                  {errors.sessionName && (
-                    <p className="text-red-500">{errors.sessionName.message}</p>
-                  )}
-                </FormItem>
-              )}
-            />
-
+          <div className="col-span-2 mb-5 flex flex-wrap content-end justify-items-end gap-2">
             <FormField
               control={form.control}
               name="sessionUrl"
               render={({ field }) => (
-                <FormItem className="text-center">
+                <FormItem>
                   <FormLabel>Session URL</FormLabel>
                   <Input
                     className="my-2 w-80 rounded-md border p-2"
@@ -185,41 +227,28 @@ const EntryCreatorForm = (props: Props) => {
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="thumbnail"
-              render={({ field }) => (
-                <FormItem className="text-center">
-                  <FormLabel>Thumbnail</FormLabel>
-
-                  {/** TODO: AUtomatically get this from URL */}
-                  <Input
-                    className="my-2 w-80 rounded-md border p-2"
-                    placeholder="Thumbnail"
-                    {...field}
-                  />
-                  {errors.thumbnail && (
-                    <p className="text-red-500">{errors.thumbnail.message}</p>
-                  )}
-                </FormItem>
-              )}
-            />
-            <AdminDatePicker />
+            <Button
+              disabled={isFetching}
+              style={{ alignSelf: "end" }}
+              onClick={handleUrlUpdated}
+              type="button"
+              variant="default"
+            >
+              Update URL
+            </Button>
           </div>
-          <div
-            id="entry-creator-form-info-subheader"
-            className="my-2 flex flex-row flex-wrap items-center justify-around"
-          >
-            <Controller
-              name="game"
-              control={control}
-              render={({ field }) => (
-                <GameDropDownForm field={field} control={form.control} />
-              )}
-            />
+          <div className="order-2 col-span-2 md:order-none md:col-span-1">
+            <div id="entry-creator-form-info-subheader" className="my-5">
+              <Controller
+                name="game"
+                control={control}
+                render={({ field }) => (
+                  <GameDropDownForm field={field} control={form.control} />
+                )}
+              />
+            </div>
 
-            <FormItem className="text-center">
+            <FormItem>
               <FormLabel>Session Players</FormLabel>
               <Controller
                 name="players"
@@ -234,18 +263,95 @@ const EntryCreatorForm = (props: Props) => {
               />
             </FormItem>
           </div>
-          <SetManager control={control} />
+          <div className="order-1 col-span-2 md:order-none md:col-span-1">
+            <div
+              id="entry-creator-form-info-header"
+              className="flex flex-wrap items-center justify-between gap-y-2"
+            >
+              <FormField
+                disabled
+                control={form.control}
+                name="sessionName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base">Session Name</FormLabel>
+                    <Input
+                      className="my-2 w-80 rounded-md border p-2"
+                      placeholder="Session Name"
+                      {...field}
+                    />
+                    {errors.sessionName && (
+                      <p className="text-red-500">
+                        {errors.sessionName.message}
+                      </p>
+                    )}
+                  </FormItem>
+                )}
+              />
 
-          <Button
-            type="submit"
-            className="my-2 w-80 rounded-md border bg-green-800 p-2"
-          >
-            Submit
-          </Button>
+              <FormField
+                disabled
+                control={form.control}
+                name="thumbnail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Thumbnail</FormLabel>
+
+                    {/** TODO: AUtomatically get this from URL */}
+                    <Input
+                      className="my-2 w-80 rounded-md border p-2"
+                      placeholder="Thumbnail"
+                      {...field}
+                    />
+                    {errors.thumbnail && (
+                      <p className="text-red-500">{errors.thumbnail.message}</p>
+                    )}
+                  </FormItem>
+                )}
+              />
+              <AdminDatePicker />
+            </div>
+            <div className="my-2 max-h-72 w-72 max-w-72">
+              {session ? (
+                <Thumbnail session={session} />
+              ) : (
+                <Skeleton className="h-32" />
+              )}
+            </div>
+          </div>
+          <div className="order-3 col-span-2 md:order-none">
+            <SetManager control={control} />
+            <Button
+              disabled={!formIsValid}
+              type="submit"
+              className="my-2 w-80 rounded-md border p-2"
+            >
+              Submit
+            </Button>
+          </div>
         </form>
       </Form>
     </FormProvider>
   );
 };
+
+const Thumbnail = ({
+  session,
+}: {
+  session: NonNullable<Awaited<ReturnType<typeof getRDCVideoDetails>>>;
+}) => (
+  <Image
+    src={
+      typeof session.thumbnail === "string"
+        ? session.thumbnail
+        : session.thumbnail.url
+    }
+    height={
+      typeof session.thumbnail === "string" ? 9 : session.thumbnail.height
+    } // 16:9 aspect ratio
+    width={typeof session.thumbnail === "string" ? 16 : session.thumbnail.width}
+    alt="RDC Youtube Video Thumbnail"
+  />
+);
 
 export default EntryCreatorForm;

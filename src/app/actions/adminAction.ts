@@ -74,25 +74,41 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
   session.sets.forEach(async (set: any) => {
     console.log("Creating Set From Admin Form Submission: ", set);
 
-    const setWinnerConect = set.setWinner.map((winner: any) => ({
+    // const setWinnerConect = await set.setWinners.map((winner: any) => ({
+    //   playerId: winner.playerId,
+    // }));
+
+    const setWinnerConnect = (set.setWinners || []).map((winner: any) => ({
       playerId: winner.playerId,
     }));
+
+    console.log("Set Winners: ", setWinnerConnect);
+    console.log("New session ID: ", newSessionId);
 
     const newSet = await prisma.gameSet.create({
       data: {
         sessionId: newSessionId,
+      },
+    });
+
+    const updateSetWinners = await prisma.gameSet.update({
+      where: {
+        setId: newSet.setId,
+      },
+      data: {
         setWinners: {
-          connect: setWinnerConect,
+          connect: setWinnerConnect,
         },
       },
     });
 
     console.log("New Set ID: ", newSet.setId);
+
     // For each match in set assign to parent set
     set.matches.forEach(async (match: any) => {
       console.log("Creating Match From Admin Form Submission: ", match);
 
-      const matchWinnerConnect = match.matchWinner.map((winner: any) => ({
+      const matchWinnerConnect = match.matchWinners.map((winner: any) => ({
         playerId: winner.playerId,
       }));
 

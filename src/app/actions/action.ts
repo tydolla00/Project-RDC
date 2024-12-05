@@ -1,6 +1,6 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../../prisma/db";
 import config from "@/lib/config";
 import { Session } from "next-auth";
 import { signOut, signIn } from "@/auth";
@@ -13,23 +13,34 @@ export const updateAuthStatus = async (session: Session | null) => {
   session ? await signOut({ redirectTo: "/" }) : await signIn("github");
 };
 
-export const getYTVid = async (videoId: string) => {
-  // TODO use API Key based off env.
-  const prisma = new PrismaClient();
+type FindManySessions = Awaited<ReturnType<typeof prisma.session.findMany>>[0];
+
+export const getRDCVideoDetails = async (
+  videoId: string,
+): Promise<
+  | FindManySessions
+  | (Pick<FindManySessions, "date" | "sessionName" | "sessionUrl"> & {
+      thumbnail: Thumbnail;
+    })
+  | undefined
+> => {
   const sessions = await prisma.session.findMany();
-  const sessionURL = sessions.find(
-    (session) => session.sessionUrl.split("=")[1] === videoId,
-  );
-  console.log(sessionURL);
-  if (!sessionURL) {
-    const YTvideo = await fetch(
-      `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${config.YOUTUBE_LOCAL_API_KEY}`,
-    );
-    console.log(
-      `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${config.YOUTUBE_LOCAL_API_KEY}`,
-    );
-    console.log(YTvideo, videoId);
-    !config.YOUTUBE_LOCAL_API_KEY &&
+
+  // TODO only store videoId in the db.
+  const session = sessions.find((session) => session.sessionUrl === videoId);
+  const apiKey =
+    process.env.NODE_ENV === "production"
+      ? config.YOUTUBE_API_KEY
+      : config.YOUTUBE_LOCAL_API_KEY;
+
+  console.log(session);
+  if (!session) {
+    const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${apiKey}`;
+    const YTvideo = await fetch(apiUrl);
+    console.log({ YTvideo }, { videoId }, { apiUrl });
+
+    process.env.NODE_ENV === "development" &&
+      !config.YOUTUBE_LOCAL_API_KEY &&
       console.log("YOUTUBE API KEY NOT CONFIGURED");
 
     if (!YTvideo.ok) return undefined;
@@ -38,7 +49,9 @@ export const getYTVid = async (videoId: string) => {
     console.log(json);
     const video = json.items[0];
 
-    if (video.snippet.channelTitle !== "RDC Live") return undefined;
+    if (video?.snippet.channelTitle !== "RDC Live") return undefined;
+
+    // TODO do something with the height and width.
 
     const session = {
       sessionUrl: `https://youtube.com/watch?v=${video.id}`,
@@ -46,12 +59,9 @@ export const getYTVid = async (videoId: string) => {
       sessionName: video.snippet.title,
       thumbnail:
         video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
-    };
+    } as unknown as Awaited<ReturnType<typeof getRDCVideoDetails>>;
     return session;
-  }
-  await prisma.$disconnect();
-
-  return undefined;
+  } else return session;
 };
 
 type YouTubeVideoListResponse = {

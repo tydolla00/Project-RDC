@@ -8,6 +8,7 @@ import PlayerSelector from "./PlayerSelector";
 import { FormValues } from "./EntryCreatorForm";
 import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   setIndex: number;
@@ -22,6 +23,8 @@ const MatchManager = (props: Props) => {
   });
   const players = getValues(`players`);
 
+  const statName = "MK8_POS";
+
   /**
    *  Handles create new match button click.
    * Creates a new child Match under parent set
@@ -35,7 +38,7 @@ const MatchManager = (props: Props) => {
     }));
     console.log("Player Sessions: ", playerSessions);
     append({
-      matchWinner: [],
+      matchWinners: [],
       playerSessions: playerSessions,
     });
   };
@@ -49,9 +52,9 @@ const MatchManager = (props: Props) => {
       )) ||
         fields.map((match, matchIndex) => {
           return (
-            <div key={match.id} className="m-2 flex flex-col justify-between">
+            <div key={match.id} className="my-5 flex flex-col justify-between">
               <div id="match-manager-header" className="flex justify-between">
-                <label>Match {matchIndex + 1}</label>
+                <Label>Match {matchIndex + 1}</Label>
                 <Button
                   className="bg-red-500 text-xs text-white hover:bg-red-400"
                   type="button"
@@ -60,17 +63,9 @@ const MatchManager = (props: Props) => {
                   <MinusCircledIcon /> Remove Match
                 </Button>
               </div>
-              <Separator className="my-4 h-[1px] bg-slate-400" />
-              <PlayerSessionManager
-                setIndex={setIndex}
-                matchIndex={matchIndex}
-                players={players}
-              />
-              <div className="text-center text-lg font-semibold">
-                Match Winner for Match {matchIndex + 1}{" "}
-              </div>
+              <Label className="my-2 text-muted-foreground">Match Winner</Label>
               <Controller
-                name={`sets.${setIndex}.matches.${matchIndex}.matchWinner`}
+                name={`sets.${setIndex}.matches.${matchIndex}.matchWinners`}
                 control={control}
                 render={({ field }) => (
                   <PlayerSelector
@@ -80,16 +75,28 @@ const MatchManager = (props: Props) => {
                   />
                 )}
               />
+              <div className="my-4 text-center text-lg">
+                Player Sessions for Match {matchIndex + 1}
+              </div>
+              <div className="my-2">{statName}</div>
+              {/* TODO Potentially move StatName here. Don't need to specify it for each control. */}
+              <PlayerSessionManager
+                statName={statName}
+                setIndex={setIndex}
+                matchIndex={matchIndex}
+                players={players}
+              />
+              {/* <Separator className="my-4 h-px bg-slate-400" /> */}
             </div>
           );
         })}
-      <div className="flex justify-center">
+      <div>
         <Button
           className="my-2 rounded-md bg-purple-900 p-2 font-semibold text-white hover:bg-purple-950"
           type="button"
           onClick={handleNewMatchClick}
         >
-          + Add Match
+          Add Match
         </Button>
       </div>
     </div>
