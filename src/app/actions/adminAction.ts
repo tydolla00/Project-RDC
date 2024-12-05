@@ -81,7 +81,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
     const newSet = await prisma.gameSet.create({
       data: {
         sessionId: newSessionId,
-        setWinner: {
+        setWinners: {
           connect: setWinnerConect,
         },
       },
@@ -99,7 +99,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
       const newMatch = await prisma.match.create({
         data: {
           setId: newSet.setId,
-          matchWinner: {
+          matchWinners: {
             connect: matchWinnerConnect,
           },
         },
