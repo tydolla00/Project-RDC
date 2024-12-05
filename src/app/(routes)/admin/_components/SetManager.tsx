@@ -21,6 +21,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { join } from "path";
 import WinnerDisplay from "./WinnerDisplay";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   control: Control<z.infer<typeof formSchema>>;
@@ -99,9 +100,9 @@ const SetManager = (props: Props) => {
                       Set Details <p>Game: {getValues("game")}</p>
                     </div>
                   </label> */}
-                  <div className="m-2 ml-0 text-muted-foreground">
+                  <Label className="my-2 block text-muted-foreground">
                     Set Winner
-                  </div>
+                  </Label>
                   <Controller
                     name={`sets.${setIndex}.setWinners`}
                     control={control}
@@ -129,7 +130,7 @@ const SetManager = (props: Props) => {
             </Collapsible>
           );
         })}
-      <div className="flex justify-center">
+      <div className="ml-auto w-fit">
         <Button
           type="button"
           onClick={() => {

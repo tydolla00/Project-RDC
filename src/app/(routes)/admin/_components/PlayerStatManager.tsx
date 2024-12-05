@@ -11,12 +11,19 @@ interface Props {
   matchIndex: number;
   setIndex: number;
   playerSessionIndex: number;
+  statName: string;
 }
 
 // Need to get the stats of each game and then display appropriate input field for each stat
 
 const PlayerStatManager = (props: Props) => {
-  const { player, matchIndex, setIndex, playerSessionIndex } = props;
+  const {
+    player,
+    matchIndex,
+    setIndex,
+    playerSessionIndex,
+    statName: gameStat,
+  } = props;
   const { register, control, getValues } = useFormContext<FormValues>();
   const { append, remove, fields } = useFieldArray({
     name: `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats`,
@@ -84,7 +91,7 @@ const PlayerStatManager = (props: Props) => {
             {/* <span className="self-end">{field.stat}</span> */}
             <Input
               className="h-full max-w-xs"
-              placeholder="Enter value"
+              placeholder={gameStat}
               type="text"
               {...register(
                 `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats.${index}.statValue`,

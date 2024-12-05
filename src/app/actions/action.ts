@@ -15,7 +15,7 @@ export const updateAuthStatus = async (session: Session | null) => {
 
 type FindManySessions = Awaited<ReturnType<typeof prisma.session.findMany>>[0];
 
-export const getYTVid = async (
+export const getRDCVideoDetails = async (
   videoId: string,
 ): Promise<
   | FindManySessions
@@ -59,7 +59,7 @@ export const getYTVid = async (
       sessionName: video.snippet.title,
       thumbnail:
         video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
-    } as unknown as Awaited<ReturnType<typeof getYTVid>>;
+    } as unknown as Awaited<ReturnType<typeof getRDCVideoDetails>>;
     return session;
   } else return session;
 };

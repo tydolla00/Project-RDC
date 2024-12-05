@@ -2,15 +2,17 @@ import { Player } from "@prisma/client";
 import React from "react";
 import { FieldValues, useFieldArray, useFormContext } from "react-hook-form";
 import PlayerStatManager from "./PlayerStatManager";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   setIndex: number;
   matchIndex: number;
   players: Player[];
+  statName: string;
 }
 
 const PlayerSessionManager = (props: Props) => {
-  const { setIndex, matchIndex, players } = props;
+  const { setIndex, matchIndex, players, statName: gameStat } = props;
   const { control, getValues } = useFormContext();
   const { append, remove, fields } = useFieldArray<FieldValues>({
     name: `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
@@ -61,7 +63,7 @@ const PlayerSessionManager = (props: Props) => {
       {fields.map((field, sessionIndex) => {
         return (
           <div className="flex flex-col" key={field.id}>
-            <label className="font-bold">{getPlayerNameFromField(field)}</label>
+            <Label className="font-bold">{getPlayerNameFromField(field)}</Label>
 
             <PlayerStatManager
               {...props}

@@ -13,7 +13,7 @@ import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { AdminDatePicker } from "./AdminDatePicker";
-import { getYTVid } from "@/app/actions/action";
+import { getRDCVideoDetails } from "@/app/actions/action";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -96,7 +96,7 @@ export type FormValues = z.infer<typeof formSchema>;
 const EntryCreatorForm = (props: Props) => {
   const [isFetching, setIsFetching] = useState(false);
   const [session, setSession] = useState<
-    Awaited<ReturnType<typeof getYTVid>> | undefined
+    Awaited<ReturnType<typeof getRDCVideoDetails>> | undefined
   >(undefined);
 
   const { rdcMembers } = props;
@@ -174,7 +174,7 @@ const EntryCreatorForm = (props: Props) => {
 
     // Get v=
 
-    const video = await getYTVid(newUrl);
+    const video = await getRDCVideoDetails(newUrl);
     if (!video) {
       form.reset(undefined, { keepIsValid: true });
       toast.error("Please upload a video by RDC Live", { richColors: true });
@@ -338,7 +338,7 @@ const EntryCreatorForm = (props: Props) => {
 const Thumbnail = ({
   session,
 }: {
-  session: NonNullable<Awaited<ReturnType<typeof getYTVid>>>;
+  session: NonNullable<Awaited<ReturnType<typeof getRDCVideoDetails>>>;
 }) => (
   <Image
     src={
