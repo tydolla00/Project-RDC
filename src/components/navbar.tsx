@@ -25,7 +25,7 @@ import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { games, RDCMembers } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
-import { AuthButton } from "./client-buttons";
+import { AuthButton, ToggleThemeButton } from "./client-buttons";
 
 export const Navbar = async () => {
   const session = await auth();
@@ -131,7 +131,8 @@ export const Navbar = async () => {
               <ListItem href="/submission">Submissions</ListItem>
               {/* add client component that will handle triggering the animation. */}
               {/* TODO MOBILE ONLY Animate up from the bottom of the screen and add dismiss option. */}
-              <ModeToggle />
+              <ToggleThemeButton />
+              {/* <ModeToggle /> */}
               <AuthButton session={session} />
             </ul>
           </NavigationMenuContent>
@@ -159,9 +160,9 @@ export const Navbar = async () => {
             )}
           </NavigationMenuItem>
         </FeatureFlag>
-        <AuthButton session={session} />
+        <AuthButton responsive session={session} />
         <NavigationMenuItem className="hidden sm:block">
-          <ModeToggle />
+          <ModeToggle className="" />
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
