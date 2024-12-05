@@ -91,7 +91,7 @@ export const calculateWinsPerPlayer = (
     for (const set of session.sets) {
       // Calculate Match Wins
       for (const match of set.matches) {
-        for (const winner of match.matchWinner) {
+        for (const winner of match.matchWinners) {
           let member = members.get(winner.playerName);
           if (!member)
             members.set(winner.playerName, { matchWins: 1, setWins: 0 });
@@ -99,7 +99,7 @@ export const calculateWinsPerPlayer = (
         }
       }
       // Calculate Set Wins
-      for (const winner of set.setWinner) {
+      for (const winner of set.setWinners) {
         let member = members.get(winner.playerName);
         if (!member)
           members.set(winner.playerName, { matchWins: 0, setWins: 1 });
