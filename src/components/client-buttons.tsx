@@ -42,12 +42,13 @@ export const AuthButton = ({
 };
 
 export const ToggleThemeButton = () => {
+  // TODO Figure out a better way to show this.
   return (
     <>
       {/* <Button type="button" variant="ghost">
         Toggle Theme
       </Button> */}
-      <ModeToggle className="fixed bottom-0 right-0" />
+      <ModeToggle className="fixed right-0 top-3 hidden max-[400px]:inline-flex" />
     </>
   );
 };
