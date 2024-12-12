@@ -36,7 +36,7 @@ export const formSchema = z.object({
       "Please paste in a valid youtube url.",
     )
     .max(100)
-    .includes("dummy", { message: "Invalid URL" }),
+    .includes("v=", { message: "Invalid URL" }),
   date: z.date().readonly(),
   thumbnail: z.string().readonly(),
   players: z.array(
@@ -110,6 +110,7 @@ const EntryCreatorForm = (props: Props) => {
       players: [],
       sets: [],
     },
+    mode: "onChange",
   });
 
   const {
@@ -119,12 +120,14 @@ const EntryCreatorForm = (props: Props) => {
     watch,
     formState: { errors, defaultValues, isValid: formIsValid },
     setValue,
+    getValues,
   } = form;
 
   const url = watch("sessionUrl");
 
   console.log("Admin Form", watch());
-  console.log("Watch: ", watch("sets.0.setWinners.0"));
+  // console.log("Watch: ", watch("sets.0.setWinners.0"));
+  console.log("Errors: ", errors);
 
   /**
    * Submit method called when EntryCreatorForm submit button clicked
@@ -172,26 +175,38 @@ const EntryCreatorForm = (props: Props) => {
 
     setIsFetching(true);
 
-    // Get v=
-
     const video = await getRDCVideoDetails(newUrl);
     if (!video) {
       form.reset(undefined, { keepIsValid: true });
       toast.error("Please upload a video by RDC Live", { richColors: true });
     } else {
-      setValue("sessionName", video.sessionName);
+      setValue("sessionName", video.sessionName, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
       setValue(
         "thumbnail",
         typeof video.thumbnail === "string"
           ? video.thumbnail
           : video.thumbnail.url,
+        {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        },
       );
-      setValue("date", video.date);
+      setValue("date", new Date(video.date), {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
       setSession(video);
       toast.success("Youtube video successfully linked.", { richColors: true });
     }
 
     console.log(video);
+    console.log("Form values after update:", getValues());
 
     setIsFetching(false);
   };
@@ -269,7 +284,7 @@ const EntryCreatorForm = (props: Props) => {
               className="flex flex-wrap items-center justify-between gap-y-2"
             >
               <FormField
-                disabled
+                // disabled
                 control={form.control}
                 name="sessionName"
                 render={({ field }) => (
@@ -290,7 +305,6 @@ const EntryCreatorForm = (props: Props) => {
               />
 
               <FormField
-                disabled
                 control={form.control}
                 name="thumbnail"
                 render={({ field }) => (
@@ -322,7 +336,7 @@ const EntryCreatorForm = (props: Props) => {
           <div className="order-3 col-span-2 md:order-none">
             <SetManager control={control} />
             <Button
-              disabled={!formIsValid}
+              // disabled={!formIsValid}
               type="submit"
               className="my-2 w-80 rounded-md border p-2"
             >
