@@ -81,17 +81,16 @@ const PlayerStatManager = (props: Props) => {
     fetchGameStats();
   }, [append, getValues, matchIndex, playerSessionIndex, setIndex]);
 
-  console.log("Fields: ", fields);
+  console.log("PlayerStatManagerFields: ", fields);
 
   return (
     <>
       {fields.map((field, index: number) => {
         return (
           <div key={field.id} className="my-4 flex gap-3">
-            {/* <span className="self-end">{field.stat}</span> */}
             <Input
               className="h-full max-w-xs"
-              placeholder={gameStat}
+              placeholder={field.stat}
               type="text"
               {...register(
                 `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats.${index}.statValue`,

@@ -2,7 +2,6 @@ import { Player } from "@prisma/client";
 import React from "react";
 import { Controller, useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
-import { Separator } from "@/components/ui/separator";
 import PlayerSessionManager from "./PlayerSessionManager";
 import PlayerSelector from "./PlayerSelector";
 import { FormValues } from "./EntryCreatorForm";
@@ -78,7 +77,6 @@ const MatchManager = (props: Props) => {
               <div className="my-4 text-center text-lg">
                 Player Sessions for Match {matchIndex + 1}
               </div>
-              <div className="my-2">{statName}</div>
               {/* TODO Potentially move StatName here. Don't need to specify it for each control. */}
               <PlayerSessionManager
                 statName={statName}
