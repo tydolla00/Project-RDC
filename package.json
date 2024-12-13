@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "postinstall": "prisma generate",
     "build": "next build",
+    "build-memory": "next build --experimental-debug-memory-usage",
     "start": "next start",
     "lint": "next lint",
     "dbcrashout": "npx prisma db push --force-reset && npx prisma db push && npx tsx prisma/seed.ts"
