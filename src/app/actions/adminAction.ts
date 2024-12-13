@@ -65,7 +65,6 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
         sessionUrl: session.sessionUrl,
         thumbnail: session.thumbnail,
         date: session.date,
-        // date: Date.now(), // TODO: Add Date Picker or get date from youtube video
       },
     });
   }
@@ -128,11 +127,15 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
           playerSession,
         );
 
+        console.log("PlayerSession PlayerId: ", playerSession.playerId);
+
         const playerSessionPlayer = await prisma.player.findFirst({
           where: {
             playerId: playerSession.playerId,
           },
         });
+
+        console.log("Found PlayerSessionPlayer: ", playerSessionPlayer);
 
         if (playerSessionPlayer) {
           const newPlayerSession = await prisma.playerSession.create({
@@ -151,24 +154,69 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
               playerStat,
             );
 
-            // Get stat ID for stat Name // TODO: fix this to be more efficient
-            // StatID in playerStatAdmin form should be same as db
             const gameStat = await prisma.gameStat.findFirst({
               where: {
                 statName: playerStat.stat,
               },
             });
 
-            await prisma.playerStat.create({
+            console.log("Found Game Stat: ", gameStat);
+
+            console.log("PlayerSessionId: ", newPlayerSession.playerSessionId);
+            console.log("Value: ", playerStat.statValue);
+            console.log("PlayerId: ", newPlayerSession.playerId);
+            console.log("GameId: ", sessionGame!.gameId);
+            console.log("StatId: ", gameStat!.statId);
+            console.log("Date: ", session.date);
+
+            const newPlayerStat = await prisma.playerStat.create({
               data: {
                 playerSessionId: newPlayerSession.playerSessionId,
                 value: playerStat.statValue,
                 playerId: newPlayerSession.playerId,
                 gameId: sessionGame!.gameId,
                 statId: gameStat!.statId,
+                date: session.date,
               },
             });
+
+            console.log("newPlayerStat Created: ", newPlayerStat);
           });
+
+          // if (playerSessionPlayer) {
+          //   const newPlayerSession = await prisma.playerSession.create({
+          //     data: {
+          //       playerId: playerSession.playerId,
+          //       sessionId: newSessionId,
+          //       matchId: newMatch.matchId,
+          //       setId: newSet.setId,
+          //     },
+          //   });
+
+          //   // For each playerStat in playerSession assign to parent playerSession
+          //   playerSession.playerStats.forEach(async (playerStat: any) => {
+          //     console.log(
+          //       "Creating PlayerStat From Admin Form Submission: ",
+          //       playerStat,
+          //     );
+
+          //     // Get stat ID for stat Name // TODO: fix this to be more efficient
+          //     // StatID in playerStatAdmin form should be same as db
+          //     const gameStat = await prisma.gameStat.findFirst({
+          //       where: {
+          //         statName: playerStat.stat,
+          //       },
+          //     });
+
+          //     await prisma.playerStat.create({
+          //       data: {
+          //         playerSessionId: newPlayerSession.playerSessionId,
+          //         value: playerStat.statValue,
+          //         playerId: newPlayerSession.playerId,
+          //         gameId: sessionGame!.gameId,
+          //         statId: gameStat!.statId,
+          //       },
+          //     });
         }
       });
     });

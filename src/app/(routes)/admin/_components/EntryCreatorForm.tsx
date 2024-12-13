@@ -74,7 +74,7 @@ export const formSchema = z.object({
                   playerSessionName: z.string(),
                   playerStats: z.array(
                     z.object({
-                      statId: z.string(),
+                      statId: z.string(), // Note this statId is not the same as the statId used in the schema
                       stat: z.string(),
                       statValue: z.string(),
                     }),
@@ -135,11 +135,20 @@ const EntryCreatorForm = (props: Props) => {
    * in EntryCreator form
    */
   const onSubmit = async (data: FormValues) => {
-    console.log("---Admin Form Submission Data---: ", data);
+    console.log("Form Data Being Submitted:", {
+      data,
+      stringified: JSON.stringify(data, null, 2),
+    });
+
+    data.date = new Date(data.date);
+    console.log("Date Type in submit:", typeof data.date);
+
     insertNewSessionFromAdmin(data);
     console.log("TOasted");
     toast.success("Session successfully created.", { richColors: true });
   };
+
+  console.log("Date Type:", typeof getValues().date);
 
   /**
    * Handles errors that occur during form submission.
