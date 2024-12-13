@@ -145,6 +145,22 @@ async function seedGames() {
     update: {},
     create: {
       gameName: "Rocket League",
+      gameStats: {
+        create: [
+          {
+            statId: 2,
+            statName: "RL_GOALS",
+          },
+          {
+            statId: 3,
+            statName: "RL_SAVES",
+          },
+          {
+            statId: 4,
+            statName: "RL_ASSISTS",
+          },
+        ],
+      },
     },
   });
 
@@ -153,6 +169,22 @@ async function seedGames() {
     update: {},
     create: {
       gameName: "Call of Duty",
+      gameStats: {
+        create: [
+          {
+            statId: 5,
+            statName: "COD_KILLS",
+          },
+          {
+            statId: 6,
+            statName: "COD_DEATHS",
+          },
+          {
+            statId: 7,
+            statName: "COD_ASSISTS",
+          },
+        ],
+      },
     },
   });
   const lethalCompany = await prisma.game.upsert({
