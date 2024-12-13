@@ -20,10 +20,8 @@ export const AuthButton = ({
       action={async () => {
         // TODO Disabling button not working -_-
         setIsDisabled(true);
-        setTimeout(async () => {
-          await updateAuthStatus(session);
-          setIsDisabled(false);
-        }, 500);
+        await updateAuthStatus(session);
+        setIsDisabled(false);
       }}
     >
       <Button
