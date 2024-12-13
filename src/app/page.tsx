@@ -7,6 +7,8 @@ import Link from "next/link";
 import { getAllGames } from "../../prisma/lib/games";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
+import Image from "next/image";
+import { gameImages } from "@/lib/constants";
 
 export default async function Home() {
   const games = await getAllGames();
@@ -48,13 +50,31 @@ export default async function Home() {
           Games
         </H2>
         <div className="flex flex-wrap justify-center gap-10">
-          {games.map((game) => (
-            <Card key={game.gameId} className="h-64 w-64">
-              <CardHeader>
-                <CardTitle>{game.gameName}</CardTitle>
-              </CardHeader>
-            </Card>
-          ))}
+          {games.map((game) => {
+            const gameName = game.gameName.replace(/\s/g, "").toLowerCase();
+            return (
+              <Card
+                key={game.gameId}
+                className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52"
+              >
+                <Link href={`/games/${gameName}`}>
+                  {/* TODO Fix warning in browser related to sizing of the image. */}
+                  <Image
+                    className="absolute h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
+                    fill
+                    sizes="(max-width: 639px) 100vw, 100vw"
+                    alt=""
+                    src={`/images/${gameImages[gameName as keyof typeof gameImages]}`} // remove from nextconfig
+                  />
+                  <CardHeader className="relative h-1/4 bg-black bg-opacity-50">
+                    <CardTitle className="absolute font-extrabold text-white opacity-100">
+                      {game.gameName}
+                    </CardTitle>
+                  </CardHeader>
+                </Link>
+              </Card>
+            );
+          })}
         </div>
         <FeatureFlag
           devOnly
@@ -73,7 +93,10 @@ export default async function Home() {
               </p>
             </CardHeader>
             <CardFooter>
-              <Button asChild className="mt-4 w-full sm:w-auto">
+              <Button
+                asChild
+                className="mt-4 w-full sm:mx-auto sm:block sm:w-fit"
+              >
                 <Link href="/submissions">Submit new entry</Link>
               </Button>
             </CardFooter>

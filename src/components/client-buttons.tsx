@@ -12,7 +12,7 @@ export const AuthButton = ({
   responsive: hide,
 }: {
   session: Session | null;
-  responsive?: true | undefined;
+  responsive?: boolean | undefined; // ? If true hide on small screens if false hide on big screens
 }) => {
   const [isDisabled, setIsDisabled] = useState(false);
   return (
@@ -29,7 +29,7 @@ export const AuthButton = ({
         className={cn(
           navigationMenuTriggerStyle(),
           "w-full",
-          hide && "hidden sm:block",
+          hide ? "hidden sm:block" : "sm:hidden",
         )}
         variant="ghost"
       >
