@@ -179,10 +179,6 @@ async function seedGames() {
             statId: 6,
             statName: "COD_DEATHS",
           },
-          {
-            statId: 7,
-            statName: "COD_ASSISTS",
-          },
         ],
       },
     },
@@ -267,10 +263,8 @@ async function seedMatch(
   playersInMatch: Player[],
   raceResults: number[],
 ) {
-  const marioKartMatch = await prisma.match.upsert({
-    where: { matchId: matchId },
-    update: {},
-    create: {
+  const marioKartMatch = await prisma.match.create({
+    data: {
       matchId: matchId,
       setId: setId,
     },

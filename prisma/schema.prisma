@@ -46,14 +46,28 @@ model Game {
   @@map("games")
 }
 
-// { stat_id: 1, game_id: 1, stat_name: 'mk_first', stat_value: '0', date: 2024-10-23 12:00:00 }
+// Define enum for stat names
+enum StatName {
+  MK8_POS
+  RL_GOALS
+  RL_ASSISTS
+  RL_SAVES
+  COD_KILLS
+  COD_DEATHS
+  COD_SCORE
+  LC_DEATHS
+  SR_WINS
+  SR_SETS
+}
+
+// { stat_id: 1, game_id: 1, stat_name: 'MK_POS', playerStats: [], type: 'int' }
 model GameStat {
   statId      Int          @id @default(autoincrement()) @map("stat_id") // TODO: MAKE ENUM
-  statName    String       @map("stat_name")
+  statName    StatName     @map("stat_name")
   gameId      Int          @map("game_id")
   game        Game         @relation(fields: [gameId], references: [gameId])
   playerStats PlayerStat[]
-  type        String?      @map("type")
+  type        String?      @map("type") // Don't think there is any stat there is not an int can probably remove
 
   @@map("game_stats")
 }

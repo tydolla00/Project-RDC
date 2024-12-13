@@ -140,15 +140,15 @@ const EntryCreatorForm = (props: Props) => {
       stringified: JSON.stringify(data, null, 2),
     });
 
-    data.date = new Date(data.date);
-    console.log("Date Type in submit:", typeof data.date);
+    // data.date = new Date(data.date);
+    // console.log("Date Type in submit:", typeof data.date);
 
     insertNewSessionFromAdmin(data);
     console.log("TOasted");
     toast.success("Session successfully created.", { richColors: true });
   };
 
-  console.log("Date Type:", typeof getValues().date);
+  // console.log("Date Type:", typeof getValues().date);
 
   /**
    * Handles errors that occur during form submission.
