@@ -47,7 +47,7 @@ const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
       id="player-selector-container"
     >
       {rdcMembers?.length !== 0 ? (
-        <div className="mt-2 grid grid-cols-8">
+        <div className="mt-2 flex flex-wrap gap-y-1 sm:grid sm:grid-cols-8">
           {rdcMembers.map((player, index) => (
             <div key={player.playerId} className="relative">
               <div
