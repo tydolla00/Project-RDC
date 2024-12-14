@@ -12,6 +12,7 @@ export default async function NotFound({
     "Sorry we couldn't find the page you were looking for. While you're here, enjoy this video of Leland singing Cash Machine";
 
   const error = (await searchParams)?.error;
+  // console.log(searchParams); // Called also when an image is not found.
   if (error?.toString() === "AccessDenied")
     msg =
       "You're not permitted to sign in to this site just yet. Don't worry we're working on exciting features but in the meantime here's a rendition of Cash Machine by Leland.";
