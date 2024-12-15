@@ -62,7 +62,7 @@ enum StatName {
 
 // { stat_id: 1, game_id: 1, stat_name: 'MK_POS', playerStats: [], type: 'int' }
 model GameStat {
-  statId      Int          @id @default(autoincrement()) @map("stat_id") // TODO: MAKE ENUM
+  statId      Int          @id @default(autoincrement()) @map("stat_id")
   statName    StatName     @map("stat_name")
   gameId      Int          @map("game_id")
   game        Game         @relation(fields: [gameId], references: [gameId])
