@@ -7,18 +7,18 @@ import { AdminDatePicker } from "./AdminDatePicker";
 import GameDropDownForm from "./GameDropDownForm";
 import PlayerSelector from "./PlayerSelector";
 import { useState, useTransition } from "react";
-import { FormProps, FormValues } from "./EntryCreatorForm";
 import { getRDCVideoDetails } from "@/app/actions/action";
 import Image from "next/image";
 import { toast } from "sonner";
 import { getVideoId } from "../_utils/helper-functions";
+import { FormValues, AdminFormProps } from "../_utils/form-helpers";
 
 export const SessionInfo = ({
   form,
   rdcMembers,
 }: {
   form: UseFormReturn<FormValues>;
-  rdcMembers: FormProps["rdcMembers"];
+  rdcMembers: AdminFormProps["rdcMembers"];
 }) => {
   const [session, setSession] = useState<
     Awaited<ReturnType<typeof getRDCVideoDetails>> | undefined
@@ -33,7 +33,7 @@ export const SessionInfo = ({
     startTransition(async () => {
       // TODO Debounce/Rate limit
       const videoId = getVideoId(url); // Raise github issue, works without being imported.
-
+      // console.log({ videoId, defaultValues, control }); // Url is only valid with this line using react compiler
       // See if url is valid.
       // TODO Invalid not working
       if (
