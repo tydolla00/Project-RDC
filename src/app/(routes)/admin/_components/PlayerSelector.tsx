@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
 import { Control, ControllerRenderProps } from "react-hook-form";
 import { z } from "zod";
-import { formSchema, FormValues } from "./EntryCreatorForm";
 import { cn } from "@/lib/utils";
+import { formSchema, FormValues } from "../_utils/form-helpers";
 interface Props {
   rdcMembers: Player[];
   handlePlayerClick?: (player: Player) => void;

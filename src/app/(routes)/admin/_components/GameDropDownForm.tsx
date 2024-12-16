@@ -27,7 +27,7 @@ import {
 import { getGames } from "@/app/actions/adminAction";
 import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
-import { FormValues } from "./EntryCreatorForm";
+import { FormValues } from "../_utils/form-helpers";
 
 const GameDropDownForm = ({
   control,

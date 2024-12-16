@@ -7,7 +7,6 @@ import {
   useWatch,
 } from "react-hook-form";
 import { z } from "zod";
-import { formSchema } from "./EntryCreatorForm";
 import MatchManager from "./MatchManager";
 import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import { ChevronDown } from "lucide-react";
 import { join } from "path";
 import WinnerDisplay from "./WinnerDisplay";
 import { Label } from "@/components/ui/label";
+import { formSchema } from "../_utils/form-helpers";
 
 interface Props {
   control: Control<z.infer<typeof formSchema>>;
