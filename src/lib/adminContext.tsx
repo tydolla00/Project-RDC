@@ -17,5 +17,5 @@ export default function ThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  return <AdminContext.Provider value="dark">{children}</AdminContext.Provider>;
+  return <AdminContext value="dark">{children}</AdminContext>;
 }

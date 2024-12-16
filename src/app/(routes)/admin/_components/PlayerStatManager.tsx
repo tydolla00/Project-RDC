@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { Player } from "@prisma/client";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { getGameStats } from "@/app/actions/adminAction";
-import { FormValues } from "./EntryCreatorForm";
 import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
+import { FormValues } from "../_utils/form-helpers";
 
 interface Props {
   player: Player;

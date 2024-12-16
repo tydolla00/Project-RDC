@@ -5,10 +5,10 @@ import { useFormContext } from "react-hook-form";
 import { Separator } from "@/components/ui/separator";
 import PlayerSessionManager from "./PlayerSessionManager";
 import PlayerSelector from "./PlayerSelector";
-import { FormValues } from "./EntryCreatorForm";
 import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
+import { FormValues } from "../_utils/form-helpers";
 
 interface Props {
   setIndex: number;
