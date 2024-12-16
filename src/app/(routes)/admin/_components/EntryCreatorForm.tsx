@@ -145,7 +145,6 @@ const EntryCreatorForm = (props: FormProps) => {
     <FormProvider {...form}>
       <Form {...form}>
         <div className="m-2 text-center text-2xl font-bold dark:text-purple-500">
-          {" "}
           Entry Creator Form
         </div>
 
@@ -166,11 +165,11 @@ const EntryCreatorForm = (props: FormProps) => {
 };
 
 const Submit = ({ formIsValid }: { formIsValid: boolean }) => {
-  const status = useFormStatus();
+  const { pending } = useFormStatus();
 
   return (
     <Button
-      disabled={!formIsValid || status.pending}
+      disabled={!formIsValid || pending}
       type="submit"
       className="my-2 w-full rounded-md border p-2 sm:w-80"
     >

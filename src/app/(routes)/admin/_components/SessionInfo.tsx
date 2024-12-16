@@ -29,7 +29,7 @@ export const SessionInfo = ({
   const defaultValues = form.formState.defaultValues;
   const url = form.watch("sessionUrl");
 
-  const handleUrlUpdated = async () => {
+  const handleUrlUpdated = () => {
     startTransition(async () => {
       // TODO Debounce/Rate limit
       const videoId = getVideoId(url); // Raise github issue, works without being imported.
