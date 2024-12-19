@@ -49,6 +49,7 @@ model Game {
 // Define enum for stat names
 enum StatName {
   MK8_POS
+  RL_SCORE
   RL_GOALS
   RL_ASSISTS
   RL_SAVES

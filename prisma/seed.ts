@@ -127,6 +127,9 @@ async function seedGames() {
       gameStats: {
         create: [
           {
+            statName: "RL_SCORE",
+          },
+          {
             statName: "RL_GOALS",
           },
           {
@@ -146,6 +149,9 @@ async function seedGames() {
       gameStats: {
         create: [
           {
+            statName: "COD_SCORE",
+          },
+          {
             statName: "COD_KILLS",
           },
           {
@@ -158,11 +164,28 @@ async function seedGames() {
   const lethalCompany = await prisma.game.create({
     data: {
       gameName: "Lethal Company",
+      gameStats: {
+        create: [
+          {
+            statName: "LC_DEATHS",
+          },
+        ],
+      },
     },
   });
   const speedRunners = await prisma.game.create({
     data: {
       gameName: "Speedrunners",
+      gameStats: {
+        create: [
+          {
+            statName: "SR_SETS",
+          },
+          {
+            statName: "SR_WINS",
+          },
+        ],
+      },
     },
   });
 
