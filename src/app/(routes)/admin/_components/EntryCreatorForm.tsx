@@ -343,7 +343,7 @@ const EntryCreatorForm = (props: Props) => {
             </div>
           </div>
           <div className="order-3 col-span-2 md:order-none">
-            <SetManager control={control} />
+            <SetManager />
             <Button
               // disabled={!formIsValid}
               type="submit"
