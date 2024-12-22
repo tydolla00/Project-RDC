@@ -138,6 +138,9 @@ async function seedGames() {
           {
             statName: "RL_ASSISTS",
           },
+          {
+            statName: "RL_SHOTS",
+          },
         ],
       },
     },
