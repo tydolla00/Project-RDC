@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdmin } from "@/lib/adminContext";
+import { FormValues } from "../_utils/form-helpers";
 
 interface Props {
   player: Player;
