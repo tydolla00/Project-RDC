@@ -249,7 +249,7 @@ const EntryCreatorForm = (props: Props) => {
                 <FormItem>
                   <FormLabel>Session URL</FormLabel>
                   <Input
-                    className="my-2 w-80 rounded-md border p-2"
+                    className="my-2 w-fit rounded-md border p-2"
                     placeholder="Session URL"
                     {...field}
                   />
@@ -308,7 +308,7 @@ const EntryCreatorForm = (props: Props) => {
                   <FormItem>
                     <FormLabel className="text-base">Session Name</FormLabel>
                     <Input
-                      className="my-2 w-80 rounded-md border p-2"
+                      className="my-2 w-full rounded-md border p-2"
                       placeholder="Session Name"
                       {...field}
                     />
@@ -330,7 +330,7 @@ const EntryCreatorForm = (props: Props) => {
 
                     {/** TODO: AUtomatically get this from URL */}
                     <Input
-                      className="my-2 w-80 rounded-md border p-2"
+                      className="my-2 w-full rounded-md border p-2"
                       placeholder="Thumbnail"
                       {...field}
                     />
@@ -342,7 +342,7 @@ const EntryCreatorForm = (props: Props) => {
               />
               <AdminDatePicker />
             </div>
-            <div className="my-2 max-h-72 w-72 max-w-72">
+            <div className="my-2 max-h-72 w-full max-w-72 sm:w-72">
               {session ? (
                 <Thumbnail session={session} />
               ) : (
@@ -355,7 +355,7 @@ const EntryCreatorForm = (props: Props) => {
             <Button
               // disabled={!formIsValid}
               type="submit"
-              className="my-2 w-80 rounded-md border p-2"
+              className="my-2 w-full rounded-md border p-2 sm:w-80"
             >
               Submit
             </Button>
