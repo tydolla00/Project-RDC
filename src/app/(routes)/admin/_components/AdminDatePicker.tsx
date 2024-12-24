@@ -6,6 +6,8 @@ import { CalendarIcon } from "lucide-react";
 import { useForm, useFormContext } from "react-hook-form";
 import { z } from "zod";
 
+// TODO Make sure Date is in UTC
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -29,11 +31,11 @@ export function AdminDatePicker() {
 
   return (
     <FormField
-      disabled
+      // disabled
       control={form.control}
       name="date"
       render={({ field }) => (
-        <FormItem className="pointer-events-none flex cursor-not-allowed flex-col">
+        <FormItem className="flex flex-col">
           <FormLabel className="p-1">Session Date</FormLabel>
           <Popover>
             <PopoverTrigger asChild>

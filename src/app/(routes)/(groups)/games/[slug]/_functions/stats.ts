@@ -1,8 +1,9 @@
+import { StatName } from "@prisma/client";
 import {
   getWinsPerPlayer,
   getScoreStatsPerPlayer,
   getMatchesPerGame,
-  StatNameValues,
+  StatEndsWith,
   getStatPerPlayer,
 } from "../../../../../../../prisma/lib/games";
 import { StatNames } from "../../../../../../../prisma/lib/utils";
@@ -16,9 +17,8 @@ export const getAllStats = async (game: {
   gameId: number;
   gameName: string;
 }) => {
-  let stat:
-    | StatNameValues<StatNames, "POS">
-    | StatNameValues<StatNames, "SCORE"> = "COD_POS";
+  let stat: StatEndsWith<"POS"> | StatEndsWith<"SCORE"> =
+    StatNames.MarioKartPosition;
 
   switch (game.gameId) {
     case 1:
@@ -46,9 +46,9 @@ export const calcAvgPerPlayer = (
   // Compute total per player
   for (const playerStat of playerStats) {
     const avg = Number(playerStat.value);
-    if (!avg) {
+    if (isNaN(avg)) {
       // TODO Log to Posthog/Sentry
-      console.log("Not a number");
+      console.log("Not a number", avg);
       continue;
     }
 
@@ -70,7 +70,7 @@ export const calcAvgPerPlayer = (
 
   const data = Array.from(avgPlacingPerPlayer, ([key, val]) => ({
     player: key,
-    placing: val.avg,
+    avg: val.avg,
     played: val.count,
   }));
 
@@ -126,8 +126,9 @@ export const calcMostPerStat = (
 
   for (const placing of placings) {
     const val = Number(placing.value);
-    if (!val || val !== 1) {
-      !val && console.log("Not a number", val);
+    if (isNaN(val) || val !== 1) {
+      // TODO Log to posthog
+      isNaN(val) && console.log("Not a number", val);
       continue;
     }
     let member = members.get(placing.player.playerName) || 0;
@@ -144,7 +145,9 @@ type MembersPerPosition = {
   second: number;
   third: number;
   last: number;
-} & {
+} & FirstThroughEighth;
+
+type FirstThroughEighth = {
   [K in 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8]?: number;
 };
 /**
@@ -154,13 +157,16 @@ type MembersPerPosition = {
  */
 export const calcMostPerPlacing = async (gameId: number) => {
   // I calculate it this way because there is a dynamic amount of players in a match,  know how many players are in a mat
-  let stat: StatNameValues<StatNames, "POS"> | undefined;
+  let stat: StatEndsWith<"POS"> | undefined;
   switch (gameId) {
     case 1:
-      stat = "MK8_POS";
+      stat = StatNames.MarioKartPosition;
       break;
-    case 2:
-      stat = "COD_POS";
+    case 3:
+      stat = StatNames.CodPosition;
+      break;
+    case 5:
+      stat = StatNames.SpeedrunnersPosition;
       break;
   }
 
@@ -175,8 +181,8 @@ export const calcMostPerPlacing = async (gameId: number) => {
         const race = [];
         for (const ps of match.playerSessions) {
           const pos = Number(ps.playerStats[0].value);
-          if (!pos) {
-            !pos && console.log("Not a number", pos);
+          if (isNaN(pos)) {
+            console.log("Not a number", pos);
             continue;
           }
           if (!members.has(ps.player.playerName))
@@ -237,16 +243,18 @@ export const calcMostPerPlacing = async (gameId: number) => {
  */
 export const calculateStatPerPlayer = async (
   gameId: number,
-  statName: StatNames,
+  statName: StatName,
 ) => {
   const stats = await getStatPerPlayer(gameId, statName);
+  console.log(stats);
   const members = new Map<string, number>();
 
   for (const { player, value } of stats) {
     const val = Number(value);
 
-    if (!val) {
+    if (isNaN(val)) {
       console.log("Not a number", val); // May want to do some logging
+      continue;
     }
 
     let member = members.get(player.playerName) || 0;

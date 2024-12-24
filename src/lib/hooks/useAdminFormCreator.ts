@@ -4,9 +4,12 @@ import { EnrichedSession } from "../../../prisma/types/session";
 import { EnrichedGameSet } from "../../../prisma/types/gameSet";
 import { EnrichedMatch } from "../../../prisma/types/match";
 import { Player } from "@prisma/client";
+import { EnrichedPlayerSession } from "../../../prisma/types/playerSession";
 
 const useAdminFormCreator = () => {
-  const [session, setSession] = useState<EnrichedSession>({
+  const [session, setSession] = useState<
+    Omit<EnrichedSession, "createdAt" | "updatedAt">
+  >({
     sessionId: 0,
     sessionName: "",
     sessionUrl: "",
@@ -41,15 +44,15 @@ const useAdminFormCreator = () => {
 
   const addSetToSession = (sessionId: number) => {
     console.log("Creating Set");
-    const newSet: EnrichedGameSet = {
+    const newSet: Omit<EnrichedGameSet, "createdAt" | "updatedAt"> = {
       setId: getNextTempSetId(),
       sessionId: sessionId,
       matches: [],
     };
 
     setSession((prevSession) => {
-      const updatedSets = [...prevSession.sets, newSet];
-      return { ...prevSession, sets: updatedSets };
+      const updatedSets = [...prevSession.sets, newSet] as (typeof newSet)[];
+      return { ...prevSession, sets: updatedSets } as unknown as typeof session;
     });
   };
 
@@ -59,26 +62,25 @@ const useAdminFormCreator = () => {
     console.log(`Creating Match for ${setId}`);
     // TODO: Add match winner
     const matchId = getNextTempMatchId();
-    const newMatch: EnrichedMatch = {
+    const newMatch: Omit<EnrichedMatch, "createdAt" | "updatedAt"> = {
       matchId: matchId,
       setId: setId,
       date: new Date(),
       playerSessions: [],
-      // Need to poulate playerSessions here
+      // Need to populate playerSessions here
     };
 
     for (let i = 0; i < sessionPlayers.length; i++) {
       const playerSessionIdOffset = (matchId - 1) * sessionPlayers.length;
       const adjustedPlayerSessionId = i + 1 + playerSessionIdOffset; // This is a hacky way to get the playerSessionId need to rework across the board
-
-      newMatch.playerSessions.push(
-        addPlayerSessionToMatch(
-          matchId,
-          setId,
-          sessionPlayers[i],
-          adjustedPlayerSessionId,
-        ),
-      );
+      // TODO temp bc of prisma bs
+      const newPlayerSession = addPlayerSessionToMatch(
+        matchId,
+        setId,
+        sessionPlayers[i],
+        adjustedPlayerSessionId,
+      ) as unknown;
+      newMatch.playerSessions.push(newPlayerSession as EnrichedPlayerSession);
     }
 
     console.log("New Match: ", newMatch);
@@ -94,7 +96,7 @@ const useAdminFormCreator = () => {
 
       console.log("Updated Sets: ", updatedSets);
 
-      return { ...prevSession, sets: updatedSets };
+      return { ...prevSession, sets: updatedSets } as typeof session;
     });
   };
 
@@ -106,12 +108,18 @@ const useAdminFormCreator = () => {
    *based on the selected players and populate playerSession with appropriate stats based on game
    */
 
+  //  TODO Use prisma types
   const addPlayerSessionToMatch = (
     matchId: number,
     setId: number,
     player: Player,
     playerSessionId: number,
   ) => {
+    const match = {
+      date: new Date(),
+      setId: setId,
+      matchId: matchId,
+    } as EnrichedPlayerSession["match"];
     return {
       sessionId: session.sessionId,
       setId: setId, // TODO: ????
@@ -119,11 +127,7 @@ const useAdminFormCreator = () => {
       matchId: matchId,
       playerId: player.playerId,
       playerStats: [],
-      match: {
-        date: new Date(),
-        setId: setId,
-        matchId: matchId,
-      },
+      match,
       player: {
         playerId: player.playerId,
         playerName: player.playerName,

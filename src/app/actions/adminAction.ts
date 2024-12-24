@@ -1,6 +1,6 @@
 "use server";
 
-import { Game, GameStat } from "@prisma/client";
+import { Game, GameStat, Player } from "@prisma/client";
 import prisma from "../../../prisma/db";
 import { FormValues } from "../(routes)/admin/_components/EntryCreatorForm";
 
@@ -38,7 +38,7 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
 export const insertNewSessionFromAdmin = async (session: FormValues) => {
   console.log("Inserting New Session: ", session);
   // Get latest session Id and create session
-  const latestSession = await prisma.session.findFirst({
+  const latestSession = await prisma.videoSession.findFirst({
     orderBy: {
       sessionId: "desc",
     },
@@ -55,7 +55,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
   });
 
   if (sessionGame) {
-    await prisma.session.upsert({
+    const newSession = await prisma.videoSession.upsert({
       where: { sessionId: newSessionId },
       update: {},
       create: {
@@ -65,112 +65,157 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
         sessionUrl: session.sessionUrl,
         thumbnail: session.thumbnail,
         date: session.date,
-        // date: Date.now(), // TODO: Add Date Picker or get date from youtube video
       },
     });
+
+    console.log("\n--- New Session Created: ---", newSession);
   }
 
   // For each set in the session assign to parent session
-  session.sets.forEach(async (set: any) => {
-    console.log("Creating Set From Admin Form Submission: ", set);
+  await Promise.all(
+    session.sets.map(async (set: any) => {
+      console.log("\n-- Creating Set From Admin Form Submission:  -- \n", set);
 
-    // const setWinnerConect = await set.setWinners.map((winner: any) => ({
-    //   playerId: winner.playerId,
-    // }));
+      // const setWinnerConect = await set.setWinners.map((winner: any) => ({
+      //   playerId: winner.playerId,
+      // }));
 
-    const setWinnerConnect = (set.setWinners || []).map((winner: any) => ({
-      playerId: winner.playerId,
-    }));
+      const setWinnerConnect = await (set?.setWinners ?? []).map(
+        (winner: any) => ({
+          playerId: winner.playerId,
+        }),
+      );
 
-    console.log("Set Winners: ", setWinnerConnect);
-    console.log("New session ID: ", newSessionId);
+      console.log("Set Winners: ", setWinnerConnect);
+      console.log("New session ID: ", newSessionId);
 
-    const newSet = await prisma.gameSet.create({
-      data: {
-        sessionId: newSessionId,
-      },
-    });
-
-    const updateSetWinners = await prisma.gameSet.update({
-      where: {
-        setId: newSet.setId,
-      },
-      data: {
-        setWinners: {
-          connect: setWinnerConnect,
-        },
-      },
-    });
-
-    console.log("New Set ID: ", newSet.setId);
-
-    // For each match in set assign to parent set
-    set.matches.forEach(async (match: any) => {
-      console.log("Creating Match From Admin Form Submission: ", match);
-
-      const matchWinnerConnect = match.matchWinners.map((winner: any) => ({
-        playerId: winner.playerId,
-      }));
-
-      const newMatch = await prisma.match.create({
+      const newSet = await prisma.gameSet.create({
         data: {
+          sessionId: newSessionId,
+        },
+      });
+
+      console.log("New Set ID: ", newSet.setId);
+
+      const updateSetWinners = await prisma.gameSet.update({
+        where: {
           setId: newSet.setId,
-          matchWinners: {
-            connect: matchWinnerConnect,
+        },
+        data: {
+          setWinners: {
+            connect: setWinnerConnect,
           },
         },
       });
 
-      // For each PlayerSession in  match assign to parent match`
-      match.playerSessions.forEach(async (playerSession: any) => {
-        console.log(
-          "Creating PlayerSession From Admin Form Submission: ",
-          playerSession,
-        );
+      // For each match in set assign to parent set
+      await Promise.all(
+        set.matches.map(async (match: any) => {
+          console.log("\n - Creating Match  - \n", match);
 
-        const playerSessionPlayer = await prisma.player.findFirst({
-          where: {
-            playerId: playerSession.playerId,
-          },
-        });
+          const matchWinnerConnect =
+            match?.matchWinners?.map((winner: any) => ({
+              playerId: winner.playerId,
+            })) ?? [];
 
-        if (playerSessionPlayer) {
-          const newPlayerSession = await prisma.playerSession.create({
+          console.log("Match Winners: ", matchWinnerConnect);
+          console.log("Set: ", set);
+
+          const newMatch = await prisma.match.create({
             data: {
-              playerId: playerSession.playerId,
-              sessionId: newSessionId,
-              matchId: newMatch.matchId,
               setId: newSet.setId,
+              matchWinners: {
+                connect: matchWinnerConnect,
+              },
             },
           });
 
-          // For each playerStat in playerSession assign to parent playerSession
-          playerSession.playerStats.forEach(async (playerStat: any) => {
-            console.log(
-              "Creating PlayerStat From Admin Form Submission: ",
-              playerStat,
-            );
+          console.log("New Match Created: ", newMatch);
 
-            // Get stat ID for stat Name // TODO: fix this to be more efficient
-            // StatID in playerStatAdmin form should be same as db
-            const gameStat = await prisma.gameStat.findFirst({
-              where: {
-                statName: playerStat.stat,
-              },
-            });
+          // For each PlayerSession in match assign to parent match`
+          await Promise.all(
+            match.playerSessions.map(async (playerSession: any) => {
+              console.log(
+                "\n  --- Creating PlayerSession  ---\n",
+                playerSession,
+              );
 
-            await prisma.playerStat.create({
-              data: {
-                playerSessionId: newPlayerSession.playerSessionId,
-                value: playerStat.statValue,
-                playerId: newPlayerSession.playerId,
-                gameId: sessionGame!.gameId,
-                statId: gameStat!.statId,
-              },
-            });
-          });
-        }
-      });
-    });
-  });
+              const playerSessionPlayer = await prisma.player.findUnique({
+                where: {
+                  playerId: playerSession.playerId,
+                },
+              });
+
+              if (!playerSessionPlayer) {
+                console.log(
+                  "!!! ERROR Player Not Found: !!!",
+                  playerSession.playerId,
+                );
+                return false;
+              }
+
+              console.log(
+                `Values to be inserted into newPlayerSession: PlayerId: ${playerSession.playerId}, SessionId: ${newSessionId}, MatchId: ${newMatch.matchId}, SetId: ${newSet.setId}`,
+              );
+
+              const newPlayerSession = await prisma.playerSession.create({
+                data: {
+                  playerId: playerSession.playerId,
+                  sessionId: newSessionId,
+                  matchId: newMatch.matchId,
+                  setId: newSet.setId,
+                },
+              });
+
+              console.log("New PlayerSession Created: ", newPlayerSession);
+
+              // For each playerStat in playerSession assign to parent playerSession
+              await Promise.all(
+                playerSession.playerStats.map(async (playerStat: any) => {
+                  console.log(
+                    "Creating PlayerStat From Admin Form Submission: ",
+                    playerStat,
+                  );
+
+                  const gameStat = await prisma.gameStat.findFirst({
+                    where: {
+                      statName: playerStat.stat,
+                    },
+                  });
+
+                  console.log("Found Game Stat: ", gameStat);
+
+                  console.log(
+                    "PlayerSessionId: ",
+                    newPlayerSession.playerSessionId,
+                  );
+                  console.log("Value: ", playerStat.statValue);
+                  console.log("PlayerId: ", newPlayerSession.playerId);
+                  console.log("GameId: ", sessionGame!.gameId);
+                  console.log("StatId: ", gameStat!.statId);
+                  console.log("Date: ", session.date);
+
+                  const sessionDate = new Date(session.date);
+                  console.log("Session Date: ", sessionDate);
+
+                  const newPlayerStat = await prisma.playerStat.create({
+                    data: {
+                      playerId: newPlayerSession.playerId,
+                      gameId: sessionGame!.gameId,
+                      playerSessionId: newPlayerSession.playerSessionId,
+                      statId: gameStat!.statId,
+                      value: playerStat.statValue,
+                      date: sessionDate,
+                    },
+                  });
+
+                  console.log("newPlayerStat Created: ", newPlayerStat);
+                }),
+              );
+            }),
+          );
+        }),
+      );
+    }),
+  );
 };
