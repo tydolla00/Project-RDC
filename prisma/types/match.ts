@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 
-const enrichedMatch = Prisma.validator<Prisma.MatchArgs>()({
+const enrichedMatch = Prisma.validator<Prisma.Match$matchWinnersArgs>()({
   include: {
     playerSessions: {
       include: {

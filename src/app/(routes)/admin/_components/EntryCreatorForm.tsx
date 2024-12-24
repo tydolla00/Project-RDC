@@ -1,17 +1,22 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
 import { insertNewSessionFromAdmin } from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { formSchema, FormValues } from "../_utils/form-helpers";
+import { AdminFormProps } from "../_utils/form-helpers";
+import { useAdmin } from "@/lib/adminContext";
 import { useFormStatus } from "react-dom";
 import { SessionInfo } from "./SessionInfo";
-import { AdminFormProps, FormValues, formSchema } from "../_utils/form-helpers";
+
+interface Props {
+  rdcMembers: Player[];
+}
 
 const EntryCreatorForm = (props: AdminFormProps) => {
   const { rdcMembers } = props;
@@ -25,19 +30,32 @@ const EntryCreatorForm = (props: AdminFormProps) => {
       players: [],
       sets: [],
     },
+    mode: "onChange",
   });
 
   const {
-    register,
     handleSubmit,
     control,
     watch,
     formState: { errors, defaultValues, isValid: formIsValid },
     setValue,
+    getValues,
   } = form;
 
-  console.log("Admin Form", watch());
-  console.log("Watch: ", watch("sets.0.setWinners.0"));
+  const { gameStats, getGameStatsFromDb } = useAdmin();
+  const game = watch("game");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (game) {
+        await getGameStatsFromDb(game);
+      }
+    };
+    fetchData();
+  }, [game, getGameStatsFromDb]);
+
+  const url = watch("sessionUrl");
+  console.log("Errors: ", errors);
 
   /**
    * Submit method called when EntryCreatorForm submit button clicked
@@ -45,11 +63,20 @@ const EntryCreatorForm = (props: AdminFormProps) => {
    * in EntryCreator form
    */
   const onSubmit = async (data: FormValues) => {
-    console.log("---Admin Form Submission Data---: ", data);
+    console.log("Form Data Being Submitted:", {
+      data,
+      stringified: JSON.stringify(data, null, 2),
+    });
+
+    // data.date = new Date(data.date);
+    // console.log("Date Type in submit:", typeof data.date);
+
     insertNewSessionFromAdmin(data);
     console.log("TOasted");
     toast.success("Session successfully created.", { richColors: true });
   };
+
+  // console.log("Date Type:", typeof getValues().date);
 
   /**
    * Handles errors that occur during form submission.
@@ -80,7 +107,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
         >
           <SessionInfo form={form} rdcMembers={rdcMembers} />
           <div className="order-3 col-span-2 md:order-none">
-            <SetManager control={control} />
+            <SetManager />
             <Submit formIsValid={formIsValid} />
           </div>
         </form>

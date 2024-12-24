@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  // previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -37,28 +38,52 @@ model Player {
 
 // { game_id: 1, game_name: 'Mario Kart', game_stats: [], player_game_stats: [] }
 model Game {
-  gameId      Int          @id @default(autoincrement()) @map("game_id")
-  gameName    String       @map("game_name")
+  gameId      Int           @id @default(autoincrement()) @map("game_id")
+  gameName    String        @map("game_name")
   gameStats   GameStat[]
   playerStats PlayerStat[]
-  sessions    Session[]
-
+  sessions    VideoSession[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   @@map("games")
 }
 
-// { stat_id: 1, game_id: 1, stat_name: 'mk_first', stat_value: '0', date: 2024-10-23 12:00:00 }
-model GameStat {
-  statId      Int          @id @default(autoincrement()) @map("stat_id") // TODO: MAKE ENUM
-  statName    String       @map("stat_name")
-  gameId      Int          @map("game_id")
-  game        Game         @relation(fields: [gameId], references: [gameId])
-  playerStats PlayerStat[]
-  type        String?      @map("type")
+// Define enum for stat names
+// Keep in sync with enum in utils and seed.
+enum StatName {
+  MK8_POS
+  MK8_DAY
+  RL_SCORE
+  RL_GOALS
+  RL_ASSISTS
+  RL_SAVES
+  RL_SHOTS
+  RL_DAY
+  COD_KILLS
+  COD_DEATHS
+  COD_SCORE
+  COD_POS
+  LC_DEATHS
+  SR_WINS
+  SR_SETS
+  SR_POS
+}
 
+// { stat_id: 1, game_id: 1, stat_name: 'MK_POS', playerStats: [], type: 'int' }
+model GameStat {
+  statId      Int           @id @default(autoincrement()) @map("stat_id")
+  statName    StatName      @map("stat_name")
+  gameId      Int           @map("game_id")
+  game        Game          @relation(fields: [gameId], references: [gameId])
+  playerStats PlayerStat[]
+  type        String?       @map("type") // Don't think there is any stat there is not an int can probably remove
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   @@map("game_stats")
 }
 
-model Session {
+model VideoSession {
   sessionId   Int       @id @default(autoincrement()) @map("session_id")
   sessionName String    @map("session_name")
   sessionUrl  String    @map("session_url")
@@ -67,30 +92,36 @@ model Session {
   sets        GameSet[]
   thumbnail   String
   date        DateTime  @default(now()) // Date video posted
-
-  @@map("sessions")
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@map("video_sessions")
 }
 
 // Set Table Concept 
 model GameSet {
-  setId          Int             @id @default(autoincrement()) @map("set_id")
+  setId          Int            @id @default(autoincrement()) @map("set_id")
   playerSessions PlayerSession[]
   matches        Match[]
-  sessionId      Int             @map("session_id")
-  session        Session         @relation(fields: [sessionId], references: [sessionId])
+  sessionId      Int            @map("session_id")
+  session        VideoSession   @relation(fields: [sessionId], references: [sessionId])
   setWinners     Player[]
-
+  
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   @@map("sets")
 }
 
 model Match {
-  matchId        Int             @id @default(autoincrement()) @map("match_id")
+  matchId        Int            @id @default(autoincrement()) @map("match_id")
   matchWinners   Player[]
   playerSessions PlayerSession[]
-  setId          Int             @map("set_id")
-  set            GameSet         @relation(fields: [setId], references: [setId])
-  date           DateTime        @default(now()) // Date video posted
-
+  setId          Int            @map("set_id")
+  set            GameSet        @relation(fields: [setId], references: [setId])
+  date           DateTime       @default(now()) // Date video posted
+  
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   @@map("matches")
 }
 
@@ -105,7 +136,9 @@ model PlayerSession {
   match           Match        @relation(fields: [matchId], references: [matchId])
   setId           Int          @map("set_id")
   set             GameSet      @relation(fields: [setId], references: [setId])
-
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
   @@map("player_sessions")
 }
 
@@ -124,4 +157,74 @@ model PlayerStat {
   date            DateTime      @default(now()) // Date video posted
 
   @@map("player_stats")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+ 
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+ 
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+ 
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([provider, providerAccountId])
+}
+ 
+model Session {
+  sessionToken String       @unique
+  userId       String
+  expires      DateTime
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+ 
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@id([identifier, token])
+}
+ 
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String   @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+ 
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([userId, credentialID])
 }
