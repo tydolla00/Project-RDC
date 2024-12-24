@@ -4,4 +4,5 @@ export enum StatNames {
   CodDays = "COD_DAY",
   CodPosition = "COD_POS",
   RLScore = "RL_SCORE",
+  SpeedrunnersPosition = "SR_POS",
 }

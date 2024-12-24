@@ -58,13 +58,14 @@ const PlayerSessionManager = (props: Props) => {
     return field?.playerSessionName ?? 0;
   };
 
+  console.log("PlayerSessionManager Fields: ", fields);
+
   return (
     <div className="flex flex-wrap gap-5">
       {fields.map((field, sessionIndex) => {
         return (
           <div className="flex flex-col" key={field.id}>
             <Label className="font-bold">{getPlayerNameFromField(field)}</Label>
-
             <PlayerStatManager
               {...props}
               playerSessionIndex={sessionIndex}
