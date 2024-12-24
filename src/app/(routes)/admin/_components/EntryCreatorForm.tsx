@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import GameDropDownForm from "./GameDropDownForm";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +16,7 @@ import { AdminDatePicker } from "./AdminDatePicker";
 import { getRDCVideoDetails } from "@/app/actions/action";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAdmin } from "@/lib/adminContext";
 
 interface Props {
   rdcMembers: Player[];
@@ -90,7 +91,6 @@ export const formSchema = z.object({
 });
 
 // TODO: How to handle type to get the form values more reliably
-// TODO Do we want to conditionally apply input types/validations based on the stat name? Most will be numbers
 export type FormValues = z.infer<typeof formSchema>;
 
 const EntryCreatorForm = (props: Props) => {
@@ -114,7 +114,6 @@ const EntryCreatorForm = (props: Props) => {
   });
 
   const {
-    register,
     handleSubmit,
     control,
     watch,
@@ -123,10 +122,19 @@ const EntryCreatorForm = (props: Props) => {
     getValues,
   } = form;
 
-  const url = watch("sessionUrl");
+  const { gameStats, getGameStatsFromDb } = useAdmin();
+  const game = watch("game");
 
-  console.log("Admin Form", watch());
-  // console.log("Watch: ", watch("sets.0.setWinners.0"));
+  useEffect(() => {
+    const fetchData = async () => {
+      if (game) {
+        await getGameStatsFromDb(game);
+      }
+    };
+    fetchData();
+  }, [game, getGameStatsFromDb]);
+
+  const url = watch("sessionUrl");
   console.log("Errors: ", errors);
 
   /**

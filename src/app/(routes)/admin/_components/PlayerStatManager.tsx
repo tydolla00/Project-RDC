@@ -1,10 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Player } from "@prisma/client";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { getGameStats } from "@/app/actions/adminAction";
 import { FormValues } from "./EntryCreatorForm";
 import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAdmin } from "@/lib/adminContext";
 
 interface Props {
   player: Player;
@@ -30,7 +32,8 @@ const PlayerStatManager = (props: Props) => {
     control,
   });
 
-  console.log("Player Session ", playerSessionIndex);
+  const [loading, setLoading] = useState(true);
+  const { gameStats } = useAdmin();
 
   // TODO: Move to PlayerSessionManager or above
   useEffect(() => {
@@ -39,34 +42,20 @@ const PlayerStatManager = (props: Props) => {
       getValues(`sets.${setIndex}.matches.${matchIndex}.playerSessions`),
     );
 
+    // Returns all the playerStats for the match
     const getPlayerSessionStats = () => {
       const values = getValues();
+      console.log(" Get PlayerSessionStats Values: ", values);
       const playerSession =
         values.sets[setIndex].matches[matchIndex].playerSessions[
           playerSessionIndex
         ];
+      console.log("PlayerSessionStatGet: ", playerSession.playerStats);
       return playerSession.playerStats;
     };
 
     const fetchGameStats = async () => {
-      const game: string = getValues(`game`);
-      let gameStats: {
-        type: string | null;
-        statId: number;
-        statName: string;
-        gameId: number;
-      }[] = [];
-
-      if (game) {
-        console.log("Fetched Game: ", game);
-
-        gameStats = await getGameStats(game);
-        console.log("Found Game Stats: ", gameStats);
-      }
-
       const existingStats = getPlayerSessionStats();
-      console.log("PlayerStats", existingStats);
-
       gameStats.forEach((stat) => {
         const statExists = existingStats.some(
           (existingStat) => existingStat.stat === stat.statName,
@@ -77,11 +66,13 @@ const PlayerStatManager = (props: Props) => {
           append({ statId: uuidv4(), stat: stat.statName, statValue: "" });
         }
       });
+      setLoading(false);
     };
     fetchGameStats();
-  }, [append, getValues, matchIndex, playerSessionIndex, setIndex]);
+  }, [append, getValues, matchIndex, playerSessionIndex, setIndex, gameStats]);
 
   console.log("PlayerStatManagerFields: ", fields);
+  console.log("Loading: ", loading);
 
   return (
     <>
