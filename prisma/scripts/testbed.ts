@@ -9,7 +9,7 @@ async function main() {
 /// Fetched Enriched Mario Kart Session
 async function getLatestMarioKartSession() {
   try {
-    const latestMKPlayerSessions = await prisma.session.findFirst({
+    const latestMKPlayerSessions = await prisma.videoSession.findFirst({
       where: {
         gameId: 1,
       },

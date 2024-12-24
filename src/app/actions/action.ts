@@ -13,7 +13,9 @@ export const updateAuthStatus = async (session: Session | null) => {
   session ? await signOut({ redirectTo: "/" }) : await signIn("github");
 };
 
-type FindManySessions = Awaited<ReturnType<typeof prisma.session.findMany>>[0];
+type FindManySessions = Awaited<
+  ReturnType<typeof prisma.videoSession.findMany>
+>[0];
 
 export const getRDCVideoDetails = async (
   videoId: string,
@@ -24,7 +26,7 @@ export const getRDCVideoDetails = async (
     })
   | undefined
 > => {
-  const sessions = await prisma.session.findMany();
+  const sessions = await prisma.videoSession.findMany();
 
   // TODO only store videoId in the db.
   const session = sessions.find((session) => session.sessionUrl === videoId);

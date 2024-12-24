@@ -7,7 +7,6 @@ async function main() {
   await seedSession(1);
 
   /**
-   * If you reaaaallllyy want to real data...
    * Here is where you would put in match results. Each list is
    * a match and the index is the playerId -1
    * e.g Ben's results are all index 2
@@ -112,11 +111,7 @@ async function seedGames() {
     data: {
       gameName: "Mario Kart",
       gameStats: {
-        create: [
-          {
-            statName: "MK8_POS",
-          },
-        ],
+        create: [{ statName: "MK8_POS" }, { statName: "MK8_DAY" }],
       },
     },
   });
@@ -126,21 +121,12 @@ async function seedGames() {
       gameName: "Rocket League",
       gameStats: {
         create: [
-          {
-            statName: "RL_SCORE",
-          },
-          {
-            statName: "RL_GOALS",
-          },
-          {
-            statName: "RL_SAVES",
-          },
-          {
-            statName: "RL_ASSISTS",
-          },
-          {
-            statName: "RL_SHOTS",
-          },
+          { statName: "RL_SCORE" },
+          { statName: "RL_GOALS" },
+          { statName: "RL_SAVES" },
+          { statName: "RL_ASSISTS" },
+          { statName: "RL_SHOTS" },
+          { statName: "RL_DAY" },
         ],
       },
     },
@@ -151,15 +137,10 @@ async function seedGames() {
       gameName: "Call of Duty",
       gameStats: {
         create: [
-          {
-            statName: "COD_SCORE",
-          },
-          {
-            statName: "COD_KILLS",
-          },
-          {
-            statName: "COD_DEATHS",
-          },
+          { statName: "COD_SCORE" },
+          { statName: "COD_KILLS" },
+          { statName: "COD_DEATHS" },
+          { statName: "COD_POS" },
         ],
       },
     },
@@ -168,11 +149,7 @@ async function seedGames() {
     data: {
       gameName: "Lethal Company",
       gameStats: {
-        create: [
-          {
-            statName: "LC_DEATHS",
-          },
-        ],
+        create: [{ statName: "LC_DEATHS" }],
       },
     },
   });
@@ -181,12 +158,9 @@ async function seedGames() {
       gameName: "Speedrunners",
       gameStats: {
         create: [
-          {
-            statName: "SR_SETS",
-          },
-          {
-            statName: "SR_WINS",
-          },
+          { statName: "SR_SETS" },
+          { statName: "SR_WINS" },
+          { statName: "SR_POS" },
         ],
       },
     },
@@ -199,7 +173,7 @@ async function seedGames() {
 async function seedSession(sessionId: number) {
   console.log(`\n--- Seeding Game Session ${sessionId} ---`);
 
-  const marioKartSession = await prisma.session.create({
+  const marioKartSession = await prisma.videoSession.create({
     data: {
       gameId: 1,
       sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",

@@ -38,7 +38,7 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
 export const insertNewSessionFromAdmin = async (session: FormValues) => {
   console.log("Inserting New Session: ", session);
   // Get latest session Id and create session
-  const latestSession = await prisma.session.findFirst({
+  const latestSession = await prisma.videoSession.findFirst({
     orderBy: {
       sessionId: "desc",
     },
@@ -55,7 +55,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
   });
 
   if (sessionGame) {
-    const newSession = await prisma.session.upsert({
+    const newSession = await prisma.videoSession.upsert({
       where: { sessionId: newSessionId },
       update: {},
       create: {
