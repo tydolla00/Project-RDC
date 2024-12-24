@@ -59,14 +59,6 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-      components={{
-        Chevron: (props) => {
-          if (props.orientation === "left") {
-            return <ChevronLeftIcon {...props} />;
-          }
-          return <ChevronRightIcon {...props} />;
-        },
-      }}
       {...props}
     />
   );
