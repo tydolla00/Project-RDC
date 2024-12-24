@@ -70,7 +70,7 @@ export const calcAvgPerPlayer = (
 
   const data = Array.from(avgPlacingPerPlayer, ([key, val]) => ({
     player: key,
-    placing: val.avg,
+    avg: val.avg,
     played: val.count,
   }));
 
