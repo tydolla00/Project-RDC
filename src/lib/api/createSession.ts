@@ -9,7 +9,7 @@ export default async function handler(
   if (req.method === "POST") {
     const { sessionName, sessionUrl, gameId, thumbnail, date } = req.body;
     try {
-      const newSession = await prisma.session.create({
+      const newSession = await prisma.videoSession.create({
         data: {
           sessionName,
           sessionUrl,

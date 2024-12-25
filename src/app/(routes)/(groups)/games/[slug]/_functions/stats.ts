@@ -1,8 +1,9 @@
+import { StatName } from "@prisma/client";
 import {
   getWinsPerPlayer,
   getScoreStatsPerPlayer,
   getMatchesPerGame,
-  StatNameValues,
+  StatEndsWith,
   getStatPerPlayer,
 } from "../../../../../../../prisma/lib/games";
 import { StatNames } from "../../../../../../../prisma/lib/utils";
@@ -16,9 +17,8 @@ export const getAllStats = async (game: {
   gameId: number;
   gameName: string;
 }) => {
-  let stat:
-    | StatNameValues<StatNames, "POS">
-    | StatNameValues<StatNames, "SCORE"> = "COD_POS";
+  let stat: StatEndsWith<"POS"> | StatEndsWith<"SCORE"> =
+    StatNames.MarioKartPosition;
 
   switch (game.gameId) {
     case 1:
@@ -154,13 +154,16 @@ type MembersPerPosition = {
  */
 export const calcMostPerPlacing = async (gameId: number) => {
   // I calculate it this way because there is a dynamic amount of players in a match,  know how many players are in a mat
-  let stat: StatNameValues<StatNames, "POS"> | undefined;
+  let stat: StatEndsWith<"POS"> | undefined;
   switch (gameId) {
     case 1:
-      stat = "MK8_POS";
+      stat = StatNames.MarioKartPosition;
       break;
-    case 2:
-      stat = "COD_POS";
+    case 3:
+      stat = StatNames.CodPosition;
+      break;
+    case 5:
+      stat = StatNames.SpeedrunnersPosition;
       break;
   }
 
@@ -237,7 +240,7 @@ export const calcMostPerPlacing = async (gameId: number) => {
  */
 export const calculateStatPerPlayer = async (
   gameId: number,
-  statName: StatNames,
+  statName: StatName,
 ) => {
   const stats = await getStatPerPlayer(gameId, statName);
   const members = new Map<string, number>();

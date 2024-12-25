@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 
-const enrichedSession = Prisma.validator<Prisma.SessionDefaultArgs>()({
+const enrichedSession = Prisma.validator<Prisma.VideoSessionDefaultArgs>()({
   include: {
     sets: {
       include: {
@@ -18,4 +18,6 @@ const enrichedSession = Prisma.validator<Prisma.SessionDefaultArgs>()({
   },
 });
 
-export type EnrichedSession = Prisma.SessionGetPayload<typeof enrichedSession>;
+export type EnrichedSession = Prisma.VideoSessionGetPayload<
+  typeof enrichedSession
+>;

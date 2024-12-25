@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
-import { StatNames } from "./utils";
 import prisma from "../db";
+import { StatName } from "@prisma/client";
 
 // ! Tags takes an array of tags if you invalidate a tag any method with that tag will also be invalidated.
 // ! So I need to figure out in which scenarios do I want to invalidate only a function or a whole game.
@@ -28,7 +28,7 @@ export const getAllGames = function () {
 export const getSetsPerPlayer = function (gameId: number) {
   return unstable_cache(
     async () =>
-      await prisma.session.findMany({
+      await prisma.videoSession.findMany({
         where: { gameId },
         include: { sets: { select: { _count: true, matches: true } } },
       }),
@@ -43,9 +43,9 @@ export const getSetsPerPlayer = function (gameId: number) {
  * @param statName Statname, must end in _DAY
  * @returns all player records and value with the statName.
  */
-export const getDaysPerPlayer = function <T extends StatNames = StatNames>(
+export const getDaysPerPlayer = function <T extends StatName = StatName>(
   gameId: number,
-  statName: StatNameValues<T, "DAY">,
+  statName: StatEndsWith<"DAY", T>,
 ) {
   return unstable_cache(
     async () =>
@@ -95,11 +95,9 @@ export const getWinsPerPlayer = function (gameId: number) {
  * @param statName Statname, must end in _POS or _SCORE
  * @returns all player records with position stats
  */
-export const getScoreStatsPerPlayer = function <
-  T extends StatNames = StatNames,
->(
+export const getScoreStatsPerPlayer = function <T extends StatName = StatName>(
   gameId: number,
-  statName: StatNameValues<T, "POS"> | StatNameValues<T, "SCORE">,
+  statName: StatEndsWith<"POS", T> | StatEndsWith<"SCORE", T>,
 ) {
   return unstable_cache(
     async () =>
@@ -121,13 +119,13 @@ export const getScoreStatsPerPlayer = function <
  * @param statName Statname of the stat you are checking for, muste end in _POS for now.
  * @returns all player records with a given statname
  */
-export const getMatchesPerGame = function <T extends StatNames = StatNames>(
+export const getMatchesPerGame = function <T extends StatName = StatName>(
   gameId: number,
-  statName: StatNameValues<T, "POS">,
+  statName: StatEndsWith<"POS", T>,
 ) {
   return unstable_cache(
     async () =>
-      await prisma.session.findMany({
+      await prisma.videoSession.findMany({
         where: { gameId },
         select: {
           sets: {
@@ -167,7 +165,7 @@ export const getMatchesPerGame = function <T extends StatNames = StatNames>(
  * @param statName Statname of the stat you are checking for.
  * @returns Array of play records
  */
-export const getStatPerPlayer = function (gameId: number, statName: StatNames) {
+export const getStatPerPlayer = function (gameId: number, statName: StatName) {
   return unstable_cache(
     async () =>
       await prisma.playerStat.findMany({
@@ -179,11 +177,7 @@ export const getStatPerPlayer = function (gameId: number, statName: StatNames) {
   )();
 };
 
-export type StatNameValues<
-  T extends StatNames,
-  Y extends string,
-> = T extends StatNames
-  ? T extends `${infer u}_${Y}`
-    ? `${u}_${Y}`
-    : never
-  : never;
+export type StatEndsWith<
+  T extends string,
+  Y extends StatName = StatName,
+> = Y extends StatName ? (Y extends `${infer u}_${T}` ? Y : never) : never;

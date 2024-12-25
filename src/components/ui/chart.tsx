@@ -52,7 +52,7 @@ const ChartContainer = React.forwardRef<
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
   return (
-    <ChartContext.Provider value={{ config }}>
+    <ChartContext value={{ config }}>
       <div
         data-chart={chartId}
         ref={ref}
@@ -67,7 +67,7 @@ const ChartContainer = React.forwardRef<
           {children}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
-    </ChartContext.Provider>
+    </ChartContext>
   );
 });
 ChartContainer.displayName = "Chart";
