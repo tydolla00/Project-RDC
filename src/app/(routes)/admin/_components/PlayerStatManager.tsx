@@ -74,6 +74,7 @@ const PlayerStatManager = (props: Props) => {
   console.log("PlayerStatManagerFields: ", fields);
   console.log("Loading: ", loading);
 
+  // TODO Fix bug, when changing the games doesn't remove stale inputs
   return (
     <>
       {fields.map((field, index: number) => {

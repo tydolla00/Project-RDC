@@ -119,6 +119,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 const Submit = ({ formIsValid }: { formIsValid: boolean }) => {
   const { pending } = useFormStatus();
 
+  // TODO add review screen logic before form is truly submitted.
   return (
     <Button
       disabled={!formIsValid || pending}
