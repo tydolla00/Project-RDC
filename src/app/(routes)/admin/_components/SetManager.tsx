@@ -7,7 +7,6 @@ import {
   useWatch,
 } from "react-hook-form";
 import { z } from "zod";
-import { formSchema } from "./EntryCreatorForm";
 import MatchManager from "./MatchManager";
 import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import WinnerDisplay from "./WinnerDisplay";
 import { Label } from "@/components/ui/label";
+import { formSchema } from "../_utils/form-helpers";
 
 const SetManager = () => {
   const { watch, formState, control } =

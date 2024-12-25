@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
 import { Control, ControllerRenderProps } from "react-hook-form";
 import { z } from "zod";
-import { formSchema, FormValues } from "./EntryCreatorForm";
 import { cn } from "@/lib/utils";
+import { formSchema, FormValues } from "../_utils/form-helpers";
 interface Props {
   rdcMembers: Player[];
   handlePlayerClick?: (player: Player) => void;
@@ -47,7 +47,7 @@ const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
       id="player-selector-container"
     >
       {rdcMembers?.length !== 0 ? (
-        <div className="mt-2 grid grid-cols-8">
+        <div className="mt-2 flex flex-wrap gap-y-1 sm:grid sm:grid-cols-8">
           {rdcMembers.map((player, index) => (
             <div key={player.playerId} className="relative">
               <div

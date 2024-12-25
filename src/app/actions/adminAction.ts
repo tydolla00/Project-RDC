@@ -2,7 +2,7 @@
 
 import { Game, GameStat, Player } from "@prisma/client";
 import prisma from "../../../prisma/db";
-import { FormValues } from "../(routes)/admin/_components/EntryCreatorForm";
+import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 
 /**
  * Get all game objects from the database
