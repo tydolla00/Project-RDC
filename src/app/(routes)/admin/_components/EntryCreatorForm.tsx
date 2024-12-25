@@ -150,10 +150,10 @@ const EntryCreatorForm = (props: Props) => {
 
     // data.date = new Date(data.date);
     // console.log("Date Type in submit:", typeof data.date);
-
-    insertNewSessionFromAdmin(data);
-    console.log("TOasted");
-    toast.success("Session successfully created.", { richColors: true });
+    const err = await insertNewSessionFromAdmin(data);
+    if (err === null)
+      toast.error("Video already submitted", { richColors: true });
+    else toast.success("Session successfully created.", { richColors: true });
   };
 
   // console.log("Date Type:", typeof getValues().date);

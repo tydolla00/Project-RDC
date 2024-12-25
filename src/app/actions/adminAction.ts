@@ -34,7 +34,7 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
   });
   return gameStats;
 }
-
+// TODO Handle proper error states
 export const insertNewSessionFromAdmin = async (session: FormValues) => {
   console.log("Inserting New Session: ", session);
   // Get latest session Id and create session
@@ -46,7 +46,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
 
   const newSessionId = latestSession ? latestSession.sessionId + 1 : 1;
 
-  console.log("Trying new sessio ID: ", newSessionId);
+  console.log("Trying new session ID: ", newSessionId);
 
   const sessionGame = await prisma.game.findFirst({
     where: {
@@ -54,7 +54,21 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
     },
   });
 
-  if (sessionGame) {
+  console.log({ sessionGame });
+
+  if (!sessionGame) {
+    // TODO This should never happen game should be required.
+    return null;
+  } else {
+    const videoAlreadyExists = await prisma.videoSession.findFirst({
+      where: {
+        gameId: sessionGame?.gameId,
+        AND: { sessionName: session.sessionName },
+      },
+    });
+
+    if (videoAlreadyExists) return null;
+
     const newSession = await prisma.videoSession.upsert({
       where: { sessionId: newSessionId },
       update: {},
@@ -72,6 +86,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
   }
 
   // For each set in the session assign to parent session
+  // TODO We might want to change these to be transactions. Need to explain the promise.all to me.
   await Promise.all(
     session.sets.map(async (set: any) => {
       console.log("\n-- Creating Set From Admin Form Submission:  -- \n", set);
