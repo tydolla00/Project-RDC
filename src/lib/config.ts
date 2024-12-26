@@ -30,9 +30,9 @@ const getSanitizedConfig = (
   config: Config,
 ): { [key in keyof typeof config]: string } => {
   for (const [key, val] of Object.entries(config)) {
-    if (val === undefined && window === undefined) {
-      throw new Error(`Missing key ${key} in .env`);
-    }
+    // if (val === undefined && window === undefined) {
+    //   throw new Error(`Missing key ${key} in .env`);
+    // }
   }
   const c = { ...config } as unknown;
   return c as { [key in keyof typeof config]: string };
