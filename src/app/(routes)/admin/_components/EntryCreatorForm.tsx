@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import GameDropDownForm from "./GameDropDownForm";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +16,7 @@ import { AdminDatePicker } from "./AdminDatePicker";
 import { getRDCVideoDetails } from "@/app/actions/action";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAdmin } from "@/lib/adminContext";
 
 interface Props {
   rdcMembers: Player[];
@@ -36,7 +37,7 @@ export const formSchema = z.object({
       "Please paste in a valid youtube url.",
     )
     .max(100)
-    .includes("dummy", { message: "Invalid URL" }),
+    .includes("v=", { message: "Invalid URL" }),
   date: z.date().readonly(),
   thumbnail: z.string().readonly(),
   players: z.array(
@@ -74,7 +75,7 @@ export const formSchema = z.object({
                   playerSessionName: z.string(),
                   playerStats: z.array(
                     z.object({
-                      statId: z.string(),
+                      statId: z.string(), // Note this statId is not the same as the statId used in the schema
                       stat: z.string(),
                       statValue: z.string(),
                     }),
@@ -90,7 +91,6 @@ export const formSchema = z.object({
 });
 
 // TODO: How to handle type to get the form values more reliably
-// TODO Do we want to conditionally apply input types/validations based on the stat name? Most will be numbers
 export type FormValues = z.infer<typeof formSchema>;
 
 const EntryCreatorForm = (props: Props) => {
@@ -110,21 +110,32 @@ const EntryCreatorForm = (props: Props) => {
       players: [],
       sets: [],
     },
+    mode: "onChange",
   });
 
   const {
-    register,
     handleSubmit,
     control,
     watch,
     formState: { errors, defaultValues, isValid: formIsValid },
     setValue,
+    getValues,
   } = form;
 
-  const url = watch("sessionUrl");
+  const { gameStats, getGameStatsFromDb } = useAdmin();
+  const game = watch("game");
 
-  console.log("Admin Form", watch());
-  console.log("Watch: ", watch("sets.0.setWinners.0"));
+  useEffect(() => {
+    const fetchData = async () => {
+      if (game) {
+        await getGameStatsFromDb(game);
+      }
+    };
+    fetchData();
+  }, [game, getGameStatsFromDb]);
+
+  const url = watch("sessionUrl");
+  console.log("Errors: ", errors);
 
   /**
    * Submit method called when EntryCreatorForm submit button clicked
@@ -132,11 +143,20 @@ const EntryCreatorForm = (props: Props) => {
    * in EntryCreator form
    */
   const onSubmit = async (data: FormValues) => {
-    console.log("---Admin Form Submission Data---: ", data);
+    console.log("Form Data Being Submitted:", {
+      data,
+      stringified: JSON.stringify(data, null, 2),
+    });
+
+    // data.date = new Date(data.date);
+    // console.log("Date Type in submit:", typeof data.date);
+
     insertNewSessionFromAdmin(data);
     console.log("TOasted");
     toast.success("Session successfully created.", { richColors: true });
   };
+
+  // console.log("Date Type:", typeof getValues().date);
 
   /**
    * Handles errors that occur during form submission.
@@ -172,26 +192,38 @@ const EntryCreatorForm = (props: Props) => {
 
     setIsFetching(true);
 
-    // Get v=
-
     const video = await getRDCVideoDetails(newUrl);
     if (!video) {
       form.reset(undefined, { keepIsValid: true });
       toast.error("Please upload a video by RDC Live", { richColors: true });
     } else {
-      setValue("sessionName", video.sessionName);
+      setValue("sessionName", video.sessionName, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
       setValue(
         "thumbnail",
         typeof video.thumbnail === "string"
           ? video.thumbnail
           : video.thumbnail.url,
+        {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        },
       );
-      setValue("date", video.date);
+      setValue("date", new Date(video.date), {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
       setSession(video);
       toast.success("Youtube video successfully linked.", { richColors: true });
     }
 
     console.log(video);
+    console.log("Form values after update:", getValues());
 
     setIsFetching(false);
   };
@@ -269,7 +301,7 @@ const EntryCreatorForm = (props: Props) => {
               className="flex flex-wrap items-center justify-between gap-y-2"
             >
               <FormField
-                disabled
+                // disabled
                 control={form.control}
                 name="sessionName"
                 render={({ field }) => (
@@ -290,7 +322,6 @@ const EntryCreatorForm = (props: Props) => {
               />
 
               <FormField
-                disabled
                 control={form.control}
                 name="thumbnail"
                 render={({ field }) => (
@@ -320,9 +351,9 @@ const EntryCreatorForm = (props: Props) => {
             </div>
           </div>
           <div className="order-3 col-span-2 md:order-none">
-            <SetManager control={control} />
+            <SetManager />
             <Button
-              disabled={!formIsValid}
+              // disabled={!formIsValid}
               type="submit"
               className="my-2 w-full rounded-md border p-2 sm:w-80"
             >
