@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate --sql",
     "build": "next build",
     "build-memory": "next build --experimental-debug-memory-usage",
     "start": "next start",
