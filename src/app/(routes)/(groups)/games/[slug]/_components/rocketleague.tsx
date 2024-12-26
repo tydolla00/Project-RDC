@@ -10,17 +10,21 @@ const RocketLeague = async ({
   const members = await getAllMembers();
   let membersMap = await Promise.all(
     members.map(async (member) => {
-      const [goals, assists, saves, score, days] = await getRLStats(
-        member.playerId,
-      );
-      return {
-        ...member,
-        goals: { sum: Number(goals?.sum), avg: Number(goals?.avg) },
-        assists: { sum: Number(assists?.sum), avg: Number(assists?.avg) },
-        saves: { sum: Number(saves?.sum), avg: Number(assists?.avg) },
-        score: { sum: Number(score?.sum), avg: Number(score?.avg) },
-        days: { sum: Number(days?.sum), avg: Number(days?.avg) },
-      };
+      try {
+        const [goals, assists, saves, score, days] = await getRLStats(
+          member.playerId,
+        );
+        return {
+          ...member,
+          goals: { sum: Number(goals?.sum), avg: Number(goals?.avg) },
+          assists: { sum: Number(assists?.sum), avg: Number(assists?.avg) },
+          saves: { sum: Number(saves?.sum), avg: Number(assists?.avg) },
+          score: { sum: Number(score?.sum), avg: Number(score?.avg) },
+          days: { sum: Number(days?.sum), avg: Number(days?.avg) },
+        };
+      } catch (error) {
+        // TODO Do something if one of the requests fail.
+      }
     }),
   );
   console.log({ membersMap });
