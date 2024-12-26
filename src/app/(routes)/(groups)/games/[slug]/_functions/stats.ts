@@ -1,88 +1,28 @@
 import { StatName } from "@prisma/client";
 import {
   getWinsPerPlayer,
-  getScoreStatsPerPlayer,
   getMatchesPerGame,
   StatEndsWith,
   getStatPerPlayer,
+  getSumPerStat,
 } from "../../../../../../../prisma/lib/games";
 import { StatNames } from "../../../../../../../prisma/lib/utils";
 
-/**
- * Makes all neccessary requests to the databae.
- * @param game a game record
- * @returns A promise of all prisma functions needed for a page.
- */
-export const getAllStats = async (game: {
-  gameId: number;
-  gameName: string;
-}) => {
-  let stat: StatEndsWith<"POS"> | StatEndsWith<"SCORE"> =
-    StatNames.MarioKartPosition;
-
-  switch (game.gameId) {
-    case 1:
-      stat = StatNames.MarioKartPosition;
-  }
-
-  return await Promise.all([
-    getWinsPerPlayer(game!.gameId),
-    getScoreStatsPerPlayer(game!.gameId, stat),
-  ]).then((data) => ({
-    wins: data[0],
-    placings: data[1],
-  }));
-};
+export const getRLStats = async (playerId: number) =>
+  await Promise.all([
+    (await getSumPerStat(playerId, StatNames.RLGoals)).at(0),
+    (await getSumPerStat(playerId, StatNames.RLAssists)).at(0),
+    (await getSumPerStat(playerId, StatNames.RLSaves)).at(0),
+    (await getSumPerStat(playerId, StatNames.RLScore)).at(0),
+    (await getSumPerStat(playerId, StatNames.RLDay)).at(0),
+  ]);
 
 /**
- * Computes the average of a players ranking within a game and returns it with the amount of games they've played.
- * @param playerStats @external getScoreStatsPerPlayer
- * @returns Array of Object containing info about the player their placing and matches played.
- */
-export const calcAvgPerPlayer = (
-  playerStats: Awaited<ReturnType<typeof getScoreStatsPerPlayer>>,
-) => {
-  const avgPlacingPerPlayer = new Map<string, { avg: number; count: number }>();
-  // Compute total per player
-  for (const playerStat of playerStats) {
-    const avg = Number(playerStat.value);
-    if (isNaN(avg)) {
-      // TODO Log to Posthog/Sentry
-      console.log("Not a number", avg);
-      continue;
-    }
-
-    let player = avgPlacingPerPlayer.get(playerStat.player.playerName);
-    if (!player)
-      avgPlacingPerPlayer.set(playerStat.player.playerName, {
-        avg,
-        count: 1,
-      });
-    else {
-      player.count += 1;
-      player.avg += avg;
-    }
-  }
-  // Compute average
-  for (const [, val] of avgPlacingPerPlayer) {
-    val.avg = Math.round(val.avg / val.count);
-  }
-
-  const data = Array.from(avgPlacingPerPlayer, ([key, val]) => ({
-    player: key,
-    avg: val.avg,
-    played: val.count,
-  }));
-
-  return data;
-};
-
-/**
- * Computes a players match wins and set wins in a given game.
+ * Computes set wins and match wins for each player.
  * @param game game record
- * @returns A map of a player's match wins and setwins.
+ * @returns Array of object containing info about the amount of match and set wins a player has.
  */
-export const calculateWinsPerPlayer = (
+export const calcWinsPerPlayer = (
   game: NonNullable<Awaited<ReturnType<typeof getWinsPerPlayer>>>,
 ) => {
   const members = new Map<string, { matchWins: number; setWins: number }>();
@@ -107,36 +47,11 @@ export const calculateWinsPerPlayer = (
       }
     }
   }
-  const data = Array.from(members);
-  return data;
-};
-
-/**
- * Computes the sum per player for a given statName
- * @param placings info about a players placings
- * @returns A map containing a player's amount of 1st place finishes.
- */
-export const calcMostPerStat = (
-  placings: {
-    value: string;
-    player: { playerId: number; playerName: string };
-  }[],
-) => {
-  const members = new Map<string, number>();
-
-  for (const placing of placings) {
-    const val = Number(placing.value);
-    if (isNaN(val) || val !== 1) {
-      // TODO Log to posthog
-      isNaN(val) && console.log("Not a number", val);
-      continue;
-    }
-    let member = members.get(placing.player.playerName) || 0;
-    members.set(placing.player.playerName, ++member);
-  }
-
-  const data = Array.from(members);
-
+  const data = Array.from(members, ([key, val]) => ({
+    player: key,
+    matchWins: val.matchWins,
+    setWins: val.setWins,
+  }));
   return data;
 };
 
@@ -153,26 +68,14 @@ type FirstThroughEighth = {
 /**
  * Computes per player, the amount of times they've placed first, second, third, and last. Also includes their placing 1 - 8.
  * @param gameId id of the game record.
- * @returns Array of objects containing info about the amount of a player's placings.
+ * @param statName statName of the stat you are checking.
+ * @returns Array of objects containing info about a player's placings.
  */
-export const calcMostPerPlacing = async (gameId: number) => {
-  // I calculate it this way because there is a dynamic amount of players in a match,  know how many players are in a mat
-  let stat: StatEndsWith<"POS"> | undefined;
-  switch (gameId) {
-    case 1:
-      stat = StatNames.MarioKartPosition;
-      break;
-    case 3:
-      stat = StatNames.CodPosition;
-      break;
-    case 5:
-      stat = StatNames.SpeedrunnersPosition;
-      break;
-  }
-
-  if (!stat) return null;
-
-  const sessions = await getMatchesPerGame(gameId, stat!);
+export const calcMostPerPlacing = async (
+  gameId: number,
+  statName: StatEndsWith<"POS">,
+) => {
+  const sessions = await getMatchesPerGame(gameId, statName);
   const members = new Map<string, MembersPerPosition>();
 
   for (const session of sessions) {
@@ -238,15 +141,11 @@ export const calcMostPerPlacing = async (gameId: number) => {
 /**
  * Computes the total of a given stat per player.
  * @param gameId id of the game record.
- * @param statName statname to retrieve from database
+ * @param statName statName of the stat you are checking for.
  * @returns Computes total of stat per player
  */
-export const calculateStatPerPlayer = async (
-  gameId: number,
-  statName: StatName,
-) => {
+export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
   const stats = await getStatPerPlayer(gameId, statName);
-  console.log(stats);
   const members = new Map<string, number>();
 
   for (const { player, value } of stats) {
@@ -260,6 +159,6 @@ export const calculateStatPerPlayer = async (
     let member = members.get(player.playerName) || 0;
     members.set(player.playerName, member + val);
   }
-
-  return members;
+  const data = Array.from(members, ([key, val]) => ({ player: key, val }));
+  return data;
 };
