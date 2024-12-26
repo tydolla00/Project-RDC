@@ -1,7 +1,6 @@
 import { Player } from "@prisma/client";
 import { z } from "zod";
 
-// TODO: Move this somewhere else
 export const formSchema = z.object({
   game: z.string(),
   sessionName: z
@@ -15,8 +14,7 @@ export const formSchema = z.object({
       "https://www.youtube.com",
       "Please paste in a valid youtube url.",
     )
-    .max(100)
-    .includes("dummy", { message: "Invalid URL" }),
+    .max(100),
   date: z.date().readonly(),
   thumbnail: z.string().readonly(),
   players: z.array(

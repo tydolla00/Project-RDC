@@ -12,3 +12,5 @@ export const domain =
 
 export const capitalizeFirst = (text: string) =>
   text.at(0)?.toUpperCase() + text.substring(1);
+
+export const isProduction = process.env.NODE_ENV === "production";

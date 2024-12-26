@@ -40,7 +40,6 @@ const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
     }
   };
 
-  // TODO Add Container Query
   return (
     <div
       className="mb-10 w-fit rounded-md border p-4"

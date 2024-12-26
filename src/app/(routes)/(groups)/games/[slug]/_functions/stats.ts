@@ -7,6 +7,7 @@ import {
   getSumPerStat,
 } from "../../../../../../../prisma/lib/games";
 import { StatNames } from "../../../../../../../prisma/lib/utils";
+import PostHogClient from "@/lib/posthog";
 
 export const getRLStats = async (playerId: number) =>
   await Promise.all([
@@ -77,6 +78,7 @@ export const calcMostPerPlacing = async (
 ) => {
   const sessions = await getMatchesPerGame(gameId, statName);
   const members = new Map<string, MembersPerPosition>();
+  const posthog = PostHogClient();
 
   for (const session of sessions) {
     for (const set of session.sets) {
@@ -85,6 +87,10 @@ export const calcMostPerPlacing = async (
         for (const ps of match.playerSessions) {
           const pos = Number(ps.playerStats[0].value);
           if (isNaN(pos)) {
+            posthog.capture({
+              event: `NaN called in calcMostPerPlacing val: ${pos}`,
+              distinctId: new Date().toUTCString(),
+            });
             console.log("Not a number", pos);
             continue;
           }
@@ -135,6 +141,7 @@ export const calcMostPerPlacing = async (
     7: val[7] || 0,
     8: val[8] || 0,
   }));
+  posthog.shutdown();
   return data;
 };
 
@@ -146,13 +153,19 @@ export const calcMostPerPlacing = async (
  */
 export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
   const stats = await getStatPerPlayer(gameId, statName);
+  console.log(stats);
   const members = new Map<string, number>();
+  const posthog = PostHogClient();
 
   for (const { player, value } of stats) {
     const val = Number(value);
 
     if (isNaN(val)) {
-      console.log("Not a number", val); // May want to do some logging
+      posthog.capture({
+        event: `NaN called in calculateStatPerPlayer val: ${val}`,
+        distinctId: new Date().toUTCString(),
+      });
+      console.log("Not a number", val);
       continue;
     }
 
@@ -160,5 +173,6 @@ export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
     members.set(player.playerName, member + val);
   }
   const data = Array.from(members, ([key, val]) => ({ player: key, val }));
+  posthog.shutdown();
   return data;
 };

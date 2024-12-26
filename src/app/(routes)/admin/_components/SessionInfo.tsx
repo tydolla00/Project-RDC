@@ -57,7 +57,7 @@ export const SessionInfo = ({
             ? video.thumbnail
             : video.thumbnail.url,
         );
-        form.setValue("date", video.date);
+        form.setValue("date", new Date(video.date));
         setSession(video);
         toast.success("Youtube video successfully linked.", {
           richColors: true,
@@ -153,7 +153,6 @@ export const SessionInfo = ({
               <FormItem>
                 <FormLabel>Thumbnail</FormLabel>
 
-                {/** TODO: AUtomatically get this from URL */}
                 <Input
                   className="my-2 w-full rounded-md border p-2"
                   placeholder="Thumbnail"

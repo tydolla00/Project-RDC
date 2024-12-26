@@ -77,14 +77,12 @@ const MatchManager = (props: Props) => {
               <div className="my-4 text-center text-lg">
                 Player Sessions for Match {matchIndex + 1}
               </div>
-              {/* TODO Potentially move StatName here. Don't need to specify it for each control. */}
               <PlayerSessionManager
                 statName={statName}
                 setIndex={setIndex}
                 matchIndex={matchIndex}
                 players={players}
               />
-              {/* <Separator className="my-4 h-px bg-slate-400" /> */}
             </div>
           );
         })}

@@ -79,6 +79,7 @@ async function getAllTimeMKRankings() {
   console.log("Player Stats", playerStats);
 }
 
+// ! TODO Can we remove this?
 // async function showSetStatsByPlayerByRace(mkSession: EnrichedSession[]) {
 //   // Group Stats For A Set By Player
 //   for (const session of mkSession) {

@@ -125,7 +125,6 @@ export const SubmissionForm = () => {
                 </CardDescription>
                 <Separator />
                 <CardContent>
-                  {/* TODO WHY ISN'T THIS WORKING */}
                   {session && (
                     <Image
                       src={

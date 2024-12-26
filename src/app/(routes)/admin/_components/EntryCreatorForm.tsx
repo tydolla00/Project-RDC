@@ -70,10 +70,10 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
     // data.date = new Date(data.date);
     // console.log("Date Type in submit:", typeof data.date);
-
-    insertNewSessionFromAdmin(data);
-    console.log("TOasted");
-    toast.success("Session successfully created.", { richColors: true });
+    const err = await insertNewSessionFromAdmin(data);
+    if (err === null)
+      toast.error("Video already submitted", { richColors: true });
+    else toast.success("Session successfully created.", { richColors: true });
   };
 
   // console.log("Date Type:", typeof getValues().date);
@@ -92,63 +92,6 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     });
   };
 
-  const handleUrlUpdated = async () => {
-    // TODO Debounce/Rate limit
-    const queryParams = url.substring(url.indexOf("v="));
-    const extraParams = queryParams.indexOf("&");
-    const end = extraParams === -1 ? undefined : extraParams;
-    const newUrl = queryParams.substring(2, end);
-
-    // See if url is valid.
-    // TODO Invalid not working
-    if (
-      defaultValues?.sessionUrl === url ||
-      control.getFieldState("sessionUrl").invalid ||
-      newUrl.length === 0
-    ) {
-      toast.error("Invalid url", { richColors: true });
-      return;
-    }
-
-    setIsFetching(true);
-
-    const video = await getRDCVideoDetails(newUrl);
-    if (!video) {
-      form.reset(undefined, { keepIsValid: true });
-      toast.error("Please upload a video by RDC Live", { richColors: true });
-    } else {
-      setValue("sessionName", video.sessionName, {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-      setValue(
-        "thumbnail",
-        typeof video.thumbnail === "string"
-          ? video.thumbnail
-          : video.thumbnail.url,
-        {
-          shouldValidate: true,
-          shouldDirty: true,
-          shouldTouch: true,
-        },
-      );
-      setValue("date", new Date(video.date), {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-      setSession(video);
-      toast.success("Youtube video successfully linked.", { richColors: true });
-    }
-
-    console.log(video);
-    console.log("Form values after update:", getValues());
-
-    setIsFetching(false);
-  };
-
-  //! TODO May need to refactor ID's. Not sure what they were being used for.
   return (
     <FormProvider {...form}>
       <Form {...form}>
@@ -175,6 +118,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 const Submit = ({ formIsValid }: { formIsValid: boolean }) => {
   const { pending } = useFormStatus();
 
+  // TODO add review screen logic before form is truly submitted.
   return (
     <Button
       disabled={!formIsValid || pending}
