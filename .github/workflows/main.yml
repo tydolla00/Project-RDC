@@ -30,6 +30,9 @@ jobs:
       - name: Set Database URL
         run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
 
+      - name: Set Direct URL
+        run: echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> $GITHUB_ENV
+
       - name: Build with Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

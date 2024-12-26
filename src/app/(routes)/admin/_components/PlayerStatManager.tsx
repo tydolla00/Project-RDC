@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdmin } from "@/lib/adminContext";
-import { FormValues } from "../_utils/form-helpers";
+import { StatNames } from "../../../../../prisma/lib/utils";
 
 interface Props {
   player: Player;
@@ -62,7 +62,7 @@ const PlayerStatManager = (props: Props) => {
         );
         // Ducttape fix to stop useEffect double render from
         // doubling playerStat fields
-        if (!statExists) {
+        if (!statExists && stat.statName !== StatNames.RLDay) {
           append({ statId: uuidv4(), stat: stat.statName, statValue: "" });
         }
       });
