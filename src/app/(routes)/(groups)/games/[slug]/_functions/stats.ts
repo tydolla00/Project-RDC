@@ -7,6 +7,7 @@ import {
   getStatPerPlayer,
 } from "../../../../../../../prisma/lib/games";
 import { StatNames } from "../../../../../../../prisma/lib/utils";
+import PostHogClient from "@/lib/posthog";
 
 /**
  * Makes all neccessary requests to the databae.
@@ -42,11 +43,16 @@ export const getAllStats = async (game: {
 export const calcAvgPerPlayer = (
   playerStats: Awaited<ReturnType<typeof getScoreStatsPerPlayer>>,
 ) => {
+  const posthog = PostHogClient();
   const avgPlacingPerPlayer = new Map<string, { avg: number; count: number }>();
   // Compute total per player
   for (const playerStat of playerStats) {
     const avg = Number(playerStat.value);
     if (isNaN(avg)) {
+      posthog.capture({
+        event: `NaN called in calcAvgPerPlayer val: ${avg}`,
+        distinctId: new Date().toUTCString(),
+      });
       // TODO Log to Posthog/Sentry
       console.log("Not a number", avg);
       continue;
@@ -73,7 +79,7 @@ export const calcAvgPerPlayer = (
     avg: val.avg,
     played: val.count,
   }));
-
+  posthog.shutdown(); // TODO May need to await
   return data;
 };
 
@@ -123,12 +129,17 @@ export const calcMostPerStat = (
   }[],
 ) => {
   const members = new Map<string, number>();
-
+  const posthog = PostHogClient();
   for (const placing of placings) {
     const val = Number(placing.value);
     if (isNaN(val) || val !== 1) {
-      // TODO Log to posthog
-      isNaN(val) && console.log("Not a number", val);
+      if (isNaN(val)) {
+        posthog.capture({
+          event: `NaN called in calcMostPerStat val: ${val}`,
+          distinctId: new Date().toUTCString(),
+        });
+        console.log("Not a number", val);
+      }
       continue;
     }
     let member = members.get(placing.player.playerName) || 0;
@@ -136,7 +147,7 @@ export const calcMostPerStat = (
   }
 
   const data = Array.from(members);
-
+  posthog.shutdown(); // TODO May need to await.
   return data;
 };
 
@@ -174,6 +185,7 @@ export const calcMostPerPlacing = async (gameId: number) => {
 
   const sessions = await getMatchesPerGame(gameId, stat!);
   const members = new Map<string, MembersPerPosition>();
+  const posthog = PostHogClient();
 
   for (const session of sessions) {
     for (const set of session.sets) {
@@ -182,6 +194,10 @@ export const calcMostPerPlacing = async (gameId: number) => {
         for (const ps of match.playerSessions) {
           const pos = Number(ps.playerStats[0].value);
           if (isNaN(pos)) {
+            posthog.capture({
+              event: `NaN called in calcMostPerPlacing val: ${pos}`,
+              distinctId: new Date().toUTCString(),
+            });
             console.log("Not a number", pos);
             continue;
           }
@@ -232,6 +248,7 @@ export const calcMostPerPlacing = async (gameId: number) => {
     7: val[7] || 0,
     8: val[8] || 0,
   }));
+  posthog.shutdown();
   return data;
 };
 
@@ -248,18 +265,23 @@ export const calculateStatPerPlayer = async (
   const stats = await getStatPerPlayer(gameId, statName);
   console.log(stats);
   const members = new Map<string, number>();
+  const posthog = PostHogClient();
 
   for (const { player, value } of stats) {
     const val = Number(value);
 
     if (isNaN(val)) {
-      console.log("Not a number", val); // May want to do some logging
+      posthog.capture({
+        event: `NaN called in calculateStatPerPlayer val: ${val}`,
+        distinctId: new Date().toUTCString(),
+      });
+      console.log("Not a number", val);
       continue;
     }
 
     let member = members.get(player.playerName) || 0;
     members.set(player.playerName, member + val);
   }
-
+  posthog.shutdown();
   return members;
 };
