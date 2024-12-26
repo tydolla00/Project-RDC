@@ -92,7 +92,6 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     });
   };
 
-  //! TODO May need to refactor ID's. Not sure what they were being used for.
   return (
     <FormProvider {...form}>
       <Form {...form}>

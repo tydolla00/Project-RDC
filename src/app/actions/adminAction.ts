@@ -35,6 +35,7 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
   return gameStats;
 }
 // TODO Handle proper error states
+// Should probably return an object with { err: , whatever else}
 export const insertNewSessionFromAdmin = async (session: FormValues) => {
   console.log("Inserting New Session: ", session);
   // Get latest session Id and create session

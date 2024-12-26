@@ -4,6 +4,7 @@ import prisma from "../../../prisma/db";
 import config from "@/lib/config";
 import { Session } from "next-auth";
 import { signOut, signIn } from "@/auth";
+import { isProduction } from "@/lib/utils";
 
 export const submitUpdates = async (props: any) => {
   console.log(props);
@@ -28,32 +29,26 @@ export const getRDCVideoDetails = async (
 > => {
   const sessions = await prisma.videoSession.findMany();
 
-  // TODO only store videoId in the db.
   const session = sessions.find((session) => session.sessionUrl === videoId);
-  const apiKey =
-    process.env.NODE_ENV === "production"
-      ? config.YOUTUBE_API_KEY
-      : config.YOUTUBE_LOCAL_API_KEY;
+  const apiKey = isProduction
+    ? config.YOUTUBE_API_KEY
+    : config.YOUTUBE_LOCAL_API_KEY;
 
   console.log(session);
   if (!session) {
     const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${apiKey}`;
     const YTvideo = await fetch(apiUrl);
-    console.log({ YTvideo }, { videoId }, { apiUrl });
 
-    process.env.NODE_ENV === "development" &&
+    !isProduction &&
       !config.YOUTUBE_LOCAL_API_KEY &&
-      console.log("YOUTUBE API KEY NOT CONFIGURED");
+      console.log("LOCAL YOUTUBE API KEY NOT CONFIGURED");
 
     if (!YTvideo.ok) return undefined;
 
     const json = (await YTvideo.json()) as YouTubeVideoListResponse;
-    console.log(json);
     const video = json.items[0];
 
     if (video?.snippet.channelTitle !== "RDC Live") return undefined;
-
-    // TODO do something with the height and width.
 
     const session = {
       sessionUrl: `https://youtube.com/watch?v=${video.id}`,

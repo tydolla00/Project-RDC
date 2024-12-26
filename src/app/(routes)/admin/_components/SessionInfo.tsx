@@ -153,7 +153,6 @@ export const SessionInfo = ({
               <FormItem>
                 <FormLabel>Thumbnail</FormLabel>
 
-                {/** TODO: AUtomatically get this from URL */}
                 <Input
                   className="my-2 w-full rounded-md border p-2"
                   placeholder="Thumbnail"
