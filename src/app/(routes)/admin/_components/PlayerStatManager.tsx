@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Player } from "@prisma/client";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { getGameStats } from "@/app/actions/adminAction";
-import { FormValues } from "./EntryCreatorForm";
 import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdmin } from "@/lib/adminContext";
 import { StatNames } from "../../../../../prisma/lib/utils";
+import { FormValues } from "../_utils/form-helpers";
 
 interface Props {
   player: Player;
@@ -75,6 +75,7 @@ const PlayerStatManager = (props: Props) => {
   console.log("PlayerStatManagerFields: ", fields);
   console.log("Loading: ", loading);
 
+  // TODO Fix bug, when changing the games doesn't remove stale inputs
   return (
     <>
       {fields.map((field, index: number) => {
