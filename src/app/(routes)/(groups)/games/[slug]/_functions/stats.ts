@@ -146,6 +146,7 @@ export const calcMostPerPlacing = async (
  */
 export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
   const stats = await getStatPerPlayer(gameId, statName);
+  console.log(stats);
   const members = new Map<string, number>();
 
   for (const { player, value } of stats) {
