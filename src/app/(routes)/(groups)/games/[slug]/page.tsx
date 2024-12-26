@@ -8,6 +8,8 @@ import RocketLeague from "./_components/rocketleague";
 import Speedrunners from "./_components/speedrunners";
 import LethalCompany from "./_components/lethalcompany";
 import GolfWithFriends from "./_components/golfwithfriends";
+import Image from "next/image";
+import { gameImages } from "@/lib/constants";
 
 // ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,
@@ -32,8 +34,8 @@ export default async function Page({
     (game) =>
       game.gameName.replace(/\s/g, "").toLowerCase() === slug.toLowerCase(),
   )!;
-
   const gameName = slug.toLowerCase();
+  console.log(game, gameName);
   let component: React.ReactNode;
   switch (gameName) {
     case "mariokart":
@@ -58,7 +60,16 @@ export default async function Page({
 
   return (
     <div className="m-16">
-      <H1>{game.gameName}</H1>
+      <div className="flex gap-5">
+        <Image
+          className="object-cover"
+          height={200}
+          width={200}
+          alt=""
+          src={`/images/${gameImages[gameName as keyof typeof gameImages]}`}
+        />
+        <H1 className="my-0">{game.gameName}</H1>
+      </div>
       {component}
       {/* <Average placings={placings} />
       <LastPlace gameId={game.gameId} /> */}

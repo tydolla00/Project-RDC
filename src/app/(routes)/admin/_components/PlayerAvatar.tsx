@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { playerAvatarMap } from "@/lib/constants";
 
 interface PlayerAvatarProps {
   player: Player;
@@ -20,17 +21,6 @@ const PlayerAvatar = ({
   optionalClassName,
 }: PlayerAvatarProps) => {
   const avatarHelperFunction = (playerName: string) => {
-    const playerAvatarMap = new Map<string, string>([
-      ["Mark", "mark_rdc.jpg"],
-      ["Dylan", "dylan_rdc.jpg"],
-      ["Ben", "ben_rdc.jpg"],
-      ["Lee", "leland_rdc.jpg"],
-      ["Des", "desmond_rdc.jpg"],
-      ["John", "john_rdc.jpg"],
-      ["Aff", "aff_rdc.jpg"],
-      ["Ipi", "ipi_rdc.jpg"],
-    ]);
-
     return playerAvatarMap.get(playerName) || "default_avatar.jpg";
   };
 

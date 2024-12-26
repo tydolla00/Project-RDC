@@ -68,7 +68,7 @@ const RocketLeague = async ({
     ["assists.sum"]: { label: "Total Assists" },
     ["days.sum"]: { label: "Total Days" },
     ["saves.sum"]: { label: "Total Saves" },
-  };
+  } satisfies ChartConfig;
 
   return (
     <div className="flex flex-wrap gap-10">

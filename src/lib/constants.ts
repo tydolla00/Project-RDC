@@ -151,6 +151,17 @@ export const gameImages = {
   callofduty: "callofduty.jpeg",
 };
 
+export const playerAvatarMap = new Map<string, string>([
+  ["Mark", "mark_rdc.jpg"],
+  ["Dylan", "dylan_rdc.jpg"],
+  ["Ben", "ben_rdc.jpg"],
+  ["Lee", "leland_rdc.jpg"],
+  ["Des", "desmond_rdc.jpg"],
+  ["John", "john_rdc.jpg"],
+  ["Aff", "aff_rdc.jpg"],
+  ["Ipi", "ipi_rdc.jpg"],
+]);
+
 type MembersProps = {
   desc: string;
   nav: { alt: string; name: string; url: string; src: string };

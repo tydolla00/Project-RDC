@@ -10,7 +10,6 @@ import {
 import { games, RDCMembers } from "@/lib/constants";
 
 export const Footer = () => {
-  const members = Array.from(RDCMembers.entries());
   return (
     <footer className="relative bottom-0 h-72 border-t-2 border-t-stone-800">
       <Breadcrumb className="mx-auto my-6 w-fit">
