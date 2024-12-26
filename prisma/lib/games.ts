@@ -95,22 +95,21 @@ export const getWinsPerPlayer = function (gameId: number) {
  * @param statName Statname, must end in _POS or _SCORE
  * @returns all player records with position stats
  */
-export const getScoreStatsPerPlayer = function <T extends StatName = StatName>(
-  gameId: number,
-  statName: StatEndsWith<"POS", T> | StatEndsWith<"SCORE", T>,
-) {
-  return unstable_cache(
-    async () =>
-      await prisma.playerStat.findMany({
-        where: { gameId, AND: { gameStat: { statName } } },
-        select: { player: true, value: true },
-      }),
-    undefined,
-    {
-      tags: ["getPositionStatsPerPlayer", gameId.toString()],
-      revalidate: false,
-    },
-  )();
+export const getScoreStatsPerPlayer = async function <
+  T extends StatName = StatName,
+>(gameId: number, statName: StatEndsWith<"POS", T> | StatEndsWith<"SCORE", T>) {
+  // return unstable_cache(
+  //   async () =>
+  return await prisma.playerStat.findMany({
+    where: { gameId, AND: { gameStat: { statName } } },
+    select: { player: true, value: true },
+  });
+  //   undefined,
+  //   {
+  //     tags: ["getPositionStatsPerPlayer", gameId.toString()],
+  //     revalidate: false,
+  //   },
+  // )();
 };
 
 /**
@@ -165,16 +164,19 @@ export const getMatchesPerGame = function <T extends StatName = StatName>(
  * @param statName Statname of the stat you are checking for.
  * @returns Array of play records
  */
-export const getStatPerPlayer = function (gameId: number, statName: StatName) {
-  return unstable_cache(
-    async () =>
-      await prisma.playerStat.findMany({
-        where: { gameId, AND: { gameStat: { statName } } },
-        select: { player: true, value: true },
-      }),
-    undefined,
-    { tags: ["getStatPerPlayer", gameId.toString()] },
-  )();
+export const getStatPerPlayer = async function (
+  gameId: number,
+  statName: StatName,
+) {
+  // return unstable_cache(
+  //   async () =>
+  return await prisma.playerStat.findMany({
+    where: { gameId, AND: { gameStat: { statName } } },
+    select: { player: true, value: true },
+  });
+  //   undefined,
+  //   { tags: ["getStatPerPlayer", gameId.toString()] },
+  // )();
 };
 
 export type StatEndsWith<
