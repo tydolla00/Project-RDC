@@ -27,7 +27,7 @@ import {
 import { getGames } from "@/app/actions/adminAction";
 import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
-import { FormValues } from "./EntryCreatorForm";
+import { FormValues } from "../_utils/form-helpers";
 
 const GameDropDownForm = ({
   control,
@@ -39,7 +39,8 @@ const GameDropDownForm = ({
 
   useEffect(() => {
     const fetchGames = async () => {
-      // TODO Maybe bring in Tanstack Query?
+      // TODO I'm so confused how this is working lol we shouldn't be able to access prisma on the client.
+      // This should be fetched on the server and then passed down as a prop.
       const games = await getGames();
       setTestGames(games);
     };

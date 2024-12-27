@@ -9,7 +9,7 @@ async function main() {
 /// Fetched Enriched Mario Kart Session
 async function getLatestMarioKartSession() {
   try {
-    const latestMKPlayerSessions = await prisma.session.findFirst({
+    const latestMKPlayerSessions = await prisma.videoSession.findFirst({
       where: {
         gameId: 1,
       },
@@ -79,6 +79,7 @@ async function getAllTimeMKRankings() {
   console.log("Player Stats", playerStats);
 }
 
+// ! TODO Can we remove this?
 // async function showSetStatsByPlayerByRace(mkSession: EnrichedSession[]) {
 //   // Group Stats For A Set By Player
 //   for (const session of mkSession) {

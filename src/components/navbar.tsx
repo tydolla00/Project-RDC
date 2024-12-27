@@ -30,7 +30,6 @@ import { AuthButton, ToggleThemeButton } from "./client-buttons";
 export const Navbar = async () => {
   const session = await auth();
 
-  // TODO Fetch Games and Members from DB.
   // TODO Memoize this component, so it doesn't ever rerender? Which it never should.
 
   const members = Array.from(RDCMembers.entries());
@@ -131,13 +130,12 @@ export const Navbar = async () => {
               <ListItem href="/submission">Submissions</ListItem>
               {/* add client component that will handle triggering the animation. */}
               {/* TODO MOBILE ONLY Animate up from the bottom of the screen and add dismiss option. */}
+              {/* Button acting weird and flashing from inside dropdown to right side of the screen */}
               <ToggleThemeButton />
-              {/* <ModeToggle /> */}
               <AuthButton responsive={false} session={session} />
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        {/* Causing spacing problems because of space-x-1 */}
         <FeatureFlag
           shouldRedirect={false}
           flagName="AUTH"
