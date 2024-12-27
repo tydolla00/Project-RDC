@@ -25,12 +25,11 @@ import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { games, RDCMembers } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
-import { AuthButton } from "./client-buttons";
+import { AuthButton, ToggleThemeButton } from "./client-buttons";
 
 export const Navbar = async () => {
   const session = await auth();
 
-  // TODO Fetch Games and Members from DB.
   // TODO Memoize this component, so it doesn't ever rerender? Which it never should.
 
   const members = Array.from(RDCMembers.entries());
@@ -81,7 +80,7 @@ export const Navbar = async () => {
                     />
                   </Avatar>
                   <ListItem
-                    className="shrink-0"
+                    className="flex-shrink-0"
                     href={rdc.url}
                     title={rdc.name}
                   />
@@ -131,12 +130,12 @@ export const Navbar = async () => {
               <ListItem href="/submission">Submissions</ListItem>
               {/* add client component that will handle triggering the animation. */}
               {/* TODO MOBILE ONLY Animate up from the bottom of the screen and add dismiss option. */}
-              <ModeToggle />
-              <AuthButton session={session} />
+              {/* Button acting weird and flashing from inside dropdown to right side of the screen */}
+              <ToggleThemeButton />
+              <AuthButton responsive={false} session={session} />
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        {/* Causing spacing problems because of space-x-1 */}
         <FeatureFlag
           shouldRedirect={false}
           flagName="AUTH"
@@ -159,9 +158,9 @@ export const Navbar = async () => {
             )}
           </NavigationMenuItem>
         </FeatureFlag>
-        <AuthButton session={session} />
+        <AuthButton responsive session={session} />
         <NavigationMenuItem className="hidden sm:block">
-          <ModeToggle />
+          <ModeToggle className="" />
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
@@ -173,14 +172,14 @@ const ListItem = React.forwardRef<
   React.ComponentPropsWithoutRef<"a">
 >(({ className, title, children, href = "", ...props }, ref) => {
   return (
-    <li className="grow">
+    <li className="flex-grow">
       <NavigationMenuLink asChild>
         <Link
           prefetch={true}
           href={href}
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "outline-hidden block select-none space-y-1 rounded-md p-3 leading-none no-underline transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
             className,
           )}
           {...props}

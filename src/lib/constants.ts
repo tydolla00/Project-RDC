@@ -143,6 +143,14 @@ export const games: { desc?: string; url: string; name: string }[] = [
   },
 ];
 
+export const gameImages = {
+  rocketleague: "rocketleague.png",
+  lethalcompany: "lethalcompany.jpg",
+  mariokart: "mk8.jpg",
+  speedrunners: "speedrunners.jpeg",
+  callofduty: "callofduty.jpeg",
+};
+
 type MembersProps = {
   desc: string;
   nav: { alt: string; name: string; url: string; src: string };

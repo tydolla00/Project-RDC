@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "./db";
 
 async function main() {
   console.log(await getMarioKartGameSession());

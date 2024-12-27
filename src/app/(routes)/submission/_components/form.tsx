@@ -24,7 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { getYTVid, submitUpdates } from "@/app/_actions/action";
+import { getRDCVideoDetails, submitUpdates } from "@/app/actions/action";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -65,7 +65,7 @@ const formSchema = z.object({
 
 export const SubmissionForm = () => {
   const [session, setSession] = useState<
-    Awaited<ReturnType<typeof getYTVid>> | undefined
+    Awaited<ReturnType<typeof getRDCVideoDetails>> | undefined
   >(undefined);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -95,7 +95,7 @@ export const SubmissionForm = () => {
     const trimEnd = id.indexOf("&");
 
     if (trimEnd !== -1) id = id.slice(0, trimEnd);
-    const video = await getYTVid(id);
+    const video = await getRDCVideoDetails(id);
     if (!video) {
       form.reset(undefined, { keepIsValid: true });
       toast("Please upload a video by RDC Live");
@@ -127,10 +127,22 @@ export const SubmissionForm = () => {
                 <CardContent>
                   {session && (
                     <Image
-                      alt="Youtube Video"
-                      src={session.thumbnail.url}
-                      height={session.thumbnail.height}
-                      width={session.thumbnail.width}
+                      src={
+                        typeof session.thumbnail === "string"
+                          ? session.thumbnail
+                          : session.thumbnail.url
+                      }
+                      height={
+                        typeof session.thumbnail === "string"
+                          ? 9
+                          : session.thumbnail.height
+                      } // 16:9 aspect ratio
+                      width={
+                        typeof session.thumbnail === "string"
+                          ? 16
+                          : session.thumbnail.width
+                      }
+                      alt="RDC Youtube Video Thumbnail"
                     />
                   )}
                   <FormField

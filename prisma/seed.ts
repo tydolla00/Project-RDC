@@ -1,6 +1,5 @@
-import { Player, PlayerSession, PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Player, PlayerSession } from "@prisma/client";
+import prisma from "./db";
 
 async function main() {
   await seedRDCMembers();
@@ -8,7 +7,6 @@ async function main() {
   await seedSession(1);
 
   /**
-   * If you reaaaallllyy want to real data...
    * Here is where you would put in match results. Each list is
    * a match and the index is the playerId -1
    * e.g Ben's results are all index 2
@@ -28,7 +26,7 @@ async function main() {
   await simulateRace(1, 3, set1Results[2]);
   await simulateRace(1, 4, set1Results[3]);
 
-  await updateSetWinner(1);
+  await updateSetWinner(1, [3]); // Ben Wins
 }
 
 main()
@@ -48,75 +46,59 @@ main()
 async function seedRDCMembers() {
   console.log("--- Seeding RDC Members ---");
 
-  const mark = await prisma.player.upsert({
-    where: { playerId: 1 },
-    update: {},
-    create: {
+  const mark = await prisma.player.create({
+    data: {
       playerId: 1,
       playerName: "Mark",
     },
   });
 
-  const aff = await prisma.player.upsert({
-    where: { playerId: 2 },
-    update: {},
-    create: {
+  const aff = await prisma.player.create({
+    data: {
       playerId: 2,
       playerName: "Dylan",
     },
   });
 
-  const des = await prisma.player.upsert({
-    where: { playerId: 3 },
-    update: {},
-    create: {
+  const des = await prisma.player.create({
+    data: {
       playerId: 3,
       playerName: "Ben",
     },
   });
 
-  const ben = await prisma.player.upsert({
-    where: { playerId: 4 },
-    update: {},
-    create: {
+  const ben = await prisma.player.create({
+    data: {
       playerId: 4,
       playerName: "Lee",
     },
   });
 
-  const lee = await prisma.player.upsert({
-    where: { playerId: 5 },
-    update: {},
-    create: {
+  const lee = await prisma.player.create({
+    data: {
       playerId: 5,
       playerName: "Des",
     },
   });
 
-  const dylan = await prisma.player.upsert({
-    where: { playerId: 6 },
-    update: {},
-    create: {
+  const dylan = await prisma.player.create({
+    data: {
       playerId: 6,
       playerName: "John",
     },
   });
 
-  const john = await prisma.player.upsert({
-    where: { playerId: 7 },
-    update: {},
-    create: {
+  const john = await prisma.player.create({
+    data: {
       playerId: 7,
       playerName: "Aff",
     },
   });
 
-  const ippi = await prisma.player.upsert({
-    where: { playerId: 8 },
-    update: {},
-    create: {
+  const ipi = await prisma.player.create({
+    data: {
       playerId: 8,
-      playerName: "Ippi",
+      playerName: "Ipi",
     },
   });
 
@@ -125,49 +107,62 @@ async function seedRDCMembers() {
 
 async function seedGames() {
   console.log("--- Seeding Games ---");
-  const marioKart = await prisma.game.upsert({
-    where: { gameId: 1 },
-    update: {},
-    create: {
+  const marioKart = await prisma.game.create({
+    data: {
       gameName: "Mario Kart",
       gameStats: {
+        create: [{ statName: "MK8_POS" }, { statName: "MK8_DAY" }],
+      },
+    },
+  });
+
+  const rocketLeague = await prisma.game.create({
+    data: {
+      gameName: "Rocket League",
+      gameStats: {
         create: [
-          {
-            statId: 1,
-            statName: "MK8_POS",
-          },
+          { statName: "RL_SCORE" },
+          { statName: "RL_GOALS" },
+          { statName: "RL_SAVES" },
+          { statName: "RL_ASSISTS" },
+          { statName: "RL_SHOTS" },
+          { statName: "RL_DAY" },
         ],
       },
     },
   });
 
-  const rocketLeague = await prisma.game.upsert({
-    where: { gameId: 2 },
-    update: {},
-    create: {
-      gameName: "Rocket League",
-    },
-  });
-
-  const callOfDuty = await prisma.game.upsert({
-    where: { gameId: 3 },
-    update: {},
-    create: {
+  const callOfDuty = await prisma.game.create({
+    data: {
       gameName: "Call of Duty",
+      gameStats: {
+        create: [
+          { statName: "COD_SCORE" },
+          { statName: "COD_KILLS" },
+          { statName: "COD_DEATHS" },
+          { statName: "COD_POS" },
+        ],
+      },
     },
   });
-  const lethalCompany = await prisma.game.upsert({
-    where: { gameId: 4 },
-    update: {},
-    create: {
+  const lethalCompany = await prisma.game.create({
+    data: {
       gameName: "Lethal Company",
+      gameStats: {
+        create: [{ statName: "LC_DEATHS" }],
+      },
     },
   });
-  const speedRunners = await prisma.game.upsert({
-    where: { gameId: 5 },
-    update: {},
-    create: {
+  const speedRunners = await prisma.game.create({
+    data: {
       gameName: "Speedrunners",
+      gameStats: {
+        create: [
+          { statName: "SR_SETS" },
+          { statName: "SR_WINS" },
+          { statName: "SR_POS" },
+        ],
+      },
     },
   });
 
@@ -177,11 +172,9 @@ async function seedGames() {
 // Seed game session with RDC Stream Five
 async function seedSession(sessionId: number) {
   console.log(`\n--- Seeding Game Session ${sessionId} ---`);
-  const marioKartSession = await prisma.session.upsert({
-    where: { sessionId: sessionId },
-    update: {},
-    create: {
-      sessionId: sessionId,
+
+  const marioKartSession = await prisma.videoSession.create({
+    data: {
       gameId: 1,
       sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",
       sessionUrl: "https://example.com",
@@ -197,11 +190,8 @@ async function seedSession(sessionId: number) {
  * @param sessionId - sessionId of parent session of seeded set
  */
 async function seedSet(setId: number, sessionId: number = 1) {
-  const marioKartSet = await prisma.gameSet.upsert({
-    where: { setId: setId },
-    update: {},
-    create: {
-      setId: setId,
+  const marioKartSet = await prisma.gameSet.create({
+    data: {
       sessionId: sessionId,
     },
   });
@@ -209,6 +199,10 @@ async function seedSet(setId: number, sessionId: number = 1) {
   console.log(`Seeded Set ${setId} Successfully.\n`);
 }
 
+/**
+ * Get the RDC Stream Five as an array of Players
+ * @returns Player[] - Array of players in RDC Stream Five
+ */
 async function getStreamFive() {
   const mk8Players: Player[] = await prisma.player.findMany({
     where: {
@@ -230,17 +224,23 @@ async function simulateRace(
   await seedMatch(matchId, setId, streamFive, raceResults);
 }
 
+/**
+ * Creates a match object and inserts into the set of setId
+ * Note this currently only handles MK cases as it calculates the match winner assuming such!
+ * @param matchId
+ * @param setId
+ * @param playersInMatch
+ * @param raceResults
+ *
+ */
 async function seedMatch(
   matchId: number,
   setId: number,
   playersInMatch: Player[],
   raceResults: number[],
 ) {
-  const marioKartMatch = await prisma.match.upsert({
-    where: { matchId: matchId },
-    update: {},
-    create: {
-      matchId: matchId,
+  const marioKartMatch = await prisma.match.create({
+    data: {
       setId: setId,
     },
   });
@@ -263,11 +263,18 @@ async function seedMatch(
   if (matchWinner) {
     await prisma.match.update({
       where: { matchId: matchId },
-      data: { matchWinner: { connect: { playerId: matchWinner.playerId } } },
+      data: { matchWinners: { connect: { playerId: matchWinner.playerId } } },
     });
   }
 }
 
+/**
+ * Inserts
+ * @param matchId
+ * @param players
+ * @param setId
+ * @param raceResults
+ */
 async function seedPlayerSessions(
   matchId: number,
   players: Player[],
@@ -279,17 +286,10 @@ async function seedPlayerSessions(
   // so we need to offset the playerSessionId by the number of previous player sessions
   const playerSessionIdOffset = (matchId - 1) * players.length;
   for (const player of players) {
-    const newPlayerSessionId = player.playerId + playerSessionIdOffset;
+    console.log(`Seeding player session  for player: ${player.playerName}`);
 
-    console.log(
-      `Seeding player session ${newPlayerSessionId} for player: ${player.playerName}`,
-    );
-
-    const playerSession = await prisma.playerSession.upsert({
-      where: { playerSessionId: newPlayerSessionId },
-      update: {},
-      create: {
-        playerSessionId: newPlayerSessionId,
+    const playerSession = await prisma.playerSession.create({
+      data: {
         matchId: matchId,
         sessionId: 1,
         setId: setId,
@@ -314,11 +314,8 @@ async function seedPlayerStat(
   statValue: number,
 ) {
   const newPlayerStatId = playerSession.playerSessionId;
-  return await prisma.playerStat.upsert({
-    where: { playerStatId: newPlayerStatId },
-    update: {},
-    create: {
-      playerStatId: newPlayerStatId,
+  return await prisma.playerStat.create({
+    data: {
       playerId: playerSession.playerId,
       statId: statId,
       playerSessionId: playerSession.playerSessionId,
@@ -329,56 +326,15 @@ async function seedPlayerStat(
   });
 }
 
-const getSetWinner = async (setId: number) => {
-  const setMatches = await prisma.match.findMany({
-    where: {
-      setId: setId,
-    },
-    include: {
-      matchWinner: true,
-    },
-  });
+const updateSetWinner = async (setId: number, winnerIds: number[]) => {
+  const setWinnerConnect = winnerIds.map((winnerId: number) => ({
+    playerId: winnerId,
+  }));
 
-  // console.log(`Set matches ${setMatches}`);
-
-  // TODO: Refactor this to be cleaner O_O
-  const matchWinners = setMatches
-    .filter((match) => match.matchWinner)
-    .map((match) => ({
-      playerId: match.matchWinner[0].playerId,
-      playerName: match.matchWinner[0].playerName,
-    }));
-
-  const winnerCount: { [playerId: number]: number } = {};
-
-  matchWinners.forEach((winner) => {
-    if (winnerCount[winner.playerId]) {
-      winnerCount[winner.playerId]++;
-    } else {
-      winnerCount[winner.playerId] = 1;
-    }
-  });
-
-  const maxWins = Math.max(...Object.values(winnerCount));
-  const setWinner = Object.keys(winnerCount).find(
-    (playerId) => winnerCount[Number(playerId)] === maxWins,
-  );
-
-  const setWinnerPlayer = matchWinners.find(
-    (winner) => winner.playerId === Number(setWinner),
-  );
-
-  console.log(`Set ${setId} Winner: ${setWinnerPlayer?.playerName}`);
-
-  return setWinnerPlayer;
-};
-
-const updateSetWinner = async (setId: number) => {
-  const setWinner = await getSetWinner(setId);
-  if (setWinner) {
+  if (setWinnerConnect) {
     await prisma.gameSet.update({
       where: { setId: setId },
-      data: { setWinner: { connect: { playerId: setWinner.playerId } } },
+      data: { setWinners: { connect: setWinnerConnect } },
     });
   }
 };
