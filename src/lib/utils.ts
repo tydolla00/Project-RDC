@@ -10,4 +10,7 @@ export const domain =
     ? "https://project-rdc.vercel.app"
     : "http://localhost:3000";
 
+export const capitalizeFirst = (text: string) =>
+  text.at(0)?.toUpperCase() + text.substring(1);
+
 export const isProduction = process.env.NODE_ENV === "production";

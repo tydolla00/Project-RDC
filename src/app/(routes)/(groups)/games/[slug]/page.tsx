@@ -2,11 +2,6 @@ import { H1 } from "@/components/headings";
 import { CustomChart } from "./_components/charts";
 import { getAllGames } from "../../../../../../prisma/lib/games";
 import { ChartConfig } from "@/components/ui/chart";
-import {
-  calcMostPerPlacing,
-  getAllStats,
-  calcAvgPerPlayer,
-} from "./_functions/stats";
 import Mariokart from "./_components/mariokart";
 import CallOfDuty from "./_components/callofduty";
 import RocketLeague from "./_components/rocketleague";
@@ -71,50 +66,44 @@ export default async function Page({
   );
 }
 
-const Average = ({
-  placings,
-}: {
-  placings: Awaited<ReturnType<typeof getAllStats>>["placings"];
-}) => {
-  const allAvgPlacing = calcAvgPerPlayer(placings);
-  const config = {
-    player: { label: "Player" },
-    placing: { label: "Avg Placing" },
-    played: { label: "# of Races" },
-  } satisfies ChartConfig;
+// const Average = ({
+// }: {
+// }) => {
+//   const config = {
+//     player: { label: "Player" },
+//     placing: { label: "Avg Placing" },
+//     played: { label: "# of Races" },
+//   } satisfies ChartConfig;
 
-  return (
-    <CustomChart
-      title="Average Placing"
-      description="July - Now"
-      data={allAvgPlacing}
-      nameKey={"player"}
-      config={config}
-      dataKey={"placing"}
-    />
-  );
-};
+//   return (
+//     <CustomChart
+//       title="Average Placing"
+//       description="July - Now"
+//       data={allAvgPlacing}
+//       nameKey={"player"}
+//       config={config}
+//       dataKey={"placing"}
+//     />
+//   );
+// };
 
-const LastPlace = async ({ gameId }: { gameId: number }) => {
-  const data = await calcMostPerPlacing(gameId);
+// const LastPlace = async ({ gameId }: { gameId: number }) => {
 
-  if (!data) return null;
+//   const config = {
+//     player: { label: "Player" },
+//     last: { label: "# of Last Places" },
+//   } satisfies ChartConfig;
 
-  const config = {
-    player: { label: "Player" },
-    last: { label: "# of Last Places" },
-  } satisfies ChartConfig;
-
-  return (
-    <>
-      <CustomChart
-        title="Most Last Places"
-        description="Keeps track of who placed last the most."
-        data={data}
-        nameKey={"player"}
-        config={config}
-        dataKey={"last"}
-      />
-    </>
-  );
-};
+//   return (
+//     <>
+//       <CustomChart
+//         title="Most Last Places"
+//         description="Keeps track of who placed last the most."
+//         data={data}
+//         nameKey={"player"}
+//         config={config}
+//         dataKey={"last"}
+//       />
+//     </>
+//   );
+// };

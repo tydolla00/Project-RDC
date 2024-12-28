@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdmin } from "@/lib/adminContext";
 import { FormValues } from "../_utils/form-helpers";
+import { StatNames } from "../../../../../prisma/lib/utils";
 
 interface Props {
   player: Player;
