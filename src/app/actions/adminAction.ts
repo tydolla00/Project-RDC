@@ -4,16 +4,6 @@ import { Game, GameStat, Player } from "@prisma/client";
 import prisma from "../../../prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 
-/**
- * Get all game objects from the database
- *
- * @returns {Promise<Game[]>} A promise that resolves to an array of game objects
- */
-export async function getGames(): Promise<Game[]> {
-  const games = await prisma.game.findMany();
-  return games;
-}
-
 export async function getGameStats(gameName: string): Promise<GameStat[]> {
   console.log("Looking for gameStats for ", gameName);
   const game = await prisma.game.findFirst({

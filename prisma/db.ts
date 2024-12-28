@@ -8,20 +8,9 @@ import ws from "ws";
 // neonConfig.webSocketConstructor = ws;
 // const connectionString = `${process.env.DATABASE_URL}`;
 
-// const pool = new Pool({ connectionString });
-// const adapter = new PrismaNeon(pool);
-// const prisma = new PrismaClient({ adapter });
-// export const runtime = "edge";
-
-const prismaClientSingleton = () => {
-  return new PrismaClient();
-};
-
-declare const globalThis: {
-  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
-} & typeof global;
-
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+const pool = new Pool({ connectionString });
+const adapter = new PrismaNeon(pool);
+const prisma = global.prisma || new PrismaClient({ adapter, log: ["query"] });
 
 if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma;
 export default prisma;
