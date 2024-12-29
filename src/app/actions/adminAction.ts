@@ -1,8 +1,10 @@
 "use server";
 
-import { Game, GameStat, Player } from "@prisma/client";
+import { $Enums, Game, GameStat, Player } from "@prisma/client";
+import { v4 } from "uuid";
 import prisma from "../../../prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
+import { getAllGames } from "../../../prisma/lib/games";
 
 export async function getGameStats(gameName: string): Promise<GameStat[]> {
   console.log("Looking for gameStats for ", gameName);
@@ -24,20 +26,11 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
   });
   return gameStats;
 }
-// TODO Handle proper error states
-// Should probably return an object with { err: , whatever else}
-export const insertNewSessionFromAdmin = async (session: FormValues) => {
+
+export const insertNewSessionFromAdmin = async (
+  session: FormValues,
+): Promise<{ error: null | string }> => {
   console.log("Inserting New Session: ", session);
-  // Get latest session Id and create session
-  const latestSession = await prisma.videoSession.findFirst({
-    orderBy: {
-      sessionId: "desc",
-    },
-  });
-
-  const newSessionId = latestSession ? latestSession.sessionId + 1 : 1;
-
-  console.log("Trying new session ID: ", newSessionId);
 
   const sessionGame = await prisma.game.findFirst({
     where: {
@@ -45,11 +38,9 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
     },
   });
 
-  console.log({ sessionGame });
-
   if (!sessionGame) {
     // TODO This should never happen game should be required.
-    return null;
+    return { error: "Game not found." };
   } else {
     const videoAlreadyExists = await prisma.videoSession.findFirst({
       where: {
@@ -58,28 +49,25 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
       },
     });
 
-    if (videoAlreadyExists) return null;
-
-    const newSession = await prisma.videoSession.upsert({
-      where: { sessionId: newSessionId },
-      update: {},
-      create: {
-        sessionId: newSessionId,
-        gameId: sessionGame.gameId,
-        sessionName: session.sessionName,
-        sessionUrl: session.sessionUrl,
-        thumbnail: session.thumbnail,
-        date: session.date,
-      },
-    });
-
-    console.log("\n--- New Session Created: ---", newSession);
+    if (videoAlreadyExists) return { error: "Video already exists." };
   }
 
+  const newSession = await prisma.videoSession.create({
+    data: {
+      gameId: sessionGame.gameId,
+      sessionName: session.sessionName,
+      sessionUrl: session.sessionUrl,
+      thumbnail: session.thumbnail,
+      date: session.date,
+    },
+  });
+  const newSessionId = newSession.sessionId; // ! TODO Remove
+  console.log("\n--- New Session Created: ---", newSession);
+
   // For each set in the session assign to parent session
-  // TODO We might want to change these to be transactions. Need to explain the promise.all to me.
+  // TODO We might want to change these to be transactions. Need to explain the promise.all to me. Also may want to wrap in try catch
   await Promise.all(
-    session.sets.map(async (set: any) => {
+    session.sets.map(async (set) => {
       console.log("\n-- Creating Set From Admin Form Submission:  -- \n", set);
 
       // const setWinnerConect = await set.setWinners.map((winner: any) => ({
@@ -116,11 +104,11 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
 
       // For each match in set assign to parent set
       await Promise.all(
-        set.matches.map(async (match: any) => {
+        set.matches.map(async (match) => {
           console.log("\n - Creating Match  - \n", match);
 
           const matchWinnerConnect =
-            match?.matchWinners?.map((winner: any) => ({
+            match?.matchWinners?.map((winner) => ({
               playerId: winner.playerId,
             })) ?? [];
 
@@ -140,7 +128,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
 
           // For each PlayerSession in match assign to parent match`
           await Promise.all(
-            match.playerSessions.map(async (playerSession: any) => {
+            match.playerSessions.map(async (playerSession) => {
               console.log(
                 "\n  --- Creating PlayerSession  ---\n",
                 playerSession,
@@ -177,7 +165,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
 
               // For each playerStat in playerSession assign to parent playerSession
               await Promise.all(
-                playerSession.playerStats.map(async (playerStat: any) => {
+                playerSession.playerStats.map(async (playerStat) => {
                   console.log(
                     "Creating PlayerStat From Admin Form Submission: ",
                     playerStat,
@@ -185,7 +173,7 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
 
                   const gameStat = await prisma.gameStat.findFirst({
                     where: {
-                      statName: playerStat.stat,
+                      statName: playerStat.stat as $Enums.StatName,
                     },
                   });
 
@@ -224,4 +212,142 @@ export const insertNewSessionFromAdmin = async (session: FormValues) => {
       );
     }),
   );
+  return { error: null };
+};
+
+/**
+ * A work in progress function to efficiently store form submissions. Test on a different branch.
+ * @param session Form values submitted by the user
+ * @returns A transaction that will successfully batch all of the queries together.
+ */
+export const insertNewSessionV2 = async ({
+  sessionUrl,
+  sessionName,
+  sets,
+  game,
+  thumbnail,
+  date, // Can we remove data from the tables.
+}: FormValues): Promise<{ error: string | null }> => {
+  const gameId = (await getAllGames()).find((g) => g.gameName === game)?.gameId;
+
+  //? Check if the game and video exists in the db.
+  // TODO This should never happen game should be required.
+  if (!gameId) return { error: "Game not found." };
+  else {
+    const videoAlreadyExists = await prisma.videoSession.findFirst({
+      where: {
+        gameId,
+        AND: { sessionName },
+      },
+    });
+
+    if (videoAlreadyExists) return { error: "Video already exists." };
+  }
+
+  const prismaSets: any[] = [];
+  const sessionId = v4() as unknown as number; // temporary bc of conflicting id types
+  const gameStats = await getGameStats(game);
+
+  prismaSets.push(
+    prisma.videoSession.create({
+      data: {
+        sessionId,
+        sessionName,
+        sessionUrl,
+        thumbnail,
+        gameId,
+      },
+    }),
+  );
+
+  sets.forEach((set) => {
+    const setId = v4() as unknown as number;
+    prismaSets.push(
+      prisma.videoSession.update({
+        where: { sessionId },
+        data: {
+          sets: {
+            create: {
+              setId,
+              setWinners: {
+                connect: set.setWinners.map((sw) => ({
+                  playerId: sw.playerId,
+                })),
+              },
+            },
+          },
+        },
+      }),
+    );
+
+    set.matches.forEach((match) => {
+      const matchId = v4() as unknown as number;
+      prismaSets.push(
+        prisma.gameSet.update({
+          where: { setId },
+          data: {
+            matches: {
+              create: {
+                matchId,
+                matchWinners: {
+                  connect: match.matchWinners.map((mw) => ({
+                    playerId: mw.playerId,
+                  })),
+                },
+              },
+            },
+          },
+        }),
+      );
+
+      match.playerSessions.forEach((ps) => {
+        const playerSessionId = v4() as unknown as number;
+        prismaSets.push(
+          prisma.gameSet.update({
+            where: { setId },
+            data: {
+              playerSessions: {
+                create: {
+                  sessionId,
+                  matchId,
+                  playerSessionId,
+                  playerId: ps.playerId,
+                },
+              },
+            },
+          }),
+        );
+
+        ps.playerStats.forEach((stat) => {
+          prismaSets.push(
+            prisma.playerSession.update({
+              where: { playerSessionId },
+              data: {
+                playerStats: {
+                  createMany: {
+                    data: [
+                      {
+                        gameId,
+                        playerId: ps.playerId,
+                        value: stat.statValue,
+                        statId: gameStats.find(
+                          (gs) => gs.statName === stat.stat,
+                        )!.statId,
+                      },
+                    ],
+                  },
+                },
+              },
+            }),
+          );
+        });
+      });
+    });
+  });
+
+  await prisma.$transaction(async (prisma) => {
+    await Promise.all([...prismaSets]); // TODO try without Promise.all
+  });
+
+  return { error: null };
 };

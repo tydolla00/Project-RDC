@@ -98,8 +98,9 @@ const PlayerStatManager = (props: Props) => {
       {fields.map((field, index: number) => {
         return (
           <div key={field.id} className="my-4 flex gap-3">
+            <span className="sr-only">{field.stat}</span>
             <Input
-              className="h-full max-w-xs"
+              className="max-w-xs"
               placeholder={field.stat}
               type="text"
               {...register(

@@ -24,18 +24,17 @@ export const SessionInfo = ({
     Awaited<ReturnType<typeof getRDCVideoDetails>> | undefined
   >(undefined);
   const [isPending, startTransition] = useTransition();
-  const control = form.control;
-  const errors = form.formState.errors;
-  const defaultValues = form.formState.defaultValues;
+  const {
+    control,
+    formState: { errors, defaultValues },
+  } = form;
   const url = form.watch("sessionUrl");
 
   const handleUrlUpdated = () => {
     startTransition(async () => {
       // TODO Debounce/Rate limit
-      const videoId = getVideoId(url); // Raise github issue, works without being imported.
-      // console.log({ videoId, defaultValues, control }); // Url is only valid with this line using react compiler
+      const videoId = getVideoId(url);
       // See if url is valid.
-      // TODO Invalid not working
       if (
         defaultValues?.sessionUrl === url ||
         control.getFieldState("sessionUrl").invalid ||
@@ -50,13 +49,12 @@ export const SessionInfo = ({
         form.reset(undefined, { keepIsValid: true });
         toast.error("Please upload a video by RDC Live", { richColors: true });
       } else {
-        form.setValue("sessionName", video.sessionName);
-        form.setValue(
-          "thumbnail",
+        const thumbnail =
           typeof video.thumbnail === "string"
             ? video.thumbnail
-            : video.thumbnail.url,
-        );
+            : video.thumbnail.url;
+        form.setValue("sessionName", video.sessionName);
+        form.setValue("thumbnail", thumbnail);
         form.setValue("date", new Date(video.date));
         setSession(video);
         toast.success("Youtube video successfully linked.", {
@@ -80,7 +78,9 @@ export const SessionInfo = ({
                 {...field}
               />
               {errors.sessionUrl && (
-                <p className="text-red-500">{errors.sessionUrl.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.sessionUrl.message}
+                </p>
               )}
             </FormItem>
           )}

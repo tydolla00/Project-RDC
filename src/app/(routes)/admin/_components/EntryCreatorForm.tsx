@@ -4,7 +4,10 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
-import { insertNewSessionFromAdmin } from "@/app/actions/adminAction";
+import {
+  insertNewSessionFromAdmin,
+  insertNewSessionV2,
+} from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -67,10 +70,11 @@ const EntryCreatorForm = (props: AdminFormProps) => {
       data,
       stringified: JSON.stringify(data, null, 2),
     });
-
-    const err = await insertNewSessionFromAdmin(data);
-    if (err === null)
-      toast.error("Video already submitted", { richColors: true });
+    console.time();
+    const { error: err } = await insertNewSessionFromAdmin(data);
+    // const {error} = await insertNewSessionV2(data);
+    console.timeEnd();
+    if (err === null) toast.error(err, { richColors: true });
     else toast.success("Session successfully created.", { richColors: true });
   };
 
