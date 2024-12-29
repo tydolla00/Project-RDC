@@ -12,7 +12,7 @@ import GolfWithFriends from "./_components/golfwithfriends";
 // ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,
 
-// TODO May need to revalidathPath/Tag after updating data.
+// TODO May need to revalidatePath/Tag after updating data.
 
 export async function generateStaticParams() {
   const games = await getAllGames();

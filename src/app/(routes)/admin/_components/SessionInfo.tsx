@@ -101,7 +101,11 @@ export const SessionInfo = ({
             name="game"
             control={control}
             render={({ field }) => (
-              <GameDropDownForm field={field} control={form.control} />
+              <GameDropDownForm
+                field={field}
+                control={form.control}
+                reset={form.resetField}
+              />
             )}
           />
         </div>

@@ -59,6 +59,7 @@ const SetManager = () => {
   const players = watch(`players`);
   const sets = useWatch({ name: "setWinners" });
   const testSets = useWatch({ control, name: "sets" });
+  const game = watch("game");
 
   useEffect(() => {
     console.log("Set Rerenders: ", sets);
@@ -134,6 +135,7 @@ const SetManager = () => {
         })}
       <div className="ml-auto w-fit">
         <Button
+          disabled={!game}
           type="button"
           onClick={() => handleAddSet()}
           className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"

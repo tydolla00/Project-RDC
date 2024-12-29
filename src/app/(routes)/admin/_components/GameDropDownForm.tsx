@@ -1,6 +1,10 @@
 "use client";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { Control, ControllerRenderProps } from "react-hook-form";
+import {
+  Control,
+  ControllerRenderProps,
+  UseFormResetField,
+} from "react-hook-form";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,15 +35,16 @@ import { getAllGames } from "../../../../../prisma/lib/games";
 
 const GameDropDownForm = ({
   control,
+  reset,
 }: {
   control: Control<FormValues>;
   field: ControllerRenderProps<FormValues>;
+  reset: UseFormResetField<FormValues>;
 }) => {
   const [testGames, setTestGames] = useState<Game[]>([]);
 
   useEffect(() => {
     const fetchGames = async () => {
-      // TODO Maybe bring in Tanstack Query?
       const games = await getAllGames();
       setTestGames(games);
     };
@@ -52,7 +57,7 @@ const GameDropDownForm = ({
       name="game"
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>Game</FormLabel>
+          <FormLabel className="w-fit">Game</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
@@ -87,6 +92,7 @@ const GameDropDownForm = ({
                         key={game.gameId}
                         onSelect={() => {
                           field.onChange(game.gameName);
+                          reset("sets");
                         }}
                       >
                         {game.gameName}

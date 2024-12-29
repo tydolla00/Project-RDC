@@ -68,15 +68,11 @@ const EntryCreatorForm = (props: AdminFormProps) => {
       stringified: JSON.stringify(data, null, 2),
     });
 
-    // data.date = new Date(data.date);
-    // console.log("Date Type in submit:", typeof data.date);
     const err = await insertNewSessionFromAdmin(data);
     if (err === null)
       toast.error("Video already submitted", { richColors: true });
     else toast.success("Session successfully created.", { richColors: true });
   };
-
-  // console.log("Date Type:", typeof getValues().date);
 
   /**
    * Handles errors that occur during form submission.
