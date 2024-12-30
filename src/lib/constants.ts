@@ -151,6 +151,10 @@ export const gameImages = {
   callofduty: "callofduty.jpeg",
 };
 
+export enum errorCodes {
+  NotAuthenticated = "Not Authenticated",
+}
+
 type MembersProps = {
   desc: string;
   nav: { alt: string; name: string; url: string; src: string };

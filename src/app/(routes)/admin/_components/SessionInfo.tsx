@@ -12,6 +12,8 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { getVideoId } from "../_utils/helper-functions";
 import { FormValues, AdminFormProps } from "../_utils/form-helpers";
+import { errorCodes } from "@/lib/constants";
+import { signOut } from "@/auth";
 
 export const SessionInfo = ({
   form,
@@ -21,8 +23,8 @@ export const SessionInfo = ({
   rdcMembers: AdminFormProps["rdcMembers"];
 }) => {
   const [session, setSession] = useState<
-    Awaited<ReturnType<typeof getRDCVideoDetails>> | undefined
-  >(undefined);
+    Awaited<ReturnType<typeof getRDCVideoDetails>>["video"] | null
+  >(null);
   const [isPending, startTransition] = useTransition();
   const {
     control,
@@ -44,10 +46,14 @@ export const SessionInfo = ({
         return;
       }
 
-      const video = await getRDCVideoDetails(videoId);
-      if (!video) {
+      const { error, video } = await getRDCVideoDetails(videoId);
+      if (error === errorCodes.NotAuthenticated)
+        await signOut({ redirectTo: "/" });
+
+      if (error !== undefined) {
         form.reset(undefined, { keepIsValid: true });
-        toast.error("Please upload a video by RDC Live", { richColors: true });
+        toast.error(error, { richColors: true });
+        setSession(null);
       } else {
         const thumbnail =
           typeof video.thumbnail === "string"
@@ -171,11 +177,7 @@ export const SessionInfo = ({
           <AdminDatePicker />
         </div>
         <div className="my-2 max-h-72 w-full max-w-72 sm:w-72 lg:my-24">
-          {session ? (
-            <Thumbnail session={session} />
-          ) : (
-            <Skeleton className="h-32" />
-          )}
+          <Thumbnail session={session} />
         </div>
       </div>
     </>
@@ -185,18 +187,28 @@ export const SessionInfo = ({
 const Thumbnail = ({
   session,
 }: {
-  session: NonNullable<Awaited<ReturnType<typeof getRDCVideoDetails>>>;
-}) => (
-  <Image
-    src={
-      typeof session.thumbnail === "string"
-        ? session.thumbnail
-        : session.thumbnail.url
-    }
-    height={
-      typeof session.thumbnail === "string" ? 9 : session.thumbnail.height
-    } // 16:9 aspect ratio
-    width={typeof session.thumbnail === "string" ? 16 : session.thumbnail.width}
-    alt="RDC Youtube Video Thumbnail"
-  />
-);
+  session: Awaited<ReturnType<typeof getRDCVideoDetails>>["video"];
+}) => {
+  return (
+    <>
+      {session ? (
+        <Image
+          src={
+            typeof session.thumbnail === "string"
+              ? session.thumbnail
+              : session.thumbnail.url
+          }
+          height={
+            typeof session.thumbnail === "string" ? 9 : session.thumbnail.height
+          } // 16:9 aspect ratio
+          width={
+            typeof session.thumbnail === "string" ? 16 : session.thumbnail.width
+          }
+          alt="RDC Youtube Video Thumbnail"
+        />
+      ) : (
+        <Skeleton className="h-32" />
+      )}
+    </>
+  );
+};

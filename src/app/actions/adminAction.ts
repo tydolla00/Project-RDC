@@ -5,6 +5,8 @@ import { v4 } from "uuid";
 import prisma from "../../../prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { getAllGames } from "../../../prisma/lib/games";
+import { auth } from "@/auth";
+import { errorCodes } from "@/lib/constants";
 
 export async function getGameStats(gameName: string): Promise<GameStat[]> {
   console.log("Looking for gameStats for ", gameName);
@@ -31,6 +33,8 @@ export const insertNewSessionFromAdmin = async (
   session: FormValues,
 ): Promise<{ error: null | string }> => {
   console.log("Inserting New Session: ", session);
+  const isAuthenticated = await auth();
+  if (!isAuthenticated) return { error: errorCodes.NotAuthenticated };
 
   const sessionGame = await prisma.game.findFirst({
     where: {
@@ -229,6 +233,8 @@ export const insertNewSessionV2 = async ({
   date, // Can we remove data from the tables.
 }: FormValues): Promise<{ error: string | null }> => {
   const gameId = (await getAllGames()).find((g) => g.gameName === game)?.gameId;
+  const isAuthenticated = await auth();
+  if (!isAuthenticated) return { error: errorCodes.NotAuthenticated };
 
   //? Check if the game and video exists in the db.
   // TODO This should never happen game should be required.
