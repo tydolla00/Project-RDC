@@ -21,6 +21,8 @@ import { ChevronDown } from "lucide-react";
 import WinnerDisplay from "./WinnerDisplay";
 import { Label } from "@/components/ui/label";
 import { formSchema } from "../_utils/form-helpers";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 const SetManager = () => {
   const { watch, formState, control } =
@@ -32,6 +34,7 @@ const SetManager = () => {
   });
 
   const [openSets, setOpenSets] = useState<boolean[]>(fields.map(() => false));
+  const [textArea, settextArea] = useState<string[]>(fields.map(() => ""));
   console.log("open sets", openSets);
   const [highestSetId, setHighestSetId] = useState(0);
   const toggleSet = (index: number) => {
@@ -54,6 +57,27 @@ const SetManager = () => {
         .fill(false)
         .map((_, i) => (i === newLength - 1 ? true : (prev[i] ?? false)));
     });
+
+    settextArea((prev) => {
+      const newArr = [...prev];
+      newArr.push("");
+      return newArr;
+    });
+  };
+
+  const handleAddJSON = (i: number) => {
+    try {
+      const json = JSON.parse(textArea[i]);
+      if (!Array.isArray(json))
+        toast.error("Please upload valid json.", { richColors: true });
+      else {
+        // TODO Set Values
+      }
+      console.log(json);
+    } catch (error) {
+      console.info(error);
+      toast.error("Please upload valid json.", { richColors: true });
+    }
   };
 
   const players = watch(`players`);
@@ -93,6 +117,12 @@ const SetManager = () => {
                         //     i === setIndex ? false : isOpen,
                         //   ),
                         // );
+                        settextArea((prev) => {
+                          const newSet = prev.filter(
+                            (_, index) => setIndex !== index,
+                          );
+                          return newSet;
+                        });
                         remove(setIndex);
                       }}
                       width={24}
@@ -103,20 +133,49 @@ const SetManager = () => {
                 </CardHeader>
 
                 <CollapsibleContent>
-                  <Label className="my-2 block text-muted-foreground">
-                    Set Winner
+                  <div
+                    style={{ position: "-webkit-sticky" }}
+                    className="sticky top-12 z-10 bg-card"
+                  >
+                    <Label className="my-2 block text-muted-foreground">
+                      Set Winner
+                    </Label>
+                    <Controller
+                      name={`sets.${setIndex}.setWinners`}
+                      control={control}
+                      render={({ field }) => (
+                        <PlayerSelector
+                          rdcMembers={players}
+                          control={control}
+                          field={field}
+                        />
+                      )}
+                    />
+                  </div>
+                  <Label>
+                    You may paste in the info of all matches for Set{" "}
+                    {setIndex + 1}
                   </Label>
-                  <Controller
-                    name={`sets.${setIndex}.setWinners`}
-                    control={control}
-                    render={({ field }) => (
-                      <PlayerSelector
-                        rdcMembers={players}
-                        control={control}
-                        field={field}
-                      />
-                    )}
+                  <Textarea
+                    value={textArea[setIndex]}
+                    onChange={(e) =>
+                      settextArea((prev) =>
+                        prev.map((prev, i) => {
+                          if (i === setIndex) prev = e.target.value;
+                          return prev;
+                        }),
+                      )
+                    }
+                    className="max-w-xs"
+                    placeholder="Paste in json"
                   />
+                  <Button
+                    type="button"
+                    onClick={() => handleAddJSON(setIndex)}
+                    disabled={textArea[setIndex]?.length <= 0}
+                  >
+                    Fill Match
+                  </Button>
                   <MatchManager setIndex={setIndex} />
                 </CollapsibleContent>
                 <CardFooter className="flex flex-row-reverse pb-0">

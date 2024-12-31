@@ -18,6 +18,7 @@ import { useFormStatus } from "react-dom";
 import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
+import { revalidateTag } from "next/cache";
 
 interface Props {
   rdcMembers: Player[];
@@ -74,11 +75,18 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     });
     console.time();
     const { error: err } = await insertNewSessionFromAdmin(data);
-    // const {error} = await insertNewSessionV2(data);
-    // if (error === errorCodes.NotAuthenticated) await signOut({ redirectTo: "/" });
+    // const { error: err } = await insertNewSessionV2(data);
     console.timeEnd();
-    if (err === null) toast.error(err, { richColors: true });
-    else toast.success("Session successfully created.", { richColors: true });
+    console.log(err);
+
+    if (err)
+      err === errorCodes.NotAuthenticated
+        ? await signOut({ redirectTo: "/" })
+        : toast.error(err, { richColors: true });
+    else {
+      toast.success("Session successfully created.", { richColors: true });
+      revalidateTag("getAllSessions");
+    }
   };
 
   /**

@@ -51,7 +51,7 @@ const SubmissionTable = async () => {
             <TableHead>Session Name</TableHead>
             <TableHead>Game</TableHead>
             <TableHead>Session URL</TableHead>
-            <TableHead>Created At</TableHead>
+            <TableHead>Created At (EST)</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -63,7 +63,7 @@ const SubmissionTable = async () => {
               <TableCell className="hover:underline">
                 <Link href={session.sessionUrl}>{session.sessionUrl}</Link>
               </TableCell>
-              <TableCell>{`${session.createdAt}`}</TableCell>
+              <TableCell>{`${new Date(session.createdAt).toLocaleString()}`}</TableCell>
             </TableRow>
           ))}
         </TableBody>

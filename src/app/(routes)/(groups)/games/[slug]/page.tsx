@@ -66,6 +66,10 @@ export default async function Page({
   );
 }
 
+const Sessions = () => {
+  // TODO This will be a table with all of the currently submitted sessions for a game. Show the name. url, and thumbnail.
+};
+
 // const Average = ({
 // }: {
 // }) => {

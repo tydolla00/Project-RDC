@@ -7,5 +7,5 @@ export const getAllSessions = unstable_cache(
       include: { Game: { select: { gameName: true } } },
     }),
   undefined,
-  { revalidate: false, tags: ["getAllSessions"] },
+  { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
 );
