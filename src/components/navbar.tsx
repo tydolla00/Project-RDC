@@ -35,7 +35,7 @@ export const Navbar = async () => {
   const members = Array.from(RDCMembers.entries());
 
   return (
-    <NavigationMenu className="sticky top-0 mx-auto w-screen bg-inherit">
+    <NavigationMenu className="sticky top-0 z-20 mx-auto w-screen bg-inherit">
       <NavigationMenuList>
         <NavigationMenuItem className={navigationMenuTriggerStyle()}>
           <Link href="/">

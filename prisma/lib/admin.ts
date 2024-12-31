@@ -1,7 +1,11 @@
+import { unstable_cache } from "next/cache";
 import prisma from "../db";
-// Should only do this once in the EntryCreator I think
-export const getRDCMembers = async () => {
-  const members = await prisma.player.findMany();
 
-  return members;
-};
+export const getAllSessions = unstable_cache(
+  async () =>
+    await prisma.videoSession.findMany({
+      include: { Game: { select: { gameName: true } } },
+    }),
+  undefined,
+  { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
+);

@@ -1,3 +1,5 @@
+"use server";
+
 import { unstable_cache } from "next/cache";
 import prisma from "../db";
 import { StatName } from "@prisma/client";
@@ -10,12 +12,15 @@ import { getSumOfStat } from "@prisma/client/sql";
  * Fetches all games from the database.
  * @returns all game records including gameName and gameId
  */
-export const getAllGames = function () {
-  return unstable_cache(async () => await prisma.game.findMany(), undefined, {
+export const getAllGames = unstable_cache(
+  async () => await prisma.game.findMany(),
+  undefined,
+  {
     tags: ["getAllGames"],
     revalidate: false,
-  })();
-};
+  },
+);
+
 export const getSumPerStat = async (playerId: number, statName: StatName) =>
   await prisma.$queryRawTyped(getSumOfStat(playerId, statName));
 /**

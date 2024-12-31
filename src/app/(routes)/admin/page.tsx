@@ -1,8 +1,8 @@
 import { H1 } from "@/components/headings";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getRDCMembers } from "../../../../prisma/lib/admin";
 import EntryCreatorForm from "./_components/EntryCreatorForm";
+import { getAllMembers } from "../../../../prisma/lib/members";
 
 export default async function Page() {
   return (
@@ -10,7 +10,7 @@ export default async function Page() {
       <H1>Admin</H1>
 
       <Suspense fallback={<Skelly />}>
-        <EntryCreatorForm rdcMembers={await getRDCMembers()} />
+        <EntryCreatorForm rdcMembers={await getAllMembers()} />
       </Suspense>
     </div>
   );
