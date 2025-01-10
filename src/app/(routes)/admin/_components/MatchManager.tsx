@@ -1,5 +1,5 @@
 import { Player } from "@prisma/client";
-import React, { useState } from "react";
+import React from "react";
 import { Controller, useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import PlayerSessionManager from "./PlayerSessionManager";
@@ -22,7 +22,6 @@ const MatchManager = (props: Props) => {
     control,
   });
   const players = getValues(`players`);
-  const [isVisionModalOpen, setIsVisionModalOpen] = useState<boolean>(false);
 
   /**
    *  Handles create new match button click.
@@ -42,11 +41,6 @@ const MatchManager = (props: Props) => {
     });
   };
 
-  const handleImportBtnClick = () => {
-    console.log("Opening Import Model");
-    setIsVisionModalOpen(!isVisionModalOpen);
-  };
-
   return (
     <div>
       {(fields.length === 0 && (
@@ -57,7 +51,6 @@ const MatchManager = (props: Props) => {
         fields.map((match, matchIndex) => {
           return (
             <div key={match.id} className="my-5 flex flex-col justify-between">
-              <RDCVisionModal isOpen={isVisionModalOpen} />
               <div id="match-manager-header" className="flex justify-between">
                 <Label>Match {matchIndex + 1}</Label>
                 <Button
@@ -80,10 +73,7 @@ const MatchManager = (props: Props) => {
                   />
                 )}
               />
-              <Button type="button" onClick={handleImportBtnClick}>
-                {" "}
-                Import{" "}
-              </Button>
+
               <div className="my-4 text-center text-lg">
                 Player Sessions for Match {matchIndex + 1}
               </div>
@@ -95,7 +85,7 @@ const MatchManager = (props: Props) => {
             </div>
           );
         })}
-      <div>
+      <div className="flex justify-between">
         <Button
           className="my-2 rounded-md bg-purple-900 p-2 font-semibold text-white hover:bg-purple-950"
           type="button"
@@ -103,6 +93,7 @@ const MatchManager = (props: Props) => {
         >
           Add Match
         </Button>
+        <RDCVisionModal />
       </div>
     </div>
   );
