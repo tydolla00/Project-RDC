@@ -1,5 +1,5 @@
 import { Player } from "@prisma/client";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import PlayerSessionManager from "./PlayerSessionManager";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import { FormValues } from "../_utils/form-helpers";
+import RDCVisionModal from "./RDCVisionModal";
 
 interface Props {
   setIndex: number;
@@ -21,8 +22,7 @@ const MatchManager = (props: Props) => {
     control,
   });
   const players = getValues(`players`);
-
-  const statName = "MK8_POS"; // ! TODO Can we remove this
+  const [isVisionModalOpen, setIsVisionModalOpen] = useState<boolean>(false);
 
   /**
    *  Handles create new match button click.
@@ -42,6 +42,11 @@ const MatchManager = (props: Props) => {
     });
   };
 
+  const handleImportBtnClick = () => {
+    console.log("Opening Import Model");
+    setIsVisionModalOpen(!isVisionModalOpen);
+  };
+
   return (
     <div>
       {(fields.length === 0 && (
@@ -52,6 +57,7 @@ const MatchManager = (props: Props) => {
         fields.map((match, matchIndex) => {
           return (
             <div key={match.id} className="my-5 flex flex-col justify-between">
+              <RDCVisionModal isOpen={isVisionModalOpen} />
               <div id="match-manager-header" className="flex justify-between">
                 <Label>Match {matchIndex + 1}</Label>
                 <Button
@@ -74,11 +80,14 @@ const MatchManager = (props: Props) => {
                   />
                 )}
               />
+              <Button type="button" onClick={handleImportBtnClick}>
+                {" "}
+                Import{" "}
+              </Button>
               <div className="my-4 text-center text-lg">
                 Player Sessions for Match {matchIndex + 1}
               </div>
               <PlayerSessionManager
-                statName={statName}
                 setIndex={setIndex}
                 matchIndex={matchIndex}
                 players={players}
