@@ -8,6 +8,7 @@ import {
 import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { analyzeScreenshot } from "@/app/actions/visionAction";
 
 const RDCVisionModal = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -41,6 +42,24 @@ const RDCVisionModal = () => {
     return true;
   };
 
+  const handleAnalyzeBtnClick = (): void => {
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const fileContent = e.target?.result;
+        if (fileContent) {
+          const base64FileContent = Buffer.from(
+            fileContent as ArrayBuffer,
+          ).toString("base64");
+
+          console.log("Base64 File Content: ", base64FileContent);
+          await analyzeScreenshot(base64FileContent);
+        }
+      };
+      reader.readAsArrayBuffer(selectedFile);
+    }
+  };
+
   console.log("Selected File: ", selectedFile);
 
   return (
@@ -57,7 +76,10 @@ const RDCVisionModal = () => {
           className="hover:cursor-pointer hover:bg-primary-foreground"
         />
         {selectedFile && <p>Selected File: {selectedFile.name}</p>}
-        <Button> Extract Stats from Image</Button>
+        <Button onClick={handleAnalyzeBtnClick}>
+          {" "}
+          Extract Stats from Image
+        </Button>
         <div>Results:</div>
       </DialogContent>
     </Dialog>
