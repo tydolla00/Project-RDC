@@ -45,7 +45,7 @@ export default async function Page({
           <CardTitle>Chart</CardTitle>
         </CardHeader>
       </Card>
-      <div className="mt-10 flex gap-10">
+      <div className="mt-10 flex flex-wrap gap-10">
         <Card className="h-64 flex-1">
           <CardHeader>
             <CardTitle>Chart</CardTitle>

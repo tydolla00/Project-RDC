@@ -22,7 +22,7 @@ const MatchManager = (props: Props) => {
   });
   const players = getValues(`players`);
 
-  const statName = "MK8_POS";
+  const statName = "MK8_POS"; // ! TODO Can we remove this
 
   /**
    *  Handles create new match button click.

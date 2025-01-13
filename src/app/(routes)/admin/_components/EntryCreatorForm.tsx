@@ -4,7 +4,10 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
-import { insertNewSessionFromAdmin } from "@/app/actions/adminAction";
+import {
+  insertNewSessionFromAdmin,
+  insertNewSessionV2,
+} from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -13,6 +16,9 @@ import { AdminFormProps } from "../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
 import { useFormStatus } from "react-dom";
 import { SessionInfo } from "./SessionInfo";
+import { errorCodes } from "@/lib/constants";
+import { signOut } from "@/auth";
+import { revalidateTag } from "next/cache";
 
 interface Props {
   rdcMembers: Player[];
@@ -67,16 +73,21 @@ const EntryCreatorForm = (props: AdminFormProps) => {
       data,
       stringified: JSON.stringify(data, null, 2),
     });
+    console.time();
+    const { error: err } = await insertNewSessionFromAdmin(data);
+    // const { error: err } = await insertNewSessionV2(data);
+    console.timeEnd();
+    console.log(err);
 
-    // data.date = new Date(data.date);
-    // console.log("Date Type in submit:", typeof data.date);
-    const err = await insertNewSessionFromAdmin(data);
-    if (err === null)
-      toast.error("Video already submitted", { richColors: true });
-    else toast.success("Session successfully created.", { richColors: true });
+    if (err)
+      err === errorCodes.NotAuthenticated
+        ? await signOut({ redirectTo: "/" })
+        : toast.error(err, { richColors: true });
+    else {
+      toast.success("Session successfully created.", { richColors: true });
+      revalidateTag("getAllSessions");
+    }
   };
-
-  // console.log("Date Type:", typeof getValues().date);
 
   /**
    * Handles errors that occur during form submission.

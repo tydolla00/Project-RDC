@@ -64,7 +64,7 @@ export default async function Home() {
                     fill
                     sizes="(max-width: 639px) 100vw, 100vw"
                     alt=""
-                    src={`/images/${gameImages[gameName as keyof typeof gameImages]}`} // remove from nextconfig
+                    src={`/images/${gameImages[gameName as keyof typeof gameImages]}`}
                   />
                   <CardHeader className="relative h-1/4 bg-black bg-opacity-50">
                     <CardTitle className="absolute font-extrabold text-white opacity-100">

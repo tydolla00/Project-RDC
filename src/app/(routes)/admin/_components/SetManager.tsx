@@ -20,18 +20,22 @@ import {
 import { ChevronDown } from "lucide-react";
 import WinnerDisplay from "./WinnerDisplay";
 import { Label } from "@/components/ui/label";
-import { formSchema } from "../_utils/form-helpers";
+import { formSchema, FormValues } from "../_utils/form-helpers";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { randomInt } from "crypto";
 
 const SetManager = () => {
   const { watch, formState, control } =
     useFormContext<z.infer<typeof formSchema>>();
 
-  const { append, remove, fields } = useFieldArray({
+  const { append, remove, fields, update } = useFieldArray({
     name: "sets",
     control,
   });
 
   const [openSets, setOpenSets] = useState<boolean[]>(fields.map(() => false));
+  const [textArea, setTextArea] = useState<string[]>(fields.map(() => ""));
   console.log("open sets", openSets);
   const [highestSetId, setHighestSetId] = useState(0);
   const toggleSet = (index: number) => {
@@ -54,11 +58,54 @@ const SetManager = () => {
         .fill(false)
         .map((_, i) => (i === newLength - 1 ? true : (prev[i] ?? false)));
     });
+
+    setTextArea((prev) => {
+      const newArr = [...prev];
+      newArr.push("");
+      return newArr;
+    });
+  };
+
+  const handleAddJSON = (setIndex: number) => {
+    try {
+      const json = JSON.parse(textArea[setIndex]);
+      if (!Array.isArray(json))
+        toast.error("Please upload valid json.", { richColors: true });
+      else {
+        // TODO Set Values
+        // TODO Work In Progress. Not completed.
+        const matches: FormValues["sets"][0]["matches"] = [];
+        const setWinners: FormValues["sets"][0]["setWinners"] = [];
+        const setId = randomInt(10000);
+        json.forEach((v) => {
+          if (!Array.isArray(v)) throw new Error("");
+          // Loop through matches.
+          v.forEach((val) => {
+            matches.push({
+              matchWinners: [],
+              playerSessions: [
+                {
+                  playerId: val.playerId,
+                  playerSessionName: val.name,
+                  playerStats: [],
+                },
+              ],
+            });
+          });
+          update(setIndex, { matches, setWinners, setId });
+        });
+      }
+      console.log(json);
+    } catch (error) {
+      console.info(error);
+      toast.error("Please upload valid json.", { richColors: true });
+    }
   };
 
   const players = watch(`players`);
   const sets = useWatch({ name: "setWinners" });
   const testSets = useWatch({ control, name: "sets" });
+  const game = watch("game");
 
   useEffect(() => {
     console.log("Set Rerenders: ", sets);
@@ -92,6 +139,12 @@ const SetManager = () => {
                         //     i === setIndex ? false : isOpen,
                         //   ),
                         // );
+                        setTextArea((prev) => {
+                          const newSet = prev.filter(
+                            (_, index) => setIndex !== index,
+                          );
+                          return newSet;
+                        });
                         remove(setIndex);
                       }}
                       width={24}
@@ -102,20 +155,50 @@ const SetManager = () => {
                 </CardHeader>
 
                 <CollapsibleContent>
-                  <Label className="my-2 block text-muted-foreground">
-                    Set Winner
+                  <div
+                    style={{ position: "-webkit-sticky" }}
+                    className="sticky top-12 z-10 bg-card"
+                  >
+                    <Label className="my-2 block text-muted-foreground">
+                      Set Winner
+                    </Label>
+                    <Controller
+                      name={`sets.${setIndex}.setWinners`}
+                      control={control}
+                      render={({ field }) => (
+                        <PlayerSelector
+                          rdcMembers={players}
+                          control={control}
+                          field={field}
+                        />
+                      )}
+                    />
+                  </div>
+                  {/* TODO Work In Progress */}
+                  <Label>
+                    You may paste in the info of all matches for Set{" "}
+                    {setIndex + 1}
                   </Label>
-                  <Controller
-                    name={`sets.${setIndex}.setWinners`}
-                    control={control}
-                    render={({ field }) => (
-                      <PlayerSelector
-                        rdcMembers={players}
-                        control={control}
-                        field={field}
-                      />
-                    )}
+                  <Textarea
+                    value={textArea[setIndex]}
+                    onChange={(e) =>
+                      setTextArea((prev) =>
+                        prev.map((prev, i) => {
+                          if (i === setIndex) prev = e.target.value;
+                          return prev;
+                        }),
+                      )
+                    }
+                    className="max-w-xs"
+                    placeholder="Paste in json"
                   />
+                  <Button
+                    type="button"
+                    onClick={() => handleAddJSON(setIndex)}
+                    disabled={textArea[setIndex]?.length <= 0}
+                  >
+                    Fill Match
+                  </Button>
                   <MatchManager setIndex={setIndex} />
                 </CollapsibleContent>
                 <CardFooter className="flex flex-row-reverse pb-0">
@@ -134,6 +217,7 @@ const SetManager = () => {
         })}
       <div className="ml-auto w-fit">
         <Button
+          disabled={!game}
           type="button"
           onClick={() => handleAddSet()}
           className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"

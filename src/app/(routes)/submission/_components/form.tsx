@@ -65,7 +65,7 @@ const formSchema = z.object({
 
 export const SubmissionForm = () => {
   const [session, setSession] = useState<
-    Awaited<ReturnType<typeof getRDCVideoDetails>> | undefined
+    Awaited<ReturnType<typeof getRDCVideoDetails>>["video"] | undefined
   >(undefined);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -95,8 +95,8 @@ export const SubmissionForm = () => {
     const trimEnd = id.indexOf("&");
 
     if (trimEnd !== -1) id = id.slice(0, trimEnd);
-    const video = await getRDCVideoDetails(id);
-    if (!video) {
+    const { error, video } = await getRDCVideoDetails(id);
+    if (error !== undefined) {
       form.reset(undefined, { keepIsValid: true });
       toast("Please upload a video by RDC Live");
     } else {
