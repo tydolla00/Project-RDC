@@ -20,21 +20,22 @@ import {
 import { ChevronDown } from "lucide-react";
 import WinnerDisplay from "./WinnerDisplay";
 import { Label } from "@/components/ui/label";
-import { formSchema } from "../_utils/form-helpers";
+import { formSchema, FormValues } from "../_utils/form-helpers";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { randomInt } from "crypto";
 
 const SetManager = () => {
   const { watch, formState, control } =
     useFormContext<z.infer<typeof formSchema>>();
 
-  const { append, remove, fields } = useFieldArray({
+  const { append, remove, fields, update } = useFieldArray({
     name: "sets",
     control,
   });
 
   const [openSets, setOpenSets] = useState<boolean[]>(fields.map(() => false));
-  const [textArea, settextArea] = useState<string[]>(fields.map(() => ""));
+  const [textArea, setTextArea] = useState<string[]>(fields.map(() => ""));
   console.log("open sets", openSets);
   const [highestSetId, setHighestSetId] = useState(0);
   const toggleSet = (index: number) => {
@@ -58,20 +59,41 @@ const SetManager = () => {
         .map((_, i) => (i === newLength - 1 ? true : (prev[i] ?? false)));
     });
 
-    settextArea((prev) => {
+    setTextArea((prev) => {
       const newArr = [...prev];
       newArr.push("");
       return newArr;
     });
   };
 
-  const handleAddJSON = (i: number) => {
+  const handleAddJSON = (setIndex: number) => {
     try {
-      const json = JSON.parse(textArea[i]);
+      const json = JSON.parse(textArea[setIndex]);
       if (!Array.isArray(json))
         toast.error("Please upload valid json.", { richColors: true });
       else {
         // TODO Set Values
+        // TODO Work In Progress. Not completed.
+        const matches: FormValues["sets"][0]["matches"] = [];
+        const setWinners: FormValues["sets"][0]["setWinners"] = [];
+        const setId = randomInt(10000);
+        json.forEach((v) => {
+          if (!Array.isArray(v)) throw new Error("");
+          // Loop through matches.
+          v.forEach((val) => {
+            matches.push({
+              matchWinners: [],
+              playerSessions: [
+                {
+                  playerId: val.playerId,
+                  playerSessionName: val.name,
+                  playerStats: [],
+                },
+              ],
+            });
+          });
+          update(setIndex, { matches, setWinners, setId });
+        });
       }
       console.log(json);
     } catch (error) {
@@ -117,7 +139,7 @@ const SetManager = () => {
                         //     i === setIndex ? false : isOpen,
                         //   ),
                         // );
-                        settextArea((prev) => {
+                        setTextArea((prev) => {
                           const newSet = prev.filter(
                             (_, index) => setIndex !== index,
                           );
@@ -152,6 +174,7 @@ const SetManager = () => {
                       )}
                     />
                   </div>
+                  {/* TODO Work In Progress */}
                   <Label>
                     You may paste in the info of all matches for Set{" "}
                     {setIndex + 1}
@@ -159,7 +182,7 @@ const SetManager = () => {
                   <Textarea
                     value={textArea[setIndex]}
                     onChange={(e) =>
-                      settextArea((prev) =>
+                      setTextArea((prev) =>
                         prev.map((prev, i) => {
                           if (i === setIndex) prev = e.target.value;
                           return prev;
