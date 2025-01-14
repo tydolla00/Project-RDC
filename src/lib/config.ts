@@ -9,6 +9,8 @@ interface Config {
   AUTH_GITHUB_SECRET: string | undefined;
   AUTH_TRUST_HOST: string | undefined;
   AUTH_SECRET: string | undefined;
+  NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT: string | undefined;
+  NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_API_KEY: string | undefined;
 }
 
 const getConfig = (): Config => {
@@ -23,6 +25,10 @@ const getConfig = (): Config => {
     AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
     AUTH_TRUST_HOST: process.env.AUTH_TRUST_HOST,
     AUTH_SECRET: process.env.AUTH_SECRET,
+    NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT:
+      process.env.DOCUMENT_INTELLIGENCE_ENDPOINT,
+    NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_API_KEY:
+      process.env.DOCUMENT_INTELLIGENCE_API_KEY,
   };
 };
 

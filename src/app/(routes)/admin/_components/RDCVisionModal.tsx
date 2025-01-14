@@ -8,7 +8,7 @@ import {
 import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { analyzeScreenshot } from "@/app/actions/visionAction";
+import { analyzeScreenShotTest } from "@/app/actions/visionAction";
 
 const RDCVisionModal = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -53,7 +53,7 @@ const RDCVisionModal = () => {
           ).toString("base64");
 
           console.log("Base64 File Content: ", base64FileContent);
-          await analyzeScreenshot(base64FileContent);
+          await analyzeScreenShotTest();
         }
       };
       reader.readAsArrayBuffer(selectedFile);
@@ -76,7 +76,7 @@ const RDCVisionModal = () => {
           className="hover:cursor-pointer hover:bg-primary-foreground"
         />
         {selectedFile && <p>Selected File: {selectedFile.name}</p>}
-        <Button onClick={handleAnalyzeBtnClick}>
+        <Button onClick={handleAnalyzeBtnClick} type="button">
           {" "}
           Extract Stats from Image
         </Button>
