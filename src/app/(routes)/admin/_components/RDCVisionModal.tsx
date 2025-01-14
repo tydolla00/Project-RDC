@@ -53,7 +53,7 @@ const RDCVisionModal = () => {
           ).toString("base64");
 
           console.log("Base64 File Content: ", base64FileContent);
-          await analyzeScreenShotTest();
+          await analyzeScreenShotTest(base64FileContent);
         }
       };
       reader.readAsArrayBuffer(selectedFile);

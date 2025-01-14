@@ -31,10 +31,14 @@ interface rlVisionStats {
   shots: string | undefined;
 }
 
-export const analyzeScreenShotTest = async () => {
+/**
+ *  Analyze the screenshot of the game stats and extract the player stats
+ * @param base64Source base64 encoded image source : string
+ * @returns Object containing teams and player objects with their stats
+ */
+export const analyzeScreenShotTest = async (base64Source: string) => {
   // TODO: Add Loading State
   // TODO: Fix env config
-  // TODO: Convert to base64
   console.log(
     "Document Endpointz: ",
     process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"],
@@ -54,7 +58,7 @@ export const analyzeScreenShotTest = async () => {
       .post({
         contentType: "application/json",
         body: {
-          urlSource: "https://i.imgur.com/QTvH8QA.png",
+          base64Source: base64Source,
         },
         queryParameters: {
           locale: "en-US",
