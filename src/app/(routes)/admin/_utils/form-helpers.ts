@@ -74,3 +74,55 @@ export type FormValues = z.infer<typeof formSchema>;
 export interface AdminFormProps {
   rdcMembers: Player[];
 }
+
+type PlayerMapping = {
+  [key: string]: {
+    playerId: number;
+    playerName: string;
+    gamerTags: string[];
+  };
+};
+
+export const PLAYER_MAPPINGS: PlayerMapping = {
+  Scott: {
+    playerId: 1,
+    playerName: "Scott",
+    gamerTags: ["Silver"],
+  },
+  Ben: {
+    playerId: 2,
+    playerName: "Ben",
+    gamerTags: ["Des"],
+  },
+  Dylan: {
+    playerId: 3,
+    playerName: "Dylan",
+    gamerTags: ["Aff"],
+  },
+  Lee: {
+    playerId: 4,
+    playerName: "Lee",
+    gamerTags: ["Lee"],
+  },
+  Mark: {
+    playerId: 5,
+    playerName: "Mark",
+    gamerTags: ["Mark"],
+  },
+};
+const playerCache = new Map<string, any>();
+
+export const findPlayerByGamerTag = (gamerTag: string) => {
+  if (playerCache.has(gamerTag)) {
+    return playerCache.get(gamerTag);
+  }
+
+  const player = Object.values(PLAYER_MAPPINGS).find((player) =>
+    player.gamerTags.some(
+      (tag) => tag.toLowerCase() === gamerTag.toLowerCase(),
+    ),
+  );
+
+  playerCache.set(gamerTag, player);
+  return player;
+};

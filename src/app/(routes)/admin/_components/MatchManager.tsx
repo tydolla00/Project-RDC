@@ -1,5 +1,5 @@
 import { Player } from "@prisma/client";
-import React from "react";
+import React, { useMemo } from "react";
 import { Controller, useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import PlayerSessionManager from "./PlayerSessionManager";
@@ -7,7 +7,11 @@ import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
-import { FormValues } from "../_utils/form-helpers";
+import {
+  findPlayerByGamerTag,
+  FormValues,
+  PLAYER_MAPPINGS,
+} from "../_utils/form-helpers";
 import RDCVisionModal from "./RDCVisionModal";
 
 interface Props {
@@ -39,6 +43,36 @@ const MatchManager = (props: Props) => {
       matchWinners: [],
       playerSessions: playerSessions,
     });
+  };
+
+  const handleCreateMatchFromVision = (visionResults: any) => {
+    console.log("Handling Create Match from Vision: ", visionResults);
+
+    const blueTEamPlayerSessions = useMemo(
+      () =>
+        visionResults.bluePlayers.map((player: any) => {
+          const foundPlayer = findPlayerByGamerTag(player.name);
+          return {
+            playerId: foundPlayer?.playerId || 0,
+            playerSessionName: player.name,
+            playerStats: [],
+          };
+        }),
+      [visionResults],
+    );
+
+    const orangeTeamPlayerSessions = useMemo(
+      () =>
+        visionResults.orangePlayers.map((player: any) => {
+          const foundPlayer = findPlayerByGamerTag(player.name);
+          return {
+            playerId: foundPlayer?.playerId || 0,
+            playerSessionName: player.name,
+            playerStats: [],
+          };
+        }),
+      [visionResults],
+    );
   };
 
   return (
@@ -93,7 +127,9 @@ const MatchManager = (props: Props) => {
         >
           Add Match
         </Button>
-        <RDCVisionModal />
+        <RDCVisionModal
+          handleCreateMatchFromVision={handleCreateMatchFromVision}
+        />
       </div>
     </div>
   );

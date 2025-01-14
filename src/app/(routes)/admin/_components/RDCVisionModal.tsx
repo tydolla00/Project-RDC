@@ -10,7 +10,12 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { analyzeScreenShotTest } from "@/app/actions/visionAction";
 
-const RDCVisionModal = () => {
+interface Props {
+  handleCreateMatchFromVision: (visionResults: any) => void;
+}
+
+const RDCVisionModal = (props: Props) => {
+  const { handleCreateMatchFromVision } = props;
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (
@@ -43,24 +48,26 @@ const RDCVisionModal = () => {
   };
 
   const handleAnalyzeBtnClick = (): void => {
+    console.log("Analyze Button Clicked");
     if (selectedFile) {
+      console.log("Selected File: ", selectedFile);
       const reader = new FileReader();
       reader.onload = async (e) => {
         const fileContent = e.target?.result;
         if (fileContent) {
+          console.log("File Content: ", fileContent);
           const base64FileContent = Buffer.from(
             fileContent as ArrayBuffer,
           ).toString("base64");
 
           console.log("Base64 File Content: ", base64FileContent);
-          await analyzeScreenShotTest(base64FileContent);
+          const visionResults = await analyzeScreenShotTest(base64FileContent);
+          handleCreateMatchFromVision(visionResults);
         }
       };
       reader.readAsArrayBuffer(selectedFile);
     }
   };
-
-  console.log("Selected File: ", selectedFile);
 
   return (
     <Dialog>
