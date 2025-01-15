@@ -85,10 +85,6 @@ const SetManager = () => {
   const testSets = useWatch({ control, name: "sets" });
   const game = watch("game");
 
-  useEffect(() => {
-    console.log("Set Rerenders: ", sets);
-  }, [fields, sets, testSets]);
-
   return (
     <div className="col-span-2 w-full space-y-4">
       {/* Loop through set fields */}
@@ -148,6 +144,7 @@ const SetManager = () => {
                           rdcMembers={players}
                           control={control}
                           field={field}
+                          savedSelectedPlayers={field.value}
                         />
                       )}
                     />

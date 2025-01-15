@@ -58,19 +58,9 @@ const MatchManager = (props: Props) => {
    * Processes vision analysis results to create match player sessions
    * @param visionResults - The results from vision analysis containing blue and orange team player information
    * @remarks
-   * This function:
    * 1. Maps vision results for both blue and orange teams into player sessions
    * 2. Finds existing players by gamer tag
    * 3. Creates player session objects with player IDs and stats
-   * 4. Combines both teams' sessions and appends them to match data
-   *
-   * @param visionResults - Object containing:
-   * - blueTeam: Array of VisionPlayer objects
-   * - orangeTeam: Array of VisionPlayer objects
-   *
-   * Each VisionPlayer contains:
-   * - name: string (gamer tag)
-   * - stats: Array of player statistics
    */
   const handleCreateMatchFromVision = (visionResults: VisionResults) => {
     console.log("Handling Create Match from Vision: ", visionResults);

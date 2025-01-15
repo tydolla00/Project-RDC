@@ -12,9 +12,17 @@ interface Props {
   control?: Control<z.infer<typeof formSchema>>;
   fieldName?: string;
   field: ControllerRenderProps<FormValues>;
+  savedSelectedPlayers?: Player[];
 }
-const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+const PlayerSelector = ({
+  handlePlayerClick,
+  rdcMembers,
+  field,
+  savedSelectedPlayers,
+}: Props) => {
+  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>(
+    savedSelectedPlayers ?? [],
+  );
 
   const reactHookFormHandlePlayerClick = (player: Player): void => {
     console.log("Handling react hook form player click");

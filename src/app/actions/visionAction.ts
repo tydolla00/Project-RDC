@@ -29,12 +29,19 @@ export interface VisionStat {
   statValue: string; // TODO: This should be allowed to be undefined but throw an error maybe?
 }
 
+export type VisionResult =
+  | { status: "Success"; data: VisionResults }
+  | { status: "CheckReq"; data: VisionResults; message: string }
+  | { status: "Failed"; message: string };
+
 /**
  *  Analyze the screenshot of the game stats and extract the player stats
  * @param base64Source base64 encoded image source : string
  * @returns Object containing teams and player objects with their stats
  */
-export const analyzeScreenShotTest = async (base64Source: string) => {
+export const analyzeScreenShotTest = async (
+  base64Source: string,
+): Promise<VisionResult> => {
   // TODO: Add Loading State
   // TODO: Fix env config
   console.log(
@@ -72,7 +79,10 @@ export const analyzeScreenShotTest = async (base64Source: string) => {
       .body as AnalyzeResultOperationOutput;
     ("0");
     if (!result.analyzeResult || !result.analyzeResult.documents) {
-      throw new Error("Analyze result or documents are undefined");
+      return {
+        status: "Failed",
+        message: "Analyze result or documents are undefined",
+      };
     }
     const teams = result.analyzeResult.documents[0].fields;
 
@@ -90,7 +100,7 @@ export const analyzeScreenShotTest = async (base64Source: string) => {
       console.log("Team Name: ", team);
       console.log("Players: ", players);
 
-      // valueInteger === confirmed number and is integer properly -- content holds the actual value detected by the model and is always present
+      // valueInteger === confirmed number and is proper integer -- content holds the actual value detected by the model and is always present
       if (team == "BluePlayers" && players.valueArray) {
         visionResult.blueTeam = players.valueArray.map((player) => {
           return {
@@ -99,27 +109,38 @@ export const analyzeScreenShotTest = async (base64Source: string) => {
               {
                 statId: "3",
                 stat: "RL_SCORE",
-                statValue: player.valueObject?.Score?.content || "0",
+                statValue:
+                  validateVisionStatValue(player.valueObject?.Score?.content) ||
+                  "0",
               },
               {
                 statId: "4",
                 stat: "RL_GOALS",
-                statValue: player.valueObject?.Goals?.content || "0",
+                statValue:
+                  validateVisionStatValue(player.valueObject?.Goals?.content) ||
+                  "0",
               },
               {
                 statId: "5",
                 stat: "RL_ASSISTS",
-                statValue: player.valueObject?.Assists?.content || "0",
+                statValue:
+                  validateVisionStatValue(
+                    player.valueObject?.Assists?.content,
+                  ) || "0",
               },
               {
                 statId: "6",
                 stat: "RL_SAVES",
-                statValue: player.valueObject?.Saves?.content || "0",
+                statValue:
+                  validateVisionStatValue(player.valueObject?.Saves?.content) ||
+                  "0",
               },
               {
                 statId: "7",
                 stat: "RL_SHOTS",
-                statValue: player.valueObject?.Shots?.content || "0",
+                statValue:
+                  validateVisionStatValue(player.valueObject?.Shots?.content) ||
+                  "0",
               },
             ],
           };
@@ -133,37 +154,94 @@ export const analyzeScreenShotTest = async (base64Source: string) => {
               {
                 statId: "3",
                 stat: "RL_SCORE",
-                statValue: player.valueObject?.Score?.content || "0",
+                statValue:
+                  validateVisionStatValue(player.valueObject?.Score?.content) ||
+                  "0",
               },
               {
                 statId: "4",
                 stat: "RL_GOALS",
-                statValue: player.valueObject?.Goals?.content || "0",
+                statValue:
+                  validateVisionStatValue(player.valueObject?.Goals?.content) ||
+                  "0",
               },
               {
                 statId: "5",
                 stat: "RL_ASSISTS",
-                statValue: player.valueObject?.Assists?.content || "0",
+                statValue:
+                  validateVisionStatValue(
+                    player.valueObject?.Assists?.content,
+                  ) || "0",
               },
               {
                 statId: "6",
                 stat: "RL_SAVES",
-                statValue: player.valueObject?.Saves?.content || "0",
+                statValue:
+                  validateVisionStatValue(player.valueObject?.Saves?.content) ||
+                  "0",
               },
               {
                 statId: "7",
                 stat: "RL_SHOTS",
-                statValue: player.valueObject?.Shots?.content || "0",
+                statValue:
+                  validateVisionStatValue(player.valueObject?.Shots?.content) ||
+                  "0",
               },
             ],
           };
         });
       }
     });
-
-    console.log("Vision Result: ", visionResult);
-    return visionResult;
+    // TODO: Pass this to visionResult
+    console.log("RL Winner: ", calculateRLWinners(visionResult));
+    return {
+      status: "Success",
+      data: visionResult,
+    };
   } catch (error) {
     console.error(error);
+    return {
+      status: "Failed",
+      message: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+};
+
+const validateVisionStatValue = (statValue: string | undefined) => {
+  // 0 is sometimes detected as Z | Ø on occassion so we need to handle this
+  if (statValue === "Z" || statValue === "Ø") {
+    return "0";
+  } else {
+    return statValue;
+  }
+};
+
+// TODO: RDC Vision grabs the winner (most of the time) can see if we can use that to determine winner potentially
+export const calculateRLWinners = (visionResults: VisionResults) => {
+  let blueTeamGoals = 0;
+  let orangeTeamGoals = 0;
+
+  visionResults.blueTeam.forEach((player) => {
+    player.stats.forEach((stat) => {
+      if (stat.stat === "RL_GOALS") {
+        blueTeamGoals += parseInt(stat.statValue, 10);
+      }
+    });
+  });
+
+  visionResults.orangeTeam.forEach((player) => {
+    player.stats.forEach((stat) => {
+      if (stat.stat === "RL_GOALS") {
+        orangeTeamGoals += parseInt(stat.statValue, 10);
+      }
+    });
+  });
+
+  if (blueTeamGoals > orangeTeamGoals) {
+    return "Blue Team";
+  } else if (orangeTeamGoals > blueTeamGoals) {
+    return "Orange Team";
+  } else {
+    return "Draw";
   }
 };

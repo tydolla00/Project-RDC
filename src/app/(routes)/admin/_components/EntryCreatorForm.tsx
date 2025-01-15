@@ -61,9 +61,6 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     fetchData();
   }, [game, getGameStatsFromDb]);
 
-  const url = watch("sessionUrl");
-  console.log("Errors: ", errors);
-
   /**
    * Submit method called when EntryCreatorForm submit button clicked
    * @param data entire "Admin" Session object constructed from values
