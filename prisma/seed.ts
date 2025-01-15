@@ -179,6 +179,7 @@ async function seedSession(sessionId: number) {
       sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",
       sessionUrl: "https://example.com",
       thumbnail: "https://example.com/thumbnail.jpg",
+      videoId: "example",
     },
   });
   console.log("Seeded MK8 Session Successfully.\n");

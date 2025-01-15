@@ -78,6 +78,7 @@ export const SessionInfo = ({
         form.setValue("sessionName", video.sessionName);
         form.setValue("thumbnail", thumbnail);
         form.setValue("date", new Date(video.date));
+        form.setValue("videoId", videoId);
         setSession(video);
         toast.success("Youtube video successfully linked.", {
           richColors: true,

@@ -37,31 +37,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useState } from "react";
 import Image from "next/image";
-
-const formSchema = z.object({
-  video: z
-    .string()
-    .toLowerCase()
-    .startsWith(
-      "https://www.youtube.com",
-      "Please paste in a valid youtube url.",
-    )
-    .max(100)
-    .includes("v="),
-  stat: z
-    .object({
-      member: z
-        .object({
-          name: z.string(),
-          statVal: z.string(),
-        })
-        .array()
-        .min(1),
-      statName: z.string(),
-    })
-    .array()
-    .min(1),
-});
+import { getVideoId } from "../../admin/_utils/helper-functions";
+import { formSchema } from "../../admin/_utils/form-helpers";
 
 // ! Deprecated
 export const SubmissionForm = () => {
@@ -70,17 +47,23 @@ export const SubmissionForm = () => {
   >(undefined);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { video: "", stat: [{ member: [{ name: "" }] }] },
-    mode: "onTouched",
+    defaultValues: {
+      game: "",
+      sessionName: "",
+      sessionUrl: "https://www.youtube.com/watch?v=",
+      thumbnail: "",
+      players: [],
+      sets: [],
+    },
+    mode: "onChange",
   });
-  const { invalid, error, isTouched } = form.getFieldState("video");
-  const { append, remove, fields } = useFieldArray({
-    name: "stat",
+  const { invalid, error, isTouched } = form.getFieldState("sessionUrl");
+  const { fields, append } = useFieldArray({
+    name: "sets",
     control: form.control,
   });
-  console.log(
-    `Form Status ${invalid}, Errors ${error}, Form Touched ${isTouched}`,
-  );
+
+  const url = form.watch("sessionUrl");
 
   const submitForm = (data: z.infer<typeof formSchema>) => {
     console.log("Got here");
@@ -92,11 +75,9 @@ export const SubmissionForm = () => {
       return;
     }
 
-    let id = form.getValues().video.split("=")[1];
-    const trimEnd = id.indexOf("&");
+    const videoId = getVideoId(url);
 
-    if (trimEnd !== -1) id = id.slice(0, trimEnd);
-    const { error, video } = await getRDCVideoDetails(id);
+    const { error, video } = await getRDCVideoDetails(videoId);
     if (error !== undefined) {
       form.reset(undefined, { keepIsValid: true });
       toast("Please upload a video by RDC Live");
@@ -148,7 +129,7 @@ export const SubmissionForm = () => {
                   )}
                   <FormField
                     control={form.control}
-                    name="video"
+                    name="sessionUrl"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Youtube Video</FormLabel>
@@ -185,11 +166,11 @@ export const SubmissionForm = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {fields.map((f, i) => (
+                {/* {fields.map((f, i) => (
                   <div key={f.id}>
                     <FormField
                       control={form.control}
-                      name={`stat.${i}.statName`}
+                      name={``}
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Stat</FormLabel>
@@ -219,10 +200,10 @@ export const SubmissionForm = () => {
                     <Members index={i} />
                     <div className="my-5 h-0.5 bg-neutral-800"></div>
                   </div>
-                ))}
+                ))} */}
               </CardContent>
               <CardFooter>
-                <Button
+                {/* <Button
                   className=""
                   type="button"
                   variant="ghost"
@@ -231,7 +212,7 @@ export const SubmissionForm = () => {
                   }}
                 >
                   Add Stat
-                </Button>
+                </Button> */}
                 <Button className="ml-auto">Submit</Button>
               </CardFooter>
             </Card>

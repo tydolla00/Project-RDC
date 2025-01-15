@@ -92,8 +92,8 @@ export const insertNewSessionFromAdmin = async (
     } else {
       const videoAlreadyExists = await prisma.session.findFirst({
         where: {
-          gameId: sessionGame?.gameId,
-          AND: { sessionName: session.sessionName },
+          gameId: sessionGame.gameId,
+          AND: { videoId: session.videoId },
         },
       });
 
@@ -107,6 +107,7 @@ export const insertNewSessionFromAdmin = async (
         sessionUrl: session.sessionUrl,
         thumbnail: session.thumbnail,
         date: session.date,
+        videoId: session.videoId,
       },
     });
     const newSessionId = newSession.sessionId; // ! TODO Remove
@@ -294,6 +295,7 @@ export const insertNewSessionV2 = async ({
   game,
   thumbnail,
   date, // Can we remove data from the tables.
+  videoId,
 }: FormValues): Promise<{ error: string | null }> => {
   const gameId = (await getAllGames()).find((g) => g.gameName === game)?.gameId;
   const isAuthenticated = await auth();
@@ -326,6 +328,7 @@ export const insertNewSessionV2 = async ({
         sessionUrl,
         thumbnail,
         gameId,
+        videoId,
       },
     }),
   );
