@@ -9,23 +9,10 @@ import { getAllMembers } from "../../../../../../prisma/lib/members";
 
 export const dynamicParams = false; // true | false,
 
-const membersObj = {
-  lee: "leland",
-  mark: "mark",
-  dylan: "dylan",
-  ben: "ben",
-  des: "des",
-  john: "john",
-  aff: "aff",
-  ippi: "ippi",
-} as const;
-
 export async function generateStaticParams() {
   const members = await getAllMembers();
   return members.map((member) => ({
-    slug: membersObj[
-      member.playerName.toLowerCase() as keyof typeof membersObj
-    ],
+    slug: member.playerName.toLowerCase(),
   }));
 }
 

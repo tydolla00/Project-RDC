@@ -32,6 +32,22 @@ export const SessionInfo = ({
   } = form;
   const url = form.watch("sessionUrl");
 
+  /**
+   * Handles the URL update process for a session.
+   *
+   * This function performs the following steps:
+   * 1. Starts a transition to handle the URL update asynchronously.
+   * 2. Checks if the provided URL is valid and not the same as the default session URL.
+   * 3. If the URL is invalid, displays an error toast message.
+   * 4. Fetches video details using the provided URL.
+   * 5. If the user is not authenticated, signs out and redirects to the home page.
+   * 6. If there is an error fetching video details, resets the form and displays an error toast message.
+   * 7. If the video details are successfully fetched, updates the form with the video details and displays a success toast message.
+   *
+   * @async
+   * @function handleUrlUpdated
+   * @returns {Promise<void>} A promise that resolves when the URL update process is complete.
+   */
   const handleUrlUpdated = () => {
     startTransition(async () => {
       // TODO Debounce/Rate limit

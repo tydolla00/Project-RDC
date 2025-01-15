@@ -63,6 +63,7 @@ const formSchema = z.object({
     .min(1),
 });
 
+// ! Deprecated
 export const SubmissionForm = () => {
   const [session, setSession] = useState<
     Awaited<ReturnType<typeof getRDCVideoDetails>>["video"] | undefined

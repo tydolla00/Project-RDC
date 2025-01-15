@@ -11,14 +11,12 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { RDCMembers } from "@/lib/constants";
-import { Members3D } from "./_client/interactive-members";
 
 // TODO Revalidate Stats Once Per Week
 // TODO Show all button that displays all Members. Default is centered 3D circular card that pops up from the 'ground'
 
 export default async function Page() {
   const members = Array.from(RDCMembers.entries());
-  // return <Members3D />;
   return (
     <div className="m-16">
       <H1>Members</H1>

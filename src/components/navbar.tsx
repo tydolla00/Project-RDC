@@ -132,7 +132,6 @@ export const Navbar = async () => {
               {/* TODO MOBILE ONLY Animate up from the bottom of the screen and add dismiss option. */}
               {/* Button acting weird and flashing from inside dropdown to right side of the screen */}
               <ToggleThemeButton />
-              <AuthButton responsive={false} session={session} />
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
