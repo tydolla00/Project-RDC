@@ -84,44 +84,55 @@ type PlayerMapping = {
 };
 
 export const PLAYER_MAPPINGS: PlayerMapping = {
-  Scott: {
+  Mark: {
     playerId: 1,
-    playerName: "Scott",
-    gamerTags: ["Silver"],
-  },
-  Ben: {
-    playerId: 2,
-    playerName: "Ben",
-    gamerTags: ["Des"],
+    playerName: "Mark",
+    gamerTags: ["SupremeMvp0020"],
   },
   Dylan: {
-    playerId: 3,
+    playerId: 2,
     playerName: "Dylan",
-    gamerTags: ["Aff"],
+    gamerTags: ["Dpatel254"],
+  },
+  Ben: {
+    playerId: 3,
+    playerName: "Ben",
+    gamerTags: ["Jabenixem"],
   },
   Lee: {
     playerId: 4,
     playerName: "Lee",
-    gamerTags: ["Lee"],
+    gamerTags: ["Leland12123"],
   },
-  Mark: {
+  Des: {
     playerId: 5,
-    playerName: "Mark",
-    gamerTags: ["Mark"],
+    playerName: "Des",
+    gamerTags: ["13RUTALxPANIiC"],
+  },
+  John: {
+    playerId: 6,
+    playerName: "John",
+    gamerTags: ["I will never forget that day in Lockdown..."],
+  },
+  Aff: {
+    playerId: 7,
+    playerName: "Aff",
+    gamerTags: ["Aff"],
+  },
+  Ipi: {
+    playerId: 8,
+    playerName: "Ipi",
+    gamerTags: ["iceman_ip"],
   },
 };
-const playerCache = new Map<string, any>();
 
 // TODO: Fix this
 export const findPlayerByGamerTag = (gamerTag: string) => {
-  if (playerCache.has(gamerTag)) {
-    return playerCache.get(gamerTag);
-  }
-
   const player = Object.values(PLAYER_MAPPINGS).find((player) =>
     player.gamerTags.some(
       (tag) => tag.toLowerCase() === gamerTag.toLowerCase(),
     ),
   );
+  console.log("Found Player: ", player);
   return player;
 };

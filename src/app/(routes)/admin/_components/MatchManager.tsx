@@ -77,10 +77,17 @@ const MatchManager = (props: Props) => {
 
     const blueTeamPlayerSessions = visionResults.blueTeam.map(
       (player: VisionPlayer) => {
-        const foundPlayer: Player = findPlayerByGamerTag(player.name);
+        const foundPlayer: Player | undefined = findPlayerByGamerTag(
+          player.name,
+        );
+        if (!foundPlayer) {
+          console.error(`Player not found: ${player.name}`);
+        } else if (!foundPlayer.playerName) {
+          console.error(`Player name not found: ${player.name}`);
+        }
         return {
           playerId: foundPlayer?.playerId || 0,
-          playerSessionName: foundPlayer.playerName,
+          playerSessionName: foundPlayer?.playerName || "Unknown Player",
           playerStats: [...player.stats],
         };
       },
@@ -89,6 +96,9 @@ const MatchManager = (props: Props) => {
     const orangeTeamPlayerSessions = visionResults.orangeTeam.map(
       (player: VisionPlayer) => {
         const foundPlayer = findPlayerByGamerTag(player.name);
+        if (!foundPlayer) {
+          console.error(`Player not found: ${player.name}`);
+        }
         return {
           playerId: foundPlayer?.playerId || 0,
           playerSessionName: player.name,

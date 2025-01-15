@@ -17,7 +17,6 @@ export const getAllGames = unstable_cache(
   undefined,
   {
     tags: ["getAllGames"],
-    revalidate: false,
   },
 );
 
