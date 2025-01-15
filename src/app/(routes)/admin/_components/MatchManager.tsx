@@ -13,6 +13,7 @@ import {
   PLAYER_MAPPINGS,
 } from "../_utils/form-helpers";
 import RDCVisionModal from "./RDCVisionModal";
+import { VisionPlayer, VisionResults } from "@/app/actions/visionAction";
 
 interface Props {
   setIndex: number;
@@ -45,34 +46,33 @@ const MatchManager = (props: Props) => {
     });
   };
 
-  const handleCreateMatchFromVision = (visionResults: any) => {
+  const handleCreateMatchFromVision = (visionResults: VisionResults) => {
     console.log("Handling Create Match from Vision: ", visionResults);
 
-    const blueTEamPlayerSessions = useMemo(
-      () =>
-        visionResults.bluePlayers.map((player: any) => {
-          const foundPlayer = findPlayerByGamerTag(player.name);
-          return {
-            playerId: foundPlayer?.playerId || 0,
-            playerSessionName: player.name,
-            playerStats: [],
-          };
-        }),
-      [visionResults],
+    const blueTeamPlayerSessions = visionResults.blueTeam.map(
+      (player: VisionPlayer) => {
+        const foundPlayer: Player = findPlayerByGamerTag(player.name);
+        return {
+          playerId: foundPlayer?.playerId || 0,
+          playerSessionName: player.name,
+          playerStats: [...player.stats],
+        };
+      },
     );
 
-    const orangeTeamPlayerSessions = useMemo(
-      () =>
-        visionResults.orangePlayers.map((player: any) => {
-          const foundPlayer = findPlayerByGamerTag(player.name);
-          return {
-            playerId: foundPlayer?.playerId || 0,
-            playerSessionName: player.name,
-            playerStats: [],
-          };
-        }),
-      [visionResults],
+    const orangeTeamPlayerSessions = visionResults.orangeTeam.map(
+      (player: VisionPlayer) => {
+        const foundPlayer = findPlayerByGamerTag(player.name);
+        return {
+          playerId: foundPlayer?.playerId || 0,
+          playerSessionName: player.name,
+          playerStats: [...player.stats],
+        };
+      },
     );
+
+    console.log("Orange Team Player Sessions: ", orangeTeamPlayerSessions);
+    console.log("Blue Team Player Sessions: ", blueTeamPlayerSessions);
   };
 
   return (

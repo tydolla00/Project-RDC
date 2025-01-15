@@ -12,23 +12,27 @@ const client = DocumentIntelligence(
 );
 const modelId = "RDC-Custom-Model";
 
-interface visionResults {
+export interface VisionResults {
   winner?: string;
-  blueTeam: Array<visionPlayer>;
-  orangeTeam: Array<visionPlayer>;
+  blueTeam: Array<VisionPlayer>;
+  orangeTeam: Array<VisionPlayer>;
 }
 
-interface visionPlayer {
+export interface VisionPlayer {
   name: string;
-  stats: rlVisionStats;
+  stats: VisionStat[];
 }
 
-interface rlVisionStats {
+export interface RLVisionStats {
   score: string | undefined;
   goals: string | undefined;
   assists: string | undefined;
   saves: string | undefined;
   shots: string | undefined;
+}
+
+interface VisionStat {
+  statName: string | undefined;
 }
 
 /**
@@ -86,7 +90,7 @@ export const analyzeScreenShotTest = async (base64Source: string) => {
       throw new Error("Teams data is undefined");
     }
 
-    const visionResult: visionResults = {} as visionResults;
+    const visionResult: VisionResults = {} as VisionResults;
     // team: {type 'array', valueArray: players: { name, stats...} , confidence: number}
     Object.entries(teams).forEach(([team, players]) => {
       console.log("Team Name: ", team);
@@ -97,13 +101,28 @@ export const analyzeScreenShotTest = async (base64Source: string) => {
         visionResult.blueTeam = players.valueArray.map((player) => {
           return {
             name: player.valueObject?.PlayerName?.content || "Unknown",
-            stats: {
-              score: player.valueObject?.Score?.content || undefined,
-              goals: player.valueObject?.Goals?.content || undefined,
-              assists: player.valueObject?.Assists?.content || undefined,
-              saves: player.valueObject?.Saves?.content || undefined,
-              shots: player.valueObject?.Shots?.content || undefined,
-            },
+            stats: [
+              {
+                statName: "Score",
+                statValue: player.valueObject?.Score?.content || undefined,
+              },
+              {
+                statName: "Goals",
+                statValue: player.valueObject?.Goals?.content || undefined,
+              },
+              {
+                statName: "Assists",
+                statValue: player.valueObject?.Assists?.content || undefined,
+              },
+              {
+                statName: "Saves",
+                statValue: player.valueObject?.Saves?.content || undefined,
+              },
+              {
+                statName: "Shots",
+                statValue: player.valueObject?.Shots?.content || undefined,
+              },
+            ],
           };
         });
       }
@@ -112,19 +131,35 @@ export const analyzeScreenShotTest = async (base64Source: string) => {
         visionResult.orangeTeam = players.valueArray.map((player) => {
           return {
             name: player.valueObject?.PlayerName?.content || "Unknown",
-            stats: {
-              score: player.valueObject?.Score?.content || undefined,
-              goals: player.valueObject?.Goals?.content || undefined,
-              assists: player.valueObject?.Assists?.content || undefined,
-              saves: player.valueObject?.Saves?.content || undefined,
-              shots: player.valueObject?.Shots?.content || undefined,
-            },
+            stats: [
+              {
+                statName: "Score",
+                statValue: player.valueObject?.Score?.content || undefined,
+              },
+              {
+                statName: "Goals",
+                statValue: player.valueObject?.Goals?.content || undefined,
+              },
+              {
+                statName: "Assists",
+                statValue: player.valueObject?.Assists?.content || undefined,
+              },
+              {
+                statName: "Saves",
+                statValue: player.valueObject?.Saves?.content || undefined,
+              },
+              {
+                statName: "Shots",
+                statValue: player.valueObject?.Shots?.content || undefined,
+              },
+            ],
           };
         });
       }
     });
 
     console.log("Vision Result: ", visionResult);
+    return visionResult;
   } catch (error) {
     console.error(error);
   }

@@ -17,6 +17,7 @@ interface Props {
 const RDCVisionModal = (props: Props) => {
   const { handleCreateMatchFromVision } = props;
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -49,6 +50,7 @@ const RDCVisionModal = (props: Props) => {
 
   const handleAnalyzeBtnClick = (): void => {
     console.log("Analyze Button Clicked");
+    setIsLoading(true);
     if (selectedFile) {
       console.log("Selected File: ", selectedFile);
       const reader = new FileReader();
@@ -62,11 +64,13 @@ const RDCVisionModal = (props: Props) => {
 
           console.log("Base64 File Content: ", base64FileContent);
           const visionResults = await analyzeScreenShotTest(base64FileContent);
+          console.log("Vision Results in Modal: ", visionResults);
           handleCreateMatchFromVision(visionResults);
         }
       };
       reader.readAsArrayBuffer(selectedFile);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -87,6 +91,7 @@ const RDCVisionModal = (props: Props) => {
           {" "}
           Extract Stats from Image
         </Button>
+        {isLoading && <div>Loading...</div>}
         <div>Results:</div>
       </DialogContent>
     </Dialog>
