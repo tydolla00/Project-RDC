@@ -13,7 +13,7 @@ import { gameImages } from "@/lib/constants";
 export default async function Home() {
   const games = await getAllGames();
   const session = await auth();
-
+  console.log(games);
   return (
     <>
       <div className="m-16">

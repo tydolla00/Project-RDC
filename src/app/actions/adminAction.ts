@@ -38,7 +38,7 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
 }
 
 /**
- * Inserts a new session from the admin panel.
+ * Inserts a new session from the admin form.
  *
  * @param {FormValues} session - The session details to be inserted.
  * @returns {Promise<{ error: null | string }>} - A promise that resolves to an object containing an error message if any error occurs, otherwise null.
@@ -90,7 +90,7 @@ export const insertNewSessionFromAdmin = async (
       // TODO This should never happen game should be required.
       return { error: "Game not found." };
     } else {
-      const videoAlreadyExists = await prisma.videoSession.findFirst({
+      const videoAlreadyExists = await prisma.session.findFirst({
         where: {
           gameId: sessionGame?.gameId,
           AND: { sessionName: session.sessionName },
@@ -100,7 +100,7 @@ export const insertNewSessionFromAdmin = async (
       if (videoAlreadyExists) return { error: "Video already exists." };
     }
 
-    const newSession = await prisma.videoSession.create({
+    const newSession = await prisma.session.create({
       data: {
         gameId: sessionGame.gameId,
         sessionName: session.sessionName,
@@ -303,7 +303,7 @@ export const insertNewSessionV2 = async ({
   // TODO This should never happen game should be required.
   if (!gameId) return { error: "Game not found." };
   else {
-    const videoAlreadyExists = await prisma.videoSession.findFirst({
+    const videoAlreadyExists = await prisma.session.findFirst({
       where: {
         gameId,
         AND: { sessionName },
@@ -319,7 +319,7 @@ export const insertNewSessionV2 = async ({
   const gameStats = await getGameStats(game);
 
   prismaSets.push(
-    prisma.videoSession.create({
+    prisma.session.create({
       data: {
         sessionId,
         sessionName,
@@ -334,7 +334,7 @@ export const insertNewSessionV2 = async ({
     // const setId = v4() as unknown as number;
     const setId = randomInt(100000);
     prismaSets.push(
-      prisma.videoSession.update({
+      prisma.session.update({
         where: { sessionId },
         data: {
           sets: {

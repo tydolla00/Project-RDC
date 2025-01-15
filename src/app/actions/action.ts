@@ -6,6 +6,7 @@ import { Session } from "next-auth";
 import { signOut, signIn, auth } from "@/auth";
 import { isProduction } from "@/lib/utils";
 import { errorCodes } from "@/lib/constants";
+import { identifyUser } from "@/lib/posthog";
 
 /**
  * @deprecated
@@ -24,7 +25,13 @@ export const submitUpdates = async (props: any) => {
  * @returns {Promise<void>} A promise that resolves when the authentication status is updated.
  */
 export const updateAuthStatus = async (session: Session | null) => {
-  session ? await signOut({ redirectTo: "/" }) : await signIn("github");
+  if (session) {
+    await signOut({ redirectTo: "/" });
+  } else {
+    await signIn("github");
+    const session = await auth();
+    identifyUser(session);
+  }
 };
 
 /**
@@ -57,7 +64,7 @@ export const getRDCVideoDetails = async (
     return { video: null, error: errorCodes.NotAuthenticated };
 
   // TODO add a column for videoId or store videoId as the primary key?
-  const dbRecord = await prisma.videoSession.findFirst({
+  const dbRecord = await prisma.session.findFirst({
     where: { sessionUrl: videoId }, //! Does not work.
   });
   const apiKey = isProduction
@@ -137,9 +144,7 @@ type Thumbnail = {
   height: number;
 };
 
-type FindManySessions = Awaited<
-  ReturnType<typeof prisma.videoSession.findMany>
->[0];
+type FindManySessions = Awaited<ReturnType<typeof prisma.session.findMany>>[0];
 
 type YTAPIRequestSession = Pick<
   FindManySessions,

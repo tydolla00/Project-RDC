@@ -10,11 +10,12 @@ export const config: NextAuthConfig = {
     error: "/not-allowed",
   },
   logger: {
-    error(error) {
+    async error(error) {
       const posthog = PostHogClient();
+      const session = await auth();
       posthog.capture({
         event: `Authentication Error - ${error}`,
-        distinctId: new Date().toUTCString(),
+        distinctId: session?.user?.email ?? "Unidentified Email",
       });
       posthog.shutdown();
     },

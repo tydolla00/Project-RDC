@@ -173,7 +173,7 @@ async function seedGames() {
 async function seedSession(sessionId: number) {
   console.log(`\n--- Seeding Game Session ${sessionId} ---`);
 
-  const marioKartSession = await prisma.videoSession.create({
+  const marioKartSession = await prisma.session.create({
     data: {
       gameId: 1,
       sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",

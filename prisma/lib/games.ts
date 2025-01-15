@@ -45,7 +45,7 @@ export const getSumPerStat = async (playerId: number, statName: StatName) =>
  * each containing the count of sets and their associated matches.
  */
 export const getSetsPerPlayer = async (gameId: number) =>
-  await prisma.videoSession.findMany({
+  await prisma.session.findMany({
     where: { gameId },
     include: { sets: { select: { _count: true, matches: true } } },
   });
@@ -87,7 +87,7 @@ export const getMatchesPerGame = async <T extends StatName = StatName>(
   gameId: number,
   statName: StatEndsWith<"POS", T>,
 ) =>
-  await prisma.videoSession.findMany({
+  await prisma.session.findMany({
     where: { gameId },
     select: {
       sets: {

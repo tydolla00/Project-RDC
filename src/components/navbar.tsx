@@ -118,6 +118,7 @@ export const Navbar = async () => {
             </Link>
           </FeatureFlag>
         </NavigationMenuItem>
+
         {/* MOBILE */}
         <NavigationMenuItem className="md:hidden">
           <NavigationMenuTrigger>
@@ -128,13 +129,13 @@ export const Navbar = async () => {
               <ListItem href="/about">About</ListItem>
               <ListItem href="/admin">Admin</ListItem>
               <ListItem href="/submission">Submissions</ListItem>
-              {/* add client component that will handle triggering the animation. */}
-              {/* TODO MOBILE ONLY Animate up from the bottom of the screen and add dismiss option. */}
-              {/* Button acting weird and flashing from inside dropdown to right side of the screen */}
+              <AuthButton hideOnSmallScreens={false} session={session} />
               <ToggleThemeButton />
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+        {/* END MOBILE */}
+
         <FeatureFlag
           shouldRedirect={false}
           flagName="AUTH"
@@ -157,7 +158,7 @@ export const Navbar = async () => {
             )}
           </NavigationMenuItem>
         </FeatureFlag>
-        <AuthButton responsive session={session} />
+        <AuthButton hideOnSmallScreens session={session} />
         <NavigationMenuItem className="hidden sm:block">
           <ModeToggle className="" />
         </NavigationMenuItem>
