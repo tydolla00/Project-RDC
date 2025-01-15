@@ -38,6 +38,7 @@ const SetManager = () => {
   const [textArea, setTextArea] = useState<string[]>(fields.map(() => ""));
   console.log("open sets", openSets);
   const [highestSetId, setHighestSetId] = useState(0);
+
   const toggleSet = (index: number) => {
     console.log("toggling set", index);
 
@@ -66,6 +67,14 @@ const SetManager = () => {
     });
   };
 
+  /**
+   * Handles the addition of JSON data to a specific set.
+   * Parses the JSON data from the text area at the given set index, validates it,
+   * and updates the set with the parsed matches and set winners.
+   *
+   * @param {number} setIndex - The index of the set to which the JSON data will be added.
+   * @throws Will throw an error if the JSON data is invalid or not an array.
+   */
   const handleAddJSON = (setIndex: number) => {
     try {
       const json = JSON.parse(textArea[setIndex]);
@@ -73,7 +82,7 @@ const SetManager = () => {
         toast.error("Please upload valid json.", { richColors: true });
       else {
         // TODO Set Values
-        // TODO Work In Progress. Not completed.
+        // TODO Work In Progress. Not completed. Awaiting the status of RDC Vision.
         const matches: FormValues["sets"][0]["matches"] = [];
         const setWinners: FormValues["sets"][0]["setWinners"] = [];
         const setId = randomInt(10000);

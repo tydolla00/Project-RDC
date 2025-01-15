@@ -1,3 +1,5 @@
+import { getAllGames } from "../../prisma/lib/games";
+
 export const RDCMembers = new Map<string, MembersProps>([
   [
     "Mark",

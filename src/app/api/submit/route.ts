@@ -3,8 +3,23 @@ import { auth } from "@/auth";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
-// TODO Throwing build error
-export async function POST(request: NextRequest) {
+/**
+ * Handles the POST request to submit a new session.
+ *
+ * @param {NextRequest} request - The incoming request object.
+ * @returns {Promise<NextResponse>} The response object.
+ *
+ * The function performs the following steps:
+ * 1. Authenticates the user session.
+ * 2. If the session is not authenticated, returns a 401 Unauthorized response.
+ * 3. If the environment is development:
+ *    - Parses the request body.
+ *    - Attempts to insert a new session from the admin.
+ *    - If successful, revalidates the "getAllSessions" tag and returns a 200 Success response.
+ *    - If an error occurs, returns a 400 Bad Request response with the error message.
+ * 4. If the environment is not development, returns a 404 response indicating the need to be in development mode.
+ */
+export async function POST(request: NextRequest): Promise<NextResponse> {
   const session = await auth();
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -22,5 +37,8 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ message: "Need to be on dev" }, { status: 404 });
+  return NextResponse.json(
+    { message: "This endpoint is only available in development mode" },
+    { status: 404 },
+  );
 }

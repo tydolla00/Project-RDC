@@ -1,3 +1,4 @@
+// Keep in sync with .env
 interface Config {
   DATABASE_URL: string | undefined;
   DIRECT_URL: string | undefined;

@@ -9,6 +9,13 @@ import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { randomInt } from "crypto";
 
+/**
+ * Retrieves the statistics for a specified game.
+ *
+ * @param {string} gameName - The name of the game to retrieve statistics for.
+ * @returns {Promise<GameStat[]>} A promise that resolves to an array of game statistics.
+ * @throws {Error} If the game with the specified name is not found.
+ */
 export async function getGameStats(gameName: string): Promise<GameStat[]> {
   console.log("Looking for gameStats for ", gameName);
   const game = await prisma.game.findFirst({
@@ -30,6 +37,41 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
   return gameStats;
 }
 
+/**
+ * Inserts a new session from the admin panel.
+ *
+ * @param {FormValues} session - The session details to be inserted.
+ * @returns {Promise<{ error: null | string }>} - A promise that resolves to an object containing an error message if any error occurs, otherwise null.
+ *
+ * @example
+ * const session = {
+ *   game: "Game Name",
+ *   sessionName: "Session Name",
+ *   sessionUrl: "http://example.com",
+ *   thumbnail: "http://example.com/thumbnail.jpg",
+ *   date: "2023-10-01",
+ *   sets: [
+ *     {
+ *       setWinners: [{ playerId: 1 }],
+ *       matches: [
+ *         {
+ *           matchWinners: [{ playerId: 1 }],
+ *           playerSessions: [
+ *             {
+ *               playerId: 1,
+ *               playerStats: [{ stat: "Score", statValue: 100 }],
+ *             },
+ *           ],
+ *         },
+ *       ],
+ *     },
+ *   ],
+ * };
+ * const result = await insertNewSessionFromAdmin(session);
+ * console.log(result); // { error: null }
+ *
+ * @throws {Error} Throws an error if an unknown error occurs.
+ */
 export const insertNewSessionFromAdmin = async (
   session: FormValues,
 ): Promise<{ error: null | string }> => {
@@ -228,9 +270,22 @@ export const insertNewSessionFromAdmin = async (
 };
 
 /**
- * A work in progress function to efficiently store form submissions. Test on a different branch.
- * @param session Form values submitted by the user
- * @returns A transaction that will successfully batch all of the queries together.
+ * Inserts a new video session into the database.
+ *
+ * @param {Object} params - The parameters for the new session.
+ * @param {string} params.sessionUrl - The URL of the session video.
+ * @param {string} params.sessionName - The name of the session.
+ * @param {Array} params.sets - The sets associated with the session.
+ * @param {string} params.game - The name of the game.
+ * @param {string} params.thumbnail - The thumbnail image URL for the session.
+ * @param {Date} params.date - The date of the session.
+ * @returns {Promise<{ error: string | null }>} - An object containing an error message if any, otherwise null.
+ *
+ * @throws {Error} If the user is not authenticated.
+ * @throws {Error} If the game is not found in the database.
+ * @throws {Error} If the video session already exists in the database.
+ *
+ * @async
  */
 export const insertNewSessionV2 = async ({
   sessionUrl,

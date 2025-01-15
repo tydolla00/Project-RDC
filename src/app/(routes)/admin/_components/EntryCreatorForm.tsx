@@ -64,9 +64,16 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   console.log("Errors: ", errors);
 
   /**
-   * Submit method called when EntryCreatorForm submit button clicked
-   * @param data entire "Admin" Session object constructed from values
-   * in EntryCreator form
+   * Handles the form submission for creating a new session.
+   *
+   * @param {FormValues} data - The form values to be submitted.
+   * @returns {Promise<void>} A promise that resolves when the submission is complete.
+   *
+   * Logs the form data being submitted and measures the time taken for the submission process.
+   * Attempts to insert a new session using the provided form data.
+   * If an error occurs during the insertion, handles the error by either signing out the user
+   * or displaying an error toast message.
+   * If the insertion is successful, displays a success toast message and revalidates the session data.
    */
   const onSubmit = async (data: FormValues) => {
     console.log("Form Data Being Submitted:", {
@@ -90,11 +97,10 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   };
 
   /**
-   * Handles errors that occur during form submission.
+   * Handles form submission errors by logging them to the console and displaying a toast notification.
    *
-   * @param errors - An object containing the errors that occurred during form submission.
+   * @param {any} errors - The errors object containing details about the form submission errors.
    * Each key in the object corresponds to a form field, and the value is the error message for that field.
-   *
    */
   const onError = (errors: any) => {
     console.log("Admin Form Submission Errors:", errors);

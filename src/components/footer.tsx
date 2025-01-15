@@ -8,9 +8,12 @@ import {
 } from "./ui/breadcrumb";
 
 import { games, RDCMembers } from "@/lib/constants";
+import { AuthButton } from "./client-buttons";
+import { auth } from "@/auth";
 
-export const Footer = () => {
+export const Footer = async () => {
   const members = Array.from(RDCMembers.entries());
+  const session = await auth();
   return (
     <footer className="relative bottom-0 h-72 border-t-2 border-t-stone-800">
       <Breadcrumb className="mx-auto my-6 w-fit">
@@ -58,6 +61,7 @@ export const Footer = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+      <AuthButton responsive={false} session={session} />
     </footer>
   );
 };

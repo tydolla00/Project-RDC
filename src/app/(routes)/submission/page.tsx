@@ -1,7 +1,4 @@
 import { H1 } from "@/components/headings";
-import { SubmissionForm } from "./_components/form";
-import { FeatureFlag } from "@/lib/featureflag";
-import { auth } from "@/auth";
 import {
   Table,
   TableBody,
@@ -18,22 +15,12 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default async function Page() {
-  const session = await auth();
   return (
     <div className="m-16">
       <H1>Sessions</H1>
       <Suspense fallback={<Skeleton className="h-72 w-full" />}>
         <SubmissionTable />
       </Suspense>
-      {/* <div className="flex justify-center">
-        <FeatureFlag
-          flagName="SUBMISSION_FORM"
-          shouldRedirect={true}
-          user={session}
-        >
-          <SubmissionForm />
-        </FeatureFlag>
-      </div> */}
     </div>
   );
 }

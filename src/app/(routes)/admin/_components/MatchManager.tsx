@@ -25,8 +25,10 @@ const MatchManager = (props: Props) => {
   const statName = "MK8_POS"; // ! TODO Can we remove this
 
   /**
-   *  Handles create new match button click.
-   * Creates a new child Match under parent set
+   * Handles the click event for creating a new match.
+   * Logs the players and their sessions, then appends a new match object.
+   *
+   * @returns {void}
    */
   const handleNewMatchClick = () => {
     console.log("Handling New Match click", players);
