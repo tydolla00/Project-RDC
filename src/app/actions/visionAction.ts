@@ -23,16 +23,10 @@ export interface VisionPlayer {
   stats: VisionStat[];
 }
 
-export interface RLVisionStats {
-  score: string | undefined;
-  goals: string | undefined;
-  assists: string | undefined;
-  saves: string | undefined;
-  shots: string | undefined;
-}
-
-interface VisionStat {
-  statName: string | undefined;
+export interface VisionStat {
+  statId: string;
+  stat: string;
+  statValue: string; // TODO: This should be allowed to be undefined but throw an error maybe?
 }
 
 /**
@@ -103,54 +97,63 @@ export const analyzeScreenShotTest = async (base64Source: string) => {
             name: player.valueObject?.PlayerName?.content || "Unknown",
             stats: [
               {
-                statName: "Score",
-                statValue: player.valueObject?.Score?.content || undefined,
+                statId: "3",
+                stat: "RL_SCORE",
+                statValue: player.valueObject?.Score?.content || "0",
               },
               {
-                statName: "Goals",
-                statValue: player.valueObject?.Goals?.content || undefined,
+                statId: "4",
+                stat: "RL_GOALS",
+                statValue: player.valueObject?.Goals?.content || "0",
               },
               {
-                statName: "Assists",
-                statValue: player.valueObject?.Assists?.content || undefined,
+                statId: "5",
+                stat: "RL_ASSISTS",
+                statValue: player.valueObject?.Assists?.content || "0",
               },
               {
-                statName: "Saves",
-                statValue: player.valueObject?.Saves?.content || undefined,
+                statId: "6",
+                stat: "RL_SAVES",
+                statValue: player.valueObject?.Saves?.content || "0",
               },
               {
-                statName: "Shots",
-                statValue: player.valueObject?.Shots?.content || undefined,
+                statId: "7",
+                stat: "RL_SHOTS",
+                statValue: player.valueObject?.Shots?.content || "0",
               },
             ],
           };
         });
       }
-
       if (team == "OrangePlayers" && players.valueArray) {
         visionResult.orangeTeam = players.valueArray.map((player) => {
           return {
             name: player.valueObject?.PlayerName?.content || "Unknown",
             stats: [
               {
-                statName: "Score",
-                statValue: player.valueObject?.Score?.content || undefined,
+                statId: "3",
+                stat: "RL_SCORE",
+                statValue: player.valueObject?.Score?.content || "0",
               },
               {
-                statName: "Goals",
-                statValue: player.valueObject?.Goals?.content || undefined,
+                statId: "4",
+                stat: "RL_GOALS",
+                statValue: player.valueObject?.Goals?.content || "0",
               },
               {
-                statName: "Assists",
-                statValue: player.valueObject?.Assists?.content || undefined,
+                statId: "5",
+                stat: "RL_ASSISTS",
+                statValue: player.valueObject?.Assists?.content || "0",
               },
               {
-                statName: "Saves",
-                statValue: player.valueObject?.Saves?.content || undefined,
+                statId: "6",
+                stat: "RL_SAVES",
+                statValue: player.valueObject?.Saves?.content || "0",
               },
               {
-                statName: "Shots",
-                statValue: player.valueObject?.Shots?.content || undefined,
+                statId: "7",
+                stat: "RL_SHOTS",
+                statValue: player.valueObject?.Shots?.content || "0",
               },
             ],
           };

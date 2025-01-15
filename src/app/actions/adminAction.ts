@@ -79,10 +79,6 @@ export const insertNewSessionFromAdmin = async (
           set,
         );
 
-        // const setWinnerConect = await set.setWinners.map((winner: any) => ({
-        //   playerId: winner.playerId,
-        // }));
-
         const setWinnerConnect = await (set?.setWinners ?? []).map(
           (winner: any) => ({
             playerId: winner.playerId,

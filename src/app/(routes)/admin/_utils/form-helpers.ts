@@ -1,4 +1,3 @@
-import { RLVisionStats } from "@/app/actions/visionAction";
 import { Player } from "@prisma/client";
 import { z } from "zod";
 
@@ -113,6 +112,7 @@ export const PLAYER_MAPPINGS: PlayerMapping = {
 };
 const playerCache = new Map<string, any>();
 
+// TODO: Fix this
 export const findPlayerByGamerTag = (gamerTag: string) => {
   if (playerCache.has(gamerTag)) {
     return playerCache.get(gamerTag);
@@ -123,7 +123,5 @@ export const findPlayerByGamerTag = (gamerTag: string) => {
       (tag) => tag.toLowerCase() === gamerTag.toLowerCase(),
     ),
   );
-
-  playerCache.set(gamerTag, player);
   return player;
 };

@@ -13,7 +13,11 @@ import {
   PLAYER_MAPPINGS,
 } from "../_utils/form-helpers";
 import RDCVisionModal from "./RDCVisionModal";
-import { VisionPlayer, VisionResults } from "@/app/actions/visionAction";
+import {
+  VisionPlayer,
+  VisionResults,
+  VisionStat,
+} from "@/app/actions/visionAction";
 
 interface Props {
   setIndex: number;
@@ -29,8 +33,12 @@ const MatchManager = (props: Props) => {
   const players = getValues(`players`);
 
   /**
-   *  Handles create new match button click.
-   * Creates a new child Match under parent set
+   * Handles the creation of a new match by creating player sessions from the available players.
+   * Maps each player to a new player session object containing their ID, name, and empty stats array.
+   * Appends the new match data with empty winners array and created player sessions to the form.
+   *
+   * @returns {void}
+   *
    */
   const handleNewMatchClick = () => {
     console.log("Handling New Match click", players);
@@ -46,6 +54,24 @@ const MatchManager = (props: Props) => {
     });
   };
 
+  /**
+   * Processes vision analysis results to create match player sessions
+   * @param visionResults - The results from vision analysis containing blue and orange team player information
+   * @remarks
+   * This function:
+   * 1. Maps vision results for both blue and orange teams into player sessions
+   * 2. Finds existing players by gamer tag
+   * 3. Creates player session objects with player IDs and stats
+   * 4. Combines both teams' sessions and appends them to match data
+   *
+   * @param visionResults - Object containing:
+   * - blueTeam: Array of VisionPlayer objects
+   * - orangeTeam: Array of VisionPlayer objects
+   *
+   * Each VisionPlayer contains:
+   * - name: string (gamer tag)
+   * - stats: Array of player statistics
+   */
   const handleCreateMatchFromVision = (visionResults: VisionResults) => {
     console.log("Handling Create Match from Vision: ", visionResults);
 
@@ -54,7 +80,7 @@ const MatchManager = (props: Props) => {
         const foundPlayer: Player = findPlayerByGamerTag(player.name);
         return {
           playerId: foundPlayer?.playerId || 0,
-          playerSessionName: player.name,
+          playerSessionName: foundPlayer.playerName,
           playerStats: [...player.stats],
         };
       },
@@ -73,6 +99,16 @@ const MatchManager = (props: Props) => {
 
     console.log("Orange Team Player Sessions: ", orangeTeamPlayerSessions);
     console.log("Blue Team Player Sessions: ", blueTeamPlayerSessions);
+
+    const visionMatchPlayerSessions = [
+      ...blueTeamPlayerSessions,
+      ...orangeTeamPlayerSessions,
+    ];
+
+    append({
+      matchWinners: [],
+      playerSessions: visionMatchPlayerSessions,
+    });
   };
 
   return (

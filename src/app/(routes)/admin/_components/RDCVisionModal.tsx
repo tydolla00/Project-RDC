@@ -9,6 +9,7 @@ import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { analyzeScreenShotTest } from "@/app/actions/visionAction";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface Props {
   handleCreateMatchFromVision: (visionResults: any) => void;
@@ -18,6 +19,8 @@ const RDCVisionModal = (props: Props) => {
   const { handleCreateMatchFromVision } = props;
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // TODO: Remove file on close
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -75,10 +78,16 @@ const RDCVisionModal = (props: Props) => {
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <Button type="button">Import Vision</Button>
+      <DialogTrigger asChild>
+        <Button className="rounded-sm bg-primary p-4 text-primary-foreground">
+          Import Vision
+        </Button>
       </DialogTrigger>
       <DialogContent>
+        <DialogDescription>
+          {" "}
+          Modal to import RDC stats to be parsed into form :)
+        </DialogDescription>
         <DialogTitle>Import Vision</DialogTitle>
         <h2 className="mb-4 text-xl">Upload Screenshot for Game Stats</h2>
         <Input

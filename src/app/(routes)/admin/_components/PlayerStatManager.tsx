@@ -43,44 +43,6 @@ const PlayerStatManager = (props: Props) => {
       ignore = true;
     };
   }, [gameStats, append]);
-  // useEffect(() => {
-  //   console.log(
-  //     "All Player Sessions: ",
-  //     getValues(`sets.${setIndex}.matches.${matchIndex}.playerSessions`),
-  //   );
-
-  //   // Returns all the playerStats for the match
-  //   const getPlayerSessionStats = () => {
-  //     const values = getValues();
-  //     console.log(" Get PlayerSessionStats Values: ", values);
-  //     const playerSession =
-  //       values.sets[setIndex].matches[matchIndex].playerSessions[
-  //         playerSessionIndex
-  //       ];
-  //     console.log("PlayerSessionStatGet: ", playerSession.playerStats);
-  //     return playerSession.playerStats;
-  //   };
-
-  //   const fetchGameStats = async () => {
-  //     console.log("Fetching game stats");
-  //     const existingStats = getPlayerSessionStats();
-  //     gameStats.forEach((stat) => {
-  //       const statExists = existingStats.some(
-  //         (existingStat) => existingStat.stat === stat.statName,
-  //       );
-  //       // Ducttape fix to stop useEffect double render from
-  //       // doubling playerStat fields
-  //       if (!statExists) {
-  //         append({ statId: uuidv4(), stat: stat.statName, statValue: "" });
-  //       }
-  //     });
-  //     setLoading(false);
-  //   };
-  //   fetchGameStats();
-  // }, [append, getValues, matchIndex, playerSessionIndex, setIndex, gameStats]);
-
-  // console.log("PlayerStatManagerFields: ", fields);
-  // console.log("Loading: ", loading);
 
   // TODO Fix bug, when changing the games doesn't remove stale inputs
   return (
