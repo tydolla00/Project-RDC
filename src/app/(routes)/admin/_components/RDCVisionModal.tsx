@@ -84,9 +84,6 @@ const RDCVisionModal = (props: Props) => {
 
       const visionResult = await analyzeScreenShot(base64FileContent);
 
-      // TODO: Check vision results here and inform user if any issues or things need to be corrected
-      // If there aren't the same amount of players in the current session as the vision results, inform user
-
       if (visionResult.status === "Success") {
         handleCreateMatchFromVision(visionResult.data);
         setVisionStatus("Success");

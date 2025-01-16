@@ -65,6 +65,7 @@ const SetManager = () => {
     });
   };
 
+  // TODO: Delete this? Not sure if we need anymore
   const handleAddJSON = (i: number) => {
     try {
       const json = JSON.parse(textArea[i]);
