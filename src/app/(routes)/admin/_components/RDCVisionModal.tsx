@@ -9,8 +9,8 @@ import {
 import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { analyzeScreenShotTest } from "@/app/actions/visionAction";
-import { CircleAlert, CircleCheck, CircleX } from "lucide-react";
+import { analyzeScreenShot } from "@/app/actions/visionAction";
+import { CircleAlert, CircleCheck, CircleX, ScanEye } from "lucide-react";
 
 interface Props {
   handleCreateMatchFromVision: (visionResults: any) => void;
@@ -21,10 +21,8 @@ const RDCVisionModal = (props: Props) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [visionStatus, setVisionStatus] = useState<
-    "Success" | "ReqCheck" | "Failed" | null
+    "Success" | "CheckReq" | "Failed" | null
   >(null);
-
-  // TODO: Remove file on close
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -55,6 +53,11 @@ const RDCVisionModal = (props: Props) => {
     return true;
   };
 
+  const handleClose = () => {
+    setSelectedFile(null);
+    setVisionStatus(null);
+  };
+
   const handleAnalyzeBtnClick = async (): Promise<void> => {
     try {
       setIsLoading(true);
@@ -79,16 +82,20 @@ const RDCVisionModal = (props: Props) => {
         fileContent as ArrayBuffer,
       ).toString("base64");
 
-      const visionResult = await analyzeScreenShotTest(base64FileContent);
+      const visionResult = await analyzeScreenShot(base64FileContent);
 
       // TODO: Check vision results here and inform user if any issues or things need to be corrected
       // If there aren't the same amount of players in the current session as the vision results, inform user
 
       if (visionResult.status === "Success") {
         handleCreateMatchFromVision(visionResult.data);
+        setVisionStatus("Success");
+        setIsLoading(false);
+      } else if (visionResult.status === "CheckReq") {
+        handleCreateMatchFromVision(visionResult.data);
+        setVisionStatus("CheckReq");
+        setIsLoading(false);
       }
-      setVisionStatus("Success");
-      setIsLoading(false);
     } catch (error) {
       console.error("Error in handleAnalyzeBtnClick: ", error);
       setIsLoading(false);
@@ -97,18 +104,18 @@ const RDCVisionModal = (props: Props) => {
     }
   };
 
-  console.log("Is Loading: ", isLoading);
   return (
-    <Dialog>
+    <Dialog onOpenChange={handleClose}>
       <DialogTrigger asChild>
         <Button className="rounded-sm bg-primary p-4 text-primary-foreground">
+          <ScanEye />
           Import Vision
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogDescription>
           {" "}
-          Modal to import RDC stats to be parsed into form :)
+          Select a screenshot of the game stats to import the match data
         </DialogDescription>
         <DialogTitle>Import Vision</DialogTitle>
         <h2 className="mb-4 text-xl">Upload Screenshot for Game Stats</h2>
@@ -126,13 +133,13 @@ const RDCVisionModal = (props: Props) => {
           {" "}
           Extract Stats from Image
         </Button>
-        {isLoading && <div>Loading...</div>}
+        {isLoading && <div className="flex justify-center"> Loading...</div>}
         <span className="flex flex-col items-center">
           {visionStatus !== null && <p className="text-lg">Vision Results:</p>}
           {visionStatus === "Success" && (
             <CircleCheck size={40} className="text-green-500" />
           )}
-          {visionStatus === "ReqCheck" && (
+          {visionStatus === "CheckReq" && (
             <CircleAlert size={40} className="text-yellow-500" />
           )}
           {visionStatus === "Failed" && (
