@@ -34,6 +34,71 @@ export type VisionResult =
   | { status: "CheckReq"; data: VisionResults; message: string }
   | { status: "Failed"; message: string };
 
+const TEAM_MAPPING = {
+  BluePlayers: "blueTeam",
+  OrangePlayers: "orangeTeam",
+} as const;
+
+const processPlayer = (player: any) => {
+  console.log("Processing Player: ", player);
+  const validations = {
+    score: validateVisionStatValue(player.valueObject?.Score?.content),
+    goals: validateVisionStatValue(player.valueObject?.Goals?.content),
+    assists: validateVisionStatValue(player.valueObject?.Assists?.content),
+    saves: validateVisionStatValue(player.valueObject?.Saves?.content),
+    shots: validateVisionStatValue(player.valueObject?.Shots?.content),
+  };
+
+  const reqCheckFlag = Object.values(validations).some((v) => v.reqCheck);
+
+  return {
+    reqCheckFlag,
+    playerData: {
+      name: player.valueObject?.PlayerName?.content || "Unknown",
+      stats: [
+        {
+          statId: "3",
+          stat: "RL_SCORE",
+          statValue: validations.score.statValue,
+        },
+        {
+          statId: "4",
+          stat: "RL_GOALS",
+          statValue: validations.goals.statValue,
+        },
+        {
+          statId: "5",
+          stat: "RL_ASSISTS",
+          statValue: validations.assists.statValue,
+        },
+        {
+          statId: "6",
+          stat: "RL_SAVES",
+          statValue: validations.saves.statValue,
+        },
+        {
+          statId: "7",
+          stat: "RL_SHOTS",
+          statValue: validations.shots.statValue,
+        },
+      ],
+    },
+  };
+};
+
+const processTeam = (teamData: any) => {
+  console.log("Processing Team: ", teamData);
+  let reqCheckFlag = false;
+  const players =
+    teamData.valueArray.map((player: any) => {
+      const { reqCheckFlag: playerFlag, playerData } = processPlayer(player);
+      reqCheckFlag = reqCheckFlag || playerFlag;
+      return playerData;
+    }) || [];
+
+  return { players, reqCheckFlag };
+};
+
 /**
  *  Analyze the screenshot of the game stats and extract the player stats
  * @param base64Source base64 encoded image source : string
@@ -81,130 +146,21 @@ export const analyzeScreenShot = async (
     }
 
     const visionResult: VisionResults = {} as VisionResults;
-    // team: {type 'array', valueArray: players: { name, stats...} , confidence: number}
-    Object.entries(teams).forEach(([team, players]) => {
-      // valueInteger === confirmed number and is proper integer -- content holds the actual value detected by the model and is always present
-      if (team == "BluePlayers" && players.valueArray) {
-        visionResult.blueTeam = players.valueArray.map((player) => {
-          const scoreValidation = validateVisionStatValue(
-            player.valueObject?.Score?.content,
-          );
-          reqCheckFlag = reqCheckFlag || scoreValidation.reqCheck;
 
-          const goalValidation = validateVisionStatValue(
-            player.valueObject?.Goals?.content,
-          );
-          reqCheckFlag = reqCheckFlag || goalValidation.reqCheck;
+    let requiresCheck = false;
 
-          const assistsValidation = validateVisionStatValue(
-            player.valueObject?.Assists?.content,
-          );
-          reqCheckFlag = reqCheckFlag || assistsValidation.reqCheck;
-
-          const savesValidation = validateVisionStatValue(
-            player.valueObject?.Saves?.content,
-          );
-          reqCheckFlag = reqCheckFlag || savesValidation.reqCheck;
-
-          const shotsValidation = validateVisionStatValue(
-            player.valueObject?.Shots?.content,
-          );
-          reqCheckFlag = reqCheckFlag || shotsValidation.reqCheck;
-          return {
-            name: player.valueObject?.PlayerName?.content || "Unknown",
-            stats: [
-              {
-                statId: "3",
-                stat: "RL_SCORE",
-                statValue: scoreValidation.statValue,
-              },
-              {
-                statId: "4",
-                stat: "RL_GOALS",
-                statValue: goalValidation.statValue,
-              },
-              {
-                statId: "5",
-                stat: "RL_ASSISTS",
-                statValue: assistsValidation.statValue,
-              },
-              {
-                statId: "6",
-                stat: "RL_SAVES",
-                statValue: savesValidation.statValue,
-              },
-              {
-                statId: "7",
-                stat: "RL_SHOTS",
-                statValue: shotsValidation.statValue,
-              },
-            ],
-          };
-        });
-      }
-      if (team == "OrangePlayers" && players.valueArray) {
-        visionResult.orangeTeam = players.valueArray.map((player) => {
-          const scoreValidation = validateVisionStatValue(
-            player.valueObject?.Score?.content,
-          );
-          reqCheckFlag = reqCheckFlag || scoreValidation.reqCheck;
-          const goalValidation = validateVisionStatValue(
-            player.valueObject?.Goals?.content,
-          );
-          reqCheckFlag = reqCheckFlag || goalValidation.reqCheck;
-
-          const assistsValidation = validateVisionStatValue(
-            player.valueObject?.Assists?.content,
-          );
-          reqCheckFlag = reqCheckFlag || assistsValidation.reqCheck;
-
-          const savesValidation = validateVisionStatValue(
-            player.valueObject?.Saves?.content,
-          );
-          reqCheckFlag = reqCheckFlag || savesValidation.reqCheck;
-
-          const shotsValidation = validateVisionStatValue(
-            player.valueObject?.Shots?.content,
-          );
-          reqCheckFlag = reqCheckFlag || shotsValidation.reqCheck;
-
-          return {
-            name: player.valueObject?.PlayerName?.content || "Unknown",
-            stats: [
-              {
-                statId: "3",
-                stat: "RL_SCORE",
-                statValue: scoreValidation.statValue,
-              },
-              {
-                statId: "4",
-                stat: "RL_GOALS",
-                statValue: goalValidation.statValue,
-              },
-              {
-                statId: "5",
-                stat: "RL_ASSISTS",
-                statValue: assistsValidation.statValue,
-              },
-              {
-                statId: "6",
-                stat: "RL_SAVES",
-                statValue: savesValidation.statValue,
-              },
-              {
-                statId: "7",
-                stat: "RL_SHOTS",
-                statValue: shotsValidation.statValue,
-              },
-            ],
-          };
-        });
+    Object.entries(teams).forEach(([teamKey, teamData]) => {
+      const teamColor = TEAM_MAPPING[teamKey as keyof typeof TEAM_MAPPING];
+      if (teamColor) {
+        const { players, reqCheckFlag } = processTeam(teamData);
+        visionResult[teamColor] = players;
+        requiresCheck = requiresCheck || reqCheckFlag;
       }
     });
     const visionWinner = calculateRLWinners(visionResult);
     visionResult.winner = visionWinner;
     console.log("Vision Result: ", visionResult);
-    return reqCheckFlag
+    return requiresCheck
       ? {
           status: "CheckReq",
           data: visionResult,
