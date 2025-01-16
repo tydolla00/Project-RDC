@@ -11,6 +11,12 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { analyzeScreenShot } from "@/app/actions/visionAction";
 import { CircleAlert, CircleCheck, CircleX, ScanEye } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   handleCreateMatchFromVision: (visionResults: any) => void;
@@ -23,6 +29,7 @@ const RDCVisionModal = (props: Props) => {
   const [visionStatus, setVisionStatus] = useState<
     "Success" | "CheckReq" | "Failed" | null
   >(null);
+  const [visionMsg, setVisionMsg] = useState<string>("");
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -91,6 +98,7 @@ const RDCVisionModal = (props: Props) => {
       } else if (visionResult.status === "CheckReq") {
         handleCreateMatchFromVision(visionResult.data);
         setVisionStatus("CheckReq");
+        setVisionMsg(visionResult.message);
         setIsLoading(false);
       }
     } catch (error) {
@@ -104,44 +112,89 @@ const RDCVisionModal = (props: Props) => {
   return (
     <Dialog onOpenChange={handleClose}>
       <DialogTrigger asChild>
-        <Button className="rounded-sm bg-primary p-4 text-primary-foreground">
+        <Button className="my-2 rounded-sm bg-primary p-4 text-primary-foreground">
           <ScanEye />
-          Import Vision
+          Import Stats
         </Button>
       </DialogTrigger>
-      <DialogContent>
-        <DialogDescription>
+      <DialogContent className="flex flex-col items-center">
+        <DialogDescription className="text-xs">
           {" "}
           Select a screenshot of the game stats to import the match data
         </DialogDescription>
-        <DialogTitle>Import Vision</DialogTitle>
-        <h2 className="mb-4 text-xl">Upload Screenshot for Game Stats</h2>
+        <DialogTitle className="text-2xl">
+          Import Stats From Screenshot
+        </DialogTitle>
+        <h2 className="mb-4 text-base">Upload Screenshot for Game Stats</h2>
         <Input
           type="file"
           onChange={handleFileChange}
           className="hover:cursor-pointer hover:bg-primary-foreground"
         />
-        {selectedFile && <p>Selected File: {selectedFile.name}</p>}
         <Button
+          className="w-full max-w-[200px] sm:w-auto"
           disabled={!selectedFile}
           onClick={handleAnalyzeBtnClick}
           type="button"
         >
-          {" "}
           Extract Stats from Image
         </Button>
         {isLoading && <div className="flex justify-center"> Loading...</div>}
-        <span className="flex flex-col items-center">
+        <span className="my-2 flex flex-col items-center">
           {visionStatus !== null && <p className="text-lg">Vision Results:</p>}
           {visionStatus === "Success" && (
-            <CircleCheck size={40} className="text-green-500" />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <CircleCheck size={40} className="my-1 text-green-500" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-72 bg-primary-foreground text-primary">
+                  <p className="text-sm">
+                    <strong>
+                      Stats have been imported to a new match successfully. Make
+                      sure to double check still!
+                    </strong>
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           {visionStatus === "CheckReq" && (
-            <CircleAlert size={40} className="text-yellow-500" />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <CircleAlert size={40} className="my-1 text-yellow-500" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-72 bg-primary-foreground text-primary">
+                  <p className="text-sm">
+                    <strong>
+                      Stats have been imported to a new match but the model had
+                      some trouble recognizing some fields. Please check to make
+                      sure it got it correct.
+                    </strong>
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           {visionStatus === "Failed" && (
-            <CircleX size={40} className="text-red-500" />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <CircleX size={40} className="my-1 text-red-500" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-72 bg-primary-foreground text-primary">
+                  <p className="text-sm">
+                    <strong>
+                      Stat import has failed due to an error please check the
+                      screenshot and try again.
+                    </strong>
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
+          {visionMsg && <p className="text-muted-foreground">{visionMsg}</p>}
         </span>
       </DialogContent>
     </Dialog>

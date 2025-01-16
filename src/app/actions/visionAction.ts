@@ -164,7 +164,8 @@ export const analyzeScreenShot = async (
       ? {
           status: "CheckReq",
           data: visionResult,
-          message: "Stats require validation please verify",
+          message:
+            "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
         }
       : {
           status: "Success",
@@ -182,7 +183,7 @@ export const analyzeScreenShot = async (
 const validateVisionStatValue = (
   statValue: string | undefined,
 ): { statValue: string; reqCheck: boolean } => {
-  // 0 is sometimes detected as Z | Ø on occassion so we need to handle this
+  // 0 is sometimes detected as Z | Ø
   if (statValue === "Z" || statValue === "Ø") {
     return { statValue: "0", reqCheck: true };
   } else if (statValue == undefined) {
