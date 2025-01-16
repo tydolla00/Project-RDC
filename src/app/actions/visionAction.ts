@@ -223,7 +223,7 @@ export const calculateRLWinners = (visionResults: VisionResults) => {
   }
 };
 
-const validateVisionResultPlayers = () => {
+const validateVisionResultPlayers = (players: []) => {
   console.log("Validating Vision Results!");
   // TODO: Check if the players from res is the same as the players in the current session
   // TODO: Should we allow players to be added to the session if they are not in the current session?

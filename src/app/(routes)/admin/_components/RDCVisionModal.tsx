@@ -17,13 +17,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Player } from "@prisma/client";
 
 interface Props {
   handleCreateMatchFromVision: (visionResults: any) => void;
+  sessionPlayers: Player[];
 }
 
 const RDCVisionModal = (props: Props) => {
-  const { handleCreateMatchFromVision } = props;
+  const { handleCreateMatchFromVision, sessionPlayers } = props;
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [visionStatus, setVisionStatus] = useState<
@@ -117,7 +119,7 @@ const RDCVisionModal = (props: Props) => {
           Import Stats
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex flex-col items-center">
+      <DialogContent className="flex min-h-[300px] w-full max-w-md flex-col items-center gap-4 transition-all duration-300 ease-in-out">
         <DialogDescription className="text-xs">
           {" "}
           Select a screenshot of the game stats to import the match data
@@ -131,9 +133,10 @@ const RDCVisionModal = (props: Props) => {
           onChange={handleFileChange}
           className="hover:cursor-pointer hover:bg-primary-foreground"
         />
+        {/** TODO: tooltip for no players */}
         <Button
           className="w-full max-w-[200px] sm:w-auto"
-          disabled={!selectedFile}
+          disabled={!selectedFile || sessionPlayers.length === 0}
           onClick={handleAnalyzeBtnClick}
           type="button"
         >

@@ -186,6 +186,7 @@ const MatchManager = (props: Props) => {
         </Button>
         <RDCVisionModal
           handleCreateMatchFromVision={handleCreateMatchFromVision}
+          sessionPlayers={players}
         />
       </div>
     </div>
