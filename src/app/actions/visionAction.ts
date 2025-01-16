@@ -13,7 +13,7 @@ const client = DocumentIntelligence(
 const modelId = "RDC-Custom-Model";
 
 export interface VisionResults {
-  winner?: string;
+  winner?: Array<VisionPlayer>;
   blueTeam: Array<VisionPlayer>;
   orangeTeam: Array<VisionPlayer>;
 }
@@ -95,6 +95,7 @@ export const analyzeScreenShotTest = async (
     }
 
     const visionResult: VisionResults = {} as VisionResults;
+    let reqUserCheck = false;
     // team: {type 'array', valueArray: players: { name, stats...} , confidence: number}
     Object.entries(teams).forEach(([team, players]) => {
       console.log("Team Name: ", team);
@@ -193,7 +194,8 @@ export const analyzeScreenShotTest = async (
       }
     });
     // TODO: Pass this to visionResult
-    console.log("RL Winner: ", calculateRLWinners(visionResult));
+    const visionWinner = calculateRLWinners(visionResult);
+    visionResult.winner = visionWinner;
     return {
       status: "Success",
       data: visionResult,
@@ -238,10 +240,10 @@ export const calculateRLWinners = (visionResults: VisionResults) => {
   });
 
   if (blueTeamGoals > orangeTeamGoals) {
-    return "Blue Team";
+    return visionResults.blueTeam;
   } else if (orangeTeamGoals > blueTeamGoals) {
-    return "Orange Team";
+    return visionResults.orangeTeam;
   } else {
-    return "Draw";
+    return undefined; // Error in vision results
   }
 };

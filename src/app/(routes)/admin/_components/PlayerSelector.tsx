@@ -12,23 +12,23 @@ interface Props {
   control?: Control<z.infer<typeof formSchema>>;
   fieldName?: string;
   field: ControllerRenderProps<FormValues>;
-  savedSelectedPlayers?: Player[];
+  currentSelectedPlayers?: Player[];
 }
 const PlayerSelector = ({
   handlePlayerClick,
   rdcMembers,
   field,
-  savedSelectedPlayers,
+  currentSelectedPlayers,
 }: Props) => {
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>(
-    savedSelectedPlayers ?? [],
+    currentSelectedPlayers ?? [],
   );
 
+  console.log("Current Selected Players: ", currentSelectedPlayers);
+
   const reactHookFormHandlePlayerClick = (player: Player): void => {
-    console.log("Handling react hook form player click");
-    const isSelected = selectedPlayers.some(
-      (p) => p.playerId === player.playerId,
-    );
+    const isSelected = getIsSelected(player);
+
     const updatedPlayers = isSelected
       ? selectedPlayers.filter((p) => p.playerId !== player.playerId)
       : [...selectedPlayers, player];
@@ -37,15 +37,15 @@ const PlayerSelector = ({
     field.onChange(updatedPlayers);
   };
 
-  const getIsSelected = (player: Player) => selectedPlayers.includes(player);
-
+  const getIsSelected = (player: Player): boolean => {
+    return selectedPlayers.some(
+      (selectedPlayer) => selectedPlayer.playerId === player.playerId,
+    );
+  };
   const getPlayerAvatarClassName = (player: Player): string => {
     const isSelected = getIsSelected(player);
-    if (isSelected) {
-      return "border-2 border-purple-700";
-    } else {
-      return "";
-    }
+    console.log(`Player ${player.playerName} is selected: ${isSelected}`);
+    return isSelected ? "border-2 border-purple-700" : "";
   };
 
   return (

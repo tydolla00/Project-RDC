@@ -21,10 +21,6 @@ import { signOut } from "@/auth";
 import { revalidateTag } from "next/cache";
 import { Input } from "@/components/ui/input";
 
-interface Props {
-  rdcMembers: Player[];
-}
-
 const EntryCreatorForm = (props: AdminFormProps) => {
   const { rdcMembers } = props;
   const form = useForm<FormValues>({
@@ -51,6 +47,8 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
   const { gameStats, getGameStatsFromDb } = useAdmin();
   const game = watch("game");
+
+  console.log(watch());
 
   useEffect(() => {
     const fetchData = async () => {

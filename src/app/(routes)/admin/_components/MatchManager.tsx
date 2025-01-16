@@ -105,10 +105,30 @@ const MatchManager = (props: Props) => {
       ...orangeTeamPlayerSessions,
     ];
 
-    append({
-      matchWinners: [],
-      playerSessions: visionMatchPlayerSessions,
-    });
+    const visionWinners = visionResults.winner
+      ?.map((player: VisionPlayer) => {
+        const foundWinner = findPlayerByGamerTag(player.name);
+        return {
+          playerId: foundWinner?.playerId,
+          playerName: foundWinner?.playerName,
+        };
+      })
+      .filter(
+        (winner): winner is { playerId: number; playerName: string } =>
+          winner.playerId !== undefined && winner.playerName !== undefined,
+      );
+    if (visionWinners && visionWinners.length > 0) {
+      console.log("Setting Vision Winners!", visionWinners);
+      append({
+        matchWinners: visionWinners,
+        playerSessions: visionMatchPlayerSessions,
+      });
+    } else {
+      append({
+        matchWinners: [],
+        playerSessions: visionMatchPlayerSessions,
+      });
+    }
   };
 
   return (
@@ -140,6 +160,7 @@ const MatchManager = (props: Props) => {
                     rdcMembers={players}
                     control={control}
                     field={field}
+                    currentSelectedPlayers={field.value}
                   />
                 )}
               />

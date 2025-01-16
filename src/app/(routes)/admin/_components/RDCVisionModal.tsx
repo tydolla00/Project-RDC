@@ -128,7 +128,7 @@ const RDCVisionModal = (props: Props) => {
         </Button>
         {isLoading && <div>Loading...</div>}
         <span className="flex flex-col items-center">
-          <p className="text-lg">Vision Results:</p>
+          {visionStatus !== null && <p className="text-lg">Vision Results:</p>}
           {visionStatus === "Success" && (
             <CircleCheck size={40} className="text-green-500" />
           )}

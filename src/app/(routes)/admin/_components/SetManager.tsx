@@ -81,8 +81,6 @@ const SetManager = () => {
   };
 
   const players = watch(`players`);
-  const sets = useWatch({ name: "setWinners" });
-  const testSets = useWatch({ control, name: "sets" });
   const game = watch("game");
 
   return (
@@ -144,7 +142,7 @@ const SetManager = () => {
                           rdcMembers={players}
                           control={control}
                           field={field}
-                          savedSelectedPlayers={field.value}
+                          currentSelectedPlayers={field.value}
                         />
                       )}
                     />
