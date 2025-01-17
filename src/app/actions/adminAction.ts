@@ -9,6 +9,13 @@ import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { randomInt } from "crypto";
 
+/**
+ * Retrieves the statistics for a specified game.
+ *
+ * @param {string} gameName - The name of the game to retrieve statistics for.
+ * @returns {Promise<GameStat[]>} A promise that resolves to an array of game statistics.
+ * @throws {Error} If the game with the specified name is not found.
+ */
 export async function getGameStats(gameName: string): Promise<GameStat[]> {
   console.log("Looking for gameStats for ", gameName);
   const game = await prisma.game.findFirst({
@@ -30,6 +37,41 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
   return gameStats;
 }
 
+/**
+ * Inserts a new session from the admin form.
+ *
+ * @param {FormValues} session - The session details to be inserted.
+ * @returns {Promise<{ error: null | string }>} - A promise that resolves to an object containing an error message if any error occurs, otherwise null.
+ *
+ * @example
+ * const session = {
+ *   game: "Game Name",
+ *   sessionName: "Session Name",
+ *   sessionUrl: "http://example.com",
+ *   thumbnail: "http://example.com/thumbnail.jpg",
+ *   date: "2023-10-01",
+ *   sets: [
+ *     {
+ *       setWinners: [{ playerId: 1 }],
+ *       matches: [
+ *         {
+ *           matchWinners: [{ playerId: 1 }],
+ *           playerSessions: [
+ *             {
+ *               playerId: 1,
+ *               playerStats: [{ stat: "Score", statValue: 100 }],
+ *             },
+ *           ],
+ *         },
+ *       ],
+ *     },
+ *   ],
+ * };
+ * const result = await insertNewSessionFromAdmin(session);
+ * console.log(result); // { error: null }
+ *
+ * @throws {Error} Throws an error if an unknown error occurs.
+ */
 export const insertNewSessionFromAdmin = async (
   session: FormValues,
 ): Promise<{ error: null | string }> => {
@@ -48,23 +90,24 @@ export const insertNewSessionFromAdmin = async (
       // TODO This should never happen game should be required.
       return { error: "Game not found." };
     } else {
-      const videoAlreadyExists = await prisma.videoSession.findFirst({
+      const videoAlreadyExists = await prisma.session.findFirst({
         where: {
-          gameId: sessionGame?.gameId,
-          AND: { sessionName: session.sessionName },
+          gameId: sessionGame.gameId,
+          AND: { videoId: session.videoId },
         },
       });
 
       if (videoAlreadyExists) return { error: "Video already exists." };
     }
 
-    const newSession = await prisma.videoSession.create({
+    const newSession = await prisma.session.create({
       data: {
         gameId: sessionGame.gameId,
         sessionName: session.sessionName,
         sessionUrl: session.sessionUrl,
         thumbnail: session.thumbnail,
         date: session.date,
+        videoId: session.videoId,
       },
     });
     const newSessionId = newSession.sessionId; // ! TODO Remove
@@ -78,6 +121,10 @@ export const insertNewSessionFromAdmin = async (
           "\n-- Creating Set From Admin Form Submission:  -- \n",
           set,
         );
+
+        // const setWinnerConect = await set.setWinners.map((winner: any) => ({
+        //   playerId: winner.playerId,
+        // }));
 
         const setWinnerConnect = await (set?.setWinners ?? []).map(
           (winner: any) => ({
@@ -224,9 +271,22 @@ export const insertNewSessionFromAdmin = async (
 };
 
 /**
- * A work in progress function to efficiently store form submissions. Test on a different branch.
- * @param session Form values submitted by the user
- * @returns A transaction that will successfully batch all of the queries together.
+ * Inserts a new video session into the database.
+ *
+ * @param {Object} params - The parameters for the new session.
+ * @param {string} params.sessionUrl - The URL of the session video.
+ * @param {string} params.sessionName - The name of the session.
+ * @param {Array} params.sets - The sets associated with the session.
+ * @param {string} params.game - The name of the game.
+ * @param {string} params.thumbnail - The thumbnail image URL for the session.
+ * @param {Date} params.date - The date of the session.
+ * @returns {Promise<{ error: string | null }>} - An object containing an error message if any, otherwise null.
+ *
+ * @throws {Error} If the user is not authenticated.
+ * @throws {Error} If the game is not found in the database.
+ * @throws {Error} If the video session already exists in the database.
+ *
+ * @async
  */
 export const insertNewSessionV2 = async ({
   sessionUrl,
@@ -235,6 +295,7 @@ export const insertNewSessionV2 = async ({
   game,
   thumbnail,
   date, // Can we remove data from the tables.
+  videoId,
 }: FormValues): Promise<{ error: string | null }> => {
   const gameId = (await getAllGames()).find((g) => g.gameName === game)?.gameId;
   const isAuthenticated = await auth();
@@ -244,7 +305,7 @@ export const insertNewSessionV2 = async ({
   // TODO This should never happen game should be required.
   if (!gameId) return { error: "Game not found." };
   else {
-    const videoAlreadyExists = await prisma.videoSession.findFirst({
+    const videoAlreadyExists = await prisma.session.findFirst({
       where: {
         gameId,
         AND: { sessionName },
@@ -260,13 +321,14 @@ export const insertNewSessionV2 = async ({
   const gameStats = await getGameStats(game);
 
   prismaSets.push(
-    prisma.videoSession.create({
+    prisma.session.create({
       data: {
         sessionId,
         sessionName,
         sessionUrl,
         thumbnail,
         gameId,
+        videoId,
       },
     }),
   );
@@ -275,7 +337,7 @@ export const insertNewSessionV2 = async ({
     // const setId = v4() as unknown as number;
     const setId = randomInt(100000);
     prismaSets.push(
-      prisma.videoSession.update({
+      prisma.session.update({
         where: { sessionId },
         data: {
           sets: {

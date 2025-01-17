@@ -13,8 +13,6 @@ interface Props {
   playerSessionIndex: number;
 }
 
-// Need to get the stats of each game and then display appropriate input field for each stat
-
 const PlayerStatManager = (props: Props) => {
   const { player, matchIndex, setIndex, playerSessionIndex } = props;
   const { register, control, getValues } = useFormContext<FormValues>();
@@ -23,7 +21,6 @@ const PlayerStatManager = (props: Props) => {
     control,
   });
 
-  // const [loading, setLoading] = useState(true);
   const { gameStats } = useAdmin();
 
   // TODO: Move to PlayerSessionManager or above
@@ -44,7 +41,6 @@ const PlayerStatManager = (props: Props) => {
     };
   }, [gameStats, append]);
 
-  // TODO Fix bug, when changing the games doesn't remove stale inputs
   return (
     <>
       {fields.map((field, index: number) => {

@@ -15,6 +15,7 @@ export const formSchema = z.object({
       "Please paste in a valid youtube url.",
     )
     .max(100),
+  videoId: z.string(),
   date: z.date().readonly(),
   thumbnail: z.string().readonly(),
   players: z.array(

@@ -6,6 +6,7 @@ import { Session } from "next-auth";
 import { signOut, signIn, auth } from "@/auth";
 import { isProduction } from "@/lib/utils";
 import { errorCodes } from "@/lib/constants";
+import { identifyUser } from "@/lib/posthog";
 
 /**
  * @deprecated
@@ -15,32 +16,46 @@ export const submitUpdates = async (props: any) => {
   console.log(props);
 };
 
+/**
+ * Updates the authentication status based on the provided session.
+ * If a session is provided, it signs out the user and redirects to the home page.
+ * If no session is provided, it initiates the sign-in process using GitHub.
+ *
+ * @param {Session | null} session - The current session object or null if no session exists.
+ * @returns {Promise<void>} A promise that resolves when the authentication status is updated.
+ */
 export const updateAuthStatus = async (session: Session | null) => {
-  session ? await signOut({ redirectTo: "/" }) : await signIn("github");
+  if (session) {
+    await signOut({ redirectTo: "/" });
+  } else {
+    await signIn("github");
+    const session = await auth();
+    identifyUser(session);
+  }
 };
 
-type FindManySessions = Awaited<
-  ReturnType<typeof prisma.videoSession.findMany>
->[0];
-
-type YTAPIRequestSession = Pick<
-  FindManySessions,
-  "date" | "sessionName" | "sessionUrl"
-> & {
-  thumbnail: Thumbnail;
-};
-
-type GetRdcVideoDetails = Promise<
-  | {
-      video: FindManySessions | YTAPIRequestSession;
-      error: undefined;
-    }
-  | {
-      video: null;
-      error: string;
-    }
->;
-
+/**
+ * Fetches RDC video details based on the provided video ID.
+ *
+ * @param videoId - The ID of the video to fetch details for.
+ * @returns An object containing the video details or an error message.
+ *
+ * The function first checks if the user is authenticated. If not, it returns an error.
+ * It then attempts to find the video session in the database using the provided video ID.
+ * If the video session is not found in the database, it fetches the video details from the YouTube API.
+ * The function ensures that the video is uploaded by "RDC Live" and returns the video details.
+ * If the video session is found in the database, it returns the database record.
+ *
+ * @example
+ * ```typescript
+ * const videoDetails = await getRDCVideoDetails("someVideoId");
+ * if (videoDetails.error) {
+ *   console.error(videoDetails.error);
+ * } else {
+ *   console.log(videoDetails.video);
+ * }
+ * ```
+ */
 export const getRDCVideoDetails = async (
   videoId: string,
 ): GetRdcVideoDetails => {
@@ -48,8 +63,8 @@ export const getRDCVideoDetails = async (
   if (!isAuthenticated)
     return { video: null, error: errorCodes.NotAuthenticated };
 
-  const dbRecord = await prisma.videoSession.findFirst({
-    where: { sessionUrl: videoId },
+  const dbRecord = await prisma.session.findFirst({
+    where: { videoId },
   });
   const apiKey = isProduction
     ? config.YOUTUBE_API_KEY
@@ -127,3 +142,23 @@ type Thumbnail = {
   width: number;
   height: number;
 };
+
+type FindManySessions = Awaited<ReturnType<typeof prisma.session.findMany>>[0];
+
+type YTAPIRequestSession = Pick<
+  FindManySessions,
+  "date" | "sessionName" | "sessionUrl"
+> & {
+  thumbnail: Thumbnail;
+};
+
+type GetRdcVideoDetails = Promise<
+  | {
+      video: FindManySessions | YTAPIRequestSession;
+      error: undefined;
+    }
+  | {
+      video: null;
+      error: string;
+    }
+>;

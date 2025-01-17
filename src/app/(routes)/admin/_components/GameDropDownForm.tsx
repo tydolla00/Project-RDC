@@ -46,7 +46,6 @@ const GameDropDownForm = ({
   useEffect(() => {
     const fetchGames = async () => {
       const games = await getAllGames();
-      console.log("Games: ", games);
       setTestGames(games);
     };
     fetchGames();

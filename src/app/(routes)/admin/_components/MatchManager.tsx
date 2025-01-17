@@ -32,13 +32,13 @@ const MatchManager = (props: Props) => {
   });
   const players = getValues(`players`);
 
+  const statName = "MK8_POS"; // ! TODO Can we remove this
+
   /**
-   * Handles the creation of a new match by creating player sessions from the available players.
-   * Maps each player to a new player session object containing their ID, name, and empty stats array.
-   * Appends the new match data with empty winners array and created player sessions to the form.
+   * Handles the click event for creating a new match.
+   * Logs the players and their sessions, then appends a new match object.
    *
    * @returns {void}
-   *
    */
   const handleNewMatchClick = () => {
     console.log("Handling New Match click", players);

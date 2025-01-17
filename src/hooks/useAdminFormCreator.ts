@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
-import { EnrichedSession } from "../../../prisma/types/session";
-import { EnrichedGameSet } from "../../../prisma/types/gameSet";
-import { EnrichedMatch } from "../../../prisma/types/match";
+import { EnrichedSession } from "../../prisma/types/session";
+import { EnrichedGameSet } from "../../prisma/types/gameSet";
+import { EnrichedMatch } from "../../prisma/types/match";
 import { Player } from "@prisma/client";
-import { EnrichedPlayerSession } from "../../../prisma/types/playerSession";
+import { EnrichedPlayerSession } from "../../prisma/types/playerSession";
 
 const useAdminFormCreator = () => {
   const [session, setSession] = useState<
@@ -17,6 +17,7 @@ const useAdminFormCreator = () => {
     date: new Date(),
     sets: [],
     thumbnail: "",
+    videoId: "",
   });
 
   const [sessionIdCounter, setSessionIdCounter] = useState(1);
@@ -38,6 +39,7 @@ const useAdminFormCreator = () => {
       date: new Date(),
       sets: [],
       thumbnail: "",
+      videoId: "",
     });
     setIsInCreationFlow(true);
   };

@@ -1,5 +1,7 @@
 import { Player, PlayerSession } from "@prisma/client";
 import prisma from "./db";
+import { MembersEnum } from "@/lib/constants";
+import { capitalizeFirst } from "@/lib/utils";
 
 async function main() {
   await seedRDCMembers();
@@ -49,56 +51,56 @@ async function seedRDCMembers() {
   const mark = await prisma.player.create({
     data: {
       playerId: 1,
-      playerName: "Mark",
+      playerName: capitalizeFirst(MembersEnum.Mark),
     },
   });
 
   const aff = await prisma.player.create({
     data: {
       playerId: 2,
-      playerName: "Dylan",
+      playerName: capitalizeFirst(MembersEnum.Dylan),
     },
   });
 
   const des = await prisma.player.create({
     data: {
       playerId: 3,
-      playerName: "Ben",
+      playerName: capitalizeFirst(MembersEnum.Ben),
     },
   });
 
   const ben = await prisma.player.create({
     data: {
       playerId: 4,
-      playerName: "Lee",
+      playerName: capitalizeFirst(MembersEnum.Lee),
     },
   });
 
   const lee = await prisma.player.create({
     data: {
       playerId: 5,
-      playerName: "Des",
+      playerName: capitalizeFirst(MembersEnum.Des),
     },
   });
 
   const dylan = await prisma.player.create({
     data: {
       playerId: 6,
-      playerName: "John",
+      playerName: capitalizeFirst(MembersEnum.John),
     },
   });
 
   const john = await prisma.player.create({
     data: {
       playerId: 7,
-      playerName: "Aff",
+      playerName: capitalizeFirst(MembersEnum.Aff),
     },
   });
 
   const ipi = await prisma.player.create({
     data: {
       playerId: 8,
-      playerName: "Ipi",
+      playerName: capitalizeFirst(MembersEnum.Ipi),
     },
   });
 
@@ -109,7 +111,7 @@ async function seedGames() {
   console.log("--- Seeding Games ---");
   const marioKart = await prisma.game.create({
     data: {
-      gameName: "Mario Kart",
+      gameName: "Mario Kart 8",
       gameStats: {
         create: [{ statName: "MK8_POS" }, { statName: "MK8_DAY" }],
       },
@@ -173,12 +175,13 @@ async function seedGames() {
 async function seedSession(sessionId: number) {
   console.log(`\n--- Seeding Game Session ${sessionId} ---`);
 
-  const marioKartSession = await prisma.videoSession.create({
+  const marioKartSession = await prisma.session.create({
     data: {
       gameId: 1,
       sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",
       sessionUrl: "https://example.com",
       thumbnail: "https://example.com/thumbnail.jpg",
+      videoId: "example",
     },
   });
   console.log("Seeded MK8 Session Successfully.\n");

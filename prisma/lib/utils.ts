@@ -1,3 +1,4 @@
+// Keep in sync with the seed script in prisma/seed.ts
 export enum StatNames {
   MarioKartPosition = "MK8_POS",
   MarioKartDays = "MK8_DAY",

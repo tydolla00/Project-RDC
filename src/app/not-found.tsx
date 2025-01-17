@@ -2,7 +2,14 @@ import { H2 } from "@/components/headings";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
 
-const Loader = () => <Skeleton className="h-[315px] w-[560px]" />;
+/**
+ * A React component that renders a "Not Found" page with a custom message and an embedded YouTube video.
+ * The message can be customized based on the presence of an error in the search parameters.
+ *
+ * @param {Object} props - The component props.
+ * @param {Promise<{ [key: string]: string | string[] | undefined }>} props.searchParams - A promise that resolves to an object containing search parameters.
+ * @returns {JSX.Element} The rendered "Not Found" page.
+ */
 export default async function NotFound({
   searchParams,
 }: {
@@ -20,7 +27,7 @@ export default async function NotFound({
     <div className="mx-auto h-[95vh] w-fit">
       {!error && <H2>Page Not Found</H2>}
       <p className="my-6">{msg}</p>
-      <Suspense fallback={<Loader />}>
+      <Suspense fallback={<Skeleton className="h-[315px] w-[560px]" />}>
         <iframe
           className="mx-auto"
           width="560"
