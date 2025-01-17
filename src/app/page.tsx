@@ -4,16 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { type ChartConfig } from "@/components/ui/chart";
 import Link from "next/link";
-import { getAllGames } from "../../prisma/lib/games";
+import { getGamesNav } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
 import Image from "next/image";
-import { gameImages } from "@/lib/constants";
 
 export default async function Home() {
-  const games = await getAllGames();
+  const games = await getGamesNav();
   const session = await auth();
-
+  console.log(games);
   return (
     <>
       <div className="m-16">
@@ -50,31 +49,29 @@ export default async function Home() {
           Games
         </H2>
         <div className="flex flex-wrap justify-center gap-10">
-          {games.map((game) => {
-            const gameName = game.gameName.replace(/\s/g, "").toLowerCase();
-            return (
-              <Card
-                key={game.gameId}
-                className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52"
-              >
-                <Link href={`/games/${gameName}`}>
-                  {/* TODO Fix warning in browser related to sizing of the image. */}
-                  <Image
-                    className="absolute h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
-                    fill
-                    sizes="(max-width: 639px) 100vw, 100vw"
-                    alt=""
-                    src={`/images/${gameImages[gameName as keyof typeof gameImages]}`}
-                  />
-                  <CardHeader className="relative h-1/4 bg-black bg-opacity-50">
-                    <CardTitle className="absolute font-extrabold text-white opacity-100">
-                      {game.gameName}
-                    </CardTitle>
-                  </CardHeader>
-                </Link>
-              </Card>
-            );
-          })}
+          {games.map((game) => (
+            <div key={game.url}>
+              {game.src && (
+                <Card className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52">
+                  <Link href={game.url}>
+                    {/* TODO Fix warning in browser related to sizing of the image. */}
+                    <Image
+                      className="absolute h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
+                      fill
+                      sizes="(max-width: 639px) 100vw, 100vw"
+                      alt=""
+                      src={game.src || ""}
+                    />
+                    <CardHeader className="relative h-1/4 bg-black bg-opacity-50">
+                      <CardTitle className="absolute font-extrabold text-white opacity-100">
+                        {game.name}
+                      </CardTitle>
+                    </CardHeader>
+                  </Link>
+                </Card>
+              )}
+            </div>
+          ))}
         </div>
         <FeatureFlag
           devOnly

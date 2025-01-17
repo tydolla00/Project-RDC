@@ -11,7 +11,7 @@ import prisma from "../db";
  */
 export const getAllSessions = unstable_cache(
   async () =>
-    await prisma.videoSession.findMany({
+    await prisma.session.findMany({
       include: { Game: { select: { gameName: true } } },
     }),
   undefined,

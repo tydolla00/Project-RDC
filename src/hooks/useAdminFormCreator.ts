@@ -17,6 +17,7 @@ const useAdminFormCreator = () => {
     date: new Date(),
     sets: [],
     thumbnail: "",
+    videoId: "",
   });
 
   const [sessionIdCounter, setSessionIdCounter] = useState(1);
@@ -38,6 +39,7 @@ const useAdminFormCreator = () => {
       date: new Date(),
       sets: [],
       thumbnail: "",
+      videoId: "",
     });
     setIsInCreationFlow(true);
   };
