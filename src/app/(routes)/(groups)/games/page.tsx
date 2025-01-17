@@ -11,12 +11,9 @@ export default async function Page() {
       <H1>Games</H1>
       <div className="flex-wra flex justify-center gap-10">
         {games.map((game) => (
-          <>
+          <div key={game.url}>
             {game.src && (
-              <Card
-                key={game.url}
-                className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52"
-              >
+              <Card className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52">
                 <Link href={game.url}>
                   <Image
                     className="h-100 absolute w-full object-cover transition-transform duration-500 group-hover:scale-125"
@@ -32,7 +29,7 @@ export default async function Page() {
                 </Link>
               </Card>
             )}
-          </>
+          </div>
         ))}
       </div>
       <div className="mt-10 flex gap-10">

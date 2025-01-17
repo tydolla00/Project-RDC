@@ -14,7 +14,6 @@ export const getMembersNav = async () => {
     stats: { prop: string; val: string }[];
   }[] = members.map((member) => {
     const memberKey = member.playerName.toLowerCase();
-    console.log(memberKey);
     const rdcMember = RDCMembers.get(memberKey)!;
     return {
       alt: rdcMember.nav.alt,

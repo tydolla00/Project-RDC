@@ -50,12 +50,9 @@ export default async function Home() {
         </H2>
         <div className="flex flex-wrap justify-center gap-10">
           {games.map((game) => (
-            <>
+            <div key={game.url}>
               {game.src && (
-                <Card
-                  key={game.url}
-                  className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52"
-                >
+                <Card className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52">
                   <Link href={game.url}>
                     {/* TODO Fix warning in browser related to sizing of the image. */}
                     <Image
@@ -73,7 +70,7 @@ export default async function Home() {
                   </Link>
                 </Card>
               )}
-            </>
+            </div>
           ))}
         </div>
         <FeatureFlag
