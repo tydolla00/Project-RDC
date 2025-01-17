@@ -7,11 +7,7 @@ import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
-import {
-  findPlayerByGamerTag,
-  FormValues,
-  PLAYER_MAPPINGS,
-} from "../_utils/form-helpers";
+import { findPlayerByGamerTag, FormValues } from "../_utils/form-helpers";
 import RDCVisionModal from "./RDCVisionModal";
 import {
   VisionPlayer,
@@ -55,16 +51,20 @@ const MatchManager = (props: Props) => {
   };
 
   /**
-   * Processes vision analysis results to create match player sessions
-   * @param visionResults - The results from vision analysis containing blue and orange team player information
-   * @remarks
-   * 1. Maps vision results for both blue and orange teams into player sessions
-   * 2. Finds existing players by gamer tag
-   * 3. Creates player session objects with player IDs and stats
+   * Handles the creation of a match from vision results.
+   *
+   * This function processes the vision results to create player sessions for both
+   * blue and orange teams, and identifies the winners of the match. It then appends
+   * the match data to the existing data structure.
+   *
+   * @param {VisionResults} visionResults - The results from the vision system containing
+   *                                        player information for both teams and the match winner.
+   *
+   * @returns {void}
+   *
+   * @throws {Error} If a player is not found by their gamer tag or if a player's name is not found.
    */
   const handleCreateMatchFromVision = (visionResults: VisionResults) => {
-    console.log("Handling Create Match from Vision: ", visionResults);
-
     const blueTeamPlayerSessions = visionResults.blueTeam.map(
       (player: VisionPlayer) => {
         const foundPlayer: Player | undefined = findPlayerByGamerTag(
@@ -97,9 +97,6 @@ const MatchManager = (props: Props) => {
       },
     );
 
-    console.log("Orange Team Player Sessions: ", orangeTeamPlayerSessions);
-    console.log("Blue Team Player Sessions: ", blueTeamPlayerSessions);
-
     const visionMatchPlayerSessions = [
       ...blueTeamPlayerSessions,
       ...orangeTeamPlayerSessions,
@@ -118,7 +115,6 @@ const MatchManager = (props: Props) => {
           winner.playerId !== undefined && winner.playerName !== undefined,
       );
     if (visionWinners && visionWinners.length > 0) {
-      console.log("Setting Vision Winners!", visionWinners);
       append({
         matchWinners: visionWinners,
         playerSessions: visionMatchPlayerSessions,

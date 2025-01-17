@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Control,
   Controller,
   useFieldArray,
   useFormContext,
@@ -26,8 +25,7 @@ import { toast } from "sonner";
 import { randomInt } from "crypto";
 
 const SetManager = () => {
-  const { watch, formState, control } =
-    useFormContext<z.infer<typeof formSchema>>();
+  const { watch, control } = useFormContext<z.infer<typeof formSchema>>();
 
   const { append, remove, fields, update } = useFieldArray({
     name: "sets",
@@ -142,12 +140,6 @@ const SetManager = () => {
                     <TrashIcon
                       className="text-sm text-red-500 hover:cursor-pointer hover:text-red-400"
                       onClick={() => {
-                        // Collapse set before removing
-                        // setOpenSets((prevOpenSets) =>
-                        //   prevOpenSets.map((isOpen, i) =>
-                        //     i === setIndex ? false : isOpen,
-                        //   ),
-                        // );
                         setTextArea((prev) => {
                           const newSet = prev.filter(
                             (_, index) => setIndex !== index,
@@ -183,8 +175,8 @@ const SetManager = () => {
                       )}
                     />
                   </div>
-                  {/* TODO Work In Progress */}
-                  <Label>
+                  {/* TODO Don't think we will be using this anymore? */}
+                  {/* <Label>
                     You may paste in the info of all matches for Set{" "}
                     {setIndex + 1}
                   </Label>
@@ -200,7 +192,7 @@ const SetManager = () => {
                     }
                     className="max-w-xs"
                     placeholder="Paste in json"
-                  />
+                  /> 
                   <Button
                     type="button"
                     onClick={() => handleAddJSON(setIndex)}
@@ -208,6 +200,7 @@ const SetManager = () => {
                   >
                     Fill Match
                   </Button>
+                  */}
                   <MatchManager setIndex={setIndex} />
                 </CollapsibleContent>
                 <CardFooter className="flex flex-row-reverse pb-0">

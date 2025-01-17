@@ -72,10 +72,6 @@ export const formSchema = z.object({
 // TODO Do we want to conditionally apply input types/validations based on the stat name? Most will be numbers
 export type FormValues = z.infer<typeof formSchema>;
 
-export interface AdminFormProps {
-  rdcMembers: Player[];
-}
-
 type PlayerMapping = {
   [key: string]: {
     playerId: number;

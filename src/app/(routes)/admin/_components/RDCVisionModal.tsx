@@ -183,8 +183,11 @@ const RDCVisionModal = (props: Props) => {
           {visionStatus === "Failed" && (
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger>
-                  <CircleX size={40} className="my-1 text-red-500" />
+                <TooltipTrigger className="hover:cursor-default">
+                  <CircleX
+                    size={40}
+                    className="my-1 text-red-500 hover:cursor-default"
+                  />
                 </TooltipTrigger>
                 <TooltipContent className="max-w-72 bg-primary-foreground text-primary">
                   <p className="text-sm">
