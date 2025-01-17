@@ -6,6 +6,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "./ui/breadcrumb";
+import { ModeToggle } from "./modetoggle";
 
 export const Footer = () => {
   return (
@@ -35,6 +36,7 @@ export const Footer = () => {
               Members
             </Link>
           </BreadcrumbItem>
+          <ModeToggle />
         </BreadcrumbList>
       </Breadcrumb>
     </footer>

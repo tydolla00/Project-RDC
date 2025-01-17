@@ -63,9 +63,8 @@ export const getRDCVideoDetails = async (
   if (!isAuthenticated)
     return { video: null, error: errorCodes.NotAuthenticated };
 
-  // TODO add a column for videoId or store videoId as the primary key?
   const dbRecord = await prisma.session.findFirst({
-    where: { sessionUrl: videoId }, //! Does not work.
+    where: { videoId },
   });
   const apiKey = isProduction
     ? config.YOUTUBE_API_KEY

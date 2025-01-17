@@ -22,17 +22,17 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { games, RDCMembers } from "@/lib/constants";
+import { getGamesNav, getMembersNav } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
 import { AuthButton, ToggleThemeButton } from "./client-buttons";
 
 export const Navbar = async () => {
   const session = await auth();
+  const games = await getGamesNav();
+  const members = await getMembersNav();
 
   // TODO Memoize this component, so it doesn't ever rerender? Which it never should.
-
-  const members = Array.from(RDCMembers.entries());
 
   return (
     <NavigationMenu className="sticky top-0 z-20 mx-auto w-screen bg-inherit">
@@ -69,7 +69,7 @@ export const Navbar = async () => {
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              {members.map(([_, { nav: rdc }]) => (
+              {members.map((rdc) => (
                 <div key={rdc.url} className="flex gap-5">
                   <Avatar>
                     <Image
@@ -82,7 +82,7 @@ export const Navbar = async () => {
                   <ListItem
                     className="flex-shrink-0"
                     href={rdc.url}
-                    title={rdc.name}
+                    title={rdc.navName}
                   />
                 </div>
               ))}

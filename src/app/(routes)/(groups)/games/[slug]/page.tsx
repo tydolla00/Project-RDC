@@ -36,7 +36,7 @@ export default async function Page({
   const gameName = slug.toLowerCase();
   let component: React.ReactNode;
   switch (gameName) {
-    case "mariokart":
+    case "mariokart8":
       component = <Mariokart game={game} />;
       break;
     case "callofduty":

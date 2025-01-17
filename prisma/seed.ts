@@ -109,7 +109,7 @@ async function seedGames() {
   console.log("--- Seeding Games ---");
   const marioKart = await prisma.game.create({
     data: {
-      gameName: "Mario Kart",
+      gameName: "Mario Kart 8",
       gameStats: {
         create: [{ statName: "MK8_POS" }, { statName: "MK8_DAY" }],
       },

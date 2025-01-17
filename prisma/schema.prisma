@@ -9,7 +9,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  directUrl = env("DIRECT_URL") // Used during development to connect to dev db
 }
 
 /////////////////////////
@@ -93,7 +93,7 @@ model Session {
   sets        GameSet[]
   thumbnail   String
   date        DateTime  @default(now()) // Date video posted
-  videoId     String
+  videoId     String    @unique
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   @@map("sessions")
@@ -105,7 +105,7 @@ model GameSet {
   playerSessions PlayerSession[]
   matches        Match[]
   sessionId      Int            @map("session_id")
-  session        Session   @relation(fields: [sessionId], references: [sessionId])
+  session        Session        @relation(fields: [sessionId], references: [sessionId])
   setWinners     Player[]
   
   createdAt      DateTime       @default(now())
