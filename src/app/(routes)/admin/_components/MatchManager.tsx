@@ -119,9 +119,9 @@ const MatchManager = (props: Props) => {
         matchWinners: visionWinners,
         playerSessions: visionMatchPlayerSessions,
       });
-    } else {
+    } else { // MatchWinner unable to be determined
       append({
-        matchWinners: [],
+        matchWinners: [], 
         playerSessions: visionMatchPlayerSessions,
       });
     }
