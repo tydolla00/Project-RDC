@@ -10,7 +10,13 @@ import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { analyzeScreenShot } from "@/app/actions/visionAction";
-import { CircleAlert, CircleCheck, CircleX, ScanEye } from "lucide-react";
+import {
+  CircleAlert,
+  CircleCheck,
+  CircleX,
+  LoaderCircle,
+  ScanEye,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -142,7 +148,11 @@ const RDCVisionModal = (props: Props) => {
         >
           Extract Stats from Image
         </Button>
-        {isLoading && <div className="flex justify-center"> Loading...</div>}
+        {isLoading && (
+          <div className="flex justify-center">
+            <LoaderCircle className="animate-spin" />
+          </div>
+        )}
         <span className="my-2 flex flex-col items-center">
           {visionStatus !== null && <p className="text-lg">Vision Results:</p>}
           {visionStatus === "Success" && (
@@ -183,11 +193,8 @@ const RDCVisionModal = (props: Props) => {
           {visionStatus === "Failed" && (
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger className="hover:cursor-default">
-                  <CircleX
-                    size={40}
-                    className="my-1 text-red-500 hover:cursor-default"
-                  />
+                <TooltipTrigger>
+                  <CircleX size={40} className="my-1 text-red-500" />
                 </TooltipTrigger>
                 <TooltipContent className="max-w-72 bg-primary-foreground text-primary">
                   <p className="text-sm">

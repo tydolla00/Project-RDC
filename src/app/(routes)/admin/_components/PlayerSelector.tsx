@@ -24,8 +24,6 @@ const PlayerSelector = ({
     currentSelectedPlayers ?? [],
   );
 
-  console.log("Current Selected Players: ", currentSelectedPlayers);
-
   const reactHookFormHandlePlayerClick = (player: Player): void => {
     const isSelected = getIsSelected(player);
 
@@ -44,7 +42,6 @@ const PlayerSelector = ({
   };
   const getPlayerAvatarClassName = (player: Player): string => {
     const isSelected = getIsSelected(player);
-    console.log(`Player ${player.playerName} is selected: ${isSelected}`);
     return isSelected ? "border-2 border-purple-700" : "";
   };
 
