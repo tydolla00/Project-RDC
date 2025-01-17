@@ -1,5 +1,7 @@
 import { Player, PlayerSession } from "@prisma/client";
 import prisma from "./db";
+import { MembersEnum } from "@/lib/constants";
+import { capitalizeFirst } from "@/lib/utils";
 
 async function main() {
   await seedRDCMembers();
@@ -49,56 +51,56 @@ async function seedRDCMembers() {
   const mark = await prisma.player.create({
     data: {
       playerId: 1,
-      playerName: "Mark",
+      playerName: capitalizeFirst(MembersEnum.Mark),
     },
   });
 
   const aff = await prisma.player.create({
     data: {
       playerId: 2,
-      playerName: "Dylan",
+      playerName: capitalizeFirst(MembersEnum.Dylan),
     },
   });
 
   const des = await prisma.player.create({
     data: {
       playerId: 3,
-      playerName: "Ben",
+      playerName: capitalizeFirst(MembersEnum.Ben),
     },
   });
 
   const ben = await prisma.player.create({
     data: {
       playerId: 4,
-      playerName: "Lee",
+      playerName: capitalizeFirst(MembersEnum.Lee),
     },
   });
 
   const lee = await prisma.player.create({
     data: {
       playerId: 5,
-      playerName: "Des",
+      playerName: capitalizeFirst(MembersEnum.Des),
     },
   });
 
   const dylan = await prisma.player.create({
     data: {
       playerId: 6,
-      playerName: "John",
+      playerName: capitalizeFirst(MembersEnum.John),
     },
   });
 
   const john = await prisma.player.create({
     data: {
       playerId: 7,
-      playerName: "Aff",
+      playerName: capitalizeFirst(MembersEnum.Aff),
     },
   });
 
   const ipi = await prisma.player.create({
     data: {
       playerId: 8,
-      playerName: "Ipi",
+      playerName: capitalizeFirst(MembersEnum.Ipi),
     },
   });
 

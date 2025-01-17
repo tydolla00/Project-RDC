@@ -14,7 +14,7 @@ export const getMembersNav = async () => {
     stats: { prop: string; val: string }[];
   }[] = members.map((member) => {
     const memberKey = member.playerName.toLowerCase();
-    const rdcMember = RDCMembers.get(memberKey)!;
+    const rdcMember = RDCMembers.get(memberKey as MembersEnum)!;
     return {
       alt: rdcMember.nav.alt,
       name: member.playerName,
@@ -29,9 +29,20 @@ export const getMembersNav = async () => {
 };
 
 // TODO Replace src with player avatars
-export const RDCMembers = new Map<string, MembersProps>([
+export enum MembersEnum {
+  Mark = "mark",
+  Ipi = "ipi",
+  John = "john",
+  Aff = "aff",
+  Lee = "lee",
+  Dylan = "dylan",
+  Ben = "ben",
+  Des = "des",
+}
+
+const RDCMembers = new Map<MembersEnum, MembersProps>([
   [
-    "mark",
+    MembersEnum.Mark,
     {
       nav: {
         alt: "RDC Mark",
@@ -48,7 +59,7 @@ export const RDCMembers = new Map<string, MembersProps>([
     },
   ],
   [
-    "ipi",
+    MembersEnum.Ipi,
     {
       nav: { alt: "Ipi", name: "Iceman Ip", url: "/members/ipi", src: "" },
       desc: "Ipi is a newcomer in the eyes of RDC, while not yet an official member of RDC yet, one can assume that it's only a matter of time as he has been beating down the crew in Golf and Mario Kart.",
@@ -60,7 +71,7 @@ export const RDCMembers = new Map<string, MembersProps>([
     },
   ],
   [
-    "john",
+    MembersEnum.John,
     {
       nav: { alt: "RDC John", name: "John", url: "/members/john", src: "" },
       desc: "If you've ever seen or been to DreamCon, this man has had a hand in it. Don't let his sorry gaming skills fool you, John is very valuable in the backend and his contributions should not go unnoticed. Don't forget his immaculate singing ability, John is clearly the best singer in RDC.",
@@ -72,7 +83,7 @@ export const RDCMembers = new Map<string, MembersProps>([
     },
   ],
   [
-    "aff",
+    MembersEnum.Aff,
     {
       nav: {
         alt: "RDC Aff",
@@ -89,7 +100,7 @@ export const RDCMembers = new Map<string, MembersProps>([
     },
   ],
   [
-    "lee",
+    MembersEnum.Lee,
     {
       nav: {
         alt: "RDC Leland",
@@ -106,7 +117,7 @@ export const RDCMembers = new Map<string, MembersProps>([
     },
   ],
   [
-    "dylan",
+    MembersEnum.Dylan,
     {
       nav: {
         alt: "RDC Dylan",
@@ -123,7 +134,7 @@ export const RDCMembers = new Map<string, MembersProps>([
     },
   ],
   [
-    "ben",
+    MembersEnum.Ben,
     {
       nav: {
         alt: "RDC Ben",
@@ -140,7 +151,7 @@ export const RDCMembers = new Map<string, MembersProps>([
     },
   ],
   [
-    "des",
+    MembersEnum.Des,
     {
       nav: {
         alt: "RDC Des",
@@ -168,34 +179,41 @@ export const getGamesNav = async () => {
     src?: string;
     desc?: string;
   }[] = games.map((game) => {
-    const gameKey = game.gameName.replace(/\s/g, "").toLowerCase();
+    const gameKey = game.gameName.replace(/\s/g, "").toLowerCase() as GamesEnum;
     return {
       alt: game.gameName,
       desc: gamesNav.get(gameKey) || "",
       name: game.gameName,
       url: `/games/${gameKey}`,
-      src: `/images/${gameImages[gameKey as keyof typeof gameImages]}`,
+      src: `/images/${gameImages[gameKey]}`,
     };
   });
   navGames.push({ name: "Browse all games", url: "/games" });
   return navGames;
 };
 
-// create a map of games to their respective descriptions
-const gamesNav = new Map<string, string>([
-  ["rocketleague", "Stats from the most intense 3v3 battles."],
-  ["lethalcompany", "Stats that tell you who touches the most paper."],
-  ["callofduty", "Stats for FFA's and who sells the most online."],
-  ["mariokart8", "Stats that tell you who races the hardest."],
-  ["speedrunners", "Stats that tell you who races the hardest."],
+export enum GamesEnum {
+  RocketLeague = "rocketleague",
+  LethalCompany = "lethalcompany",
+  CallOfDuty = "callofduty",
+  MarioKart8 = "mariokart8",
+  SpeedRunners = "speedrunners",
+}
+
+const gamesNav = new Map<GamesEnum, string>([
+  [GamesEnum.RocketLeague, "Stats from the most intense 3v3 battles."],
+  [GamesEnum.LethalCompany, "Stats that tell you who touches the most paper."],
+  [GamesEnum.CallOfDuty, "Stats for FFA's and who sells the most online."],
+  [GamesEnum.MarioKart8, "Stats that tell you who races the hardest."],
+  [GamesEnum.SpeedRunners, "Stats that tell you who races the hardest."],
 ]);
 
 export const gameImages = {
-  rocketleague: "rocketleague.png",
-  lethalcompany: "lethalcompany.jpg",
-  mariokart8: "mk8.jpg",
-  speedrunners: "speedrunners.jpeg",
-  callofduty: "callofduty.jpeg",
+  [GamesEnum.RocketLeague]: "rocketleague.png",
+  [GamesEnum.LethalCompany]: "lethalcompany.jpg",
+  [GamesEnum.MarioKart8]: "mk8.jpg",
+  [GamesEnum.SpeedRunners]: "speedrunners.jpeg",
+  [GamesEnum.CallOfDuty]: "callofduty.jpeg",
 };
 
 export enum errorCodes {
