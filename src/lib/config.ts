@@ -10,6 +10,8 @@ interface Config {
   AUTH_GITHUB_SECRET: string | undefined;
   AUTH_TRUST_HOST: string | undefined;
   AUTH_SECRET: string | undefined;
+  AUTH_GOOGLE_ID: string | undefined;
+  AUTH_GOOGLE_SECRET: string | undefined;
 }
 
 const getConfig = (): Config => {
@@ -24,6 +26,8 @@ const getConfig = (): Config => {
     AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
     AUTH_TRUST_HOST: process.env.AUTH_TRUST_HOST,
     AUTH_SECRET: process.env.AUTH_SECRET,
+    AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
+    AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
   };
 };
 
