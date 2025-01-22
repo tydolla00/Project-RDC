@@ -47,14 +47,24 @@ const PlayerStatManager = (props: Props) => {
         return (
           <div key={field.id} className="my-4 flex gap-3">
             <span className="sr-only">{field.stat}</span>
-            <Input
-              className="max-w-xs"
-              placeholder={field.stat}
-              type="text"
-              {...register(
-                `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats.${index}.statValue`,
-              )}
-            />
+            <div className="relative">
+              <Input
+                className="peer block w-full appearance-none rounded-t-lg border-2 border-gray-500 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:border-b-gray-200 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-purple-700"
+                placeholder=""
+                id={`sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats.${index}.statValue`}
+                type="text"
+                {...register(
+                  `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats.${index}.statValue`,
+                )}
+              />
+
+              <label
+                htmlFor={`sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats.${index}.statValue`}
+                className="dark:text-white-500 absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-purple-500 peer-focus:dark:text-purple-700 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
+              >
+                {field.stat}
+              </label>
+            </div>
           </div>
         );
       })}
