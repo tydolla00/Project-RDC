@@ -28,13 +28,13 @@ const MatchManager = (props: Props) => {
   });
   const players = getValues(`players`);
 
-  const statName = "MK8_POS"; // ! TODO Can we remove this
-
   /**
-   * Handles the click event for creating a new match.
-   * Logs the players and their sessions, then appends a new match object.
+   * Handles the creation of a new match by creating player sessions from the available players.
+   * Maps each player to a new player session object containing their ID, name, and empty stats array.
+   * Appends the new match data with empty winners array and created player sessions to the form.
    *
    * @returns {void}
+   *
    */
   const handleNewMatchClick = () => {
     console.log("Handling New Match click", players);
@@ -50,51 +50,39 @@ const MatchManager = (props: Props) => {
     });
   };
 
+  const processTeamPlayers = (teamPlayers: VisionPlayer[]) => {
+    return teamPlayers.map((player) => {
+      const foundPlayer = findPlayerByGamerTag(player.name);
+
+      if (!foundPlayer) {
+        console.error(`Player not found: ${player.name}`);
+      } else if (!foundPlayer.playerName) {
+        console.error(`Player name not found: ${player.name}`);
+      }
+
+      return {
+        playerId: foundPlayer?.playerId || 0,
+        playerSessionName: foundPlayer?.playerName || "Unknown Player",
+        playerStats: [...player.stats],
+      };
+    });
+  };
+
   /**
-   * Handles the creation of a match from vision results.
-   *
-   * This function processes the vision results to create player sessions for both
-   * blue and orange teams, and identifies the winners of the match. It then appends
-   * the match data to the existing data structure.
-   *
-   * @param {VisionResults} visionResults - The results from the vision system containing
-   *                                        player information for both teams and the match winner.
-   *
-   * @returns {void}
-   *
-   * @throws {Error} If a player is not found by their gamer tag or if a player's name is not found.
+   * Processes vision analysis results to create match player sessions
+   * @param visionResults - The results from vision analysis containing blue and orange team player information
+   * @remarks
+   * 1. Maps vision results for both blue and orange teams into player sessions
+   * 2. Finds existing players by gamer tag
+   * 3. Creates player session objects with player IDs and stats
    */
   const handleCreateMatchFromVision = (visionResults: VisionResults) => {
-    const blueTeamPlayerSessions = visionResults.blueTeam.map(
-      (player: VisionPlayer) => {
-        const foundPlayer: Player | undefined = findPlayerByGamerTag(
-          player.name,
-        );
-        if (!foundPlayer) {
-          console.error(`Player not found: ${player.name}`);
-        } else if (!foundPlayer.playerName) {
-          console.error(`Player name not found: ${player.name}`);
-        }
-        return {
-          playerId: foundPlayer?.playerId || 0,
-          playerSessionName: foundPlayer?.playerName || "Unknown Player",
-          playerStats: [...player.stats],
-        };
-      },
-    );
+    console.log("Handling Create Match from Vision: ", visionResults);
 
-    const orangeTeamPlayerSessions = visionResults.orangeTeam.map(
-      (player: VisionPlayer) => {
-        const foundPlayer = findPlayerByGamerTag(player.name);
-        if (!foundPlayer) {
-          console.error(`Player not found: ${player.name}`);
-        }
-        return {
-          playerId: foundPlayer?.playerId || 0,
-          playerSessionName: player.name,
-          playerStats: [...player.stats],
-        };
-      },
+    const blueTeamPlayerSessions = processTeamPlayers(visionResults.blueTeam);
+
+    const orangeTeamPlayerSessions = processTeamPlayers(
+      visionResults.orangeTeam,
     );
 
     const visionMatchPlayerSessions = [
@@ -115,13 +103,14 @@ const MatchManager = (props: Props) => {
           winner.playerId !== undefined && winner.playerName !== undefined,
       );
     if (visionWinners && visionWinners.length > 0) {
+      console.log("Setting Vision Winners!", visionWinners);
       append({
         matchWinners: visionWinners,
         playerSessions: visionMatchPlayerSessions,
       });
-    } else { // MatchWinner unable to be determined
+    } else {
       append({
-        matchWinners: [], 
+        matchWinners: [],
         playerSessions: visionMatchPlayerSessions,
       });
     }

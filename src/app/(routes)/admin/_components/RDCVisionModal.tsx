@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { analyzeScreenShot } from "@/app/actions/visionAction";
@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Player } from "@prisma/client";
+import Image from "next/image";
 
 interface Props {
   handleCreateMatchFromVision: (visionResults: any) => void;
@@ -38,6 +39,36 @@ const RDCVisionModal = (props: Props) => {
     "Success" | "CheckReq" | "Failed" | null
   >(null);
   const [visionMsg, setVisionMsg] = useState<string>("");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.addEventListener("paste", handlePaste);
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
+  });
+
+  const handlePaste = async (e: ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+
+    if (!items) return;
+
+    for (const item of Array.from(items)) {
+      if (item.type.indexOf("image") !== -1) {
+        const file = item.getAsFile();
+        if (!file) continue;
+
+        // Update file state
+        setSelectedFile(file);
+
+        // Create preview URL
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+
+        break;
+      }
+    }
+  };
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -71,6 +102,7 @@ const RDCVisionModal = (props: Props) => {
   const handleClose = () => {
     setSelectedFile(null);
     setVisionStatus(null);
+    setPreviewUrl(null);
   };
 
   const handleAnalyzeBtnClick = async (): Promise<void> => {
@@ -134,10 +166,29 @@ const RDCVisionModal = (props: Props) => {
           Import Stats From Screenshot
         </DialogTitle>
         <h2 className="mb-4 text-base">Upload Screenshot for Game Stats</h2>
+        <div
+          className="flex h-48 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed"
+          tabIndex={0}
+          role="button"
+        >
+          {previewUrl ? (
+            <Image
+              src={previewUrl}
+              alt="Pasted preview"
+              width={300}
+              height={200}
+              className="object-contain"
+            />
+          ) : (
+            <p>Paste an image (Ctrl+V/⌘+V)</p>
+          )}
+        </div>
+        <p className="font-semibold underline underline-offset-2"> OR </p>
         <Input
           type="file"
           onChange={handleFileChange}
           className="hover:cursor-pointer hover:bg-primary-foreground"
+          tabIndex={1}
         />
         {/** TODO: tooltip for no players */}
         <Button

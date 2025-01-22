@@ -130,6 +130,8 @@ export const findPlayerByGamerTag = (gamerTag: string) => {
       (tag) => tag.toLowerCase() === gamerTag.toLowerCase(),
     ),
   );
-  console.log("Found Player: ", player);
-  return player;
+  return {
+    playerId: player?.playerId,
+    playerName: player?.playerName,
+  } as Player;
 };
