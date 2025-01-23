@@ -152,7 +152,7 @@ export const DataTable = <TData, TValue>({
           }
           className="max-w-sm"
         />
-        <div className="mx-3 text-sm text-muted-foreground">
+        <div className="text-muted-foreground mx-3 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>

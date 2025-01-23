@@ -101,7 +101,7 @@ export const SessionInfo = ({
                 {...field}
               />
               {errors.sessionUrl && (
-                <p className="text-sm text-destructive">
+                <p className="text-destructive text-sm">
                   {errors.sessionUrl.message}
                 </p>
               )}

@@ -51,7 +51,7 @@ export const AuthButton = ({
 export const ToggleThemeButton = () => {
   return (
     <>
-      <ModeToggle className="fixed right-0 top-3 hidden max-[400px]:inline-flex" />
+      <ModeToggle className="fixed top-3 right-0 hidden max-[400px]:inline-flex" />
     </>
   );
 };
