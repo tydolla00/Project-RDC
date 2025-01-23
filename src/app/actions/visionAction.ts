@@ -1,3 +1,4 @@
+import { VisionResultCodes } from "@/lib/constants";
 import DocumentIntelligence, {
   getLongRunningPoller,
   AnalyzeResultOperationOutput,
@@ -31,9 +32,13 @@ export interface VisionStat {
 }
 
 export type VisionResult =
-  | { status: "Success"; data: VisionResults }
-  | { status: "CheckReq"; data: VisionResults; message: string }
-  | { status: "Failed"; message: string };
+  | { status: VisionResultCodes.Success; data: VisionResults }
+  | {
+      status: VisionResultCodes.CheckRequest;
+      data: VisionResults;
+      message: string;
+    }
+  | { status: VisionResultCodes.Failed; message: string };
 
 const TEAM_MAPPING = {
   BluePlayers: "blueTeam",
@@ -134,7 +139,7 @@ export const analyzeScreenShot = async (
 
     if (!result.analyzeResult || !result.analyzeResult.documents) {
       return {
-        status: "Failed",
+        status: VisionResultCodes.Failed,
         message: "Analyze result or documents are undefined",
       };
     }
@@ -170,19 +175,19 @@ export const analyzeScreenShot = async (
     console.log("Vision Result: ", visionResult);
     return requiresCheck
       ? {
-          status: "CheckReq",
+          status: VisionResultCodes.CheckRequest,
           data: visionResult,
           message:
             "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
         }
       : {
-          status: "Success",
+          status: VisionResultCodes.Success,
           data: visionResult,
         };
   } catch (error) {
     console.error(error);
     return {
-      status: "Failed",
+      status: VisionResultCodes.Failed,
       message: error instanceof Error ? error.message : "Unknown error",
     };
   }

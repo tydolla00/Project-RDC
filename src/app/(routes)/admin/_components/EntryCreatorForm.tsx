@@ -116,11 +116,13 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
         <form
           method="post"
-          className="grid grid-cols-2 rounded-md border p-4"
+          className="relative mx-auto rounded-md border p-4"
           onSubmit={handleSubmit(onSubmit, onError)}
         >
-          <SessionInfo form={form} rdcMembers={rdcMembers} />
-          <div className="order-3 col-span-2 md:order-none">
+          <div className="mx-auto w-fit">
+            <SessionInfo form={form} rdcMembers={rdcMembers} />
+          </div>
+          <div className="mx-auto">
             <SetManager />
             <Submit formIsValid={formIsValid} />
           </div>
@@ -138,7 +140,7 @@ const Submit = ({ formIsValid }: { formIsValid: boolean }) => {
     <Button
       disabled={!formIsValid || pending}
       type="submit"
-      className="my-2 w-full rounded-md border p-2 sm:w-80"
+      className="my-2 w-full rounded-md border p-2"
     >
       Submit
     </Button>

@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Player } from "@prisma/client";
 import Image from "next/image";
+import { VisionResultCodes } from "@/lib/constants";
 
 interface Props {
   handleCreateMatchFromVision: (visionResults: any) => void;
@@ -44,11 +45,14 @@ const RDCVisionModal = (props: Props) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    document.addEventListener("paste", handlePaste);
+    const controller = new AbortController();
+    document.addEventListener("paste", handlePaste, {
+      signal: controller.signal,
+    });
     return () => {
-      document.removeEventListener("paste", handlePaste);
+      controller.abort();
     };
-  });
+  }, []);
 
   const handlePaste = async (e: ClipboardEvent) => {
     const items = e.clipboardData?.items;
@@ -134,13 +138,13 @@ const RDCVisionModal = (props: Props) => {
 
       const visionResult = await analyzeScreenShot(base64FileContent);
 
-      if (visionResult.status === "Success") {
+      if (visionResult.status === VisionResultCodes.Success) {
         handleCreateMatchFromVision(visionResult.data);
-        setVisionStatus("Success");
+        setVisionStatus(VisionResultCodes.Success);
         setIsLoading(false);
-      } else if (visionResult.status === "CheckReq") {
+      } else if (visionResult.status === VisionResultCodes.CheckRequest) {
         handleCreateMatchFromVision(visionResult.data);
-        setVisionStatus("CheckReq");
+        setVisionStatus(VisionResultCodes.CheckRequest);
         setVisionMsg(visionResult.message);
         setIsLoading(false);
       }
@@ -189,6 +193,7 @@ const RDCVisionModal = (props: Props) => {
         <p className="font-semibold underline underline-offset-2"> OR </p>
         <Input
           type="file"
+          accept="image/*"
           onChange={handleFileChange}
           className="hover:cursor-pointer hover:bg-primary-foreground"
           tabIndex={1}
