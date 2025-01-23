@@ -136,3 +136,10 @@ export const findPlayerByGamerTag = (gamerTag: string) => {
     playerName: player?.playerName,
   } as Player;
 };
+
+export class PlayerNotFoundError extends Error {
+  constructor(playerName: string) {
+    super(`Player not found: ${playerName}`);
+    this.name = "PlayerNotFoundError";
+  }
+}

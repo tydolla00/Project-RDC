@@ -119,7 +119,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
           className="relative mx-auto rounded-md border p-4"
           onSubmit={handleSubmit(onSubmit, onError)}
         >
-          <div className="mx-auto w-fit">
+          <div className="w-fit">
             <SessionInfo form={form} rdcMembers={rdcMembers} />
           </div>
           <div className="mx-auto">
@@ -134,7 +134,6 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
 const Submit = ({ formIsValid }: { formIsValid: boolean }) => {
   const { pending } = useFormStatus();
-
   // TODO add review screen logic before form is truly submitted.
   return (
     <Button

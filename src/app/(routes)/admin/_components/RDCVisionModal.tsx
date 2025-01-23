@@ -136,7 +136,10 @@ const RDCVisionModal = (props: Props) => {
         fileContent as ArrayBuffer,
       ).toString("base64");
 
-      const visionResult = await analyzeScreenShot(base64FileContent);
+      const visionResult = await analyzeScreenShot(
+        base64FileContent,
+        sessionPlayers,
+      );
 
       if (visionResult.status === VisionResultCodes.Success) {
         handleCreateMatchFromVision(visionResult.data);

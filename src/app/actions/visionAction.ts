@@ -5,6 +5,7 @@ import DocumentIntelligence, {
   isUnexpected,
 } from "@azure-rest/ai-document-intelligence";
 import { Player } from "@prisma/client";
+import { PlayerNotFoundError } from "../(routes)/admin/_utils/form-helpers";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -112,10 +113,8 @@ const processTeam = (teamData: any) => {
  */
 export const analyzeScreenShot = async (
   base64Source: string,
+  sessionPlayers: Player[] = [],
 ): Promise<VisionResult> => {
-  // TODO: Fix env config
-  let reqCheckFlag = false;
-
   try {
     const response = await client
       .path("/documentModels/{modelId}:analyze", modelId)
@@ -153,12 +152,6 @@ export const analyzeScreenShot = async (
 
     const visionResult: VisionResults = {} as VisionResults;
 
-    // Check to make sure players are valid
-    validateVisionResultPlayers(
-      [...visionResult.blueTeam, ...visionResult.orangeTeam],
-      [],
-    );
-
     let requiresCheck = false;
 
     Object.entries(teams).forEach(([teamKey, teamData]) => {
@@ -170,9 +163,15 @@ export const analyzeScreenShot = async (
       }
     });
 
+    console.log("Vision Result: ", visionResult);
+
+    // Check to make sure players are valid
+    validateVisionResultPlayers(
+      [...visionResult.blueTeam, ...visionResult.orangeTeam],
+      [],
+    );
     const visionWinner = calculateRLWinners(visionResult);
     visionResult.winner = visionWinner;
-    console.log("Vision Result: ", visionResult);
     return requiresCheck
       ? {
           status: VisionResultCodes.CheckRequest,
@@ -246,14 +245,23 @@ const validateVisionResultPlayers = (
   // TODO: Should not automatically insert players if this fails but should maybe store the data and allow the user to fix or something before inputing
   console.log("Validating Vision Players: ", visionPlayers);
 
-  for (const player of visionPlayers) {
-    const foundPlayer = sessionPlayers.find(
-      (p) => p.playerName === player.name,
-    );
-    if (!foundPlayer) {
-      console.error(`Player not found: ${player.name}`);
-    } else {
-      console.log("Found Player: ", foundPlayer);
+  try {
+    for (const player of visionPlayers) {
+      const foundPlayer = sessionPlayers.find(
+        (p) => p.playerName === player.name,
+      );
+      if (!foundPlayer) {
+        console.error(`Player not found: ${player.name}`);
+      } else {
+        console.log("Found Player: ", foundPlayer);
+      }
     }
+  } catch (error) {
+    if (error instanceof PlayerNotFoundError) {
+      console.error("Vision validation failed:", error.message);
+      return false;
+    }
+    console.error("Unexpected error:", error);
+    return false;
   }
 };
