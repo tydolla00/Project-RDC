@@ -19,7 +19,7 @@ import {
 import { BarChart, YAxis } from "recharts";
 import { CartesianGrid, XAxis, Bar } from "recharts";
 
-export const CustomChart = ({
+export const CustomChart = <T extends any[]>({
   data,
   nameKey,
   config,
@@ -27,18 +27,20 @@ export const CustomChart = ({
   title,
   description,
   type = "bar",
+  ignoreWarnings = false,
 }: {
-  data: { [key: string]: any }[];
-  nameKey: keyof (typeof data)[0];
+  data: T;
+  nameKey: string;
   config: ChartConfig;
-  dataKey: keyof (typeof data)[0];
+  dataKey: string;
   title: string;
   description: string;
   type?: "pie" | "bar";
+  ignoreWarnings?: boolean;
 }) => {
-  if (data.some((d) => d[nameKey] === undefined))
+  if (!ignoreWarnings && data.some((d) => d[nameKey] === undefined))
     console.error("NameKey not present in data passed to chart.");
-  if (data.some((d) => d[dataKey] === undefined))
+  if (!ignoreWarnings && data.some((d) => d[dataKey] === undefined))
     console.error("DataKey not present in data passed to chart");
 
   return (
@@ -63,7 +65,6 @@ export const CustomChart = ({
               content={<ChartLegendContent nameKey={nameKey.toString()} />}
             />
             <Bar dataKey={dataKey} fill="hsl(var(--chart-1))" radius={4} />
-            {/* <Bar dataKey="played" fill="hsl(var(--chart-2))" radius={4} /> */}
           </BarChart>
         </ChartContainer>
       </CardContent>
