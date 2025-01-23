@@ -56,7 +56,7 @@ const PlayerSelector = ({
         style={sticky ? { position: "-webkit-sticky" } : undefined}
         className={cn(
           "mb-10 w-fit rounded-md border p-4",
-          sticky && "sticky top-12 z-10 bg-card",
+          sticky && "sticky top-12 z-20 bg-card",
         )}
         id="player-selector-container"
       >
