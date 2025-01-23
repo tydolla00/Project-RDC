@@ -3,6 +3,7 @@ import DocumentIntelligence, {
   AnalyzeResultOperationOutput,
   isUnexpected,
 } from "@azure-rest/ai-document-intelligence";
+import { Player } from "@prisma/client";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -147,6 +148,12 @@ export const analyzeScreenShot = async (
 
     const visionResult: VisionResults = {} as VisionResults;
 
+    // Check to make sure players are valid
+    validateVisionResultPlayers(
+      [...visionResult.blueTeam, ...visionResult.orangeTeam],
+      [],
+    );
+
     let requiresCheck = false;
 
     Object.entries(teams).forEach(([teamKey, teamData]) => {
@@ -157,6 +164,7 @@ export const analyzeScreenShot = async (
         requiresCheck = requiresCheck || reqCheckFlag;
       }
     });
+
     const visionWinner = calculateRLWinners(visionResult);
     visionResult.winner = visionWinner;
     console.log("Vision Result: ", visionResult);
@@ -223,8 +231,24 @@ export const calculateRLWinners = (visionResults: VisionResults) => {
   }
 };
 
-const validateVisionResultPlayers = (players: []) => {
+const validateVisionResultPlayers = (
+  visionPlayers: VisionPlayer[],
+  sessionPlayers: Player[],
+) => {
+  // Get the current session players
   console.log("Validating Vision Results!");
   // TODO: Check if the players from res is the same as the players in the current session
-  // TODO: Should we allow players to be added to the session if they are not in the current session?
+  // TODO: Should not automatically insert players if this fails but should maybe store the data and allow the user to fix or something before inputing
+  console.log("Validating Vision Players: ", visionPlayers);
+
+  for (const player of visionPlayers) {
+    const foundPlayer = sessionPlayers.find(
+      (p) => p.playerName === player.name,
+    );
+    if (!foundPlayer) {
+      console.error(`Player not found: ${player.name}`);
+    } else {
+      console.log("Found Player: ", foundPlayer);
+    }
+  }
 };

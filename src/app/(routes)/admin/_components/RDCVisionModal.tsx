@@ -33,8 +33,10 @@ interface Props {
 
 const RDCVisionModal = (props: Props) => {
   const { handleCreateMatchFromVision, sessionPlayers } = props;
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  // TODO: Should probably combine Vision status into custom type -- already done somewhere
   const [visionStatus, setVisionStatus] = useState<
     "Success" | "CheckReq" | "Failed" | null
   >(null);
@@ -103,6 +105,7 @@ const RDCVisionModal = (props: Props) => {
     setSelectedFile(null);
     setVisionStatus(null);
     setPreviewUrl(null);
+    setVisionMsg("");
   };
 
   const handleAnalyzeBtnClick = async (): Promise<void> => {

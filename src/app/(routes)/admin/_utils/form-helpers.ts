@@ -80,6 +80,7 @@ type PlayerMapping = {
   };
 };
 
+// TODO: Fuzzy Matching
 export const PLAYER_MAPPINGS: PlayerMapping = {
   Mark: {
     playerId: 1,
@@ -104,7 +105,7 @@ export const PLAYER_MAPPINGS: PlayerMapping = {
   Des: {
     playerId: 5,
     playerName: "Des",
-    gamerTags: ["13RUTALxPANIiC"],
+    gamerTags: ["13RUTALxPANIiC", "13RUTALxPANIC"],
   },
   John: {
     playerId: 6,
