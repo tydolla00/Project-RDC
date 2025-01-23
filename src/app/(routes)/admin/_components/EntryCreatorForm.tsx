@@ -4,7 +4,10 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
-import { insertNewSessionFromAdmin } from "@/app/actions/adminAction";
+import {
+  insertNewSessionFromAdmin,
+  insertNewSessionV2,
+} from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -13,6 +16,9 @@ import { AdminFormProps } from "../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
 import { useFormStatus } from "react-dom";
 import { SessionInfo } from "./SessionInfo";
+import { errorCodes } from "@/lib/constants";
+import { signOut } from "@/auth";
+import { revalidateTag } from "next/cache";
 
 interface Props {
   rdcMembers: Player[];
@@ -58,32 +64,43 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   console.log("Errors: ", errors);
 
   /**
-   * Submit method called when EntryCreatorForm submit button clicked
-   * @param data entire "Admin" Session object constructed from values
-   * in EntryCreator form
+   * Handles the form submission for creating a new session.
+   *
+   * @param {FormValues} data - The form values to be submitted.
+   * @returns {Promise<void>} A promise that resolves when the submission is complete.
+   *
+   * Logs the form data being submitted and measures the time taken for the submission process.
+   * Attempts to insert a new session using the provided form data.
+   * If an error occurs during the insertion, handles the error by either signing out the user
+   * or displaying an error toast message.
+   * If the insertion is successful, displays a success toast message and revalidates the session data.
    */
   const onSubmit = async (data: FormValues) => {
     console.log("Form Data Being Submitted:", {
       data,
       stringified: JSON.stringify(data, null, 2),
     });
+    console.time();
+    const { error: err } = await insertNewSessionFromAdmin(data);
+    // const { error: err } = await insertNewSessionV2(data);
+    console.timeEnd();
+    console.log(err);
 
-    // data.date = new Date(data.date);
-    // console.log("Date Type in submit:", typeof data.date);
-    const err = await insertNewSessionFromAdmin(data);
-    if (err === null)
-      toast.error("Video already submitted", { richColors: true });
-    else toast.success("Session successfully created.", { richColors: true });
+    if (err)
+      err === errorCodes.NotAuthenticated
+        ? await signOut({ redirectTo: "/" })
+        : toast.error(err, { richColors: true });
+    else {
+      toast.success("Session successfully created.", { richColors: true });
+      revalidateTag("getAllSessions");
+    }
   };
 
-  // console.log("Date Type:", typeof getValues().date);
-
   /**
-   * Handles errors that occur during form submission.
+   * Handles form submission errors by logging them to the console and displaying a toast notification.
    *
-   * @param errors - An object containing the errors that occurred during form submission.
+   * @param {any} errors - The errors object containing details about the form submission errors.
    * Each key in the object corresponds to a form field, and the value is the error message for that field.
-   *
    */
   const onError = (errors: any) => {
     console.log("Admin Form Submission Errors:", errors);

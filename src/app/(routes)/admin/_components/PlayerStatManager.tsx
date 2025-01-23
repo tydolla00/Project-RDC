@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Player } from "@prisma/client";
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { getGameStats } from "@/app/actions/adminAction";
 import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAdmin } from "@/lib/adminContext";
-import { StatNames } from "../../../../../prisma/lib/utils";
 import { FormValues } from "../_utils/form-helpers";
 
 interface Props {
@@ -16,8 +13,6 @@ interface Props {
   playerSessionIndex: number;
   statName: string;
 }
-
-// Need to get the stats of each game and then display appropriate input field for each stat
 
 const PlayerStatManager = (props: Props) => {
   const {
@@ -33,56 +28,34 @@ const PlayerStatManager = (props: Props) => {
     control,
   });
 
-  const [loading, setLoading] = useState(true);
   const { gameStats } = useAdmin();
 
   // TODO: Move to PlayerSessionManager or above
+
   useEffect(() => {
-    console.log(
-      "All Player Sessions: ",
-      getValues(`sets.${setIndex}.matches.${matchIndex}.playerSessions`),
+    let ignore = false;
+    const matchFields = getValues(
+      `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}.playerStats`,
     );
+    gameStats.forEach((stat) => {
+      const isMatch = matchFields.some((f) => f.stat === stat.statName); // Need to do this in dev because useEffect renders twice.
+      if (!ignore && !isMatch)
+        append({ statId: uuidv4(), stat: stat.statName, statValue: "" });
+    });
 
-    // Returns all the playerStats for the match
-    const getPlayerSessionStats = () => {
-      const values = getValues();
-      console.log(" Get PlayerSessionStats Values: ", values);
-      const playerSession =
-        values.sets[setIndex].matches[matchIndex].playerSessions[
-          playerSessionIndex
-        ];
-      console.log("PlayerSessionStatGet: ", playerSession.playerStats);
-      return playerSession.playerStats;
+    return () => {
+      ignore = true;
     };
+  }, [gameStats, append]);
 
-    const fetchGameStats = async () => {
-      const existingStats = getPlayerSessionStats();
-      gameStats.forEach((stat) => {
-        const statExists = existingStats.some(
-          (existingStat) => existingStat.stat === stat.statName,
-        );
-        // Ducttape fix to stop useEffect double render from
-        // doubling playerStat fields
-        if (!statExists && stat.statName !== StatNames.RLDay) {
-          append({ statId: uuidv4(), stat: stat.statName, statValue: "" });
-        }
-      });
-      setLoading(false);
-    };
-    fetchGameStats();
-  }, [append, getValues, matchIndex, playerSessionIndex, setIndex, gameStats]);
-
-  console.log("PlayerStatManagerFields: ", fields);
-  console.log("Loading: ", loading);
-
-  // TODO Fix bug, when changing the games doesn't remove stale inputs
   return (
     <>
       {fields.map((field, index: number) => {
         return (
           <div key={field.id} className="my-4 flex gap-3">
+            <span className="sr-only">{field.stat}</span>
             <Input
-              className="h-full max-w-xs"
+              className="max-w-xs"
               placeholder={field.stat}
               type="text"
               {...register(

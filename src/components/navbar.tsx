@@ -22,20 +22,20 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { games, RDCMembers } from "@/lib/constants";
+import { getGamesNav, getMembersNav } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
 import { AuthButton, ToggleThemeButton } from "./client-buttons";
 
 export const Navbar = async () => {
   const session = await auth();
+  const games = await getGamesNav();
+  const members = await getMembersNav();
 
   // TODO Memoize this component, so it doesn't ever rerender? Which it never should.
 
-  const members = Array.from(RDCMembers.entries());
-
   return (
-    <NavigationMenu className="sticky top-0 mx-auto w-screen bg-inherit">
+    <NavigationMenu className="sticky top-0 z-20 mx-auto w-screen bg-inherit">
       <NavigationMenuList>
         <NavigationMenuItem className={navigationMenuTriggerStyle()}>
           <Link href="/">
@@ -69,7 +69,7 @@ export const Navbar = async () => {
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              {members.map(([_, { nav: rdc }]) => (
+              {members.map((rdc) => (
                 <div key={rdc.url} className="flex gap-5">
                   <Avatar>
                     <Image
@@ -82,7 +82,7 @@ export const Navbar = async () => {
                   <ListItem
                     className="flex-shrink-0"
                     href={rdc.url}
-                    title={rdc.name}
+                    title={rdc.navName}
                   />
                 </div>
               ))}
@@ -118,6 +118,7 @@ export const Navbar = async () => {
             </Link>
           </FeatureFlag>
         </NavigationMenuItem>
+
         {/* MOBILE */}
         <NavigationMenuItem className="md:hidden">
           <NavigationMenuTrigger>
@@ -128,14 +129,13 @@ export const Navbar = async () => {
               <ListItem href="/about">About</ListItem>
               <ListItem href="/admin">Admin</ListItem>
               <ListItem href="/submission">Submissions</ListItem>
-              {/* add client component that will handle triggering the animation. */}
-              {/* TODO MOBILE ONLY Animate up from the bottom of the screen and add dismiss option. */}
-              {/* Button acting weird and flashing from inside dropdown to right side of the screen */}
+              <AuthButton hideOnSmallScreens={false} session={session} />
               <ToggleThemeButton />
-              <AuthButton responsive={false} session={session} />
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+        {/* END MOBILE */}
+
         <FeatureFlag
           shouldRedirect={false}
           flagName="AUTH"
@@ -158,7 +158,7 @@ export const Navbar = async () => {
             )}
           </NavigationMenuItem>
         </FeatureFlag>
-        <AuthButton responsive session={session} />
+        <AuthButton hideOnSmallScreens session={session} />
         <NavigationMenuItem className="hidden sm:block">
           <ModeToggle className="" />
         </NavigationMenuItem>

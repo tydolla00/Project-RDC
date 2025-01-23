@@ -9,7 +9,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  directUrl = env("DIRECT_URL") // Used during development to connect to dev db
 }
 
 /////////////////////////
@@ -43,7 +43,7 @@ model Game {
   gameName    String        @map("game_name")
   gameStats   GameStat[]
   playerStats PlayerStat[]
-  sessions    VideoSession[]
+  sessions    Session[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   @@map("games")
@@ -84,7 +84,7 @@ model GameStat {
   @@map("game_stats")
 }
 
-model VideoSession {
+model Session {
   sessionId   Int       @id @default(autoincrement()) @map("session_id")
   sessionName String    @map("session_name")
   sessionUrl  String    @map("session_url")
@@ -93,10 +93,10 @@ model VideoSession {
   sets        GameSet[]
   thumbnail   String
   date        DateTime  @default(now()) // Date video posted
-  
+  videoId     String    @unique
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  @@map("video_sessions")
+  @@map("sessions")
 }
 
 // Set Table Concept 
@@ -105,7 +105,7 @@ model GameSet {
   playerSessions PlayerSession[]
   matches        Match[]
   sessionId      Int            @map("session_id")
-  session        VideoSession   @relation(fields: [sessionId], references: [sessionId])
+  session        Session        @relation(fields: [sessionId], references: [sessionId])
   setWinners     Player[]
   
   createdAt      DateTime       @default(now())
@@ -166,66 +166,6 @@ model User {
   email         String          @unique
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
-  // Optional for WebAuthn support
-  Authenticator Authenticator[]
- 
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-}
- 
-model Account {
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
- 
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-  @@id([provider, providerAccountId])
-}
- 
-model Session {
-  sessionToken String       @unique
-  userId       String
-  expires      DateTime
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-}
- 
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
- 
-  @@id([identifier, token])
-}
- 
-// Optional for WebAuthn support
-model Authenticator {
-  credentialID         String   @unique
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
- 
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-  @@id([userId, credentialID])
 }
