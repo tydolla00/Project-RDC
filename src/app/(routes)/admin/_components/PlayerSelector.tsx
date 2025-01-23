@@ -51,7 +51,7 @@ const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
             <div key={player.playerId} className="relative">
               <div
                 className={cn(
-                  "absolute -top-2 left-1/2 right-1/2 h-2 w-2 rounded-full bg-gray-500 transition-colors",
+                  "absolute -top-2 right-1/2 left-1/2 h-2 w-2 rounded-full bg-gray-500 transition-colors",
                   getIsSelected(player) && "bg-green-500",
                 )}
               ></div>

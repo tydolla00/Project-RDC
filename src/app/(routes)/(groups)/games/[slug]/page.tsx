@@ -8,11 +8,12 @@ import RocketLeague from "./_components/rocketleague";
 import Speedrunners from "./_components/speedrunners";
 import LethalCompany from "./_components/lethalcompany";
 import GolfWithFriends from "./_components/golfwithfriends";
+import { GamesEnum } from "@/lib/constants";
 
 // ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,
 
-// TODO May need to revalidathPath/Tag after updating data.
+// TODO May need to revalidatePath/Tag after updating data.
 
 export async function generateStaticParams() {
   const games = await getAllGames();
@@ -33,27 +34,27 @@ export default async function Page({
       game.gameName.replace(/\s/g, "").toLowerCase() === slug.toLowerCase(),
   )!;
 
-  const gameName = slug.toLowerCase();
+  const gameName = slug.toLowerCase() as GamesEnum;
   let component: React.ReactNode;
   switch (gameName) {
-    case "mariokart":
+    case GamesEnum.MarioKart8:
       component = <Mariokart game={game} />;
       break;
-    case "callofduty":
+    case GamesEnum.CallOfDuty:
       component = <CallOfDuty game={game} />;
       break;
-    case "rocketleague":
+    case GamesEnum.RocketLeague:
       component = <RocketLeague game={game} />;
       break;
-    case "speedrunners":
+    case GamesEnum.SpeedRunners:
       component = <Speedrunners game={game} />;
       break;
-    case "lethalcompany":
+    case GamesEnum.LethalCompany:
       component = <LethalCompany game={game} />;
       break;
-    case "golfwithfriends":
-      component = <GolfWithFriends game={game} />;
-      break;
+    // case "golfwithfriends":
+    //   component = <GolfWithFriends game={game} />;
+    //   break;
   }
 
   return (
@@ -65,6 +66,10 @@ export default async function Page({
     </div>
   );
 }
+
+const Sessions = () => {
+  // TODO This will be a table with all of the currently submitted sessions for a game. Show the name. url, and thumbnail.
+};
 
 // const Average = ({
 // }: {

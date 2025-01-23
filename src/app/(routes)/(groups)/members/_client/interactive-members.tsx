@@ -6,6 +6,7 @@ import useViewTransition from "@/hooks/useViewTransition";
 import Image from "next/image";
 import { useState } from "react";
 
+// Deprecated
 export const Members3D = () => {
   const members = [
     "https://static.wikia.nocookie.net/rdcworld1/images/f/f2/Mark-Phillips.jpg/revision/latest/thumbnail/width/360/height/450?cb=20191004005953",
