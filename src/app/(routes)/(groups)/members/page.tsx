@@ -49,11 +49,11 @@ export default async function Page() {
             </HoverCardTrigger>
             <HoverCardContent align="center" side="right">
               <H3>{rdc.name}</H3>
-              <i className="leading-7 text-muted-foreground">{rdc.desc}</i>
+              <i className="text-muted-foreground leading-7">{rdc.desc}</i>
               {rdc.stats.map((stat, index) => (
                 <div key={index}>
                   <p className="mt-2 font-bold">{stat.prop}</p>
-                  <p className="mb-6 text-muted-foreground">{stat.val}</p>
+                  <p className="text-muted-foreground mb-6">{stat.val}</p>
                 </div>
               ))}
             </HoverCardContent>

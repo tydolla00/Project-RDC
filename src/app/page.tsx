@@ -22,7 +22,7 @@ export default async function Home() {
         >
           <div className="col-span-2 md:col-span-1">
             <H1>RDC Stat Tracker</H1>
-            <p className="leading-7 text-muted-foreground md:w-3/4">
+            <p className="text-muted-foreground leading-7 md:w-3/4">
               This site is dedicated to tracking and celebrating the gaming
               stats and achievements of RDC (Real Dreams Change the World). As a
               fan of their incredible teamwork and drive, I created this space
@@ -45,7 +45,7 @@ export default async function Home() {
           </div>
           <PieChartRDC config={config} data={data} />
         </div>
-        <H2 className="mx-auto mb-6 mt-40 w-fit text-chart-4 md:my-10">
+        <H2 className="text-chart-4 mx-auto mt-40 mb-6 w-fit md:my-10">
           Games
         </H2>
         <div className="flex flex-wrap justify-center gap-10">
@@ -62,7 +62,7 @@ export default async function Home() {
                       alt=""
                       src={game.src || ""}
                     />
-                    <CardHeader className="relative h-1/4 bg-black bg-opacity-50">
+                    <CardHeader className="relative h-1/4 bg-black/50">
                       <CardTitle className="absolute font-extrabold text-white opacity-100">
                         {game.name}
                       </CardTitle>
@@ -79,7 +79,7 @@ export default async function Home() {
           user={session}
           shouldRedirect={false}
         >
-          <H2 className="mx-auto my-10 w-fit text-chart-4">Want to Help</H2>
+          <H2 className="text-chart-4 mx-auto my-10 w-fit">Want to Help</H2>
           <Card className="mx-auto md:w-1/2">
             <CardHeader>
               <p>

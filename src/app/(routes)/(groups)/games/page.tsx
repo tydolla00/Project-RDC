@@ -9,19 +9,19 @@ export default async function Page() {
   return (
     <div className="m-16">
       <H1>Games</H1>
-      <div className="flex-wra flex justify-center gap-10">
+      <div className="flex flex-wrap justify-center gap-10">
         {games.map((game) => (
           <div key={game.url}>
             {game.src && (
               <Card className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52">
                 <Link href={game.url}>
                   <Image
-                    className="h-100 absolute w-full object-cover transition-transform duration-500 group-hover:scale-125"
+                    className="absolute h-100 w-full object-cover transition-transform duration-500 group-hover:scale-125"
                     fill
                     alt=""
                     src={game.src || ""}
                   />
-                  <CardHeader className="relative h-1/4 bg-black bg-opacity-50">
+                  <CardHeader className="relative h-1/4 bg-black/50">
                     <CardTitle className="absolute font-extrabold text-white opacity-100">
                       {game.name}
                     </CardTitle>
