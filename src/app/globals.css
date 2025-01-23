@@ -1,12 +1,10 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *));
 
 @theme {
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
-  --animate-sink-down: sink-down 2s linear forwards;
-  --animate-sink-up: sink-up 1s linear forwards;
   --animate-float-up: floatup 5s ease-out both alternate;
   --animate-sink-down: sink-down 2s linear forwards;
   --animate-sink-up: sink-up 1s linear forwards;
@@ -65,6 +63,14 @@
       height: 0;
     }
   }
+  @keyframes floatup {
+    from {
+      transform: translateY(calc(-100%));
+    }
+    to {
+      transform: translateY(calc(300px));
+    }
+  }
   @keyframes sink-down {
     50% {
       transform: rotateY(80deg);
@@ -89,28 +95,12 @@
       opacity: 1;
     }
   }
-  @keyframes floatup {
-    from: { transform: translateY(calc(-100%)) };
-    to: { transform: translateY(calc(300px)) };
-  },
-  @keyframes sink-down {
-    50%: { transform: rotateY(80deg), opacity: 1 },
-    65%: { transform: rotateY(80deg) translateY(400px) };
-    80%: { transform: rotateY(0deg) translateY(400px) };
-    to: { transform: rotateY(0deg) translateY(400px), opacity: 0 };
-  },
-  @keyframes sink-up {
-    from: {},
-    50%: { transform: rotateY(1turn) };
-    60%: { transform: rotateY(.75turn) };
-    to: { transform: rotateY(1turn) translateY(-1000px), opacity: 1 };
-  },
 }
 
 @utility container {
   margin-inline: auto;
   padding-inline: 2rem;
-  @media (width >= theme(--breakpoint-sm)) {
+  @media (width >= --theme(--breakpoint-sm)) {
     max-width: none;
   }
   @media (width >= 1400px) {
