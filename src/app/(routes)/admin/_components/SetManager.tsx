@@ -156,25 +156,19 @@ const SetManager = () => {
                 </CardHeader>
 
                 <CollapsibleContent>
-                  <div
-                    style={{ position: "-webkit-sticky" }}
-                    className="sticky top-12 z-10 bg-card"
-                  >
-                    <Label className="my-2 block text-muted-foreground">
-                      Set Winner
-                    </Label>
-                    <Controller
-                      name={`sets.${setIndex}.setWinners`}
-                      control={control}
-                      render={({ field }) => (
-                        <PlayerSelector
-                          rdcMembers={players}
-                          control={control}
-                          field={field}
-                        />
-                      )}
-                    />
-                  </div>
+                  <Controller
+                    name={`sets.${setIndex}.setWinners`}
+                    control={control}
+                    render={({ field }) => (
+                      <PlayerSelector
+                        rdcMembers={players}
+                        control={control}
+                        field={field}
+                        label="Set Winners"
+                        sticky={true}
+                      />
+                    )}
+                  />
                   {/* TODO Don't think we will be using this anymore? */}
                   {/* <Label>
                     You may paste in the info of all matches for Set{" "}

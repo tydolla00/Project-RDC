@@ -11,16 +11,24 @@ import { getRDCVideoDetails } from "@/app/actions/action";
 import Image from "next/image";
 import { toast } from "sonner";
 import { getVideoId } from "../_utils/helper-functions";
-import { FormValues, AdminFormProps } from "../_utils/form-helpers";
+import { FormValues } from "../_utils/form-helpers";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Player } from "@prisma/client";
 
 export const SessionInfo = ({
   form,
   rdcMembers,
 }: {
   form: UseFormReturn<FormValues>;
-  rdcMembers: AdminFormProps["rdcMembers"];
+  rdcMembers: Player[];
 }) => {
   const [session, setSession] = useState<
     Awaited<ReturnType<typeof getRDCVideoDetails>>["video"] | null
@@ -31,6 +39,8 @@ export const SessionInfo = ({
     formState: { errors, defaultValues },
   } = form;
   const url = form.watch("sessionUrl");
+  const sessionName = form.watch("sessionName");
+  const date = form.watch("date");
 
   /**
    * Handles the URL update process for a session.
@@ -88,7 +98,16 @@ export const SessionInfo = ({
   };
   return (
     <>
-      <div className="col-span-2 mb-5 flex flex-wrap content-end justify-items-end gap-2">
+      <div className="mb-5 gap-2">
+        <Card className="absolute right-0 top-0 h-72 w-72">
+          <CardHeader>
+            <CardTitle>{sessionName}</CardTitle>
+            <CardDescription>{new Date(date).toDateString()}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Thumbnail session={session} />
+          </CardContent>
+        </Card>
         <FormField
           control={form.control}
           name="sessionUrl"
@@ -109,6 +128,7 @@ export const SessionInfo = ({
           )}
         />
         <Button
+          className="my-2"
           disabled={isPending}
           style={{ alignSelf: "end" }}
           onClick={handleUrlUpdated}
@@ -118,85 +138,34 @@ export const SessionInfo = ({
           Update URL
         </Button>
       </div>
-      <div className="order-2 col-span-2 md:order-none md:col-span-1">
-        <div id="entry-creator-form-info-subheader" className="my-5">
-          <Controller
-            name="game"
-            control={control}
-            render={({ field }) => (
-              <GameDropDownForm
-                field={field}
-                control={form.control}
-                reset={form.resetField}
-              />
-            )}
-          />
-        </div>
-
-        <FormItem>
-          <FormLabel>Session Players</FormLabel>
-          <Controller
-            name="players"
-            control={control}
-            render={({ field }) => (
-              <PlayerSelector
-                rdcMembers={rdcMembers}
-                control={form.control}
-                field={field}
-              />
-            )}
-          />
-        </FormItem>
+      <div id="entry-creator-form-info-subheader" className="my-5">
+        <Controller
+          name="game"
+          control={control}
+          render={({ field }) => (
+            <GameDropDownForm
+              field={field}
+              control={form.control}
+              reset={form.resetField}
+            />
+          )}
+        />
       </div>
-      <div className="order-1 col-span-2 md:order-none md:col-span-1">
-        <div
-          id="entry-creator-form-info-header"
-          className="flex flex-wrap items-center justify-between gap-y-2 lg:-my-20"
-        >
-          <FormField
-            disabled
-            control={form.control}
-            name="sessionName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-base">Session Name</FormLabel>
-                <Input
-                  className="my-2 w-full rounded-md border p-2"
-                  placeholder="Session Name"
-                  {...field}
-                />
-                {errors.sessionName && (
-                  <p className="text-red-500">{errors.sessionName.message}</p>
-                )}
-              </FormItem>
-            )}
-          />
 
-          <FormField
-            disabled
-            control={form.control}
-            name="thumbnail"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Thumbnail</FormLabel>
-
-                <Input
-                  className="my-2 w-full rounded-md border p-2"
-                  placeholder="Thumbnail"
-                  {...field}
-                />
-                {errors.thumbnail && (
-                  <p className="text-red-500">{errors.thumbnail.message}</p>
-                )}
-              </FormItem>
-            )}
-          />
-          <AdminDatePicker />
-        </div>
-        <div className="my-2 max-h-72 w-full max-w-72 sm:w-72 lg:my-24">
-          <Thumbnail session={session} />
-        </div>
-      </div>
+      <FormItem>
+        <Controller
+          name="players"
+          control={control}
+          render={({ field }) => (
+            <PlayerSelector
+              rdcMembers={rdcMembers}
+              control={form.control}
+              field={field}
+              label="Session Players"
+            />
+          )}
+        />
+      </FormItem>
     </>
   );
 };
