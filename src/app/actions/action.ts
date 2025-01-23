@@ -7,6 +7,7 @@ import { signOut, signIn, auth } from "@/auth";
 import { isProduction } from "@/lib/utils";
 import { errorCodes } from "@/lib/constants";
 import { identifyUser } from "@/lib/posthog";
+import { redirect } from "next/navigation";
 
 /**
  * @deprecated
@@ -18,20 +19,17 @@ export const submitUpdates = async (props: any) => {
 
 /**
  * Updates the authentication status based on the provided session.
- * If a session is provided, it signs out the user and redirects to the home page.
- * If no session is provided, it initiates the sign-in process using GitHub.
  *
- * @param {Session | null} session - The current session object or null if no session exists.
- * @returns {Promise<void>} A promise that resolves when the authentication status is updated.
+ * If a session is provided, it signs out the user and redirects to the home page.
+ * If no session is provided, it redirects the user to the sign-in page.
+ *
+ * @param {Session | null} session - The current user session.
+ * @returns {Promise<void>} A promise that resolves when the operation is complete.
  */
 export const updateAuthStatus = async (session: Session | null) => {
   if (session) {
     await signOut({ redirectTo: "/" });
-  } else {
-    await signIn("github");
-    const session = await auth();
-    identifyUser(session);
-  }
+  } else redirect("/signin");
 };
 
 /**

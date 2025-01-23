@@ -1,8 +1,10 @@
 import { signIn } from "@/auth";
 import { H1 } from "@/components/headings";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { domain } from "@/lib/utils";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { redirect } from "next/navigation";
 
 export default function Page() {
   return (
@@ -14,14 +16,48 @@ export default function Page() {
       </div>
       <div className="mx-auto mt-4 w-fit">
         <form
-          action={async () => {
+          action={async (fd) => {
             "use server";
-            await signIn("github", { redirectTo: domain });
+            const provider = fd.get("provider")?.slice(13);
+            console.log(provider);
+            switch (provider) {
+              case "Google":
+                await signIn("google", { redirectTo: domain });
+                break;
+              case "Github":
+                await signIn("github", { redirectTo: domain });
+                break;
+              default:
+                console.error("Invalid provider");
+                redirect("/");
+            }
           }}
         >
-          <Button className="focus-visible:bg-primary/90">
-            Sign in with Github <GitHubLogoIcon />
-          </Button>
+          <div className="flex flex-col space-y-4">
+            <Button
+              type="submit"
+              className="cursor-pointer focus-visible:bg-primary/90"
+              asChild
+            >
+              <Input
+                name="provider"
+                type="submit"
+                value="Sign in with Github"
+              />
+              {/* <GitHubLogoIcon /> */}
+            </Button>
+            <Button
+              type="submit"
+              className="cursor-pointer focus-visible:bg-primary/90"
+              asChild
+            >
+              <Input
+                name="provider"
+                type="submit"
+                value="Sign in with Google"
+              />
+            </Button>
+          </div>
         </form>
       </div>
     </div>

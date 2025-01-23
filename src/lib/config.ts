@@ -12,6 +12,8 @@ interface Config {
   AUTH_SECRET: string | undefined;
   NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT: string | undefined;
   NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_API_KEY: string | undefined;
+  AUTH_GOOGLE_ID: string | undefined;
+  AUTH_GOOGLE_SECRET: string | undefined;
 }
 
 const getConfig = (): Config => {
@@ -30,6 +32,8 @@ const getConfig = (): Config => {
       process.env.DOCUMENT_INTELLIGENCE_ENDPOINT,
     NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_API_KEY:
       process.env.DOCUMENT_INTELLIGENCE_API_KEY,
+    AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
+    AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
   };
 };
 
