@@ -7,7 +7,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { playerAvatarMap } from "@/lib/constants";
+import { MembersEnum } from "@/lib/constants";
+import { capitalizeFirst } from "@/lib/utils";
 
 interface PlayerAvatarProps {
   player: Player;
@@ -21,7 +22,20 @@ const PlayerAvatar = ({
   optionalClassName,
 }: PlayerAvatarProps) => {
   const avatarHelperFunction = (playerName: string) => {
-    return playerAvatarMap.get(playerName) || "default_avatar.jpg";
+    const playerAvatarMap = new Map<MembersEnum, string>([
+      [capitalizeFirst(MembersEnum.Mark), "mark_rdc.jpg"],
+      [capitalizeFirst(MembersEnum.Dylan), "dylan_rdc.jpg"],
+      [capitalizeFirst(MembersEnum.Ben), "ben_rdc.jpg"],
+      [capitalizeFirst(MembersEnum.Lee), "leland_rdc.jpg"],
+      [capitalizeFirst(MembersEnum.Des), "desmond_rdc.jpg"],
+      [capitalizeFirst(MembersEnum.John), "john_rdc.jpg"],
+      [capitalizeFirst(MembersEnum.Aff), "aff_rdc.jpg"],
+      [capitalizeFirst(MembersEnum.Ipi), "ipi_rdc.jpg"],
+    ]);
+
+    return (
+      playerAvatarMap.get(playerName as MembersEnum) || "default_avatar.jpg"
+    );
   };
 
   const avatarSrc = `/images/${avatarHelperFunction(player.playerName)}`;

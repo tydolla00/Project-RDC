@@ -3,67 +3,97 @@
 import prisma from "../../../prisma/db";
 import config from "@/lib/config";
 import { Session } from "next-auth";
-import { signOut, signIn } from "@/auth";
+import { signOut, signIn, auth } from "@/auth";
+import { isProduction } from "@/lib/utils";
+import { errorCodes } from "@/lib/constants";
+import { identifyUser } from "@/lib/posthog";
+import { redirect } from "next/navigation";
 
+/**
+ * @deprecated
+ * @param props
+ */
 export const submitUpdates = async (props: any) => {
   console.log(props);
 };
 
+/**
+ * Updates the authentication status based on the provided session.
+ *
+ * If a session is provided, it signs out the user and redirects to the home page.
+ * If no session is provided, it redirects the user to the sign-in page.
+ *
+ * @param {Session | null} session - The current user session.
+ * @returns {Promise<void>} A promise that resolves when the operation is complete.
+ */
 export const updateAuthStatus = async (session: Session | null) => {
-  session ? await signOut({ redirectTo: "/" }) : await signIn("github");
+  if (session) {
+    await signOut({ redirectTo: "/" });
+  } else redirect("/signin");
 };
 
-type FindManySessions = Awaited<
-  ReturnType<typeof prisma.videoSession.findMany>
->[0];
-
+/**
+ * Fetches RDC video details based on the provided video ID.
+ *
+ * @param videoId - The ID of the video to fetch details for.
+ * @returns An object containing the video details or an error message.
+ *
+ * The function first checks if the user is authenticated. If not, it returns an error.
+ * It then attempts to find the video session in the database using the provided video ID.
+ * If the video session is not found in the database, it fetches the video details from the YouTube API.
+ * The function ensures that the video is uploaded by "RDC Live" and returns the video details.
+ * If the video session is found in the database, it returns the database record.
+ *
+ * @example
+ * ```typescript
+ * const videoDetails = await getRDCVideoDetails("someVideoId");
+ * if (videoDetails.error) {
+ *   console.error(videoDetails.error);
+ * } else {
+ *   console.log(videoDetails.video);
+ * }
+ * ```
+ */
 export const getRDCVideoDetails = async (
   videoId: string,
-): Promise<
-  | FindManySessions
-  | (Pick<FindManySessions, "date" | "sessionName" | "sessionUrl"> & {
-      thumbnail: Thumbnail;
-    })
-  | undefined
-> => {
-  const sessions = await prisma.videoSession.findMany();
+): GetRdcVideoDetails => {
+  const isAuthenticated = await auth();
+  if (!isAuthenticated)
+    return { video: null, error: errorCodes.NotAuthenticated };
 
-  // TODO only store videoId in the db.
-  const session = sessions.find((session) => session.sessionUrl === videoId);
-  const apiKey =
-    process.env.NODE_ENV === "production"
-      ? config.YOUTUBE_API_KEY
-      : config.YOUTUBE_LOCAL_API_KEY;
+  const dbRecord = await prisma.session.findFirst({
+    where: { videoId },
+  });
+  const apiKey = isProduction
+    ? config.YOUTUBE_API_KEY
+    : config.YOUTUBE_LOCAL_API_KEY;
 
-  console.log(session);
-  if (!session) {
+  if (!dbRecord) {
     const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${apiKey}`;
     const YTvideo = await fetch(apiUrl);
-    console.log({ YTvideo }, { videoId }, { apiUrl });
 
-    process.env.NODE_ENV === "development" &&
+    !isProduction &&
       !config.YOUTUBE_LOCAL_API_KEY &&
-      console.log("YOUTUBE API KEY NOT CONFIGURED");
+      console.log("LOCAL YOUTUBE API KEY NOT CONFIGURED");
 
-    if (!YTvideo.ok) return undefined;
+    if (!YTvideo.ok)
+      return { error: "Something went wrong. Please try again.", video: null };
 
     const json = (await YTvideo.json()) as YouTubeVideoListResponse;
-    console.log(json);
     const video = json.items[0];
 
-    if (video?.snippet.channelTitle !== "RDC Live") return undefined;
+    if (video?.snippet.channelTitle !== "RDC Live")
+      return { error: "Please upload a video by RDC Live", video: null };
 
-    // TODO do something with the height and width.
-
-    const session = {
+    const session: YTAPIRequestSession = {
       sessionUrl: `https://youtube.com/watch?v=${video.id}`,
-      date: video.snippet.publishedAt,
+      date: new Date(video.snippet.publishedAt),
       sessionName: video.snippet.title,
       thumbnail:
         video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
-    } as unknown as Awaited<ReturnType<typeof getRDCVideoDetails>>;
-    return session;
-  } else return session;
+    };
+    return { video: session, error: undefined };
+  } else return { video: dbRecord, error: undefined };
 };
 
 type YouTubeVideoListResponse = {
@@ -110,3 +140,23 @@ type Thumbnail = {
   width: number;
   height: number;
 };
+
+type FindManySessions = Awaited<ReturnType<typeof prisma.session.findMany>>[0];
+
+type YTAPIRequestSession = Pick<
+  FindManySessions,
+  "date" | "sessionName" | "sessionUrl"
+> & {
+  thumbnail: Thumbnail;
+};
+
+type GetRdcVideoDetails = Promise<
+  | {
+      video: FindManySessions | YTAPIRequestSession;
+      error: undefined;
+    }
+  | {
+      video: null;
+      error: string;
+    }
+>;

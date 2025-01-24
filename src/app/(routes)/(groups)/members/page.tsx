@@ -10,26 +10,24 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { RDCMembers } from "@/lib/constants";
-import { Members3D } from "./_client/interactive-members";
+import { getMembersNav } from "@/lib/constants";
 
 // TODO Revalidate Stats Once Per Week
 // TODO Show all button that displays all Members. Default is centered 3D circular card that pops up from the 'ground'
 
 export default async function Page() {
-  const members = Array.from(RDCMembers.entries());
-  // return <Members3D />;
+  const members = await getMembersNav();
   return (
     <div className="m-16">
       <H1>Members</H1>
       <div className="flex flex-wrap justify-center gap-10">
-        {members.map(([member, { desc, stat1, stat2, stat3, nav: rdc }]) => (
-          <HoverCard key={member} openDelay={200} closeDelay={200}>
+        {members.map((rdc) => (
+          <HoverCard key={rdc.name} openDelay={200} closeDelay={200}>
             <HoverCardTrigger asChild>
               <Link
                 className="group/fill overflow-hidden"
-                href={`/members/${member}`}
-                key={member}
+                href={rdc.url}
+                key={rdc.name}
               >
                 <Avatar className="h-32 w-32">
                   <Image
@@ -44,20 +42,20 @@ export default async function Page() {
                   <FillText
                     overrideGroup
                     className="text-chart-4"
-                    text={member}
+                    text={rdc.name}
                   />
                 </div>
               </Link>
             </HoverCardTrigger>
             <HoverCardContent align="center" side="right">
-              <H3>{member}</H3>
-              <i className="leading-7 text-muted-foreground">{desc}</i>
-              <p className="mt-2 font-bold">{stat1.prop}</p>
-              <p className="mb-6 text-muted-foreground">{stat1.val}</p>
-              <p className="mt-2 font-bold">{stat2.prop}</p>
-              <p className="mb-6 text-muted-foreground">{stat2.val}</p>
-              <p className="mt-2 font-bold">{stat3.prop}</p>
-              <p className="mb-6 text-muted-foreground">{stat3.val}</p>
+              <H3>{rdc.name}</H3>
+              <i className="text-muted-foreground leading-7">{rdc.desc}</i>
+              {rdc.stats.map((stat, index) => (
+                <div key={index}>
+                  <p className="mt-2 font-bold">{stat.prop}</p>
+                  <p className="text-muted-foreground mb-6">{stat.val}</p>
+                </div>
+              ))}
             </HoverCardContent>
           </HoverCard>
         ))}

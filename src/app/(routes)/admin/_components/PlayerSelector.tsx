@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
 import { Control, ControllerRenderProps } from "react-hook-form";
 import { z } from "zod";
-import { formSchema, FormValues } from "./EntryCreatorForm";
 import { cn } from "@/lib/utils";
+import { formSchema, FormValues } from "../_utils/form-helpers";
 interface Props {
   rdcMembers: Player[];
   handlePlayerClick?: (player: Player) => void;
@@ -40,7 +40,6 @@ const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
     }
   };
 
-  // TODO Add Container Query
   return (
     <div
       className="mb-10 w-fit rounded-md border p-4"
@@ -52,7 +51,7 @@ const PlayerSelector = ({ handlePlayerClick, rdcMembers, field }: Props) => {
             <div key={player.playerId} className="relative">
               <div
                 className={cn(
-                  "absolute -top-2 left-1/2 right-1/2 h-2 w-2 rounded-full bg-gray-500 transition-colors",
+                  "absolute -top-2 right-1/2 left-1/2 h-2 w-2 rounded-full bg-gray-500 transition-colors",
                   getIsSelected(player) && "bg-green-500",
                 )}
               ></div>

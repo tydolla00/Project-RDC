@@ -4,10 +4,10 @@ import { Controller, useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import PlayerSessionManager from "./PlayerSessionManager";
 import PlayerSelector from "./PlayerSelector";
-import { FormValues } from "./EntryCreatorForm";
 import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
+import { FormValues } from "../_utils/form-helpers";
 
 interface Props {
   setIndex: number;
@@ -22,11 +22,13 @@ const MatchManager = (props: Props) => {
   });
   const players = getValues(`players`);
 
-  const statName = "MK8_POS";
+  const statName = "MK8_POS"; // ! TODO Can we remove this
 
   /**
-   *  Handles create new match button click.
-   * Creates a new child Match under parent set
+   * Handles the click event for creating a new match.
+   * Logs the players and their sessions, then appends a new match object.
+   *
+   * @returns {void}
    */
   const handleNewMatchClick = () => {
     console.log("Handling New Match click", players);
@@ -62,7 +64,7 @@ const MatchManager = (props: Props) => {
                   <MinusCircledIcon /> Remove Match
                 </Button>
               </div>
-              <Label className="my-2 text-muted-foreground">Match Winner</Label>
+              <Label className="text-muted-foreground my-2">Match Winner</Label>
               <Controller
                 name={`sets.${setIndex}.matches.${matchIndex}.matchWinners`}
                 control={control}
@@ -77,14 +79,12 @@ const MatchManager = (props: Props) => {
               <div className="my-4 text-center text-lg">
                 Player Sessions for Match {matchIndex + 1}
               </div>
-              {/* TODO Potentially move StatName here. Don't need to specify it for each control. */}
               <PlayerSessionManager
                 statName={statName}
                 setIndex={setIndex}
                 matchIndex={matchIndex}
                 players={players}
               />
-              {/* <Separator className="my-4 h-px bg-slate-400" /> */}
             </div>
           );
         })}

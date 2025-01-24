@@ -6,8 +6,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "./ui/breadcrumb";
-
-import { games, RDCMembers } from "@/lib/constants";
+import { ModeToggle } from "./modetoggle";
 
 export const Footer = () => {
   return (
@@ -30,31 +29,14 @@ export const Footer = () => {
             <Link className="hover:text-white" href="/games">
               Games
             </Link>
-            {/* <div>
-              {games.map((game) => (
-                <Link
-                  className="block transition-colors hover:text-white"
-                  key={game.url}
-                  href={game.url}
-                >
-                  {game.name}
-                </Link>
-              ))}
-            </div> */}
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <Link className="hover:text-white" href="/members">
               Members
             </Link>
-            {/* <div>
-              {members.map(([_, { nav: rdc }]) => (
-                <Link key={rdc.url} href={rdc.url}>
-                  {rdc.name}
-                </Link>
-              ))}
-            </div> */}
           </BreadcrumbItem>
+          <ModeToggle />
         </BreadcrumbList>
       </Breadcrumb>
     </footer>
