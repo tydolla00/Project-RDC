@@ -125,8 +125,8 @@ async function seedGames() {
         create: [
           { statName: "RL_SCORE" },
           { statName: "RL_GOALS" },
-          { statName: "RL_SAVES" },
           { statName: "RL_ASSISTS" },
+          { statName: "RL_SAVES" },
           { statName: "RL_SHOTS" },
           { statName: "RL_DAY" },
         ],

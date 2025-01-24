@@ -8,11 +8,10 @@ interface Props {
   setIndex: number;
   matchIndex: number;
   players: Player[];
-  statName: string;
 }
 
 const PlayerSessionManager = (props: Props) => {
-  const { setIndex, matchIndex, players, statName: gameStat } = props;
+  const { setIndex, matchIndex, players } = props;
   const { control, getValues } = useFormContext();
   const { append, remove, fields } = useFieldArray<FieldValues>({
     name: `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
@@ -23,11 +22,6 @@ const PlayerSessionManager = (props: Props) => {
     const finalPlayerSessionValues = getValues(
       `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
     );
-
-    // -- Logging --
-    // finalPlayerSessionValues?.forEach((element: any) => {
-    //   console.log("Element: ", element);
-    // });
 
     // Add new PlayerSession for each Player
     players.forEach((player) => {
