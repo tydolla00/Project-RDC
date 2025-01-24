@@ -1,5 +1,6 @@
 import { getAllGames } from "../../prisma/lib/games";
 import { getAllMembers } from "../../prisma/lib/members";
+import { capitalizeFirst } from "./utils";
 
 export const getMembersNav = async () => {
   const members = await getAllMembers();
@@ -215,6 +216,17 @@ export const gameImages = {
   [GamesEnum.SpeedRunners]: "speedrunners.jpeg",
   [GamesEnum.CallOfDuty]: "callofduty.jpeg",
 };
+
+export const memberImages = new Map<MembersEnum, string>([
+  [capitalizeFirst(MembersEnum.Mark), "mark_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Dylan), "dylan_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Ben), "ben_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Lee), "leland_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Des), "desmond_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.John), "john_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Aff), "aff_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Ipi), "ipi_rdc.jpg"],
+]);
 
 export enum errorCodes {
   NotAuthenticated = "Not Authenticated",

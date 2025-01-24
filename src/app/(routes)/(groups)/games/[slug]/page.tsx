@@ -1,6 +1,10 @@
 import { H1 } from "@/components/headings";
 import { CustomChart } from "./_components/charts";
 import { getAllGames } from "../../../../../../prisma/lib/games";
+import {
+  getAllSessions,
+  getAllSessionsByGame,
+} from "../../../../../../prisma/lib/admin"; // Import getAllSessions
 import { ChartConfig } from "@/components/ui/chart";
 import Mariokart from "./_components/mariokart";
 import CallOfDuty from "./_components/callofduty";
@@ -11,6 +15,7 @@ import GolfWithFriends from "./_components/golfwithfriends";
 import { GamesEnum } from "@/lib/constants";
 import Image from "next/image";
 import { gameImages } from "@/lib/constants";
+import { TimelineChart } from "../../_components/timeline-chart";
 
 // ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,
@@ -21,16 +26,18 @@ export async function generateStaticParams() {
   const games = await getAllGames();
   return games.map((game) => ({
     slug: game.gameName.replace(/\s/g, "").toLowerCase(),
+    id: game.gameId,
   }));
 }
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; id: number }>;
 }) {
-  const { slug } = await params;
+  const { slug, id } = await params;
   const games = await getAllGames();
+  const sessions = await getAllSessionsByGame(id); // Fetch sessions
   const game = games.find(
     (game) =>
       game.gameName.replace(/\s/g, "").toLowerCase() === slug.toLowerCase(),
@@ -71,6 +78,7 @@ export default async function Page({
         />
         <H1 className="my-0">{game.gameName}</H1>
       </div>
+      <TimelineChart sessions={sessions} /> {/* Pass sessions as prop */}
       {component}
       {/* <Average placings={placings} />
       <LastPlace gameId={game.gameId} /> */}

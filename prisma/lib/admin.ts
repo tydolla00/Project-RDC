@@ -17,3 +17,13 @@ export const getAllSessions = unstable_cache(
   undefined,
   { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
 );
+
+export const getAllSessionsByGame = unstable_cache(
+  async (gameId: number) =>
+    await prisma.session.findMany({
+      where: { gameId },
+      include: { Game: { select: { gameName: true } } },
+    }),
+  undefined,
+  { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
+);
