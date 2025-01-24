@@ -45,12 +45,9 @@ const RDCVisionModal = (props: Props) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    document.addEventListener("paste", handlePaste, {
-      signal: controller.signal,
-    });
+    document.addEventListener("paste", handlePaste);
     return () => {
-      controller.abort();
+      document.removeEventListener("paste", handlePaste);
     };
   }, []);
 
