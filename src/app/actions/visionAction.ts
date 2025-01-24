@@ -3,9 +3,13 @@ import DocumentIntelligence, {
   getLongRunningPoller,
   AnalyzeResultOperationOutput,
   isUnexpected,
+  DocumentFieldOutput,
 } from "@azure-rest/ai-document-intelligence";
 import { Player } from "@prisma/client";
-import { PlayerNotFoundError } from "../(routes)/admin/_utils/form-helpers";
+import {
+  findPlayerByGamerTag,
+  PlayerNotFoundError,
+} from "../(routes)/admin/_utils/form-helpers";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -22,6 +26,7 @@ export interface VisionResults {
 }
 
 export interface VisionPlayer {
+  playerId?: number;
   name: string;
   stats: VisionStat[];
 }
@@ -48,7 +53,7 @@ const TEAM_MAPPING = {
 
 const processPlayer = (player: any) => {
   console.log("Processing Player: ", player);
-  const validations = {
+  const statValidations = {
     score: validateVisionStatValue(player.valueObject?.Score?.content),
     goals: validateVisionStatValue(player.valueObject?.Goals?.content),
     assists: validateVisionStatValue(player.valueObject?.Assists?.content),
@@ -56,7 +61,7 @@ const processPlayer = (player: any) => {
     shots: validateVisionStatValue(player.valueObject?.Shots?.content),
   };
 
-  const reqCheckFlag = Object.values(validations).some((v) => v.reqCheck);
+  const reqCheckFlag = Object.values(statValidations).some((v) => v.reqCheck);
 
   return {
     reqCheckFlag,
@@ -66,44 +71,63 @@ const processPlayer = (player: any) => {
         {
           statId: "3",
           stat: "RL_SCORE",
-          statValue: validations.score.statValue,
+          statValue: statValidations.score.statValue,
         },
         {
           statId: "4",
           stat: "RL_GOALS",
-          statValue: validations.goals.statValue,
+          statValue: statValidations.goals.statValue,
         },
         {
           statId: "5",
           stat: "RL_ASSISTS",
-          statValue: validations.assists.statValue,
+          statValue: statValidations.assists.statValue,
         },
         {
           statId: "6",
           stat: "RL_SAVES",
-          statValue: validations.saves.statValue,
+          statValue: statValidations.saves.statValue,
         },
         {
           statId: "7",
           stat: "RL_SHOTS",
-          statValue: validations.shots.statValue,
+          statValue: statValidations.shots.statValue,
         },
       ],
     },
   };
 };
 
-const processTeam = (teamData: any) => {
+const processTeam = (
+  teamData: DocumentFieldOutput,
+  sessionPlayers: Player[],
+): { processedPlayers: VisionPlayer[]; reqCheckFlag: boolean } => {
   console.log("Processing Team: ", teamData);
   let reqCheckFlag = false;
-  const players =
-    teamData.valueArray.map((player: any) => {
-      const { reqCheckFlag: playerFlag, playerData } = processPlayer(player);
-      reqCheckFlag = reqCheckFlag || playerFlag;
-      return playerData;
-    }) || [];
 
-  return { players, reqCheckFlag };
+  try {
+    const processedPlayers =
+      teamData.valueArray?.map((player: any) => {
+        const { reqCheckFlag: playerFlag, playerData } = processPlayer(player);
+
+        const validatedPlayerData = validateVisionResultPlayer(
+          playerData,
+          sessionPlayers,
+        );
+        console.log("Validated Player: ", validatedPlayerData);
+        reqCheckFlag = reqCheckFlag || playerFlag;
+        if (!validatedPlayerData) {
+          console.error("Player validation failed: ", playerData);
+          return {} as VisionPlayer;
+        }
+        return validatedPlayerData;
+      }) || [];
+    return { processedPlayers, reqCheckFlag };
+  } catch (error) {
+    console.error("Error processing team: ", error);
+  }
+
+  return { processedPlayers: [], reqCheckFlag: true };
 };
 
 /**
@@ -157,8 +181,11 @@ export const analyzeScreenShot = async (
     Object.entries(teams).forEach(([teamKey, teamData]) => {
       const teamColor = TEAM_MAPPING[teamKey as keyof typeof TEAM_MAPPING];
       if (teamColor) {
-        const { players, reqCheckFlag } = processTeam(teamData);
-        visionResult[teamColor] = players;
+        const { processedPlayers, reqCheckFlag } = processTeam(
+          teamData,
+          sessionPlayers,
+        );
+        visionResult[teamColor] = processedPlayers;
         requiresCheck = requiresCheck || reqCheckFlag;
       }
     });
@@ -166,10 +193,10 @@ export const analyzeScreenShot = async (
     console.log("Vision Result: ", visionResult);
 
     // Check to make sure players are valid
-    validateVisionResultPlayers(
-      [...visionResult.blueTeam, ...visionResult.orangeTeam],
-      [],
-    );
+    // validateVisionResultPlayers(
+    //   [...visionResult.blueTeam, ...visionResult.orangeTeam],
+    //   sessionPlayers,
+    // );
     const visionWinner = calculateRLWinners(visionResult);
     visionResult.winner = visionWinner;
     return requiresCheck
@@ -205,7 +232,7 @@ const validateVisionStatValue = (
   }
 };
 
-// TODO: RDC Vision grabs the winner (most of the time) can see if we can use that to determine winner potentially
+// TODO: RDC Vision grabs the winner text value (most of the time) can see if we can use that to determine winner potentially
 export const calculateRLWinners = (visionResults: VisionResults) => {
   let blueTeamGoals = 0;
   let orangeTeamGoals = 0;
@@ -239,22 +266,52 @@ const validateVisionResultPlayers = (
   visionPlayers: VisionPlayer[],
   sessionPlayers: Player[],
 ) => {
-  // Get the current session players
-  console.log("Validating Vision Results!");
-  // TODO: Check if the players from res is the same as the players in the current session
   // TODO: Should not automatically insert players if this fails but should maybe store the data and allow the user to fix or something before inputing
   console.log("Validating Vision Players: ", visionPlayers);
 
   try {
     for (const player of visionPlayers) {
+      const processedPlayer: Player = findPlayerByGamerTag(player.name);
+      console.log("Processed Player: ", processedPlayer);
       const foundPlayer = sessionPlayers.find(
-        (p) => p.playerName === player.name,
+        (p) => p.playerName === processedPlayer?.playerName,
       );
+      console.log("Found Player: ", foundPlayer);
       if (!foundPlayer) {
         console.error(`Player not found: ${player.name}`);
       } else {
-        console.log("Found Player: ", foundPlayer);
+        continue;
       }
+    }
+    return true;
+  } catch (error) {
+    if (error instanceof PlayerNotFoundError) {
+      console.error("Vision validation failed:", error.message);
+      return false;
+    }
+    console.error("Unexpected error:", error);
+    return false;
+  }
+};
+
+const validateVisionResultPlayer = (
+  visionPlayer: VisionPlayer,
+  sessionPlayers: Player[],
+): VisionPlayer | false => {
+  try {
+    const processedPlayer: Player = findPlayerByGamerTag(visionPlayer.name);
+    const foundPlayer = sessionPlayers.find(
+      (p) => p.playerName === processedPlayer?.playerName,
+    );
+    if (!foundPlayer) {
+      console.error(`Player not found: ${visionPlayer.name}`);
+      return false;
+    } else {
+      return {
+        playerId: foundPlayer.playerId,
+        name: foundPlayer.playerName,
+        stats: [...visionPlayer.stats],
+      };
     }
   } catch (error) {
     if (error instanceof PlayerNotFoundError) {

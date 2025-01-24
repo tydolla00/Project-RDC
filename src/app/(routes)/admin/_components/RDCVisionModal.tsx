@@ -58,7 +58,6 @@ const RDCVisionModal = (props: Props) => {
     const items = e.clipboardData?.items;
 
     if (!items) return;
-
     for (const item of Array.from(items)) {
       if (item.type.indexOf("image") !== -1) {
         const file = item.getAsFile();
@@ -66,7 +65,6 @@ const RDCVisionModal = (props: Props) => {
 
         // Update file state
         setSelectedFile(file);
-
         // Create preview URL
         const url = URL.createObjectURL(file);
         setPreviewUrl(url);
@@ -83,7 +81,11 @@ const RDCVisionModal = (props: Props) => {
       return;
     }
     if (validateFile(event.target.files)) {
-      setSelectedFile(event.target.files?.[0]);
+      const file = event.target.files?.[0];
+      setSelectedFile(file);
+
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
     } else {
       setSelectedFile(null);
       event.target.value = "";
@@ -106,6 +108,9 @@ const RDCVisionModal = (props: Props) => {
   };
 
   const handleClose = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setSelectedFile(null);
     setVisionStatus(null);
     setPreviewUrl(null);
@@ -116,6 +121,10 @@ const RDCVisionModal = (props: Props) => {
     try {
       setIsLoading(true);
       if (!selectedFile) return;
+
+      setVisionStatus(null);
+      // setPreviewUrl(null);
+      setVisionMsg("");
 
       const reader = new FileReader();
 

@@ -9,11 +9,7 @@ import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import { findPlayerByGamerTag, FormValues } from "../_utils/form-helpers";
 import RDCVisionModal from "./RDCVisionModal";
-import {
-  VisionPlayer,
-  VisionResults,
-  VisionStat,
-} from "@/app/actions/visionAction";
+import { VisionPlayer, VisionResults } from "@/app/actions/visionAction";
 
 interface Props {
   setIndex: number;
@@ -52,17 +48,9 @@ const MatchManager = (props: Props) => {
 
   const processTeamPlayers = (teamPlayers: VisionPlayer[]) => {
     return teamPlayers.map((player) => {
-      const foundPlayer = findPlayerByGamerTag(player.name);
-
-      if (!foundPlayer) {
-        console.error(`Player not found: ${player.name}`);
-      } else if (!foundPlayer.playerName) {
-        console.error(`Player name not found: ${player.name}`);
-      }
-
       return {
-        playerId: foundPlayer?.playerId || 0,
-        playerSessionName: foundPlayer?.playerName || "Unknown Player",
+        playerId: player?.playerId || 0,
+        playerSessionName: player?.name || "Unknown Player",
         playerStats: [...player.stats],
       };
     });
@@ -92,10 +80,9 @@ const MatchManager = (props: Props) => {
 
     const visionWinners = visionResults.winner
       ?.map((player: VisionPlayer) => {
-        const foundWinner = findPlayerByGamerTag(player.name);
         return {
-          playerId: foundWinner?.playerId,
-          playerName: foundWinner?.playerName,
+          playerId: player?.playerId,
+          playerName: player?.name,
         };
       })
       .filter(

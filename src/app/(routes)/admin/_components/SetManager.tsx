@@ -34,12 +34,9 @@ const SetManager = () => {
 
   const [openSets, setOpenSets] = useState<boolean[]>(fields.map(() => false));
   const [textArea, setTextArea] = useState<string[]>(fields.map(() => ""));
-  console.log("open sets", openSets);
   const [highestSetId, setHighestSetId] = useState(0);
 
   const toggleSet = (index: number) => {
-    console.log("toggling set", index);
-
     setOpenSets((prevOpenSets) =>
       prevOpenSets.map((isOpen, i) => (i === index ? !isOpen : isOpen)),
     );

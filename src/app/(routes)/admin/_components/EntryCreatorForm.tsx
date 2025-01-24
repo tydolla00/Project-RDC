@@ -119,7 +119,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
           className="relative mx-auto rounded-md border p-4"
           onSubmit={handleSubmit(onSubmit, onError)}
         >
-          <div className="w-fit">
+          <div className="mb-10 flex w-fit items-center gap-4">
             <SessionInfo form={form} rdcMembers={rdcMembers} />
           </div>
           <div className="mx-auto">

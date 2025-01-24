@@ -98,7 +98,7 @@ export const SessionInfo = ({
   };
   return (
     <>
-      <div className="mb-5 gap-2">
+      <div className="gap-2">
         <Card className="absolute right-0 top-0 h-72 w-72">
           <CardHeader>
             <CardTitle>{sessionName}</CardTitle>
@@ -175,6 +175,7 @@ const Thumbnail = ({
 }: {
   session: Awaited<ReturnType<typeof getRDCVideoDetails>>["video"];
 }) => {
+  console.log("Session: ", session);
   return (
     <>
       {session ? (
@@ -185,10 +186,14 @@ const Thumbnail = ({
               : session.thumbnail.url
           }
           height={
-            typeof session.thumbnail === "string" ? 9 : session.thumbnail.height
+            typeof session.thumbnail === "string"
+              ? 108
+              : session.thumbnail.height
           } // 16:9 aspect ratio
           width={
-            typeof session.thumbnail === "string" ? 16 : session.thumbnail.width
+            typeof session.thumbnail === "string"
+              ? 192
+              : session.thumbnail.width
           }
           alt="RDC Youtube Video Thumbnail"
         />
