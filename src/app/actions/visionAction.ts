@@ -38,7 +38,7 @@ export interface VisionStat {
 }
 
 export type VisionResult =
-  | { status: VisionResultCodes.Success; data: VisionResults }
+  | { status: VisionResultCodes.Success; data: VisionResults; message: string }
   | {
       status: VisionResultCodes.CheckRequest;
       data: VisionResults;
@@ -209,6 +209,7 @@ export const analyzeScreenShot = async (
       : {
           status: VisionResultCodes.Success,
           data: visionResult,
+          message: "Results have been successfully imported.",
         };
   } catch (error) {
     console.error(error);

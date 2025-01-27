@@ -123,7 +123,6 @@ const MatchManager = (props: Props) => {
                   <MinusCircledIcon /> Remove Match
                 </Button>
               </div>
-              <Label className="my-2 text-muted-foreground">Match Winner</Label>
               <Controller
                 name={`sets.${setIndex}.matches.${matchIndex}.matchWinners`}
                 control={control}

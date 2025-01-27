@@ -18,6 +18,7 @@ import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
 import { revalidateTag } from "next/cache";
+import { FormSummary } from "./Summary";
 
 interface AdminFormProps {
   rdcMembers: Player[];
@@ -50,8 +51,9 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   const { gameStats, getGameStatsFromDb } = useAdmin();
   const game = watch("game");
 
-  console.log(watch());
+  // console.log(watch());
 
+  // TODO Can we pass this down as a prop?
   useEffect(() => {
     const fetchData = async () => {
       if (game) {
@@ -78,11 +80,10 @@ const EntryCreatorForm = (props: AdminFormProps) => {
       data,
       stringified: JSON.stringify(data, null, 2),
     });
-    console.time();
+    console.time("Form Submission Time Start: ");
     const { error: err } = await insertNewSessionFromAdmin(data);
     // const { error: err } = await insertNewSessionV2(data);
-    console.timeEnd();
-    console.log(err);
+    console.timeEnd("Form Submission Time End: ");
 
     if (err)
       err === errorCodes.NotAuthenticated
@@ -91,6 +92,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     else {
       toast.success("Session successfully created.", { richColors: true });
       revalidateTag("getAllSessions");
+      form.reset();
     }
   };
 
@@ -119,9 +121,10 @@ const EntryCreatorForm = (props: AdminFormProps) => {
           className="relative mx-auto rounded-md border p-4"
           onSubmit={handleSubmit(onSubmit, onError)}
         >
-          <div className="mb-10 flex w-fit items-center gap-4">
+          <div className="mb-10 w-fit items-center gap-4">
             <SessionInfo form={form} rdcMembers={rdcMembers} />
           </div>
+          {/* <FormSummary /> */}
           <div className="mx-auto">
             <SetManager />
             <Submit formIsValid={formIsValid} />
@@ -134,7 +137,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
 const Submit = ({ formIsValid }: { formIsValid: boolean }) => {
   const { pending } = useFormStatus();
-  // TODO add review screen logic before form is truly submitted.
+  // TODO button not being disabled when pending
   return (
     <Button
       disabled={!formIsValid || pending}

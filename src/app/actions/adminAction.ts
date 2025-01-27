@@ -70,7 +70,6 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
  * const result = await insertNewSessionFromAdmin(session);
  * console.log(result); // { error: null }
  *
- * @throws {Error} Throws an error if an unknown error occurs.
  */
 export const insertNewSessionFromAdmin = async (
   session: FormValues,
