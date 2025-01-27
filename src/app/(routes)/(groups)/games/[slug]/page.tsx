@@ -26,17 +26,19 @@ export async function generateStaticParams() {
   const games = await getAllGames();
   return games.map((game) => ({
     slug: game.gameName.replace(/\s/g, "").toLowerCase(),
-    id: game.gameId,
   }));
 }
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ slug: string; id: number }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug, id } = await params;
+  const { slug } = await params;
   const games = await getAllGames();
+  const id = games.find(
+    (g) => g.gameName.replace(/\s/g, "").toLowerCase() === slug,
+  )?.gameId!;
   const sessions = await getAllSessionsByGame(id); // Fetch sessions
   const game = games.find(
     (game) =>
@@ -68,66 +70,20 @@ export default async function Page({
 
   return (
     <div className="m-16">
-      <div className="flex gap-5">
-        <Image
-          className="object-cover"
-          height={200}
-          width={200}
-          alt=""
-          src={`/images/${gameImages[gameName as keyof typeof gameImages]}`}
-        />
-        <H1 className="my-0">{game.gameName}</H1>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 5fr" }}>
+        <div>
+          <H1 className="my-0">{game.gameName}</H1>
+          <Image
+            className="object-cover"
+            height={200}
+            width={200}
+            alt=""
+            src={`/images/${gameImages[gameName as keyof typeof gameImages]}`}
+          />
+        </div>
+        <TimelineChart sessions={sessions} />
       </div>
-      <TimelineChart sessions={sessions} /> {/* Pass sessions as prop */}
       {component}
-      {/* <Average placings={placings} />
-      <LastPlace gameId={game.gameId} /> */}
     </div>
   );
 }
-
-const Sessions = () => {
-  // TODO This will be a table with all of the currently submitted sessions for a game. Show the name. url, and thumbnail.
-};
-
-// const Average = ({
-// }: {
-// }) => {
-//   const config = {
-//     player: { label: "Player" },
-//     placing: { label: "Avg Placing" },
-//     played: { label: "# of Races" },
-//   } satisfies ChartConfig;
-
-//   return (
-//     <CustomChart
-//       title="Average Placing"
-//       description="July - Now"
-//       data={allAvgPlacing}
-//       nameKey={"player"}
-//       config={config}
-//       dataKey={"placing"}
-//     />
-//   );
-// };
-
-// const LastPlace = async ({ gameId }: { gameId: number }) => {
-
-//   const config = {
-//     player: { label: "Player" },
-//     last: { label: "# of Last Places" },
-//   } satisfies ChartConfig;
-
-//   return (
-//     <>
-//       <CustomChart
-//         title="Most Last Places"
-//         description="Keeps track of who placed last the most."
-//         data={data}
-//         nameKey={"player"}
-//         config={config}
-//         dataKey={"last"}
-//       />
-//     </>
-//   );
-// };

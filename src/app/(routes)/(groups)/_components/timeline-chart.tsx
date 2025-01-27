@@ -50,60 +50,83 @@ export function TimelineChart({ sessions }: { sessions: Sessions }) {
   }, []);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Line Chart - Interactive</CardTitle>
-          <CardDescription>
-            Showing total visitors for the last 3 months
-          </CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent className="px-2 sm:p-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
-        >
-          <LineChart
-            accessibilityLayer
-            data={sessions}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
+    <>
+      <Card className="col-span-8">
+        <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
+          <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
+            <CardTitle>Line Chart - Interactive</CardTitle>
+            <CardDescription>
+              Showing total visitors for the last 3 months
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="px-2 sm:p-6">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[250px] w-full"
           >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                });
+            <LineChart
+              accessibilityLayer
+              data={sessions}
+              margin={{
+                left: 12,
+                right: 12,
               }}
-            />
-            <Tooltip
-              content={<CustomTooltip setSession={handleSetSession} />}
-            />
-            <Line
-              dataKey={"sessionId"}
-              type="monotone"
-              stroke={`hsl(var(--chart-1))`}
-              strokeWidth={2}
-              dot={true}
-            />
-          </LineChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={32}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
+              />
+              <Tooltip
+                content={<CustomTooltip setSession={handleSetSession} />}
+              />
+              <Line
+                dataKey={"sessionId"}
+                type="monotone"
+                stroke={`hsl(var(--chart-1))`}
+                strokeWidth={2}
+                dot={true}
+              />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+      {/* <div className="col-span-full">
+        <div>{session?.sessionName}</div>
+        {session && (
+          <>
+            <Link
+              className="col-span-1 w-fit"
+              href={session.sessionUrl}
+              passHref
+            >
+              <Image
+                height={200}
+                width={200}
+                alt={session.sessionName}
+                src={session.thumbnail}
+              />
+            </Link>
+            <div>Hello</div>
+          </>
+        )}
+      </div> */}
+    </>
   );
 }
 
+// TODO Show session info about sets/matches.
 const CustomTooltip = ({
   active,
   payload,
@@ -121,8 +144,11 @@ const CustomTooltip = ({
 
   if (active) {
     return (
-      <div className="max-w-10 flex-wrap rounded-md p-2 shadow-md">
+      <div className="max-w-48 flex-wrap rounded-md p-2 shadow-md">
         <Card>
+          <CardHeader>
+            <CardTitle className="absolute">{session.sessionName}</CardTitle>
+          </CardHeader>
           <CardContent>
             <Image
               height={200}

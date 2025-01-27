@@ -18,7 +18,8 @@ const connectionString = config.DATABASE_URL;
 
 const pool = new Pool({ connectionString });
 const adapter = new PrismaNeon(pool);
-const prisma = global.prisma || new PrismaClient({ adapter, log: ["query"] });
+const prisma =
+  global.prisma || new PrismaClient({ adapter, log: ["warn", "error"] });
 
 if (process.env.NODE_ENV === "development") global.prisma = prisma;
 
