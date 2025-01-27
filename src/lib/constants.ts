@@ -220,6 +220,12 @@ export enum errorCodes {
   NotAuthenticated = "Not Authenticated",
 }
 
+export enum VisionResultCodes {
+  Success = "Success",
+  Failed = "Failed",
+  CheckRequest = "CheckReq",
+}
+
 type MembersProps = {
   desc: string;
   nav: { alt: string; name: string; url: string; src: string };

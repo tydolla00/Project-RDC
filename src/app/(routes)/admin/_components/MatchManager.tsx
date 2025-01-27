@@ -1,5 +1,5 @@
 import { Player } from "@prisma/client";
-import React from "react";
+import React, { useMemo } from "react";
 import { Controller, useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import PlayerSessionManager from "./PlayerSessionManager";
@@ -7,7 +7,9 @@ import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
-import { FormValues } from "../_utils/form-helpers";
+import { findPlayerByGamerTag, FormValues } from "../_utils/form-helpers";
+import RDCVisionModal from "./RDCVisionModal";
+import { VisionPlayer, VisionResults } from "@/app/actions/visionAction";
 
 interface Props {
   setIndex: number;
@@ -22,13 +24,13 @@ const MatchManager = (props: Props) => {
   });
   const players = getValues(`players`);
 
-  const statName = "MK8_POS"; // ! TODO Can we remove this
-
   /**
-   * Handles the click event for creating a new match.
-   * Logs the players and their sessions, then appends a new match object.
+   * Handles the creation of a new match by creating player sessions from the available players.
+   * Maps each player to a new player session object containing their ID, name, and empty stats array.
+   * Appends the new match data with empty winners array and created player sessions to the form.
    *
    * @returns {void}
+   *
    */
   const handleNewMatchClick = () => {
     console.log("Handling New Match click", players);
@@ -42,6 +44,63 @@ const MatchManager = (props: Props) => {
       matchWinners: [],
       playerSessions: playerSessions,
     });
+  };
+
+  const processTeamPlayers = (teamPlayers: VisionPlayer[]) => {
+    return teamPlayers.map((player) => {
+      return {
+        playerId: player?.playerId || 0,
+        playerSessionName: player?.name || "Unknown Player",
+        playerStats: [...player.stats],
+      };
+    });
+  };
+
+  /**
+   * Processes vision analysis results to create match player sessions
+   * @param visionResults - The results from vision analysis containing blue and orange team player information
+   * @remarks
+   * 1. Maps vision results for both blue and orange teams into player sessions
+   * 2. Finds existing players by gamer tag
+   * 3. Creates player session objects with player IDs and stats
+   */
+  const handleCreateMatchFromVision = (visionResults: VisionResults) => {
+    console.log("Handling Create Match from Vision: ", visionResults);
+
+    const blueTeamPlayerSessions = processTeamPlayers(visionResults.blueTeam);
+
+    const orangeTeamPlayerSessions = processTeamPlayers(
+      visionResults.orangeTeam,
+    );
+
+    const visionMatchPlayerSessions = [
+      ...blueTeamPlayerSessions,
+      ...orangeTeamPlayerSessions,
+    ];
+
+    const visionWinners = visionResults.winner
+      ?.map((player: VisionPlayer) => {
+        return {
+          playerId: player?.playerId,
+          playerName: player?.name,
+        };
+      })
+      .filter(
+        (winner): winner is { playerId: number; playerName: string } =>
+          winner.playerId !== undefined && winner.playerName !== undefined,
+      );
+    if (visionWinners && visionWinners.length > 0) {
+      console.log("Setting Vision Winners!", visionWinners);
+      append({
+        matchWinners: visionWinners,
+        playerSessions: visionMatchPlayerSessions,
+      });
+    } else {
+      append({
+        matchWinners: [],
+        playerSessions: visionMatchPlayerSessions,
+      });
+    }
   };
 
   return (
@@ -64,7 +123,7 @@ const MatchManager = (props: Props) => {
                   <MinusCircledIcon /> Remove Match
                 </Button>
               </div>
-              <Label className="text-muted-foreground my-2">Match Winner</Label>
+              <Label className="my-2 text-muted-foreground">Match Winner</Label>
               <Controller
                 name={`sets.${setIndex}.matches.${matchIndex}.matchWinners`}
                 control={control}
@@ -73,14 +132,16 @@ const MatchManager = (props: Props) => {
                     rdcMembers={players}
                     control={control}
                     field={field}
+                    currentSelectedPlayers={field.value}
+                    label="Match Winners"
                   />
                 )}
               />
+
               <div className="my-4 text-center text-lg">
                 Player Sessions for Match {matchIndex + 1}
               </div>
               <PlayerSessionManager
-                statName={statName}
                 setIndex={setIndex}
                 matchIndex={matchIndex}
                 players={players}
@@ -88,7 +149,7 @@ const MatchManager = (props: Props) => {
             </div>
           );
         })}
-      <div>
+      <div className="flex justify-between">
         <Button
           className="my-2 rounded-md bg-purple-900 p-2 font-semibold text-white hover:bg-purple-950"
           type="button"
@@ -96,6 +157,10 @@ const MatchManager = (props: Props) => {
         >
           Add Match
         </Button>
+        <RDCVisionModal
+          handleCreateMatchFromVision={handleCreateMatchFromVision}
+          sessionPlayers={players}
+        />
       </div>
     </div>
   );

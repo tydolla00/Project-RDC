@@ -72,6 +72,74 @@ export const formSchema = z.object({
 // TODO Do we want to conditionally apply input types/validations based on the stat name? Most will be numbers
 export type FormValues = z.infer<typeof formSchema>;
 
-export interface AdminFormProps {
-  rdcMembers: Player[];
+type PlayerMapping = {
+  [key: string]: {
+    playerId: number;
+    playerName: string;
+    gamerTags: string[];
+  };
+};
+
+// TODO: Fuzzy Matching
+export const PLAYER_MAPPINGS: PlayerMapping = {
+  Mark: {
+    playerId: 1,
+    playerName: "Mark",
+    gamerTags: ["SupremeMvp0020"],
+  },
+  Dylan: {
+    playerId: 2,
+    playerName: "Dylan",
+    gamerTags: ["Dpatel254"],
+  },
+  Ben: {
+    playerId: 3,
+    playerName: "Ben",
+    gamerTags: ["Jabenixem"],
+  },
+  Lee: {
+    playerId: 4,
+    playerName: "Lee",
+    gamerTags: ["Leland12123"],
+  },
+  Des: {
+    playerId: 5,
+    playerName: "Des",
+    gamerTags: ["13RUTALxPANIiC", "13RUTALxPANIC"],
+  },
+  John: {
+    playerId: 6,
+    playerName: "John",
+    gamerTags: ["I will never forget that day in Lockdown..."],
+  },
+  Aff: {
+    playerId: 7,
+    playerName: "Aff",
+    gamerTags: ["Aff"],
+  },
+  Ipi: {
+    playerId: 8,
+    playerName: "Ipi",
+    gamerTags: ["iceman_ip"],
+  },
+};
+
+// TODO: Fix this
+export const findPlayerByGamerTag = (gamerTag: string) => {
+  const player = Object.values(PLAYER_MAPPINGS).find((player) =>
+    player.gamerTags.some(
+      (tag) => tag.toLowerCase() === gamerTag.toLowerCase(),
+    ),
+  );
+  return {
+    playerId: player?.playerId,
+    playerName: player?.playerName,
+  } as Player;
+};
+
+export class PlayerNotFoundError extends Error {
+  constructor(playerName: string) {
+    super(`Player not found: ${playerName}`);
+    this.name = "PlayerNotFoundError";
+  }
 }

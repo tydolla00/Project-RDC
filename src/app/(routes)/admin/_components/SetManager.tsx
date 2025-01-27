@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Control,
   Controller,
   useFieldArray,
   useFormContext,
@@ -26,8 +25,7 @@ import { toast } from "sonner";
 import { randomInt } from "crypto";
 
 const SetManager = () => {
-  const { watch, formState, control } =
-    useFormContext<z.infer<typeof formSchema>>();
+  const { watch, control } = useFormContext<z.infer<typeof formSchema>>();
 
   const { append, remove, fields, update } = useFieldArray({
     name: "sets",
@@ -36,12 +34,9 @@ const SetManager = () => {
 
   const [openSets, setOpenSets] = useState<boolean[]>(fields.map(() => false));
   const [textArea, setTextArea] = useState<string[]>(fields.map(() => ""));
-  console.log("open sets", openSets);
   const [highestSetId, setHighestSetId] = useState(0);
 
   const toggleSet = (index: number) => {
-    console.log("toggling set", index);
-
     setOpenSets((prevOpenSets) =>
       prevOpenSets.map((isOpen, i) => (i === index ? !isOpen : isOpen)),
     );
@@ -125,7 +120,7 @@ const SetManager = () => {
       {/* Loop through set fields */}
       <div className="font-2xl m-2 text-center font-bold"> Sets </div>
       {(fields.length === 0 && (
-        <div className="text-muted-foreground text-center">
+        <div className="text-center text-muted-foreground">
           No Sets! Click Add Set to start!
         </div>
       )) ||
@@ -133,7 +128,7 @@ const SetManager = () => {
           return (
             <Collapsible open={openSets[setIndex]} key={set.setId}>
               <Card className="flex flex-col space-y-3 rounded-lg p-6 shadow-lg">
-                <CardHeader className="flex flex-row justify-between space-y-0 pr-0 pb-0 pl-0">
+                <CardHeader className="flex flex-row justify-between space-y-0 pb-0 pl-0 pr-0">
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
                   </div>{" "}
@@ -142,12 +137,6 @@ const SetManager = () => {
                     <TrashIcon
                       className="text-sm text-red-500 hover:cursor-pointer hover:text-red-400"
                       onClick={() => {
-                        // Collapse set before removing
-                        // setOpenSets((prevOpenSets) =>
-                        //   prevOpenSets.map((isOpen, i) =>
-                        //     i === setIndex ? false : isOpen,
-                        //   ),
-                        // );
                         setTextArea((prev) => {
                           const newSet = prev.filter(
                             (_, index) => setIndex !== index,
@@ -166,25 +155,28 @@ const SetManager = () => {
                 <CollapsibleContent>
                   <div
                     style={{ position: "-webkit-sticky" }}
-                    className="bg-card sticky top-12 z-10"
+                    className="sticky top-12 z-10 bg-card"
                   >
-                    <Label className="text-muted-foreground my-2 block">
+                    <Label className="my-2 block text-muted-foreground">
                       Set Winner
                     </Label>
-                    <Controller
-                      name={`sets.${setIndex}.setWinners`}
-                      control={control}
-                      render={({ field }) => (
-                        <PlayerSelector
-                          rdcMembers={players}
-                          control={control}
-                          field={field}
-                        />
-                      )}
-                    />
                   </div>
                   {/* TODO Work In Progress */}
-                  <Label>
+                  <Controller
+                    name={`sets.${setIndex}.setWinners`}
+                    control={control}
+                    render={({ field }) => (
+                      <PlayerSelector
+                        rdcMembers={players}
+                        control={control}
+                        field={field}
+                        label="Set Winners"
+                        sticky={true}
+                      />
+                    )}
+                  />
+                  {/* TODO Don't think we will be using this anymore? */}
+                  {/* <Label>
                     You may paste in the info of all matches for Set{" "}
                     {setIndex + 1}
                   </Label>
@@ -200,7 +192,7 @@ const SetManager = () => {
                     }
                     className="max-w-xs"
                     placeholder="Paste in json"
-                  />
+                  /> 
                   <Button
                     type="button"
                     onClick={() => handleAddJSON(setIndex)}
@@ -208,6 +200,7 @@ const SetManager = () => {
                   >
                     Fill Match
                   </Button>
+                  */}
                   <MatchManager setIndex={setIndex} />
                 </CollapsibleContent>
                 <CardFooter className="flex flex-row-reverse pb-0">

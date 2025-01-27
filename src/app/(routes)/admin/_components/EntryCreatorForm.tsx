@@ -12,7 +12,6 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { formSchema, FormValues } from "../_utils/form-helpers";
-import { AdminFormProps } from "../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
 import { useFormStatus } from "react-dom";
 import { SessionInfo } from "./SessionInfo";
@@ -20,7 +19,7 @@ import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
 import { revalidateTag } from "next/cache";
 
-interface Props {
+interface AdminFormProps {
   rdcMembers: Player[];
 }
 
@@ -51,6 +50,8 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   const { gameStats, getGameStatsFromDb } = useAdmin();
   const game = watch("game");
 
+  console.log(watch());
+
   useEffect(() => {
     const fetchData = async () => {
       if (game) {
@@ -59,9 +60,6 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     };
     fetchData();
   }, [game, getGameStatsFromDb]);
-
-  const url = watch("sessionUrl");
-  console.log("Errors: ", errors);
 
   /**
    * Handles the form submission for creating a new session.
@@ -118,11 +116,13 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
         <form
           method="post"
-          className="grid grid-cols-2 rounded-md border p-4"
+          className="relative mx-auto rounded-md border p-4"
           onSubmit={handleSubmit(onSubmit, onError)}
         >
-          <SessionInfo form={form} rdcMembers={rdcMembers} />
-          <div className="order-3 col-span-2 md:order-none">
+          <div className="mb-10 flex w-fit items-center gap-4">
+            <SessionInfo form={form} rdcMembers={rdcMembers} />
+          </div>
+          <div className="mx-auto">
             <SetManager />
             <Submit formIsValid={formIsValid} />
           </div>
@@ -134,13 +134,12 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
 const Submit = ({ formIsValid }: { formIsValid: boolean }) => {
   const { pending } = useFormStatus();
-
   // TODO add review screen logic before form is truly submitted.
   return (
     <Button
       disabled={!formIsValid || pending}
       type="submit"
-      className="my-2 w-full rounded-md border p-2 sm:w-80"
+      className="my-2 w-full rounded-md border p-2"
     >
       Submit
     </Button>
