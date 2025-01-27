@@ -120,7 +120,7 @@ const SetManager = () => {
       {/* Loop through set fields */}
       <div className="font-2xl m-2 text-center font-bold"> Sets </div>
       {(fields.length === 0 && (
-        <div className="text-center text-muted-foreground">
+        <div className="text-muted-foreground text-center">
           No Sets! Click Add Set to start!
         </div>
       )) ||
@@ -128,7 +128,7 @@ const SetManager = () => {
           return (
             <Collapsible open={openSets[setIndex]} key={set.setId}>
               <Card className="flex flex-col space-y-3 rounded-lg p-6 shadow-lg">
-                <CardHeader className="flex flex-row justify-between space-y-0 pb-0 pl-0 pr-0">
+                <CardHeader className="flex flex-row justify-between space-y-0 pr-0 pb-0 pl-0">
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
                   </div>{" "}
@@ -155,9 +155,9 @@ const SetManager = () => {
                 <CollapsibleContent>
                   <div
                     style={{ position: "-webkit-sticky" }}
-                    className="sticky top-12 z-10 bg-card"
+                    className="bg-card sticky top-12 z-10"
                   >
-                    <Label className="my-2 block text-muted-foreground">
+                    <Label className="text-muted-foreground my-2 block">
                       Set Winner
                     </Label>
                   </div>
@@ -219,7 +219,7 @@ const SetManager = () => {
         })}
       <div className="ml-auto w-fit">
         <Button
-          disabled={!game}
+          disabled={!game || players.length === 0}
           type="button"
           onClick={() => handleAddSet()}
           className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"

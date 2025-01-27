@@ -6,10 +6,9 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
-import { analyzeScreenShot } from "@/app/actions/visionAction";
 import {
   CircleAlert,
   CircleCheck,
@@ -26,23 +25,58 @@ import {
 import { Player } from "@prisma/client";
 import Image from "next/image";
 import { VisionResultCodes } from "@/lib/constants";
+import { toast } from "sonner";
+import {
+  handleAnalyzeBtnClick,
+  handleClose,
+} from "../_utils/rdc-vision-helpers";
 
 interface Props {
   handleCreateMatchFromVision: (visionResults: any) => void;
   sessionPlayers: Player[];
 }
 
+const initialState = {
+  selectedFile: null as File | null,
+  isLoading: false,
+  visionStatus: null as VisionResultCodes | null,
+  visionMsg: "",
+  previewUrl: null as string | null,
+};
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "UPDATE_FILE":
+      return {
+        ...state,
+        selectedFile: action.file,
+        previewUrl: action.previewUrl,
+      };
+    case "UPDATE_VISION":
+      return {
+        ...state,
+        visionStatus: action.visionStatus,
+        visionMsg: action.visionMsg,
+        isLoading: action.loading ?? state.isLoading,
+      };
+    case "UPDATE_LOADING":
+      return { ...state, isLoading: action.loading };
+    case "RESET":
+      return initialState;
+    default:
+      return state;
+  }
+};
+
 const RDCVisionModal = (props: Props) => {
   const { handleCreateMatchFromVision, sessionPlayers } = props;
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  // TODO: Should probably combine Vision status into custom type -- already done somewhere
-  const [visionStatus, setVisionStatus] = useState<
-    "Success" | "CheckReq" | "Failed" | null
-  >(null);
-  const [visionMsg, setVisionMsg] = useState<string>("");
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const { selectedFile, isLoading, visionStatus, visionMsg, previewUrl } =
+    state;
+
+  const visionButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     document.addEventListener("paste", handlePaste);
@@ -56,119 +90,52 @@ const RDCVisionModal = (props: Props) => {
 
     if (!items) return;
     for (const item of Array.from(items)) {
-      if (item.type.indexOf("image") !== -1) {
-        const file = item.getAsFile();
-        if (!file) continue;
+      const file = item.getAsFile();
 
-        // Update file state
-        setSelectedFile(file);
-        // Create preview URL
+      if (item.type.indexOf("image") !== -1 && file) {
         const url = URL.createObjectURL(file);
-        setPreviewUrl(url);
+        dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
+        if (visionButton.current) visionButton.current.focus();
 
         break;
       }
     }
   };
 
-  const handleFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ): void => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
       return;
     }
     if (validateFile(event.target.files)) {
       const file = event.target.files?.[0];
-      setSelectedFile(file);
 
       const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
     } else {
-      setSelectedFile(null);
+      dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
       event.target.value = "";
     }
   };
 
   const validateFile = (file: FileList): boolean => {
     if (file.length > 1) {
-      alert("Please select only one file");
+      toast.error("Please select only one file", { richColors: true });
       return false;
     }
 
     const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
     if (!allowedTypes.includes(file[0].type)) {
-      alert("Please select a valid image file");
+      toast.error("Please select a valid image file", { richColors: true });
       return false;
     }
 
     return true;
   };
 
-  const handleClose = () => {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setSelectedFile(null);
-    setVisionStatus(null);
-    setPreviewUrl(null);
-    setVisionMsg("");
-  };
-
-  const handleAnalyzeBtnClick = async (): Promise<void> => {
-    try {
-      setIsLoading(true);
-      if (!selectedFile) return;
-
-      setVisionStatus(null);
-      // setPreviewUrl(null);
-      setVisionMsg("");
-
-      const reader = new FileReader();
-
-      const readFile = () =>
-        new Promise((resolve, reject) => {
-          reader.onload = async (e) => resolve(e.target?.result);
-          reader.onerror = (error) => reject(error);
-          reader.readAsArrayBuffer(selectedFile);
-        });
-
-      const fileContent = await readFile();
-      if (!fileContent) {
-        console.error("Error reading file content");
-        setIsLoading(false);
-      }
-
-      const base64FileContent = Buffer.from(
-        fileContent as ArrayBuffer,
-      ).toString("base64");
-
-      const visionResult = await analyzeScreenShot(
-        base64FileContent,
-        sessionPlayers,
-      );
-
-      if (visionResult.status === VisionResultCodes.Success) {
-        handleCreateMatchFromVision(visionResult.data);
-        setVisionStatus(VisionResultCodes.Success);
-        setIsLoading(false);
-      } else if (visionResult.status === VisionResultCodes.CheckRequest) {
-        handleCreateMatchFromVision(visionResult.data);
-        setVisionStatus(VisionResultCodes.CheckRequest);
-        setVisionMsg(visionResult.message);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error("Error in handleAnalyzeBtnClick: ", error);
-      setIsLoading(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <Dialog onOpenChange={handleClose}>
+    <Dialog onOpenChange={() => handleClose(previewUrl, dispatch)}>
       <DialogTrigger asChild>
-        <Button className="my-2 rounded-sm bg-primary p-4 text-primary-foreground">
+        <Button className="bg-primary text-primary-foreground my-2 rounded-sm p-4">
           <ScanEye />
           Import Stats
         </Button>
@@ -204,14 +171,21 @@ const RDCVisionModal = (props: Props) => {
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="hover:cursor-pointer hover:bg-primary-foreground"
+          className="hover:bg-primary-foreground hover:cursor-pointer"
           tabIndex={1}
         />
-        {/** TODO: tooltip for no players */}
         <Button
+          ref={visionButton}
           className="w-full max-w-[200px] sm:w-auto"
           disabled={!selectedFile || sessionPlayers.length === 0}
-          onClick={handleAnalyzeBtnClick}
+          onClick={() =>
+            handleAnalyzeBtnClick(
+              state,
+              dispatch,
+              handleCreateMatchFromVision,
+              sessionPlayers,
+            )
+          }
           type="button"
         >
           Extract Stats from Image
@@ -222,58 +196,34 @@ const RDCVisionModal = (props: Props) => {
           </div>
         )}
         <span className="my-2 flex flex-col items-center">
-          {visionStatus !== null && <p className="text-lg">Vision Results:</p>}
-          {visionStatus === "Success" && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <CircleCheck size={40} className="my-1 text-green-500" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-72 bg-primary-foreground text-primary">
-                  <p className="text-sm">
-                    <strong>
-                      Stats have been imported to a new match successfully. Make
-                      sure to double check still!
-                    </strong>
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          {visionStatus === "CheckReq" && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <CircleAlert size={40} className="my-1 text-yellow-500" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-72 bg-primary-foreground text-primary">
-                  <p className="text-sm">
-                    <strong>
-                      Stats have been imported to a new match but the model had
-                      some trouble recognizing some fields. Please check to make
-                      sure it got it correct.
-                    </strong>
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          {visionStatus === "Failed" && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <CircleX size={40} className="my-1 text-red-500" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-72 bg-primary-foreground text-primary">
-                  <p className="text-sm">
-                    <strong>
-                      Stat import has failed due to an error please check the
-                      screenshot and try again.
-                    </strong>
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          {visionStatus !== null && (
+            <>
+              <p className="text-lg">Vision Results:</p>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    {visionStatus === VisionResultCodes.Success ? (
+                      <CircleCheck size={40} className="text-green-500" />
+                    ) : visionStatus === VisionResultCodes.CheckRequest ? (
+                      <CircleAlert size={40} className="text-yellow-500" />
+                    ) : (
+                      <CircleX size={40} className="text-red-500" />
+                    )}
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-primary-foreground text-primary max-w-72">
+                    <p className="text-sm">
+                      <strong>
+                        {visionStatus === VisionResultCodes.Success
+                          ? "Stats have been imported to a new match successfully. Make sure to double check still!"
+                          : visionStatus === VisionResultCodes.CheckRequest
+                            ? "Stats have been imported to a new match but the model had some trouble recognizing some fields. Please check to make sure it got it correct."
+                            : "Stat import has failed due to an error please check the screenshot and try again."}
+                      </strong>
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </>
           )}
           {visionMsg && <p className="text-muted-foreground">{visionMsg}</p>}
         </span>
@@ -283,3 +233,16 @@ const RDCVisionModal = (props: Props) => {
 };
 
 export default RDCVisionModal;
+
+export type State = typeof initialState;
+
+export type Action =
+  | { type: "UPDATE_FILE"; file: File | null; previewUrl: string | null }
+  | {
+      type: "UPDATE_VISION";
+      visionStatus: VisionResultCodes | null;
+      visionMsg: string;
+      loading?: boolean;
+    }
+  | { type: "UPDATE_LOADING"; loading: boolean }
+  | { type: "RESET" };
