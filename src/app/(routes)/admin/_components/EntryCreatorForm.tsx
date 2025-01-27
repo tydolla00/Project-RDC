@@ -18,6 +18,7 @@ import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
 import { revalidateTag } from "next/cache";
+import { FormSummary } from "./Summary";
 
 interface AdminFormProps {
   rdcMembers: Player[];
@@ -50,7 +51,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   const { gameStats, getGameStatsFromDb } = useAdmin();
   const game = watch("game");
 
-  console.log(watch());
+  // console.log(watch());
 
   // TODO Can we pass this down as a prop?
   useEffect(() => {
@@ -120,9 +121,10 @@ const EntryCreatorForm = (props: AdminFormProps) => {
           className="relative mx-auto rounded-md border p-4"
           onSubmit={handleSubmit(onSubmit, onError)}
         >
-          <div className="mb-10 flex w-fit items-center gap-4">
+          <div className="mb-10 w-fit items-center gap-4">
             <SessionInfo form={form} rdcMembers={rdcMembers} />
           </div>
+          {/* <FormSummary /> */}
           <div className="mx-auto">
             <SetManager />
             <Submit formIsValid={formIsValid} />

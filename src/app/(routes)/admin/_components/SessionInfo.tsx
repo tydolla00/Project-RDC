@@ -99,7 +99,7 @@ export const SessionInfo = ({
   return (
     <>
       <div className="gap-2">
-        <Card className="absolute right-0 top-0 h-72 w-72">
+        {/* <Card className="absolute top-0 right-0 h-72 w-72">
           <CardHeader>
             <CardTitle>{sessionName}</CardTitle>
             <CardDescription>{new Date(date).toDateString()}</CardDescription>
@@ -107,7 +107,7 @@ export const SessionInfo = ({
           <CardContent>
             <Thumbnail session={session} />
           </CardContent>
-        </Card>
+        </Card> */}
         <FormField
           control={form.control}
           name="sessionUrl"

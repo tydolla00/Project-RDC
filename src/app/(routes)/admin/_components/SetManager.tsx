@@ -153,15 +153,6 @@ const SetManager = () => {
                 </CardHeader>
 
                 <CollapsibleContent>
-                  <div
-                    style={{ position: "-webkit-sticky" }}
-                    className="bg-card sticky top-12 z-10"
-                  >
-                    <Label className="text-muted-foreground my-2 block">
-                      Set Winner
-                    </Label>
-                  </div>
-                  {/* TODO Work In Progress */}
                   <Controller
                     name={`sets.${setIndex}.setWinners`}
                     control={control}
