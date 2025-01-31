@@ -6,7 +6,7 @@ import { getAllMembers } from "../../../../prisma/lib/members";
 
 export default async function Page() {
   return (
-    <div className="m-16">
+    <div>
       <H1>Admin</H1>
 
       <Suspense fallback={<Skelly />}>
