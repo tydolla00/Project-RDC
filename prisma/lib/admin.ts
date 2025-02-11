@@ -18,6 +18,7 @@ export const getAllSessions = unstable_cache(
   { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
 );
 
+// TODO Update the documentation
 /**
  * Retrieves all sessions associated with a specific game.
  *
@@ -38,7 +39,37 @@ export const getAllSessionsByGame = unstable_cache(
   async (gameId: number) =>
     await prisma.session.findMany({
       where: { gameId },
-      include: { Game: { select: { gameName: true } } },
+      select: {
+        date: true,
+        sessionId: true,
+        sessionName: true,
+        sessionUrl: true,
+        thumbnail: true,
+        Game: { select: { gameName: true } },
+        sets: {
+          select: {
+            setWinners: true,
+            matches: {
+              select: {
+                matchWinners: true,
+                playerSessions: {
+                  select: {
+                    playerStats: {
+                      select: {
+                        value: true,
+                        player: true,
+                        gameStat: {
+                          select: { statName: true, statId: true, type: true },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     }),
   undefined,
   { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week

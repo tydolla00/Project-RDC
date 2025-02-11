@@ -3,6 +3,7 @@ import { getWinsPerPlayer } from "../../../../../../../prisma/lib/games";
 import { getAllMembers } from "../../../../../../../prisma/lib/members";
 import { calcWinsPerPlayer, getRLStats } from "../_functions/stats";
 import { CustomChart } from "./charts";
+import { TabbedChart } from "../../../_components/tabbed-chart";
 
 const RocketLeague = async ({
   game,
@@ -59,6 +60,7 @@ const RocketLeague = async ({
   const config = {
     player: { label: "Player" },
     matchWins: { label: "Games won" },
+    days: { label: "Days won" },
   } satisfies ChartConfig;
 
   const sumConfig = {
@@ -130,6 +132,7 @@ const RocketLeague = async ({
         config={sumConfig}
         ignoreWarnings // No days in db currently
       />
+      <TabbedChart chartConfig={config} chartData={winsPerPlayer} />
     </div>
   );
 };
