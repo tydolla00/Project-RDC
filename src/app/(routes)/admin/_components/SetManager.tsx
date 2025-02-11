@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Control,
   Controller,
   useFieldArray,
   useFormContext,
@@ -26,8 +25,7 @@ import { toast } from "sonner";
 import { randomInt } from "crypto";
 
 const SetManager = () => {
-  const { watch, formState, control } =
-    useFormContext<z.infer<typeof formSchema>>();
+  const { watch, control } = useFormContext<z.infer<typeof formSchema>>();
 
   const { append, remove, fields, update } = useFieldArray({
     name: "sets",
@@ -36,12 +34,9 @@ const SetManager = () => {
 
   const [openSets, setOpenSets] = useState<boolean[]>(fields.map(() => false));
   const [textArea, setTextArea] = useState<string[]>(fields.map(() => ""));
-  console.log("open sets", openSets);
   const [highestSetId, setHighestSetId] = useState(0);
 
   const toggleSet = (index: number) => {
-    console.log("toggling set", index);
-
     setOpenSets((prevOpenSets) =>
       prevOpenSets.map((isOpen, i) => (i === index ? !isOpen : isOpen)),
     );
@@ -142,12 +137,6 @@ const SetManager = () => {
                     <TrashIcon
                       className="text-sm text-red-500 hover:cursor-pointer hover:text-red-400"
                       onClick={() => {
-                        // Collapse set before removing
-                        // setOpenSets((prevOpenSets) =>
-                        //   prevOpenSets.map((isOpen, i) =>
-                        //     i === setIndex ? false : isOpen,
-                        //   ),
-                        // );
                         setTextArea((prev) => {
                           const newSet = prev.filter(
                             (_, index) => setIndex !== index,
@@ -171,20 +160,23 @@ const SetManager = () => {
                     <Label className="text-muted-foreground my-2 block">
                       Set Winner
                     </Label>
-                    <Controller
-                      name={`sets.${setIndex}.setWinners`}
-                      control={control}
-                      render={({ field }) => (
-                        <PlayerSelector
-                          rdcMembers={players}
-                          control={control}
-                          field={field}
-                        />
-                      )}
-                    />
                   </div>
                   {/* TODO Work In Progress */}
-                  <Label>
+                  <Controller
+                    name={`sets.${setIndex}.setWinners`}
+                    control={control}
+                    render={({ field }) => (
+                      <PlayerSelector
+                        rdcMembers={players}
+                        control={control}
+                        field={field}
+                        label="Set Winners"
+                        sticky={true}
+                      />
+                    )}
+                  />
+                  {/* TODO Don't think we will be using this anymore? */}
+                  {/* <Label>
                     You may paste in the info of all matches for Set{" "}
                     {setIndex + 1}
                   </Label>
@@ -200,7 +192,7 @@ const SetManager = () => {
                     }
                     className="max-w-xs"
                     placeholder="Paste in json"
-                  />
+                  /> 
                   <Button
                     type="button"
                     onClick={() => handleAddJSON(setIndex)}
@@ -208,6 +200,7 @@ const SetManager = () => {
                   >
                     Fill Match
                   </Button>
+                  */}
                   <MatchManager setIndex={setIndex} />
                 </CollapsibleContent>
                 <CardFooter className="flex flex-row-reverse pb-0">
