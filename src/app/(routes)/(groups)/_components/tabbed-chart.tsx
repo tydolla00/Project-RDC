@@ -25,18 +25,19 @@ export const TabbedChart = ({
   chartConfig: ChartConfig;
   chartData: any[];
 }) => {
-  const [activeChart, setActiveChart] = useState("");
+  const [activeChart, setActiveChart] = useState("matchWins");
+  // TODO Set up days won
   return (
     <Card style={{ minWidth: "100%" }}>
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Bar Chart - Interactive</CardTitle>
+          <CardTitle>Games, Sets, & Days won</CardTitle>
           <CardDescription>
-            Change tabs to view wins vs days stats
+            View the amount of games and days won for each player.
           </CardDescription>
         </div>
         <div className="flex">
-          {["matchWins", "days"].map((key) => {
+          {["matchWins", "setWins", "days"].map((key) => {
             const chart = key as keyof typeof chartConfig;
             return (
               <button

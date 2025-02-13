@@ -24,21 +24,10 @@ import {
 } from "@/components/ui/chart";
 import { getAllSessionsByGame } from "../../../../../prisma/lib/admin";
 import Image from "next/image";
-import Link from "next/link";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { H1, H2, H3 } from "@/components/headings";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import MatchData from "./match-data";
 
 const chartConfig = {
   id: {
@@ -123,6 +112,14 @@ export function TimelineChart({
         </CardContent>
       </Card>
       <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+        {session && (
+          <Button
+            className="cursor-pointer"
+            onClick={() => setSession(undefined)}
+          >
+            Hide Match Data
+          </Button>
+        )}
         <MatchData session={session} />
       </Suspense>
     </>
@@ -136,159 +133,6 @@ export type RLStats = {
   saves: number;
   shots: number;
   player: string;
-};
-const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
-  const sets = useMemo(() => {
-    const innerSets: RLStats[][][] = [];
-    session?.sets.forEach((set) => {
-      const setWinners = new Set(set.setWinners.map((p) => p.playerName));
-      const innerSet: RLStats[][] = [];
-      set.matches.forEach((match) => {
-        const matchWinners = new Set(
-          match.matchWinners.map((m) => m.playerName),
-        );
-        const innerMatch = new Map<string, RLStats>();
-        match.playerSessions.forEach((ps) => {
-          ps.playerStats.forEach(({ player, value, gameStat }) => {
-            if (!innerMatch.has(player.playerName))
-              innerMatch.set(player.playerName, {
-                score: 0,
-                goals: 0,
-                assists: 0,
-                saves: 0,
-                shots: 0,
-                player: player.playerName,
-              });
-
-            let innerPlayer = innerMatch.get(player.playerName)!;
-            switch (gameStat.statName) {
-              case "RL_SCORE":
-                innerPlayer.score = Number(value);
-                break;
-              case "RL_GOALS":
-                innerPlayer.goals = Number(value);
-                break;
-              case "RL_ASSISTS":
-                innerPlayer.assists = Number(value);
-                break;
-              case "RL_SAVES":
-                innerPlayer.saves = Number(value);
-                break;
-              case "RL_SHOTS":
-                innerPlayer.shots = Number(value);
-                break;
-            }
-          });
-        });
-        const matchData = Array.from(innerMatch, ([s, stats]) => ({
-          ...stats,
-        })).sort((a, b) => {
-          if (matchWinners.has(a.player) && matchWinners.has(b.player))
-            return b.score - a.score;
-          else if (matchWinners.has(a.player)) return -1;
-          else if (matchWinners.has(b.player)) return 1;
-          else return b.score - a.score;
-        });
-        innerSet.push(matchData);
-      });
-      innerSets.push(innerSet);
-    });
-    return innerSets;
-  }, [session]);
-  console.log({ sets });
-  return (
-    <>
-      {session && (
-        <>
-          <Link className="hover:underline" href={session.sessionUrl}>
-            {session.sessionName}
-          </Link>
-          <Image
-            height={200}
-            width={200}
-            alt={session.sessionName}
-            src={session.thumbnail}
-          />
-        </>
-      )}
-      {sets.map((set, setIndex) => {
-        return (
-          <div key={setIndex} className="my-6">
-            <div className="text-muted-foreground">Set {setIndex + 1}</div>
-            {set.map((match, matchIndex) => {
-              return (
-                <div className="mb-4" key={matchIndex}>
-                  <H3>Match {matchIndex + 1}</H3>
-                  <div
-                    className="grid gap-10"
-                    style={{
-                      gridTemplateColumns: "1fr 1fr",
-                    }}
-                  >
-                    <Table>
-                      <TableCaption></TableCaption>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Player</TableHead>
-                          <TableHead>Score</TableHead>
-                          <TableHead>Goals</TableHead>
-                          <TableHead>Assists</TableHead>
-                          <TableHead>Saves</TableHead>
-                          <TableHead>Shots</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {match.slice(0, 3).map((ps, i) => (
-                          <TableRow
-                            className={cn(i === 0 && "bg-amber-400")}
-                            key={ps.player}
-                          >
-                            <TableCell>{ps.player}</TableCell>
-                            <TableCell>{ps.score}</TableCell>
-                            <TableCell>{ps.goals}</TableCell>
-                            <TableCell>{ps.assists}</TableCell>
-                            <TableCell>{ps.saves}</TableCell>
-                            <TableCell>{ps.shots}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                      <TableFooter></TableFooter>
-                    </Table>
-                    <Table>
-                      <TableCaption></TableCaption>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Player</TableHead>
-                          <TableHead>Score</TableHead>
-                          <TableHead>Goals</TableHead>
-                          <TableHead>Assists</TableHead>
-                          <TableHead>Saves</TableHead>
-                          <TableHead>Shots</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {match.slice(3).map((ps) => (
-                          <TableRow key={ps.player}>
-                            <TableCell>{ps.player}</TableCell>
-                            <TableCell>{ps.score}</TableCell>
-                            <TableCell>{ps.goals}</TableCell>
-                            <TableCell>{ps.assists}</TableCell>
-                            <TableCell>{ps.saves}</TableCell>
-                            <TableCell>{ps.shots}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                      <TableFooter></TableFooter>
-                    </Table>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
-    </>
-  );
 };
 
 // TODO Show session info about sets/matches.

@@ -59,7 +59,8 @@ const RocketLeague = async ({
 
   const config = {
     player: { label: "Player" },
-    matchWins: { label: "Games won" },
+    matchWins: { label: "Matches won" },
+    setWins: { label: "Sets won" },
     days: { label: "Days won" },
   } satisfies ChartConfig;
 
@@ -73,17 +74,8 @@ const RocketLeague = async ({
   } satisfies ChartConfig;
 
   return (
-    <div className="flex flex-wrap gap-10">
+    <div className="flex flex-wrap justify-center gap-10">
       <CustomChart
-        data={winsPerPlayer}
-        nameKey="player"
-        dataKey="matchWins"
-        title="Wins Per Player"
-        description="All time rocket league stats"
-        config={config}
-      />
-      <CustomChart
-        // @ts-ignore
         data={membersMap}
         nameKey="playerName"
         dataKey="goals.sum"
@@ -93,7 +85,6 @@ const RocketLeague = async ({
         ignoreWarnings
       />
       <CustomChart
-        // @ts-ignore
         data={membersMap}
         nameKey="playerName"
         dataKey="saves.sum"
@@ -103,7 +94,6 @@ const RocketLeague = async ({
         ignoreWarnings
       />
       <CustomChart
-        // @ts-ignore
         data={membersMap}
         nameKey="playerName"
         dataKey="assists.sum"
@@ -113,7 +103,6 @@ const RocketLeague = async ({
         ignoreWarnings
       />
       <CustomChart
-        // @ts-ignore
         data={membersMap}
         nameKey="playerName"
         dataKey="score.avg"
@@ -122,7 +111,7 @@ const RocketLeague = async ({
         config={sumConfig}
         ignoreWarnings
       />
-      <CustomChart
+      {/* <CustomChart
         // @ts-ignore
         data={membersMap}
         nameKey="playerName"
@@ -131,7 +120,7 @@ const RocketLeague = async ({
         description="The amount of days each member has won."
         config={sumConfig}
         ignoreWarnings // No days in db currently
-      />
+      /> */}
       <TabbedChart chartConfig={config} chartData={winsPerPlayer} />
     </div>
   );
