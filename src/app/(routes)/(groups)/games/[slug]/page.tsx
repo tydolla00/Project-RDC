@@ -9,6 +9,7 @@ import LethalCompany from "./_components/lethalcompany";
 import GolfWithFriends from "./_components/golfwithfriends";
 import { GamesEnum } from "@/lib/constants";
 import { TimelineChart } from "../../_components/timeline-chart";
+import { Separator } from "@/components/ui/separator";
 
 // ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,
@@ -69,6 +70,7 @@ export default async function Page({
         title="Rocket League Videos"
         desc="Use the keyboard to view specific data for a video"
       />
+      <Separator className="my-4" />
       {component}
     </div>
   );

@@ -13,7 +13,7 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
   const sets = useMemo(() => {
     const innerSets: RLStats[][][] = [];
     session?.sets.forEach((set) => {
-      const setWinners = new Set(set.setWinners.map((p) => p.playerName));
+      const setWinners = set.setWinners.map((p) => p.playerName);
       const innerSet: RLStats[][] = [];
       set.matches.forEach((match) => {
         const matchWinners = new Set(
@@ -30,6 +30,7 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
                 saves: 0,
                 shots: 0,
                 player: player.playerName,
+                winners: setWinners,
               });
 
             let innerPlayer = innerMatch.get(player.playerName)!;
@@ -70,34 +71,27 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
   const [currentSet, setCurrentSet] = useState(0);
   console.log({ sets });
   return (
-    <div className="my-6 grid grid-cols-2">
-      <div>
-        <Card className="max-h-fit max-w-fit">
-          <CardHeader>
-            {session ? (
-              <Link className="hover:underline" href={session.sessionUrl}>
-                {session.sessionName}
-              </Link>
-            ) : (
-              <div>Hover over a video to view match data!</div>
-            )}
-          </CardHeader>
-          <CardContent>
-            {session ? (
+    <div className="my-6">
+      <div className="my-4">
+        {session ? (
+          <div className="w-[300px]">
+            <Link className="block" href={session?.sessionUrl}>
               <Image
-                height={200}
-                width={200}
+                className="my-4"
+                height={300}
+                width={300}
                 alt={session.sessionName}
                 src={session.thumbnail}
               />
-            ) : null}
+              <div className="my-4 hover:underline">{session.sessionName}</div>
+            </Link>
             <div>Hover card from bottom</div>
-          </CardContent>
-        </Card>
+          </div>
+        ) : null}
       </div>
-      <div>
-        {sets.length > 0 && (
-          <>
+      {sets.length > 0 && (
+        <>
+          <div>
             <Button
               className="cursor-pointer"
               variant="ghost"
@@ -114,11 +108,28 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
             >
               Next Set
             </Button>
-
-            <SetData set={sets[currentSet]} setIndex={currentSet} />
-          </>
-        )}
-      </div>
+          </div>
+          <SetData set={sets[currentSet]} setIndex={currentSet} />
+          <div>
+            <Button
+              className="cursor-pointer"
+              variant="ghost"
+              disabled={currentSet === 0}
+              onClick={() => setCurrentSet((curr) => curr - 1)}
+            >
+              Previous Set
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant="ghost"
+              disabled={currentSet === sets.length - 1}
+              onClick={() => setCurrentSet((curr) => curr + 1)}
+            >
+              Next Set
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

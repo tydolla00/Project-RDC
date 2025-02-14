@@ -28,6 +28,8 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import MatchData from "./match-data";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const chartConfig = {
   id: {
@@ -58,6 +60,7 @@ export function TimelineChart({
   const handleSetSession = useCallback((session: Sessions[0]) => {
     setSession(session);
   }, []);
+  const [showMatchData, setShowMatchData] = useState(true);
 
   return (
     <>
@@ -66,6 +69,17 @@ export function TimelineChart({
           <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
             <CardTitle>{title}</CardTitle>
             <CardDescription>{desc}</CardDescription>
+          </div>
+          <div className="flex items-center justify-center gap-3 p-6">
+            <Label htmlFor="showMatchData">Turn off hover effect</Label>
+            <Switch
+              id="showMatchData"
+              onCheckedChange={(val) => {
+                console.log(val);
+                if (val) setSession(undefined);
+                setShowMatchData(!val);
+              }}
+            />
           </div>
         </CardHeader>
         <CardContent className="px-2 sm:p-6">
@@ -98,7 +112,12 @@ export function TimelineChart({
                 }}
               />
               <Tooltip
-                content={<CustomTooltip setSession={handleSetSession} />}
+                content={
+                  <CustomTooltip
+                    showMatchData={showMatchData}
+                    setSession={handleSetSession}
+                  />
+                }
               />
               <Line
                 dataKey={"sessionId"}
@@ -133,6 +152,7 @@ export type RLStats = {
   saves: number;
   shots: number;
   player: string;
+  winners: string[];
 };
 
 // TODO Show session info about sets/matches.
@@ -141,12 +161,15 @@ const CustomTooltip = ({
   payload,
   label,
   setSession,
+  showMatchData,
 }: TooltipProps<any, any> & {
   setSession: (session: Sessions[0]) => void;
+  showMatchData: boolean;
 }) => {
   const session = payload?.at(0)?.payload as Sessions[0];
   useEffect(() => {
-    if (active) {
+    if (active && showMatchData) {
+      console.log(showMatchData);
       setSession(session);
     }
   }, [active, session, setSession]);

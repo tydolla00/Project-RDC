@@ -35,7 +35,7 @@ export const Navbar = async () => {
   // TODO Memoize this component, so it doesn't ever rerender? Which it never should.
 
   return (
-    <NavigationMenu className="sticky top-0 z-20 mx-auto w-screen bg-inherit">
+    <NavigationMenu className="sticky top-0 z-20 mx-auto w-screen rounded-2xl bg-inherit px-2">
       <NavigationMenuList>
         <NavigationMenuItem className={navigationMenuTriggerStyle()}>
           <Link href="/">

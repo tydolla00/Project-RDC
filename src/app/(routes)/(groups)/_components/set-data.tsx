@@ -11,18 +11,19 @@ import {
 } from "@/components/ui/table";
 import { RLStats } from "./timeline-chart";
 
+// TODO Show Set Results - Who Won and what was the score.
 const SetData = ({ set, setIndex }: { set: RLStats[][]; setIndex: number }) => (
   <div className="mb-6">
-    <div className="text-muted-foreground font-light">Set {setIndex + 1}</div>
+    <div className="text-chart-4 text-2xl font-bold">Set {setIndex + 1}</div>
+    <div className="text-muted-foreground text-sm">
+      Winners: {set.at(0)?.at(0)?.winners.join(",")}
+    </div>
     {set.map((match, matchIndex) => {
       return (
         <div className="mb-4" key={matchIndex}>
           <div>Match {matchIndex + 1}</div>
           <Separator className="my-2" />
-          <div className="flex justify-between">
-            <span>Winning Team</span>
-            <span>Losing Team</span>
-          </div>
+          <span className="text-muted-foreground text-sm">Winning Team</span>
           <div className="flex gap-10 text-white">
             <Table className="max-w-sm">
               <TableCaption></TableCaption>
