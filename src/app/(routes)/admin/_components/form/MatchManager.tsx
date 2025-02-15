@@ -7,9 +7,9 @@ import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
-import { findPlayerByGamerTag, FormValues } from "../_utils/form-helpers";
 import RDCVisionModal from "./RDCVisionModal";
 import { VisionPlayer, VisionResults } from "@/app/actions/visionAction";
+import { FormValues } from "../../_utils/form-helpers";
 
 interface Props {
   setIndex: number;

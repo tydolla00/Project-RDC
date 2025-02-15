@@ -17,12 +17,12 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import WinnerDisplay from "./WinnerDisplay";
 import { Label } from "@/components/ui/label";
-import { formSchema, FormValues } from "../_utils/form-helpers";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { randomInt } from "crypto";
+import { formSchema, FormValues } from "../../_utils/form-helpers";
+import WinnerDisplay from "./WinnerDisplay";
 
 const SetManager = () => {
   const { watch, control } = useFormContext<z.infer<typeof formSchema>>();

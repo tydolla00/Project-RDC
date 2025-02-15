@@ -1,8 +1,8 @@
 import { VisionResultCodes } from "@/lib/constants";
-import { Action, State } from "../_components/RDCVisionModal";
 import { toast } from "sonner";
 import { Player } from "@prisma/client";
 import { analyzeScreenShot } from "@/app/actions/visionAction";
+import { Action, State } from "../_components/form/RDCVisionModal";
 
 export const handleAnalyzeBtnClick = async (
   state: State,

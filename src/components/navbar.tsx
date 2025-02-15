@@ -106,18 +106,6 @@ export const Navbar = async () => {
             </Link>
           </FeatureFlag>
         </NavigationMenuItem>
-        <NavigationMenuItem className="hidden md:block">
-          <FeatureFlag
-            devOnly
-            shouldRedirect={false}
-            flagName="SUBMISSION_FORM"
-            user={session}
-          >
-            <Link className={navigationMenuTriggerStyle()} href="/submission">
-              <FillText className="text-chart-4" text="Submissions" />
-            </Link>
-          </FeatureFlag>
-        </NavigationMenuItem>
 
         {/* MOBILE */}
         <NavigationMenuItem className="md:hidden">
@@ -128,7 +116,6 @@ export const Navbar = async () => {
             <ul>
               <ListItem href="/about">About</ListItem>
               <ListItem href="/admin">Admin</ListItem>
-              <ListItem href="/submission">Submissions</ListItem>
               <AuthButton hideOnSmallScreens={false} session={session} />
               <ToggleThemeButton />
             </ul>

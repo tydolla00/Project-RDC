@@ -27,9 +27,9 @@ import Image from "next/image";
 import { VisionResultCodes } from "@/lib/constants";
 import { toast } from "sonner";
 import {
-  handleAnalyzeBtnClick,
   handleClose,
-} from "../_utils/rdc-vision-helpers";
+  handleAnalyzeBtnClick,
+} from "../../_utils/rdc-vision-helpers";
 
 interface Props {
   handleCreateMatchFromVision: (visionResults: any) => void;

@@ -10,8 +10,6 @@ import { useState, useTransition } from "react";
 import { getRDCVideoDetails } from "@/app/actions/action";
 import Image from "next/image";
 import { toast } from "sonner";
-import { getVideoId } from "../_utils/helper-functions";
-import { FormValues } from "../_utils/form-helpers";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
 import {
@@ -22,6 +20,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Player } from "@prisma/client";
+import { FormValues } from "../../_utils/form-helpers";
+import { getVideoId } from "../../_utils/helper-functions";
 
 export const SessionInfo = ({
   form,

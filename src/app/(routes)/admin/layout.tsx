@@ -21,7 +21,7 @@ import Link from "next/link";
 const items = [
   { label: "Dashboard", icon: Home, href: "/admin" },
   { label: "Submissions", icon: Notebook, href: "/admin/submissions" },
-  { label: "Games", icon: Gamepad, href: "/admin/updatedb" },
+  { label: "Games", icon: Gamepad, href: "/admin/update" },
 ];
 
 export default async function Layout({
@@ -32,13 +32,15 @@ export default async function Layout({
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
   return (
-    <SidebarProvider className="m-16" defaultOpen={defaultOpen}>
-      <AdminSidebar />
-      <SidebarInset>
-        <SidebarTrigger className="-ml-1" />
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="m-16">
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <AdminSidebar />
+        <SidebarInset>
+          <SidebarTrigger className="-ml-1" />
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
+    </div>
   );
 }
 
