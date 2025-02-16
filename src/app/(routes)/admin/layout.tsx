@@ -21,7 +21,7 @@ import Link from "next/link";
 const items = [
   { label: "Dashboard", icon: Home, href: "/admin" },
   { label: "Submissions", icon: Notebook, href: "/admin/submissions" },
-  { label: "Games", icon: Gamepad, href: "/admin/update" },
+  { label: "Update", icon: Gamepad, href: "/admin/update" },
 ];
 
 export default async function Layout({
