@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
@@ -24,6 +24,7 @@ interface AdminFormProps {
 }
 
 const EntryCreatorForm = (props: AdminFormProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const { rdcMembers } = props;
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -75,6 +76,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
    * If the insertion is successful, displays a success toast message and revalidates the session data.
    */
   const onSubmit = async (data: FormValues) => {
+    setIsLoading(true);
     console.log("Form Data Being Submitted:", {
       data,
       stringified: JSON.stringify(data, null, 2),
@@ -93,6 +95,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
       revalidateTag("getAllSessions");
       form.reset();
     }
+    setIsLoading(false);
   };
 
   /**
@@ -126,7 +129,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
           {/* <FormSummary /> */}
           <div className="mx-auto">
             <SetManager />
-            <Submit formIsValid={formIsValid} />
+            <Submit formIsValid={formIsValid} loading={isLoading} />
           </div>
         </form>
       </Form>
@@ -134,12 +137,16 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   );
 };
 
-const Submit = ({ formIsValid }: { formIsValid: boolean }) => {
-  const { pending } = useFormStatus();
-  // TODO button not being disabled when pending
+const Submit = ({
+  formIsValid,
+  loading,
+}: {
+  formIsValid: boolean;
+  loading: boolean;
+}) => {
   return (
     <Button
-      disabled={!formIsValid || pending}
+      disabled={!formIsValid || loading}
       type="submit"
       className="my-2 w-full rounded-md border p-2"
     >
