@@ -53,7 +53,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
   // console.log(watch());
 
-  // TODO Can we pass this down as a prop?
+  // TODO Can we pass this down as a prop, fetch all stats at once.
   useEffect(() => {
     const fetchData = async () => {
       if (game) {

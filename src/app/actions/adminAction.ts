@@ -85,10 +85,8 @@ export const insertNewSessionFromAdmin = async (
       },
     });
 
-    if (!sessionGame) {
-      // TODO This should never happen game should be required.
-      return { error: "Game not found." };
-    } else {
+    if (!sessionGame) return { error: "Game not found." };
+    else {
       const videoAlreadyExists = await prisma.session.findFirst({
         where: {
           gameId: sessionGame.gameId,
@@ -113,7 +111,7 @@ export const insertNewSessionFromAdmin = async (
     console.log("\n--- New Session Created: ---", newSession);
 
     // For each set in the session assign to parent session
-    // TODO We might want to change these to be transactions. Need to explain the promise.all to me. Also may want to wrap in try catch
+    // TODO We might want to change these to be transactions. Need to explain the promise.all to me.
     await Promise.all(
       session.sets.map(async (set) => {
         console.log(
@@ -300,8 +298,6 @@ export const insertNewSessionV2 = async ({
   const isAuthenticated = await auth();
   if (!isAuthenticated) return { error: errorCodes.NotAuthenticated };
 
-  //? Check if the game and video exists in the db.
-  // TODO This should never happen game should be required.
   if (!gameId) return { error: "Game not found." };
   else {
     const videoAlreadyExists = await prisma.session.findFirst({

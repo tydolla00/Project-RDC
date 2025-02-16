@@ -68,7 +68,6 @@ export const formSchema = z.object({
     .min(1, "At least one set is required"),
 });
 
-// TODO: How to handle type to get the form values more reliably
 // TODO Do we want to conditionally apply input types/validations based on the stat name? Most will be numbers
 export type FormValues = z.infer<typeof formSchema>;
 

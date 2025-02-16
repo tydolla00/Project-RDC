@@ -32,8 +32,6 @@ export const Navbar = async () => {
   const games = await getGamesNav();
   const members = await getMembersNav();
 
-  // TODO Memoize this component, so it doesn't ever rerender? Which it never should.
-
   return (
     <NavigationMenu className="sticky top-0 z-20 mx-auto w-screen bg-inherit">
       <NavigationMenuList>
