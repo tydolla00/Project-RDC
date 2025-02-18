@@ -13,8 +13,6 @@ import { GamesEnum } from "@/lib/constants";
 // ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,
 
-// TODO May need to revalidatePath/Tag after updating data.
-
 export async function generateStaticParams() {
   const games = await getAllGames();
   return games.map((game) => ({
@@ -61,54 +59,6 @@ export default async function Page({
     <div className="m-16">
       <H1>{game.gameName}</H1>
       {component}
-      {/* <Average placings={placings} />
-      <LastPlace gameId={game.gameId} /> */}
     </div>
   );
 }
-
-const Sessions = () => {
-  // TODO This will be a table with all of the currently submitted sessions for a game. Show the name. url, and thumbnail.
-};
-
-// const Average = ({
-// }: {
-// }) => {
-//   const config = {
-//     player: { label: "Player" },
-//     placing: { label: "Avg Placing" },
-//     played: { label: "# of Races" },
-//   } satisfies ChartConfig;
-
-//   return (
-//     <CustomChart
-//       title="Average Placing"
-//       description="July - Now"
-//       data={allAvgPlacing}
-//       nameKey={"player"}
-//       config={config}
-//       dataKey={"placing"}
-//     />
-//   );
-// };
-
-// const LastPlace = async ({ gameId }: { gameId: number }) => {
-
-//   const config = {
-//     player: { label: "Player" },
-//     last: { label: "# of Last Places" },
-//   } satisfies ChartConfig;
-
-//   return (
-//     <>
-//       <CustomChart
-//         title="Most Last Places"
-//         description="Keeps track of who placed last the most."
-//         data={data}
-//         nameKey={"player"}
-//         config={config}
-//         dataKey={"last"}
-//       />
-//     </>
-//   );
-// };

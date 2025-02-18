@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
@@ -11,19 +11,20 @@ import {
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { formSchema, FormValues } from "../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
 import { useFormStatus } from "react-dom";
 import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
 import { revalidateTag } from "next/cache";
+import { formSchema, FormValues } from "../../_utils/form-helpers";
 
 interface AdminFormProps {
   rdcMembers: Player[];
 }
 
 const EntryCreatorForm = (props: AdminFormProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const { rdcMembers } = props;
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -50,8 +51,9 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   const { gameStats, getGameStatsFromDb } = useAdmin();
   const game = watch("game");
 
-  console.log(watch());
+  // console.log(watch());
 
+  // TODO Can we pass this down as a prop, fetch all stats at once.
   useEffect(() => {
     const fetchData = async () => {
       if (game) {
@@ -74,15 +76,15 @@ const EntryCreatorForm = (props: AdminFormProps) => {
    * If the insertion is successful, displays a success toast message and revalidates the session data.
    */
   const onSubmit = async (data: FormValues) => {
+    setIsLoading(true);
     console.log("Form Data Being Submitted:", {
       data,
       stringified: JSON.stringify(data, null, 2),
     });
-    console.time();
+    console.time("Form Submission Time Start: ");
     const { error: err } = await insertNewSessionFromAdmin(data);
     // const { error: err } = await insertNewSessionV2(data);
-    console.timeEnd();
-    console.log(err);
+    console.timeEnd("Form Submission Time End: ");
 
     if (err)
       err === errorCodes.NotAuthenticated
@@ -91,7 +93,9 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     else {
       toast.success("Session successfully created.", { richColors: true });
       revalidateTag("getAllSessions");
+      form.reset();
     }
+    setIsLoading(false);
   };
 
   /**
@@ -119,12 +123,13 @@ const EntryCreatorForm = (props: AdminFormProps) => {
           className="relative mx-auto rounded-md border p-4"
           onSubmit={handleSubmit(onSubmit, onError)}
         >
-          <div className="mb-10 flex w-fit items-center gap-4">
+          <div className="mb-10 w-fit items-center gap-4">
             <SessionInfo form={form} rdcMembers={rdcMembers} />
           </div>
+          {/* <FormSummary /> */}
           <div className="mx-auto">
             <SetManager />
-            <Submit formIsValid={formIsValid} />
+            <Submit formIsValid={formIsValid} loading={isLoading} />
           </div>
         </form>
       </Form>
@@ -132,12 +137,16 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   );
 };
 
-const Submit = ({ formIsValid }: { formIsValid: boolean }) => {
-  const { pending } = useFormStatus();
-  // TODO add review screen logic before form is truly submitted.
+const Submit = ({
+  formIsValid,
+  loading,
+}: {
+  formIsValid: boolean;
+  loading: boolean;
+}) => {
   return (
     <Button
-      disabled={!formIsValid || pending}
+      disabled={!formIsValid || loading}
       type="submit"
       className="my-2 w-full rounded-md border p-2"
     >

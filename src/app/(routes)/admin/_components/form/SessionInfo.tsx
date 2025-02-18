@@ -10,8 +10,6 @@ import { useState, useTransition } from "react";
 import { getRDCVideoDetails } from "@/app/actions/action";
 import Image from "next/image";
 import { toast } from "sonner";
-import { getVideoId } from "../_utils/helper-functions";
-import { FormValues } from "../_utils/form-helpers";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
 import {
@@ -22,6 +20,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Player } from "@prisma/client";
+import { FormValues } from "../../_utils/form-helpers";
+import { getVideoId } from "../../_utils/helper-functions";
 
 export const SessionInfo = ({
   form,
@@ -99,7 +99,7 @@ export const SessionInfo = ({
   return (
     <>
       <div className="gap-2">
-        <Card className="absolute right-0 top-0 h-72 w-72">
+        {/* <Card className="absolute top-0 right-0 h-72 w-72">
           <CardHeader>
             <CardTitle>{sessionName}</CardTitle>
             <CardDescription>{new Date(date).toDateString()}</CardDescription>
@@ -107,7 +107,7 @@ export const SessionInfo = ({
           <CardContent>
             <Thumbnail session={session} />
           </CardContent>
-        </Card>
+        </Card> */}
         <FormField
           control={form.control}
           name="sessionUrl"

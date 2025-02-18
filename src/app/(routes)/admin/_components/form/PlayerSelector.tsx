@@ -5,8 +5,8 @@ import PlayerAvatar from "./PlayerAvatar";
 import { Control, ControllerRenderProps } from "react-hook-form";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
-import { formSchema, FormValues } from "../_utils/form-helpers";
 import { Label } from "@/components/ui/label";
+import { formSchema, FormValues } from "../../_utils/form-helpers";
 interface Props {
   rdcMembers: Player[];
   handlePlayerClick?: (player: Player) => void;
@@ -67,7 +67,7 @@ const PlayerSelector = ({
               <div key={player.playerId} className="relative">
                 <div
                   className={cn(
-                    "absolute -top-2 left-1/2 right-1/2 h-2 w-2 rounded-full bg-gray-500 transition-colors",
+                    "absolute -top-2 right-1/2 left-1/2 h-2 w-2 rounded-full bg-gray-500 transition-colors",
                     getIsSelected(player) && "bg-green-500",
                   )}
                 ></div>

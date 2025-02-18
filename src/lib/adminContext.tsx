@@ -30,7 +30,6 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
       console.log("Getting game stats from db");
       try {
         const gameStats = await getGameStats(gameName);
-        // TODO: Don't want to include _DAY stats for each match will handle this at later date
         const filteredGameStats = gameStats.filter(
           (stat) => !stat.statName.endsWith("_DAY"),
         );

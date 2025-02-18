@@ -30,8 +30,8 @@ import {
 } from "@/components/ui/popover";
 import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
-import { FormValues } from "../_utils/form-helpers";
-import { getAllGames } from "../../../../../prisma/lib/games";
+import { getAllGames } from "../../../../../../prisma/lib/games";
+import { FormValues } from "../../_utils/form-helpers";
 
 const GameDropDownForm = ({
   control,

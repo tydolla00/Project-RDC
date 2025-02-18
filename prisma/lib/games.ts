@@ -127,6 +127,11 @@ export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
     select: { player: true, value: true },
   });
 
+export const getAllGameStats = async () =>
+  await prisma.gameStat.findMany({
+    select: { statName: true, statId: true },
+  });
+
 export type StatEndsWith<
   T extends string,
   Y extends StatName = StatName,
