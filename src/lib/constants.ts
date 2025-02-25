@@ -74,7 +74,7 @@ const RDCMembers = new Map<MembersEnum, MembersProps>([
   [
     MembersEnum.John,
     {
-      nav: { alt: "RDC John", name: "John", url: "/members/john", src: "" },
+      nav: { alt: "RDC John", name: "J.O.H.N.", url: "/members/john", src: "" },
       desc: "If you've ever seen or been to DreamCon, this man has had a hand in it. Don't let his sorry gaming skills fool you, John is very valuable in the backend and his contributions should not go unnoticed. Don't forget his immaculate singing ability, John is clearly the best singer in RDC.",
       stats: [
         { prop: "", val: "" },
@@ -156,7 +156,7 @@ const RDCMembers = new Map<MembersEnum, MembersProps>([
     {
       nav: {
         alt: "RDC Des",
-        name: "Big Booty Des",
+        name: "Old Man Des",
         url: "/members/des",
         src: "https://static.wikia.nocookie.net/rdcworld1/images/6/62/Desmond-johnson-4.jpg/revision/latest?cb=20191004011638",
       },
@@ -233,7 +233,7 @@ export const statDescriptions: { [key in $Enums.StatName]: string } = {
   [$Enums.StatName.RL_SAVES]: "Rocket League Saves",
   [$Enums.StatName.RL_SHOTS]: "Rocket League Shots",
   [$Enums.StatName.RL_SCORE]: "Rocket League Score",
-  [$Enums.StatName.RL_DAY]: "Rocket League Position",
+  [$Enums.StatName.RL_DAY]: "Rocket League Days",
 };
 
 export enum errorCodes {
@@ -251,3 +251,12 @@ type MembersProps = {
   nav: { alt: string; name: string; url: string; src: string };
   stats: { prop: string; val: string }[]; // TODO: Grab stats from database
 };
+
+export const GAME_MODEL_MAPPING: { [key: number]: string } = {
+  3: "RDC-Custom-Model", // RL
+};
+
+export const RL_TEAM_MAPPING = {
+  BluePlayers: "blueTeam",
+  OrangePlayers: "orangeTeam",
+} as const;

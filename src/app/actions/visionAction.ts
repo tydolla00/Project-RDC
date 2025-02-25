@@ -1,4 +1,4 @@
-import { VisionResultCodes } from "@/lib/constants";
+import { GAME_MODEL_MAPPING, VisionResultCodes } from "@/lib/constants";
 import DocumentIntelligence, {
   getLongRunningPoller,
   AnalyzeResultOperationOutput,
@@ -10,6 +10,7 @@ import {
   findPlayerByGamerTag,
   PlayerNotFoundError,
 } from "../(routes)/admin/_utils/form-helpers";
+import { RL_TEAM_MAPPING } from "@/lib/constants";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -17,7 +18,8 @@ const client = DocumentIntelligence(
     key: process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_API_KEY"]!,
   },
 );
-const modelId = "RDC-Custom-Model";
+
+// const modelId = "RDC-Custom-Model";
 
 export interface VisionResults {
   winner?: Array<VisionPlayer>;
@@ -46,10 +48,44 @@ export type VisionResult =
     }
   | { status: VisionResultCodes.Failed; message: string };
 
-const TEAM_MAPPING = {
-  BluePlayers: "blueTeam",
-  OrangePlayers: "orangeTeam",
-} as const;
+type GameProcessor = {
+  processTeam: (
+    teamData: DocumentFieldOutput,
+    sessionPlayers: Player[],
+  ) => { processedPlayers: VisionPlayer[]; reqCheckFlag: boolean };
+  calculateWinners: (visionResults: VisionResults) => VisionPlayer[];
+  validateStats: (statValue: string | undefined) => {
+    statValue: string;
+    reqCheck: boolean;
+  };
+};
+
+export const RocketLeagueProcessor: GameProcessor = {
+  processTeam: function (
+    teamData: DocumentFieldOutput,
+    sessionPlayers: Player[],
+  ): { processedPlayers: VisionPlayer[]; reqCheckFlag: boolean } {
+    throw new Error("Function not implemented.");
+  },
+  calculateWinners: function (visionResults: VisionResults): VisionPlayer[] {
+    throw new Error("Function not implemented.");
+  },
+  validateStats: function (statValue: string | undefined): {
+    statValue: string;
+    reqCheck: boolean;
+  } {
+    throw new Error("Function not implemented.");
+  },
+};
+
+export const getGameProcessor = (gameId: number): GameProcessor => {
+  switch (gameId) {
+    case 3:
+      return RocketLeagueProcessor;
+    default:
+      throw new Error(`Invalid game id: ${gameId}`);
+  }
+};
 
 const processPlayer = (player: any) => {
   console.log("Processing Player: ", player);
@@ -138,8 +174,12 @@ const processTeam = (
 export const analyzeScreenShot = async (
   base64Source: string,
   sessionPlayers: Player[] = [],
+  gameId: number,
 ): Promise<VisionResult> => {
   try {
+    const gameProcessor = getGameProcessor(gameId);
+    const modelId = GAME_MODEL_MAPPING[gameId];
+
     const response = await client
       .path("/documentModels/{modelId}:analyze", modelId)
       .post({
@@ -178,8 +218,12 @@ export const analyzeScreenShot = async (
 
     let requiresCheck = false;
 
+    // Go into individual game checks
+
     Object.entries(teams).forEach(([teamKey, teamData]) => {
-      const teamColor = TEAM_MAPPING[teamKey as keyof typeof TEAM_MAPPING];
+      const teamColor =
+        RL_TEAM_MAPPING[teamKey as keyof typeof RL_TEAM_MAPPING];
+
       if (teamColor) {
         const { processedPlayers, reqCheckFlag } = processTeam(
           teamData,
@@ -197,6 +241,7 @@ export const analyzeScreenShot = async (
     //   [...visionResult.blueTeam, ...visionResult.orangeTeam],
     //   sessionPlayers,
     // );
+
     const visionWinner = calculateRLWinners(visionResult);
     visionResult.winner = visionWinner;
     return requiresCheck
