@@ -32,6 +32,7 @@ export const handleAnalyzeBtnClick = async (
     const visionResult = await analyzeScreenShot(
       base64FileContent,
       sessionPlayers,
+      3,
     );
 
     switch (visionResult.status) {

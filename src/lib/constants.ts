@@ -256,6 +256,25 @@ export const GAME_MODEL_MAPPING: { [key: number]: string } = {
   3: "RDC-Custom-Model", // RL
 };
 
+export type GameType = "TEAM" | "SOLO";
+
+export interface GameConfig {
+  type: GameType;
+  id: number;
+  name: string;
+  modelId: string;
+  // Stats?? Maybe
+}
+
+export const GAME_CONFIGS: Record<number, GameConfig> = {
+  3: {
+    type: "TEAM",
+    id: 3,
+    name: "Rocket League",
+    modelId: "RDC-Custom-Model",
+  },
+};
+
 export const RL_TEAM_MAPPING = {
   BluePlayers: "blueTeam",
   OrangePlayers: "orangeTeam",
