@@ -1,8 +1,4 @@
-import {
-  GAME_CONFIGS,
-  GAME_MODEL_MAPPING,
-  VisionResultCodes,
-} from "@/lib/constants";
+import { GAME_CONFIGS, VisionResultCodes } from "@/lib/constants";
 import DocumentIntelligence, {
   getLongRunningPoller,
   AnalyzeResultOperationOutput,
@@ -10,10 +6,6 @@ import DocumentIntelligence, {
   DocumentFieldOutput,
 } from "@azure-rest/ai-document-intelligence";
 import { Player } from "@prisma/client";
-import {
-  findPlayerByGamerTag,
-  PlayerNotFoundError,
-} from "../(routes)/admin/_utils/form-helpers";
 import { GameProcessor, RocketLeagueProcessor } from "@/lib/gameProcessors";
 
 const client = DocumentIntelligence(
@@ -23,10 +15,15 @@ const client = DocumentIntelligence(
   },
 );
 
+// export interface VisionResults {
+//   winner?: VisionPlayer[];
+//   blueTeam: VisionPlayer[];
+//   orangeTeam: VisionPlayer[];
+// }
+
 export interface VisionResults {
-  winner?: Array<VisionPlayer>;
-  blueTeam: Array<VisionPlayer>;
-  orangeTeam: Array<VisionPlayer>;
+  players: VisionPlayer[];
+  winner?: VisionPlayer[];
 }
 
 export interface VisionPlayer {
@@ -41,7 +38,7 @@ export interface VisionStat {
   statValue: string; // TODO: This should be allowed to be undefined but throw an error maybe?
 }
 
-export type VisionResult =
+export type AnalysisResults =
   | { status: VisionResultCodes.Success; data: VisionResults; message: string }
   | {
       status: VisionResultCodes.CheckRequest;
@@ -68,7 +65,7 @@ export const analyzeScreenShot = async (
   base64Source: string,
   sessionPlayers: Player[] = [],
   gameId: number,
-): Promise<VisionResult> => {
+): Promise<AnalysisResults> => {
   try {
     const gameProcessor = getGameProcessor(gameId);
     const gameConfig = GAME_CONFIGS[gameId];
@@ -117,7 +114,7 @@ export const analyzeScreenShot = async (
 
     // Go into individual game checks
 
-    return {} as VisionResult;
+    return {} as AnalysisResults;
   } catch (error) {
     console.error(error);
     return {

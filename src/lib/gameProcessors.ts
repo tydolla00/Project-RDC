@@ -166,32 +166,47 @@ const processRocketLeaguePlayers = (
   console.log("Vision Result: ", visionResult);
 };
 
-export const calculateRLWinners = (visionResults: VisionResults) => {
-  let blueTeamGoals = 0;
-  let orangeTeamGoals = 0;
+export const calculateRLWinners = (rlPlayers: VisionPlayer[]) => {
+  try {
+    let blueTeamGoals = 0;
+    let orangeTeamGoals = 0;
 
-  visionResults.blueTeam.forEach((player) => {
-    player.stats.forEach((stat) => {
-      if (stat.stat === "RL_GOALS") {
-        blueTeamGoals += parseInt(stat.statValue, 10);
-      }
+    // TODO: New Implementation parse through players rather than indiviual team
+
+    // Players should have 2 arrays consisting of blue and orange team players
+    if (rlPlayers.length !== 2) {
+      return []; // Error in vision results
+    }
+    // Should each team have an optional "team name" field?
+    // Or should we just assume the first team is blue and the second is orange?
+    // Or should we just compare the goals of each team and determine the winner that way?
+
+    visionResults.blueTeam.forEach((player) => {
+      player.stats.forEach((stat) => {
+        if (stat.stat === "RL_GOALS") {
+          blueTeamGoals += parseInt(stat.statValue, 10);
+        }
+      });
     });
-  });
 
-  visionResults.orangeTeam.forEach((player) => {
-    player.stats.forEach((stat) => {
-      if (stat.stat === "RL_GOALS") {
-        orangeTeamGoals += parseInt(stat.statValue, 10);
-      }
+    visionResults.orangeTeam.forEach((player) => {
+      player.stats.forEach((stat) => {
+        if (stat.stat === "RL_GOALS") {
+          orangeTeamGoals += parseInt(stat.statValue, 10);
+        }
+      });
     });
-  });
 
-  if (blueTeamGoals > orangeTeamGoals) {
-    return visionResults.blueTeam;
-  } else if (orangeTeamGoals > blueTeamGoals) {
-    return visionResults.orangeTeam;
-  } else {
-    return []; // Error in vision results
+    if (blueTeamGoals > orangeTeamGoals) {
+      return visionResults.blueTeam;
+    } else if (orangeTeamGoals > blueTeamGoals) {
+      return visionResults.orangeTeam;
+    } else {
+      return []; // Error in vision results
+    }
+  } catch (error) {
+    console.error("Error calculating RL winners: ", error);
+    return [];
   }
 };
 
@@ -206,18 +221,20 @@ export const calculateRLWinners = (visionResults: VisionResults) => {
 
 //     const visionWinner = calculateRLWinners(visionResult);
 //     visionResult.winner = visionWinner;
-//     return requiresCheck
-//       ? {
-//           status: VisionResultCodes.CheckRequest,
-//           data: visionResult,
-//           message:
-//             "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
-//         }
-//       : {
-//           status: VisionResultCodes.Success,
-//           data: visionResult,
-//           message: "Results have been successfully imported.",
-//         };
+//      TODO: Below needs to be incorporated still into gameprocessors
+// TODO: Add new function to processor that uses this
+// return requiresCheck
+//   ? {
+//       status: VisionResultCodes.CheckRequest,
+//       data: visionResult,
+//       message:
+//         "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
+//     }
+//   : {
+//       status: VisionResultCodes.Success,
+//       data: visionResult,
+//       message: "Results have been successfully imported.",
+//     };
 //   },
 //   calculateWinners: function (visionResults: VisionResults): VisionPlayer[] {
 //     throw new Error("Function not implemented.");

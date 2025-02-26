@@ -252,10 +252,6 @@ type MembersProps = {
   stats: { prop: string; val: string }[]; // TODO: Grab stats from database
 };
 
-export const GAME_MODEL_MAPPING: { [key: number]: string } = {
-  3: "RDC-Custom-Model", // RL
-};
-
 export type GameType = "TEAM" | "SOLO";
 
 export interface GameConfig {
