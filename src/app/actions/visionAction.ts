@@ -3,7 +3,6 @@ import DocumentIntelligence, {
   getLongRunningPoller,
   AnalyzeResultOperationOutput,
   isUnexpected,
-  DocumentFieldOutput,
 } from "@azure-rest/ai-document-intelligence";
 import { Player } from "@prisma/client";
 import { GameProcessor, RocketLeagueProcessor } from "@/lib/gameProcessors";
@@ -14,12 +13,6 @@ const client = DocumentIntelligence(
     key: process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_API_KEY"]!,
   },
 );
-
-// export interface VisionResults {
-//   winner?: VisionPlayer[];
-//   blueTeam: VisionPlayer[];
-//   orangeTeam: VisionPlayer[];
-// }
 
 export interface VisionResults {
   players: VisionPlayer[];
@@ -109,14 +102,22 @@ export const analyzeScreenShot = async (
     // , may or may not be broken up into teams depending on model
     // RL: Blue Team, Orange Team
     // MK: Yoshi, Mario, Luigi, Peach, etc...
-    const analyzedTeams = result.analyzeResult.documents[0].fields;
-    console.log("Analyzed Teams: ", analyzedTeams);
+    const analyzedPlayers = result.analyzeResult.documents[0].fields;
+    // Returns team objects eg RL returns two arrays of playersStat field Arrays (not typed)
+    console.log("Analyzed Teams: ", analyzedPlayers);
 
-    if (!analyzedTeams) {
+    if (!analyzedPlayers) {
       throw new Error("Vision Analysis Player Results are undefined");
     }
-
     // Go into individual game checks
+    const teamsArray: AnalyzedTeamData[] = Object.entries(analyzedPlayers).map(
+      ([teamName, teamData]) => ({
+        teamName,
+        players: teamData as unknown as AnalyzedPlayer[],
+      }),
+    );
+
+    console.log("Teams Array: ", teamsArray);
 
     return {} as AnalysisResults;
   } catch (error) {
@@ -126,4 +127,27 @@ export const analyzeScreenShot = async (
       message: error instanceof Error ? error.message : "Unknown error",
     };
   }
+};
+
+type PlayerField = {
+  type: string;
+  content: string;
+  valueString?: string;
+  valueInteger?: number;
+  confidence: number;
+};
+
+export type AnalyzedPlayer = {
+  type: "array";
+  valueArray: {
+    type: "object";
+    valueObject: {
+      [fieldName: string]: PlayerField;
+    };
+  };
+};
+
+export type AnalyzedTeamData = {
+  teamName: string;
+  players: AnalyzedPlayer[];
 };
