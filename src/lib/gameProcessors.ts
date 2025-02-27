@@ -38,6 +38,7 @@ const processTeam = (
           sessionPlayers,
         );
         console.log("Validated Player: ", validatedPlayerData);
+
         reqCheckFlag = reqCheckFlag || playerFlag;
         if (!validatedPlayerData) {
           console.error("Player validation failed: ", playerData);

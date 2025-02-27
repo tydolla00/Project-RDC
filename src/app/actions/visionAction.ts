@@ -26,6 +26,10 @@ export interface VisionResults {
   winner?: VisionPlayer[];
 }
 
+export type VisionTeam = {
+  [key: string]: VisionPlayer[];
+};
+
 export interface VisionPlayer {
   playerId?: number;
   name: string;
