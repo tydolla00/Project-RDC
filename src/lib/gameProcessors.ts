@@ -1,6 +1,7 @@
 import {
   AnalyzedPlayer,
   AnalyzedTeamData,
+  Stat,
   VisionPlayer,
   VisionResults,
   VisionTeam,
@@ -38,58 +39,36 @@ const processTeam = (
 
   // Process Players
   try {
-    const processedTeam = teamData.players?.forEach((player) => {
-      const { reqCheckFlag: playerFlag, playerData } = processPlayer(player);
+    const processedPlayers =
+      teamData.players?.map((player) => {
+        const processedPlayer = processPlayer(player);
 
-      const validatedPlayerData = validateAnalyzedPlayer(
-        playerData,
-        sessionPlayers,
-      );
-      console.log("Validated Player: ", validatedPlayerData);
+        const validatedPlayerData = validateProcessedlayer(
+          processedPlayer,
+          sessionPlayers,
+        );
+        console.log("Validated Player: ", validatedPlayerData);
 
-      reqCheckFlag = reqCheckFlag || playerFlag;
-      if (!validatedPlayerData) {
-        console.error("Player validation failed: ", playerData);
-        return {} as VisionPlayer;
-      }
-      return validatedPlayerData;
-    });
-    return { processedTeam, reqCheckFlag };
+        reqCheckFlag = reqCheckFlag || processedPlayer.reqCheckFlag;
+        if (!validatedPlayerData) {
+          console.error("Player validation failed: ", processPlayer);
+          return {} as VisionPlayer;
+        }
+        return validatedPlayerData;
+      }) || [];
+    return { processedPlayers, reqCheckFlag };
   } catch (error) {
     console.error("Error processing team: ", error);
+    return { processedPlayers: [], reqCheckFlag: true }; // Changed from processedTeam
   }
-
-  // try {
-  //   const processedPlayers =
-  //     teamData.valueArray?.map((player: any) => {
-  //       const { reqCheckFlag: playerFlag, playerData } = processPlayer(player);
-
-  //       const validatedPlayerData = validateVisionResultPlayer(
-  //         playerData,
-  //         sessionPlayers,
-  //       );
-  //       console.log("Validated Player: ", validatedPlayerData);
-
-  //       reqCheckFlag = reqCheckFlag || playerFlag;
-  //       if (!validatedPlayerData) {
-  //         console.error("Player validation failed: ", playerData);
-  //         return {} as VisionPlayer;
-  //       }
-  //       return validatedPlayerData;
-  //     }) || [];
-  //   return { processedPlayers, reqCheckFlag };
-  // } catch (error) {
-  //   console.error("Error processing team: ", error);
-  // }
-
-  return { processedPlayers: [], reqCheckFlag: true };
 };
 
 // Changed from validateVisionResultPlayer
-const validateAnalyzedPlayer = (
+// validated processedPlayer to VisionPlayer
+const validateProcessedlayer = (
   processedPlayer: ProcessedPlayer,
   sessionPlayers: Player[],
-) => {
+): VisionPlayer | undefined => {
   try {
     const foundPlayer: Player = findPlayerByGamerTag(
       processedPlayer.playerData.name,
@@ -99,7 +78,9 @@ const validateAnalyzedPlayer = (
     );
     if (!foundPlayer || !foundSessionPlayer) {
       console.error(`Player not found: ${processedPlayer.playerData.name}`);
-      return false;
+      throw new PlayerNotFoundError(
+        `Player not found: ${processedPlayer.playerData.name}`,
+      );
     } else {
       return {
         playerId: foundSessionPlayer?.playerId,
@@ -110,81 +91,55 @@ const validateAnalyzedPlayer = (
   } catch (error) {
     if (error instanceof PlayerNotFoundError) {
       console.error("Vision validation failed:", error.message);
-      return false;
     }
     console.error("Unexpected error:", error);
-    return false;
+    return undefined;
   }
-};
-
-type ProcessedStat = {
-  statId: string;
-  stat: string;
-  statValue: number;
 };
 
 type ProcessedPlayer = {
   reqCheckFlag: boolean;
   playerData: {
     name: string;
-    stats: ProcessedStat[];
+    stats: Stat[];
   };
 };
 
-// Processes Player should end up as VisionPlayer 
+// Processes Player should end up as VisionPlayer
 const processPlayer = (player: AnalyzedPlayer): ProcessedPlayer => {
   console.log("Processing Player: ", player);
-  const statValidations = {
-    score: validateVisionStatValue(
-      player.valueArray.valueObject?.Score?.content,
-    ),
-    goals: validateVisionStatValue(
-      player.valueArray.valueObject?.Goals?.content,
-    ),
-    assists: validateVisionStatValue(
-      player.valueArray.valueObject?.Assists?.content,
-    ),
-    saves: validateVisionStatValue(
-      player.valueArray.valueObject?.Saves?.content,
-    ),
-    shots: validateVisionStatValue(
-      player.valueArray.valueObject?.Shots?.content,
-    ),
-  };
+
+  const statValidations = Object.entries(player.valueArray.valueObject).reduce(
+    (acc, [fieldName, field]) => {
+      // Skip PlayerName field
+      if (fieldName !== "PlayerName") {
+        // Add validation for each stat
+        acc[fieldName.toLowerCase()] = validateVisionStatValue(field.content);
+      }
+      return acc;
+    },
+    {} as Record<string, { statValue: string; reqCheck: boolean }>,
+  );
 
   const reqCheckFlag = Object.values(statValidations).some((v) => v.reqCheck);
+  // Map to RL stat IDs - This could be moved to a config
+  const statMapping: Record<string, { id: string; name: string }> = {
+    score: { id: "3", name: "RL_SCORE" },
+    goals: { id: "4", name: "RL_GOALS" },
+    assists: { id: "5", name: "RL_ASSISTS" },
+    saves: { id: "6", name: "RL_SAVES" },
+    shots: { id: "7", name: "RL_SHOTS" },
+  };
 
   return {
     reqCheckFlag,
     playerData: {
       name: player.valueArray.valueObject?.PlayerName?.content || "Unknown",
-      stats: [
-        {
-          statId: "3",
-          stat: "RL_SCORE",
-          statValue: parseInt(statValidations.score.statValue, 10),
-        },
-        {
-          statId: "4",
-          stat: "RL_GOALS",
-          statValue: parseInt(statValidations.goals.statValue, 10),
-        },
-        {
-          statId: "5",
-          stat: "RL_ASSISTS",
-          statValue: parseInt(statValidations.assists.statValue, 10),
-        },
-        {
-          statId: "6",
-          stat: "RL_SAVES",
-          statValue: parseInt(statValidations.saves.statValue, 10),
-        },
-        {
-          statId: "7",
-          stat: "RL_SHOTS",
-          statValue: parseInt(statValidations.shots.statValue, 10),
-        },
-      ],
+      stats: Object.entries(statValidations).map(([statKey, validation]) => ({
+        statId: statMapping[statKey]?.id || "0",
+        stat: statMapping[statKey]?.name || `RL_${statKey.toUpperCase()}`,
+        statValue: parseInt(validation.statValue, 10),
+      })),
     },
   };
 };
@@ -202,11 +157,13 @@ const validateVisionStatValue = (
   }
 };
 
-export const calculateRLWinners = (rlPlayers: VisionTeam[], analyzedTeamsData: AnalyzedTeamData[]) => {
+export const calculateRLWinners = (
+  rlPlayers: VisionTeam[],
+  analyzedTeamsData: AnalyzedTeamData[],
+) => {
   try {
     let blueTeamGoals = 0;
     let orangeTeamGoals = 0;
-
     // TODO: New Implementation parse through players rather than indiviual team
 
     // Players should have 2 arrays consisting of blue and orange team players
@@ -216,40 +173,29 @@ export const calculateRLWinners = (rlPlayers: VisionTeam[], analyzedTeamsData: A
 
     analyzedTeamsData.forEach((team: AnalyzedTeamData) => {
       team.players.forEach((player) => {
-        player.stats.forEach((stat) => {
-          if (stat.stat === "RL_GOALS") {
-            if (team.teamName === "BluePlayers") {
-              blueTeamGoals += parseInt(stat.statValue, 10);
-            } else if (team.teamName === "OrangePlayers") {
-              orangeTeamGoals += parseInt(stat.statValue, 10);
+        const analyzedPlayerValueObject = player.valueArray.valueObject;
+
+        const playerGoals = Object.entries(analyzedPlayerValueObject).reduce(
+          (acc, [fieldName, field]) => {
+            if (fieldName === "RL_GOALS") {
+              acc += parseInt(field.content, 10);
             }
-          }
-        });
+            return acc;
+          },
+          0,
+        );
+
+        if (team.teamName === "BluePlayers") {
+          blueTeamGoals += playerGoals;
+        } else if (team.teamName === "OrangePlayers") {
+          orangeTeamGoals += playerGoals;
+        }
       });
-    }
-
-    
-
-    // visionResults.blueTeam.forEach((player) => {
-    //   player.stats.forEach((stat) => {
-    //     if (stat.stat === "RL_GOALS") {
-    //       blueTeamGoals += parseInt(stat.statValue, 10);
-    //     }
-    //   });
-    // });
-
-    // visionResults.orangeTeam.forEach((player) => {
-    //   player.stats.forEach((stat) => {
-    //     if (stat.stat === "RL_GOALS") {
-    //       orangeTeamGoals += parseInt(stat.statValue, 10);
-    //     }
-    //   });
-    // });
-
+    });
     if (blueTeamGoals > orangeTeamGoals) {
-      return visionResults.blueTeam;
+      return "Blue";
     } else if (orangeTeamGoals > blueTeamGoals) {
-      return visionResults.orangeTeam;
+      return "Orange"; // TODO - Return proper
     } else {
       return []; // Error in vision results
     }
@@ -265,10 +211,10 @@ export const RocketLeagueProcessor: GameProcessor = {
     sessionPlayers: Player[],
   ) {
     // Process Players
-    const visionResult: VisionResults = {
-      blueTeam: [],
-      orangeTeam: [],
-    };
+    // const visionResult: VisionResults = {
+    //   blueTeam: [],
+    //   orangeTeam: [],
+    // };
     let requiresCheck = false;
 
     Object.entries(playerData).forEach(([teamKey, teamData]) => {
@@ -280,14 +226,15 @@ export const RocketLeagueProcessor: GameProcessor = {
           teamData,
           sessionPlayers,
         );
+
         visionResult[teamColor] = processedPlayers;
         requiresCheck = requiresCheck || reqCheckFlag;
       }
     });
 
-    // Calculate winners after processing all players
-    const visionWinner = this.calculateWinners(visionResult);
-    visionResult.winner = visionWinner;
+    // // Calculate winners after processing all players
+    // const visionWinner = this.calculateWinners(visionResult);
+    // visionResult.winner = visionWinner;
 
     return {
       processedPlayers: [...visionResult.blueTeam, ...visionResult.orangeTeam],

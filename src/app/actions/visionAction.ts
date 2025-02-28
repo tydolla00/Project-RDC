@@ -26,13 +26,13 @@ export type VisionTeam = {
 export interface VisionPlayer {
   playerId?: number;
   name: string;
-  stats: VisionStat[];
+  stats: Stat[];
 }
 
-export interface VisionStat {
+export interface Stat {
   statId: string;
   stat: string;
-  statValue: string; // TODO: This should be allowed to be undefined but throw an error maybe?
+  statValue: string | number; // TODO: This should be allowed to be undefined but throw an error maybe?
 }
 
 export type AnalysisResults =
