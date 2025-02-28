@@ -3,6 +3,7 @@ import {
   AnalyzedTeamData,
   VisionPlayer,
   VisionResults,
+  VisionTeam,
 } from "@/app/actions/visionAction";
 import {
   DocumentFieldOutput,
@@ -88,7 +89,7 @@ const processTeam = (
 const validateAnalyzedPlayer = (
   processedPlayer: ProcessedPlayer,
   sessionPlayers: Player[],
-): VisionPlayer | false => {
+) => {
   try {
     const foundPlayer: Player = findPlayerByGamerTag(
       processedPlayer.playerData.name,
@@ -130,6 +131,7 @@ type ProcessedPlayer = {
   };
 };
 
+// Processes Player should end up as VisionPlayer 
 const processPlayer = (player: AnalyzedPlayer): ProcessedPlayer => {
   console.log("Processing Player: ", player);
   const statValidations = {
@@ -200,7 +202,7 @@ const validateVisionStatValue = (
   }
 };
 
-export const calculateRLWinners = (rlPlayers: VisionPlayer[]) => {
+export const calculateRLWinners = (rlPlayers: VisionTeam[], analyzedTeamsData: AnalyzedTeamData[]) => {
   try {
     let blueTeamGoals = 0;
     let orangeTeamGoals = 0;
@@ -212,21 +214,37 @@ export const calculateRLWinners = (rlPlayers: VisionPlayer[]) => {
       return []; // Error in vision results
     }
 
-    visionResults.blueTeam.forEach((player) => {
-      player.stats.forEach((stat) => {
-        if (stat.stat === "RL_GOALS") {
-          blueTeamGoals += parseInt(stat.statValue, 10);
-        }
+    analyzedTeamsData.forEach((team: AnalyzedTeamData) => {
+      team.players.forEach((player) => {
+        player.stats.forEach((stat) => {
+          if (stat.stat === "RL_GOALS") {
+            if (team.teamName === "BluePlayers") {
+              blueTeamGoals += parseInt(stat.statValue, 10);
+            } else if (team.teamName === "OrangePlayers") {
+              orangeTeamGoals += parseInt(stat.statValue, 10);
+            }
+          }
+        });
       });
-    });
+    }
 
-    visionResults.orangeTeam.forEach((player) => {
-      player.stats.forEach((stat) => {
-        if (stat.stat === "RL_GOALS") {
-          orangeTeamGoals += parseInt(stat.statValue, 10);
-        }
-      });
-    });
+    
+
+    // visionResults.blueTeam.forEach((player) => {
+    //   player.stats.forEach((stat) => {
+    //     if (stat.stat === "RL_GOALS") {
+    //       blueTeamGoals += parseInt(stat.statValue, 10);
+    //     }
+    //   });
+    // });
+
+    // visionResults.orangeTeam.forEach((player) => {
+    //   player.stats.forEach((stat) => {
+    //     if (stat.stat === "RL_GOALS") {
+    //       orangeTeamGoals += parseInt(stat.statValue, 10);
+    //     }
+    //   });
+    // });
 
     if (blueTeamGoals > orangeTeamGoals) {
       return visionResults.blueTeam;
