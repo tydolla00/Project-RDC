@@ -3,7 +3,7 @@ import {
   AnalyzedTeamData,
   Stat,
   VisionPlayer,
-  VisionResults,
+  VisionResult,
   VisionTeam,
 } from "@/app/actions/visionAction";
 import {
@@ -22,12 +22,16 @@ export type GameProcessor = {
     playerData: DocumentFieldOutput, // TODO: Type this better
     sessionPlayers: Player[],
   ) => { processedPlayers: VisionPlayer[]; reqCheckFlag: boolean };
-  calculateWinners: (visionResults: VisionResults) => VisionPlayer[];
+  calculateWinners: (visionResults: VisionResult) => VisionPlayer[];
   validateStats: (statValue: string | undefined) => {
     statValue: string;
     reqCheck: boolean;
   };
-  finalCheck: () => { status: VisionResultCodes; data: any; message: string };
+  finalCheck: (requiresCheck: boolean) => {
+    status: VisionResultCodes;
+    data: any;
+    message: string;
+  };
 };
 
 const processTeam = (
@@ -210,11 +214,7 @@ export const RocketLeagueProcessor: GameProcessor = {
     playerData: DocumentFieldOutput,
     sessionPlayers: Player[],
   ) {
-    // Process Players
-    // const visionResult: VisionResults = {
-    //   blueTeam: [],
-    //   orangeTeam: [],
-    // };
+    let rocketLeagueVisionResult = {} as VisionResult;
     let requiresCheck = false;
 
     Object.entries(playerData).forEach(([teamKey, teamData]) => {
@@ -227,7 +227,8 @@ export const RocketLeagueProcessor: GameProcessor = {
           sessionPlayers,
         );
 
-        visionResult[teamColor] = processedPlayers;
+        rocketLeagueVisionResult.players.push(...processedPlayers);
+
         requiresCheck = requiresCheck || reqCheckFlag;
       }
     });
@@ -237,7 +238,7 @@ export const RocketLeagueProcessor: GameProcessor = {
     // visionResult.winner = visionWinner;
 
     return {
-      processedPlayers: [...visionResult.blueTeam, ...visionResult.orangeTeam],
+      processedPlayers: rocketLeagueVisionResult.players,
       reqCheckFlag: requiresCheck,
     };
   },
@@ -246,7 +247,7 @@ export const RocketLeagueProcessor: GameProcessor = {
 
   validateStats: validateVisionStatValue,
 
-  finalCheck: () => {
+  finalCheck: (requiresCheck: boolean) => {
     return requiresCheck
       ? {
           status: VisionResultCodes.CheckRequest,

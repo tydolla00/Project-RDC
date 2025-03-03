@@ -14,7 +14,7 @@ const client = DocumentIntelligence(
   },
 );
 
-export interface VisionResults {
+export interface VisionResult {
   players: VisionPlayer[];
   winner?: VisionPlayer[];
 }
@@ -36,10 +36,10 @@ export interface Stat {
 }
 
 export type AnalysisResults =
-  | { status: VisionResultCodes.Success; data: VisionResults; message: string }
+  | { status: VisionResultCodes.Success; data: VisionResult; message: string }
   | {
       status: VisionResultCodes.CheckRequest;
-      data: VisionResults;
+      data: VisionResult;
       message: string;
     }
   | { status: VisionResultCodes.Failed; message: string };
