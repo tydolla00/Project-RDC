@@ -197,9 +197,16 @@ export const calculateRLWinners = (
       });
     });
     if (blueTeamGoals > orangeTeamGoals) {
-      return "Blue";
+      return (
+        analyzedTeamsData.find((team) => team.teamName === "Blue")?.players ||
+        []
+      );
     } else if (orangeTeamGoals > blueTeamGoals) {
-      return "Orange"; // TODO - Return proper
+      return (
+        analyzedTeamsData.find((team) => team.teamName === "Orange")?.players ||
+        []
+      );
+      // TODO - Return proper
     } else {
       return []; // Error in vision results
     }
