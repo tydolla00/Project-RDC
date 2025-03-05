@@ -6,10 +6,7 @@ import {
   VisionResult,
   VisionTeam,
 } from "@/app/actions/visionAction";
-import {
-  DocumentFieldOutput,
-  BoundingRegionOutput,
-} from "@azure-rest/ai-document-intelligence";
+import { DocumentFieldOutput } from "@azure-rest/ai-document-intelligence";
 import { Player } from "@prisma/client";
 import { RL_TEAM_MAPPING, VisionResultCodes } from "./constants";
 import {
@@ -17,17 +14,34 @@ import {
   PlayerNotFoundError,
 } from "@/app/(routes)/admin/_utils/form-helpers";
 
+type WinnerType = "TEAM" | "INDIVIDUAL";
+
+interface WinnerConfig {
+  type: WinnerType;
+  winCondition: {
+    statName: string;
+    comparison: "highest" | "lowest" | "sum";
+  };
+}
+
 export type GameProcessor = {
   processPlayers: (
     playerData: DocumentFieldOutput, // TODO: Type this better
     sessionPlayers: Player[],
   ) => { processedPlayers: VisionPlayer[]; reqCheckFlag: boolean };
-  calculateWinners: (visionResults: VisionResult) => VisionPlayer[];
+  calculateWinners: (
+    players: VisionPlayer[],
+    config: WinnerConfig,
+  ) => VisionPlayer[];
   validateStats: (statValue: string | undefined) => {
     statValue: string;
     reqCheck: boolean;
   };
-  finalCheck: (requiresCheck: boolean) => {
+  validateResults: (
+    visionPlayers: VisionPlayer[],
+    winners: VisionPlayer[],
+    requiresCheck: boolean,
+  ) => {
     status: VisionResultCodes;
     data: any;
     message: string;
@@ -175,6 +189,10 @@ export const calculateRLWinners = (
       return []; // Error in vision results
     }
 
+    // const foundSessionPlayer = sessionPlayers.find(
+    //   (p) => p.playerName === foundPlayer?.playerName,
+    // );
+
     analyzedTeamsData.forEach((team: AnalyzedTeamData) => {
       team.players.forEach((player) => {
         const analyzedPlayerValueObject = player.valueArray.valueObject;
@@ -216,6 +234,64 @@ export const calculateRLWinners = (
   }
 };
 
+const calculateTeamWinners = (
+  players: VisionPlayer[],
+  teamKey: string,
+  config: WinnerConfig,
+): VisionPlayer[] => {
+  const teams = players.reduce(
+    (acc, player) => {
+      const team = player.stats.find((s) => s.stat === teamKey)?.statValue;
+      if (team) {
+        acc[team] = acc[team] || [];
+        acc[team].push(player);
+      }
+      return acc;
+    },
+    {} as Record<string, VisionPlayer[]>,
+  );
+
+  if (config.winCondition.comparison === "sum") {
+    const teamScores = Object.entries(teams).map(([teamName, teamPlayers]) => {
+      const score = teamPlayers.reduce((sum, player) => {
+        const statValue = player.stats.find(
+          (s) => s.stat === config.winCondition.statName,
+        )?.statValue;
+        return sum + (Number(statValue) || 0);
+      }, 0);
+      return { teamName, score, players: teamPlayers };
+    });
+
+    const winningTeam = teamScores.reduce((winner, current) =>
+      current.score > winner.score ? current : winner,
+    );
+
+    return winningTeam.players;
+  }
+  return [];
+};
+
+const calculateIndividualWinner = (
+  players: VisionPlayer[],
+  config: WinnerConfig,
+): VisionPlayer[] => {
+  if (config.winCondition.comparison === "highest") {
+    return [
+      players.reduce((winner, current) => {
+        const winnerScore = winner.stats.find(
+          (s) => s.stat === config.winCondition.statName,
+        )?.statValue;
+        const currentScore = current.stats.find(
+          (s) => s.stat === config.winCondition.statName,
+        )?.statValue;
+
+        return Number(currentScore) > Number(winnerScore) ? current : winner;
+      }),
+    ];
+  }
+  return [];
+};
+
 export const RocketLeagueProcessor: GameProcessor = {
   processPlayers: function (
     playerData: DocumentFieldOutput,
@@ -250,21 +326,35 @@ export const RocketLeagueProcessor: GameProcessor = {
     };
   },
 
-  calculateWinners: calculateRLWinners,
+  calculateWinners: (players: VisionPlayer[]): VisionPlayer[] => {
+    const config: WinnerConfig = {
+      type: "TEAM",
+      winCondition: {
+        statName: "RL_GOALS",
+        comparison: "sum",
+      },
+    };
+    return calculateTeamWinners(players, "TEAM", config);
+  },
 
   validateStats: validateVisionStatValue,
 
-  finalCheck: (requiresCheck: boolean) => {
+  validateResults: (
+    visionPlayers: VisionPlayer[],
+    visionWinners: VisionPlayer[],
+    requiresCheck: boolean,
+  ) => {
+    // VisionResult AKA data is  passed into HandleCreateMatchFromVision
     return requiresCheck
       ? {
           status: VisionResultCodes.CheckRequest,
-          data: visionResult,
+          data: { visionPlayers: visionPlayers, winner: visionWinners },
           message:
             "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
         }
       : {
           status: VisionResultCodes.Success,
-          data: visionResult,
+          data: { visionPlayers: visionPlayers, winner: visionWinners },
           message: "Results have been successfully imported.",
         };
   },

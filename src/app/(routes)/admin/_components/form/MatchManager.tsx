@@ -103,6 +103,11 @@ const MatchManager = (props: Props) => {
     }
   };
 
+  const handleCreateMatchFromVision2: (
+    visionPlayers: VisionPlayer[],
+    visionWiners: VisionPlayer[],
+  ) => {};
+
   return (
     <div>
       {(fields.length === 0 && (
