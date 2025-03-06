@@ -1,13 +1,16 @@
 import { VisionResultCodes } from "@/lib/constants";
 import { toast } from "sonner";
 import { Player } from "@prisma/client";
-import { analyzeScreenShot } from "@/app/actions/visionAction";
+import { analyzeScreenShot, VisionPlayer } from "@/app/actions/visionAction";
 import { Action, State } from "../_components/form/RDCVisionModal";
 
 export const handleAnalyzeBtnClick = async (
   state: State,
   dispatch: (action: Action) => void,
-  handleCreateMatchFromVision: (vr: any) => void,
+  handleCreateMatchFromVision: (
+    visionPlayers: VisionPlayer[],
+    visionWinner: VisionPlayer[],
+  ) => void,
   sessionPlayers: Player[],
 ): Promise<void> => {
   try {
@@ -37,7 +40,10 @@ export const handleAnalyzeBtnClick = async (
 
     switch (visionResult.status) {
       case VisionResultCodes.Success:
-        handleCreateMatchFromVision(visionResult.data);
+        handleCreateMatchFromVision(
+          visionResult.data.players,
+          visionResult.data.winner || [],
+        );
         dispatch({
           type: "UPDATE_VISION",
           visionStatus: VisionResultCodes.Success,
@@ -46,7 +52,10 @@ export const handleAnalyzeBtnClick = async (
         toast.success("Success", { richColors: true });
         break;
       case VisionResultCodes.CheckRequest:
-        handleCreateMatchFromVision(visionResult.data);
+        handleCreateMatchFromVision(
+          visionResult.data.players,
+          visionResult.data.winner || [],
+        );
         dispatch({
           type: "UPDATE_VISION",
           visionStatus: VisionResultCodes.CheckRequest,

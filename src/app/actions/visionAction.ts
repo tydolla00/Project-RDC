@@ -25,6 +25,7 @@ export type VisionTeam = {
 
 export interface VisionPlayer {
   playerId?: number;
+  teamKey?: string;
   name: string;
   stats: Stat[];
 }
@@ -32,7 +33,7 @@ export interface VisionPlayer {
 export interface Stat {
   statId: string;
   stat: string;
-  statValue: string | number; // TODO: This should be allowed to be undefined but throw an error maybe?
+  statValue: string; // TODO: This should be allowed to be undefined but throw an error maybe?
 }
 
 export type AnalysisResults =
@@ -113,13 +114,28 @@ export const analyzeScreenShot = async (
     const teamsArray: AnalyzedTeamData[] = Object.entries(analyzedPlayers).map(
       ([teamName, teamData]) => ({
         teamName,
-        players: teamData as unknown as AnalyzedPlayer[],
+        players: teamData as unknown as AnalyzedPlayersObj,
       }),
+    );
+
+    const processedPlayers = gameProcessor.processPlayers(
+      teamsArray,
+      sessionPlayers,
+    );
+    console.log("Processed Players: ", processedPlayers);
+    const winners = gameProcessor.calculateWinners(
+      processedPlayers.processedPlayers,
+    );
+
+    const validatedResult: AnalysisResults = gameProcessor.validateResults(
+      processedPlayers.processedPlayers,
+      winners,
+      processedPlayers.reqCheckFlag,
     );
 
     console.log("Teams Array: ", teamsArray);
 
-    return {} as AnalysisResults;
+    return validatedResult;
   } catch (error) {
     console.error(error);
     return {
@@ -138,16 +154,18 @@ type PlayerField = {
 };
 
 export type AnalyzedPlayer = {
-  type: "array";
-  valueArray: {
-    type: "object";
-    valueObject: {
-      [fieldName: string]: PlayerField;
-    };
+  type: "object";
+  valueObject: {
+    [fieldName: string]: PlayerField;
   };
 };
 
 export type AnalyzedTeamData = {
   teamName: string;
-  players: AnalyzedPlayer[];
+  players: AnalyzedPlayersObj;
+};
+
+export type AnalyzedPlayersObj = {
+  type: "array";
+  valueArray: AnalyzedPlayer[];
 };

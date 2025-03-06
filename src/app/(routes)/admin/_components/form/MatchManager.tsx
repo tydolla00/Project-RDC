@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import RDCVisionModal from "./RDCVisionModal";
-import { VisionPlayer, VisionResults } from "@/app/actions/visionAction";
+import { VisionPlayer, VisionResult } from "@/app/actions/visionAction";
 import { FormValues } from "../../_utils/form-helpers";
 
 interface Props {
@@ -64,31 +64,58 @@ const MatchManager = (props: Props) => {
    * 2. Finds existing players by gamer tag
    * 3. Creates player session objects with player IDs and stats
    */
-  const handleCreateMatchFromVision = (visionResults: VisionResults) => {
-    console.log("Handling Create Match from Vision: ", visionResults);
+  // const handleCreateMatchFromVision = (visionResults: VisionResult) => {
+  //   console.log("Handling Create Match from Vision: ", visionResults);
 
-    const blueTeamPlayerSessions = processTeamPlayers(visionResults.blueTeam);
+  //   const blueTeamPlayerSessions = processTeamPlayers(visionResults.blueTeam);
 
-    const orangeTeamPlayerSessions = processTeamPlayers(
-      visionResults.orangeTeam,
-    );
+  //   const orangeTeamPlayerSessions = processTeamPlayers(
+  //     visionResults.orangeTeam,
+  //   );
 
-    const visionMatchPlayerSessions = [
-      ...blueTeamPlayerSessions,
-      ...orangeTeamPlayerSessions,
-    ];
+  //   const visionMatchPlayerSessions = [
+  //     ...blueTeamPlayerSessions,
+  //     ...orangeTeamPlayerSessions,
+  //   ];
 
-    const visionWinners = visionResults.winner
-      ?.map((player: VisionPlayer) => {
-        return {
-          playerId: player?.playerId,
-          playerName: player?.name,
-        };
-      })
-      .filter(
-        (winner): winner is { playerId: number; playerName: string } =>
-          winner.playerId !== undefined && winner.playerName !== undefined,
-      );
+  //   const visionWinners = visionResults.winner
+  //     ?.map((player: VisionPlayer) => {
+  //       return {
+  //         playerId: player?.playerId,
+  //         playerName: player?.name,
+  //       };
+  //     })
+  //     .filter(
+  //       (winner): winner is { playerId: number; playerName: string } =>
+  //         winner.playerId !== undefined && winner.playerName !== undefined,
+  //     );
+  //   if (visionWinners && visionWinners.length > 0) {
+  //     console.log("Setting Vision Winners!", visionWinners);
+  //     append({
+  //       matchWinners: visionWinners,
+  //       playerSessions: visionMatchPlayerSessions,
+  //     });
+  //   } else {
+  //     append({
+  //       matchWinners: [],
+  //       playerSessions: visionMatchPlayerSessions,
+  //     });
+  //   }
+  // };
+
+  const handleCreateMatchFromVision2 = (
+    visionPlayers: VisionPlayer[],
+    visionWiners: VisionPlayer[],
+  ) => {
+    const visionMatchPlayerSessions = processTeamPlayers(visionPlayers);
+    console.log("Vision Match Player Sessions: ", visionMatchPlayerSessions);
+    const visionWinners = visionWiners.map((player: VisionPlayer) => {
+      return {
+        playerId: player?.playerId || 0,
+        playerName: player?.name,
+      };
+    });
+
     if (visionWinners && visionWinners.length > 0) {
       console.log("Setting Vision Winners!", visionWinners);
       append({
@@ -102,11 +129,6 @@ const MatchManager = (props: Props) => {
       });
     }
   };
-
-  const handleCreateMatchFromVision2: (
-    visionPlayers: VisionPlayer[],
-    visionWiners: VisionPlayer[],
-  ) => {};
 
   return (
     <div>
@@ -162,7 +184,7 @@ const MatchManager = (props: Props) => {
           Add Match
         </Button>
         <RDCVisionModal
-          handleCreateMatchFromVision={handleCreateMatchFromVision}
+          handleCreateMatchFromVision={handleCreateMatchFromVision2}
           sessionPlayers={players}
         />
       </div>

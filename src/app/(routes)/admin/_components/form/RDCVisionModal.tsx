@@ -30,9 +30,13 @@ import {
   handleClose,
   handleAnalyzeBtnClick,
 } from "../../_utils/rdc-vision-helpers";
+import { VisionPlayer } from "@/app/actions/visionAction";
 
 interface Props {
-  handleCreateMatchFromVision: (visionResults: any) => void;
+  handleCreateMatchFromVision: (
+    visionPlayers: VisionPlayer[],
+    visionWinners: VisionPlayer[],
+  ) => void;
   sessionPlayers: Player[];
 }
 

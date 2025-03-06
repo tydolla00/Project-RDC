@@ -6,7 +6,6 @@ import {
   VisionResult,
   VisionTeam,
 } from "@/app/actions/visionAction";
-import { DocumentFieldOutput } from "@azure-rest/ai-document-intelligence";
 import { Player } from "@prisma/client";
 import { RL_TEAM_MAPPING, VisionResultCodes } from "./constants";
 import {
@@ -26,13 +25,10 @@ interface WinnerConfig {
 
 export type GameProcessor = {
   processPlayers: (
-    playerData: DocumentFieldOutput, // TODO: Type this better
+    playerData: AnalyzedTeamData[], // TODO: Type this better
     sessionPlayers: Player[],
   ) => { processedPlayers: VisionPlayer[]; reqCheckFlag: boolean };
-  calculateWinners: (
-    players: VisionPlayer[],
-    config: WinnerConfig,
-  ) => VisionPlayer[];
+  calculateWinners: (players: VisionPlayer[]) => VisionPlayer[];
   validateStats: (statValue: string | undefined) => {
     statValue: string;
     reqCheck: boolean;
@@ -52,16 +48,16 @@ const processTeam = (
   teamData: AnalyzedTeamData,
   sessionPlayers: Player[],
 ): { processedPlayers: VisionPlayer[]; reqCheckFlag: boolean } => {
-  console.log("Processing Team: ", teamData);
+  console.log("Processing Team: ", teamData.players);
   let reqCheckFlag = false;
 
   // Process Players
   try {
     const processedPlayers =
-      teamData.players?.map((player) => {
+      teamData.players.valueArray?.map((player) => {
         const processedPlayer = processPlayer(player);
 
-        const validatedPlayerData = validateProcessedlayer(
+        const validatedPlayerData = validateProcessedPlayer(
           processedPlayer,
           sessionPlayers,
         );
@@ -83,7 +79,7 @@ const processTeam = (
 
 // Changed from validateVisionResultPlayer
 // validated processedPlayer to VisionPlayer
-const validateProcessedlayer = (
+const validateProcessedPlayer = (
   processedPlayer: ProcessedPlayer,
   sessionPlayers: Player[],
 ): VisionPlayer | undefined => {
@@ -121,13 +117,13 @@ type ProcessedPlayer = {
     name: string;
     stats: Stat[];
   };
+  teamKey?: string;
 };
 
-// Processes Player should end up as VisionPlayer
 const processPlayer = (player: AnalyzedPlayer): ProcessedPlayer => {
   console.log("Processing Player: ", player);
 
-  const statValidations = Object.entries(player.valueArray.valueObject).reduce(
+  const statValidations = Object.entries(player.valueObject).reduce(
     (acc, [fieldName, field]) => {
       // Skip PlayerName field
       if (fieldName !== "PlayerName") {
@@ -152,11 +148,11 @@ const processPlayer = (player: AnalyzedPlayer): ProcessedPlayer => {
   return {
     reqCheckFlag,
     playerData: {
-      name: player.valueArray.valueObject?.PlayerName?.content || "Unknown",
+      name: player.valueObject?.PlayerName?.content || "Unknown",
       stats: Object.entries(statValidations).map(([statKey, validation]) => ({
         statId: statMapping[statKey]?.id || "0",
         stat: statMapping[statKey]?.name || `RL_${statKey.toUpperCase()}`,
-        statValue: parseInt(validation.statValue, 10),
+        statValue: validation.statValue,
       })),
     },
   };
@@ -194,8 +190,8 @@ export const calculateRLWinners = (
     // );
 
     analyzedTeamsData.forEach((team: AnalyzedTeamData) => {
-      team.players.forEach((player) => {
-        const analyzedPlayerValueObject = player.valueArray.valueObject;
+      team.players.valueArray.forEach((player) => {
+        const analyzedPlayerValueObject = player.valueObject;
 
         const playerGoals = Object.entries(analyzedPlayerValueObject).reduce(
           (acc, [fieldName, field]) => {
@@ -239,17 +235,35 @@ const calculateTeamWinners = (
   teamKey: string,
   config: WinnerConfig,
 ): VisionPlayer[] => {
+  console.log("Calculating Team Winners: ", players);
+
+  // Group players by team and calculate team scores
   const teams = players.reduce(
     (acc, player) => {
-      const team = player.stats.find((s) => s.stat === teamKey)?.statValue;
+      const team = player.teamKey;
       if (team) {
-        acc[team] = acc[team] || [];
-        acc[team].push(player);
+        if (!acc[team]) {
+          acc[team] = {
+            players: [],
+            score: 0,
+          };
+        }
+
+        // Add player to team
+        acc[team].players.push(player);
+
+        // Add player's score to team total
+        const playerScore = player.stats.find(
+          (s) => s.stat === config.winCondition.statName,
+        )?.statValue;
+        acc[team].score += Number(playerScore || 0);
       }
       return acc;
     },
-    {} as Record<string, VisionPlayer[]>,
+    {} as Record<string, { players: VisionPlayer[]; score: number }>,
   );
+
+  console.log("Teams in calculateWinners: ", teams);
 
   if (config.winCondition.comparison === "sum") {
     const teamScores = Object.entries(teams).map(([teamName, teamPlayers]) => {
@@ -262,9 +276,12 @@ const calculateTeamWinners = (
       return { teamName, score, players: teamPlayers };
     });
 
-    const winningTeam = teamScores.reduce((winner, current) =>
-      current.score > winner.score ? current : winner,
+    const winningTeam = teamScores.reduce(
+      (winner, current) => (current.score > winner.score ? current : winner),
+      teamScores[0],
     );
+
+    console.log("Winning Team: ", winningTeam);
 
     return winningTeam.players;
   }
@@ -294,15 +311,21 @@ const calculateIndividualWinner = (
 
 export const RocketLeagueProcessor: GameProcessor = {
   processPlayers: function (
-    playerData: DocumentFieldOutput,
+    rlTeams: AnalyzedTeamData[],
     sessionPlayers: Player[],
   ) {
-    let rocketLeagueVisionResult = {} as VisionResult;
+    let rocketLeagueVisionResult: VisionResult = {
+      players: [],
+    };
     let requiresCheck = false;
 
-    Object.entries(playerData).forEach(([teamKey, teamData]) => {
+    console.log("Processing Rocket League Players: ", rlTeams);
+
+    rlTeams.forEach((teamData) => {
       const teamColor =
-        RL_TEAM_MAPPING[teamKey as keyof typeof RL_TEAM_MAPPING];
+        RL_TEAM_MAPPING[teamData.teamName as keyof typeof RL_TEAM_MAPPING];
+      console.log(`Processing Team: ${teamColor}`);
+      console.log("Team Data: ", teamData);
 
       if (teamColor) {
         const { processedPlayers, reqCheckFlag } = processTeam(
@@ -310,8 +333,8 @@ export const RocketLeagueProcessor: GameProcessor = {
           sessionPlayers,
         );
 
+        console.log(`Processed Player for: ${teamColor}:`, processedPlayers);
         rocketLeagueVisionResult.players.push(...processedPlayers);
-
         requiresCheck = requiresCheck || reqCheckFlag;
       }
     });
