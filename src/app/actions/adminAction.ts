@@ -8,6 +8,7 @@ import { getAllGames } from "../../../prisma/lib/games";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { randomInt } from "crypto";
+import { revalidateTag } from "next/cache";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -427,3 +428,10 @@ export const insertNewSessionV2 = async ({
 
   return { error: null };
 };
+
+/**
+ * Server action to revalidate a tag so it can be used in client components.
+ * @param path path that you want to revalidate
+ * @returns
+ */
+export const revalidateAction = async (path: string) => revalidateTag(path);

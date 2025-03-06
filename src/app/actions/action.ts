@@ -93,7 +93,7 @@ export const getRDCVideoDetails = async (
         video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
     };
     return { video: session, error: undefined };
-  } else return { video: dbRecord, error: undefined };
+  } else return { video: dbRecord, error: "Video already exists" };
 };
 
 type YouTubeVideoListResponse = {
@@ -151,12 +151,7 @@ type YTAPIRequestSession = Pick<
 };
 
 type GetRdcVideoDetails = Promise<
-  | {
-      video: FindManySessions | YTAPIRequestSession;
-      error: undefined;
-    }
-  | {
-      video: null;
-      error: string;
-    }
+  | { video: FindManySessions | YTAPIRequestSession; error: undefined }
+  | { video: null; error: string }
+  | { video: FindManySessions | YTAPIRequestSession; error: string }
 >;

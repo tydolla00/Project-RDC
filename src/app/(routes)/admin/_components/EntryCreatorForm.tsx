@@ -7,6 +7,7 @@ import SetManager from "./SetManager";
 import {
   insertNewSessionFromAdmin,
   insertNewSessionV2,
+  revalidateAction,
 } from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -90,7 +91,8 @@ const EntryCreatorForm = (props: AdminFormProps) => {
         : toast.error(err, { richColors: true });
     else {
       toast.success("Session successfully created.", { richColors: true });
-      revalidateTag("getAllSessions");
+      await revalidateAction("getAllSessions");
+      form.reset();
     }
   };
 
