@@ -15,8 +15,8 @@ import { RLStats } from "./timeline-chart";
 const SetData = ({ set, setIndex }: { set: RLStats[][]; setIndex: number }) => (
   <div className="mb-6">
     <div className="text-chart-4 text-2xl font-bold">Set {setIndex + 1}</div>
-    <div className="text-muted-foreground text-sm">
-      Winners: {set.at(0)?.at(0)?.winners.join(",")}
+    <div className="text-muted-foreground my-2 text-sm">
+      Winners: {set.at(0)?.at(0)?.winners.join(", ")}
     </div>
     {set.map((match, matchIndex) => {
       return (

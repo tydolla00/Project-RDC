@@ -16,12 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { getAllSessionsByGame } from "../../../../../prisma/lib/admin";
 import Image from "next/image";
 import { Suspense, useCallback, useEffect, useState } from "react";
@@ -30,6 +25,16 @@ import { Button } from "@/components/ui/button";
 import MatchData from "./match-data";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import Link from "next/link";
 
 const chartConfig = {
   id: {
@@ -131,15 +136,49 @@ export function TimelineChart({
         </CardContent>
       </Card>
       <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+        <div className="my-4">
+          {session ? (
+            <div className="flex space-x-4">
+              <div className="w-[300px]">
+                <Link className="block" href={session?.sessionUrl}>
+                  <Image
+                    height={300}
+                    width={300}
+                    alt={session.sessionName}
+                    src={session.thumbnail}
+                  />
+                  <div className="my-4 hover:underline">
+                    {session.sessionName}
+                  </div>
+                </Link>
+              </div>
+              <MVP session={session} />
+            </div>
+          ) : null}
+        </div>
         {session && (
-          <Button
-            className="cursor-pointer"
-            onClick={() => setSession(undefined)}
-          >
-            Hide Match Data
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                className="cursor-pointer"
+                // onClick={() => setSession(undefined)}
+              >
+                Show Session Data
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="h-screen max-w-3xl">
+              <DialogHeader className="space-y-0">
+                <DialogTitle>Session Info</DialogTitle>
+                <DialogDescription>
+                  Explore the info about this video
+                </DialogDescription>
+              </DialogHeader>
+              <ScrollArea className="h-[80vh]">
+                <MatchData session={session} />
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
         )}
-        <MatchData session={session} />
       </Suspense>
     </>
   );
@@ -195,3 +234,7 @@ const CustomTooltip = ({
   }
   return null;
 };
+
+// TODO Create a MVP Card Displaying Stats for the Day
+// Goals Per Game, Assists Per Game, Saves Per Game, Shots Per Game, Player Nickname under name
+const MVP = ({ session }: { session: Sessions[0] }) => <div>MVP</div>;

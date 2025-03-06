@@ -1,9 +1,6 @@
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useMemo, useState } from "react";
 import { RLStats } from "./timeline-chart";
-import Link from "next/link";
 import { getAllSessionsByGame } from "../../../../../prisma/lib/admin";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import SetData from "./set-data";
 
@@ -72,23 +69,6 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
   console.log({ sets });
   return (
     <div className="my-6">
-      <div className="my-4">
-        {session ? (
-          <div className="w-[300px]">
-            <Link className="block" href={session?.sessionUrl}>
-              <Image
-                className="my-4"
-                height={300}
-                width={300}
-                alt={session.sessionName}
-                src={session.thumbnail}
-              />
-              <div className="my-4 hover:underline">{session.sessionName}</div>
-            </Link>
-            <div>Hover card from bottom</div>
-          </div>
-        ) : null}
-      </div>
       {sets.length > 0 && (
         <>
           <div>
