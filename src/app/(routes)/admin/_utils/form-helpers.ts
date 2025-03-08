@@ -90,7 +90,7 @@ export const formSchema = z.object({
                 });
                 if (winningTeam <= losingTeam)
                   console.warn(
-                    `Error in match ${i + 1}. Winning team should have more goals. Winners: ${winningTeam} Losers: ${winningTeam}`,
+                    `Error in match ${i + 1}. Winning team should have more goals. Winners: ${winningTeam} Losers: ${losingTeam}`,
                   );
                 return winningTeam > losingTeam;
               });
