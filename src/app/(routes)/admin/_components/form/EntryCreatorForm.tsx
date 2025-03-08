@@ -27,7 +27,15 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { rdcMembers } = props;
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: async (data, context, options) => {
+      // you can debug your validation schema here
+      console.log("formData", data);
+      console.log(
+        "validation result",
+        await zodResolver(formSchema)(data, context, options),
+      );
+      return zodResolver(formSchema)(data, context, options);
+    },
     defaultValues: {
       game: "",
       sessionName: "",
@@ -81,6 +89,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
       data,
       stringified: JSON.stringify(data, null, 2),
     });
+    return console.log("This should not have ran");
     console.time("Form Submission Time Start: ");
     const { error: err } = await insertNewSessionFromAdmin(data);
     // const { error: err } = await insertNewSessionV2(data);

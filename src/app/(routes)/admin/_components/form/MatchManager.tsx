@@ -1,5 +1,5 @@
 import { Player } from "@prisma/client";
-import React, { useMemo } from "react";
+import React from "react";
 import { Controller, useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import PlayerSessionManager from "./PlayerSessionManager";
@@ -9,7 +9,11 @@ import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import RDCVisionModal from "./RDCVisionModal";
 import { VisionPlayer, VisionResults } from "@/app/actions/visionAction";
-import { FormValues } from "../../_utils/form-helpers";
+import {
+  FormValues,
+  MatchWinners,
+  PlayerSessions,
+} from "../../_utils/form-helpers";
 
 interface Props {
   setIndex: number;
@@ -41,8 +45,8 @@ const MatchManager = (props: Props) => {
     }));
     console.log("Player Sessions: ", playerSessions);
     append({
-      matchWinners: [],
-      playerSessions: playerSessions,
+      matchWinners: [] as unknown as MatchWinners,
+      playerSessions: playerSessions as unknown as PlayerSessions,
     });
   };
 
@@ -92,13 +96,13 @@ const MatchManager = (props: Props) => {
     if (visionWinners && visionWinners.length > 0) {
       console.log("Setting Vision Winners!", visionWinners);
       append({
-        matchWinners: visionWinners,
-        playerSessions: visionMatchPlayerSessions,
+        matchWinners: visionWinners as MatchWinners, // Enforce non empty array
+        playerSessions: visionMatchPlayerSessions as PlayerSessions,
       });
     } else {
       append({
-        matchWinners: [],
-        playerSessions: visionMatchPlayerSessions,
+        matchWinners: [] as unknown as MatchWinners, // Enforce non empty array,
+        playerSessions: visionMatchPlayerSessions as PlayerSessions,
       });
     }
   };

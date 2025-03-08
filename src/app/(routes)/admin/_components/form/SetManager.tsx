@@ -17,11 +17,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import { randomInt } from "crypto";
-import { formSchema, FormValues } from "../../_utils/form-helpers";
+import { formSchema, Matches, SetWinners } from "../../_utils/form-helpers";
 import WinnerDisplay from "./WinnerDisplay";
 
 const SetManager = () => {
@@ -45,7 +41,11 @@ const SetManager = () => {
   const handleAddSet = () => {
     const newSetId = highestSetId + 1;
     setHighestSetId(newSetId);
-    append({ setId: newSetId, matches: [], setWinners: [] });
+    append({
+      setId: newSetId,
+      matches: [] as unknown as Matches,
+      setWinners: [] as unknown as SetWinners,
+    });
 
     // Then update openSets to match new length with last set open
     setOpenSets((prev) => {

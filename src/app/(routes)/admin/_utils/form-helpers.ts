@@ -77,6 +77,13 @@ export const formSchema = z.object({
 // TODO Do we want to conditionally apply input types/validations based on the stat name? Most will be numbers
 export type FormValues = z.infer<typeof formSchema>;
 
+export type Matches = FormValues["sets"][number]["matches"];
+export type MatchWinners =
+  FormValues["sets"][number]["matches"][number]["matchWinners"];
+export type PlayerSessions =
+  FormValues["sets"][number]["matches"][number]["playerSessions"];
+export type SetWinners = FormValues["sets"][number]["setWinners"];
+
 type PlayerMapping = {
   [key: string]: {
     playerId: number;
