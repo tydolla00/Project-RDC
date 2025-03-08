@@ -52,10 +52,18 @@ const PlayerAvatar = ({
             }
             onClick={handleOnClick}
           >
-            <AvatarImage src={avatarSrc} alt={player.playerName} />
-            <AvatarFallback className="AvatarFallback" delayMs={200}>
+            <AvatarFallback className="AvatarFallback">
               {player.playerName.slice(0, 2)}
             </AvatarFallback>
+            <AvatarImage
+              src={avatarSrc}
+              alt={player.playerName}
+              onLoadingStatusChange={(status) => {
+                if (status === "loaded") {
+                  // Image is ready
+                }
+              }}
+            />
           </Avatar>
         </TooltipTrigger>
         <TooltipContent className="dark:bg-purple-700 dark:text-white">
