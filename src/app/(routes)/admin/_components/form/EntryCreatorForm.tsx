@@ -29,11 +29,11 @@ const EntryCreatorForm = (props: AdminFormProps) => {
   const form = useForm<FormValues>({
     resolver: async (data, context, options) => {
       // you can debug your validation schema here
-      console.log("formData", data);
-      console.log(
-        "validation result",
-        await zodResolver(formSchema)(data, context, options),
-      );
+      // console.log("formData", data);
+      // console.log(
+      //   "validation result",
+      //   await zodResolver(formSchema)(data, context, options),
+      // );
       return zodResolver(formSchema)(data, context, options);
     },
     defaultValues: {
@@ -89,7 +89,6 @@ const EntryCreatorForm = (props: AdminFormProps) => {
       data,
       stringified: JSON.stringify(data, null, 2),
     });
-    return console.log("This should not have ran");
     console.time("Form Submission Time Start: ");
     const { error: err } = await insertNewSessionFromAdmin(data);
     // const { error: err } = await insertNewSessionV2(data);

@@ -40,7 +40,7 @@ const MatchManager = (props: Props) => {
     console.log("Handling New Match click", players);
     const playerSessions = players.map((player: Player) => ({
       playerId: player.playerId,
-      playerSessionName: player.playerName,
+      playerSessionName: player.playerName, // Discrepancy in what is being assigned to playerSessionName
       playerStats: [],
     }));
     console.log("Player Sessions: ", playerSessions);

@@ -1,4 +1,4 @@
-import { Player } from "@prisma/client";
+import { $Enums, Player } from "@prisma/client";
 import { z } from "zod";
 
 export const formSchema = z.object({
@@ -68,7 +68,37 @@ export const formSchema = z.object({
                 .nonempty("At least one player session is required"),
             }),
           )
-          .nonempty("At least one match is required"),
+          .nonempty("At least one match is required")
+          .refine(
+            (data) => {
+              // TODO figure out how to pass this as a param. Maybe explicitly define type.
+              return data.every((match, i) => {
+                let winningTeam = 0;
+                let losingTeam = 0;
+
+                match.playerSessions.forEach((ps) => {
+                  const onWinningTeam = match.matchWinners.some(
+                    (mw) => mw.playerId === ps.playerId,
+                  );
+                  ps.playerStats.forEach((stat) => {
+                    if (stat.stat === $Enums.StatName.RL_GOALS) {
+                      if (onWinningTeam)
+                        winningTeam += Number(stat.statValue) || 0;
+                      else losingTeam += Number(stat.statValue) || 0;
+                    }
+                  });
+                });
+                if (winningTeam <= losingTeam)
+                  console.warn(
+                    `Error in match ${i + 1}. Winning team should have more goals. Winners: ${winningTeam} Losers: ${winningTeam}`,
+                  );
+                return winningTeam > losingTeam;
+              });
+            },
+            {
+              message: "Winning team should have more goals in each match",
+            },
+          ),
       }),
     )
     .nonempty("At least one set is required"),

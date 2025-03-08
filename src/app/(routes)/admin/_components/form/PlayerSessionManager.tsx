@@ -49,7 +49,7 @@ const PlayerSessionManager = (props: Props) => {
   }, [props.players, append, getValues, setIndex, matchIndex, players, remove]);
 
   const getPlayerNameFromField = (field: any): boolean => {
-    return field?.playerSessionName ?? 0;
+    return field?.playerSessionName ?? 0; // Discrepancy in what is being assigned to playerSessionName
   };
 
   console.log("PlayerSessionManager Fields: ", fields);
