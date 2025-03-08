@@ -2,28 +2,30 @@ import { Player } from "@prisma/client";
 import { z } from "zod";
 
 export const formSchema = z.object({
-  game: z.string(),
-  sessionName: z
-    .string()
-    .min(4, "Session Name must be at least 4 characters")
-    .readonly(),
+  game: z.string().trim().min(1),
+  sessionName: z.string().trim().min(1).max(100).readonly(),
   sessionUrl: z
     .string()
+    .url()
     .toLowerCase()
+    .trim()
+    .min(1)
     .startsWith(
       "https://www.youtube.com",
       "Please paste in a valid youtube url.",
     )
     .max(100),
-  videoId: z.string(),
-  date: z.date().readonly(),
-  thumbnail: z.string().readonly(),
-  players: z.array(
-    z.object({
-      playerId: z.number(),
-      playerName: z.string(),
-    }),
-  ),
+  videoId: z.string().trim().min(1).readonly(),
+  date: z.date({ required_error: "Date is required" }).readonly(),
+  thumbnail: z.string().trim().min(1).readonly(),
+  players: z
+    .array(
+      z.object({
+        playerId: z.number(),
+        playerName: z.string().trim().min(1),
+      }),
+    )
+    .nonempty("At least one player is required"),
   sets: z
     .array(
       z.object({
@@ -32,40 +34,44 @@ export const formSchema = z.object({
           .array(
             z.object({
               playerId: z.number(),
-              playerName: z.string(),
+              playerName: z.string().trim().min(1),
             }),
           )
-          .min(1, "At least one set winner is required."),
-        matches: z.array(
-          z.object({
-            matchWinners: z
-              .array(
-                z.object({
-                  playerId: z.number(),
-                  playerName: z.string(),
-                }),
-              )
-              .min(1, "At least one match winner is required."),
-            playerSessions: z
-              .array(
-                z.object({
-                  playerId: z.number(),
-                  playerSessionName: z.string(),
-                  playerStats: z.array(
-                    z.object({
-                      statId: z.string(),
-                      stat: z.string(),
-                      statValue: z.string(),
-                    }),
-                  ),
-                }),
-              )
-              .min(1, "At least one player session is required"),
-          }),
-        ),
+          .nonempty("At least one set winner is required"),
+        matches: z
+          .array(
+            z.object({
+              matchWinners: z
+                .array(
+                  z.object({
+                    playerId: z.number(),
+                    playerName: z.string().trim().min(1),
+                  }),
+                )
+                .nonempty("At least one match winner is required"),
+              playerSessions: z
+                .array(
+                  z.object({
+                    playerId: z.number(),
+                    playerSessionName: z.string().trim().min(1),
+                    playerStats: z
+                      .array(
+                        z.object({
+                          statId: z.string().trim().min(1),
+                          stat: z.string().trim().min(1),
+                          statValue: z.string().trim().min(1).max(100),
+                        }),
+                      )
+                      .nonempty("At least one player stat is required"),
+                  }),
+                )
+                .nonempty("At least one player session is required"),
+            }),
+          )
+          .nonempty("At least one match is required"),
       }),
     )
-    .min(1, "At least one set is required"),
+    .nonempty("At least one set is required"),
 });
 
 // TODO Do we want to conditionally apply input types/validations based on the stat name? Most will be numbers
