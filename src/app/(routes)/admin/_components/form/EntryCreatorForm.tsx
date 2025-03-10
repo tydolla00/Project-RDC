@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
@@ -11,13 +11,12 @@ import {
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useAdmin } from "@/lib/adminContext";
-import { useFormStatus } from "react-dom";
 import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
 import { revalidateTag } from "next/cache";
-import { formSchema, FormValues } from "../../_utils/form-helpers";
+import { FormValues, getSchema } from "../../_utils/form-helpers";
+import { useAdmin } from "@/lib/adminContext";
 
 interface AdminFormProps {
   rdcMembers: Player[];
@@ -26,15 +25,16 @@ interface AdminFormProps {
 const EntryCreatorForm = (props: AdminFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { rdcMembers } = props;
-  const form = useForm<FormValues>({
+  const form = useForm<FormValues, any>({
     resolver: async (data, context, options) => {
       // you can debug your validation schema here
-      // console.log("formData", data);
-      // console.log(
-      //   "validation result",
-      //   await zodResolver(formSchema)(data, context, options),
-      // );
-      return zodResolver(formSchema)(data, context, options);
+      const schema = getSchema(data.game);
+      console.log("formData", { data, context, options });
+      console.log(
+        "validation result",
+        await zodResolver(schema)(data, context, options),
+      );
+      return zodResolver(schema)(data, context, options);
     },
     defaultValues: {
       game: "",
@@ -49,27 +49,9 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
   const {
     handleSubmit,
-    control,
     watch,
     formState: { errors, defaultValues, isValid: formIsValid },
-    setValue,
-    getValues,
   } = form;
-
-  const { gameStats, getGameStatsFromDb } = useAdmin();
-  const game = watch("game");
-
-  // console.log(watch());
-
-  // TODO Can we pass this down as a prop, fetch all stats at once.
-  useEffect(() => {
-    const fetchData = async () => {
-      if (game) {
-        await getGameStatsFromDb(game);
-      }
-    };
-    fetchData();
-  }, [game, getGameStatsFromDb]);
 
   /**
    * Handles the form submission for creating a new session.
@@ -83,7 +65,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
    * or displaying an error toast message.
    * If the insertion is successful, displays a success toast message and revalidates the session data.
    */
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: FormValues): Promise<void> => {
     setIsLoading(true);
     console.log("Form Data Being Submitted:", {
       data,
@@ -134,7 +116,6 @@ const EntryCreatorForm = (props: AdminFormProps) => {
           <div className="mb-10 w-fit items-center gap-4">
             <SessionInfo form={form} rdcMembers={rdcMembers} />
           </div>
-          {/* <FormSummary /> */}
           <div className="mx-auto">
             <SetManager />
             <Submit formIsValid={formIsValid} loading={isLoading} />
