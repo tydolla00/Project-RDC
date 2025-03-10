@@ -55,8 +55,11 @@ const processTeam = (
   try {
     const processedPlayers =
       teamData.players.valueArray?.map((player) => {
-        const processedPlayer = processPlayer(player);
-
+        console.log(
+          `Processing Player: ${player.valueObject.PlayerName.content} for ${teamData.teamName}`,
+        );
+        const processedPlayer = processPlayer(player, teamData.teamName);
+        console.log("Processed Player: ", processedPlayer);
         const validatedPlayerData = validateProcessedPlayer(
           processedPlayer,
           sessionPlayers,
@@ -77,8 +80,6 @@ const processTeam = (
   }
 };
 
-// Changed from validateVisionResultPlayer
-// validated processedPlayer to VisionPlayer
 const validateProcessedPlayer = (
   processedPlayer: ProcessedPlayer,
   sessionPlayers: Player[],
@@ -100,6 +101,7 @@ const validateProcessedPlayer = (
         playerId: foundSessionPlayer?.playerId,
         name: foundSessionPlayer?.playerName,
         stats: [...processedPlayer.playerData.stats],
+        teamKey: processedPlayer.teamKey,
       };
     }
   } catch (error) {
@@ -120,7 +122,10 @@ type ProcessedPlayer = {
   teamKey?: string;
 };
 
-const processPlayer = (player: AnalyzedPlayer): ProcessedPlayer => {
+const processPlayer = (
+  player: AnalyzedPlayer,
+  teamName?: string,
+): ProcessedPlayer => {
   console.log("Processing Player: ", player);
 
   const statValidations = Object.entries(player.valueObject).reduce(
@@ -155,6 +160,7 @@ const processPlayer = (player: AnalyzedPlayer): ProcessedPlayer => {
         statValue: validation.statValue,
       })),
     },
+    teamKey: teamName,
   };
 };
 
@@ -267,7 +273,7 @@ const calculateTeamWinners = (
 
   if (config.winCondition.comparison === "sum") {
     const teamScores = Object.entries(teams).map(([teamName, teamPlayers]) => {
-      const score = teamPlayers.reduce((sum, player) => {
+      const score = teamPlayers.players.reduce((sum, player) => {
         const statValue = player.stats.find(
           (s) => s.stat === config.winCondition.statName,
         )?.statValue;
@@ -283,7 +289,7 @@ const calculateTeamWinners = (
 
     console.log("Winning Team: ", winningTeam);
 
-    return winningTeam.players;
+    return winningTeam.players.players;
   }
   return [];
 };
@@ -371,13 +377,13 @@ export const RocketLeagueProcessor: GameProcessor = {
     return requiresCheck
       ? {
           status: VisionResultCodes.CheckRequest,
-          data: { visionPlayers: visionPlayers, winner: visionWinners },
+          data: { players: visionPlayers, winner: visionWinners },
           message:
             "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
         }
       : {
           status: VisionResultCodes.Success,
-          data: { visionPlayers: visionPlayers, winner: visionWinners },
+          data: { players: visionPlayers, winner: visionWinners },
           message: "Results have been successfully imported.",
         };
   },

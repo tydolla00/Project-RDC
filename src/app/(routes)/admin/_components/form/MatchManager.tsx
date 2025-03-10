@@ -47,6 +47,7 @@ const MatchManager = (props: Props) => {
   };
 
   const processTeamPlayers = (teamPlayers: VisionPlayer[]) => {
+    console.log("Processing Team Players: ", teamPlayers);
     return teamPlayers.map((player) => {
       return {
         playerId: player?.playerId || 0,

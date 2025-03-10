@@ -134,7 +134,7 @@ export const analyzeScreenShot = async (
     );
 
     console.log("Teams Array: ", teamsArray);
-
+    console.log("Validated Result: ", validatedResult);
     return validatedResult;
   } catch (error) {
     console.error(error);

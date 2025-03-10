@@ -32,44 +32,46 @@ export const handleAnalyzeBtnClick = async (
       return;
     }
 
-    const visionResult = await analyzeScreenShot(
+    const analysisResults = await analyzeScreenShot(
       base64FileContent,
       sessionPlayers,
       3,
     );
 
-    switch (visionResult.status) {
+    console.log("analysis Results: ", analysisResults);
+
+    switch (analysisResults.status) {
       case VisionResultCodes.Success:
         handleCreateMatchFromVision(
-          visionResult.data.players,
-          visionResult.data.winner || [],
+          analysisResults.data.players,
+          analysisResults.data.winner || [],
         );
         dispatch({
           type: "UPDATE_VISION",
           visionStatus: VisionResultCodes.Success,
-          visionMsg: visionResult.message,
+          visionMsg: analysisResults.message,
         });
         toast.success("Success", { richColors: true });
         break;
       case VisionResultCodes.CheckRequest:
         handleCreateMatchFromVision(
-          visionResult.data.players,
-          visionResult.data.winner || [],
+          analysisResults.data.players,
+          analysisResults.data.winner || [],
         );
         dispatch({
           type: "UPDATE_VISION",
           visionStatus: VisionResultCodes.CheckRequest,
-          visionMsg: visionResult.message,
+          visionMsg: analysisResults.message,
         });
-        toast.warning(visionResult.message, { richColors: true });
+        toast.warning(analysisResults.message, { richColors: true });
         break;
       case VisionResultCodes.Failed:
         dispatch({
           type: "UPDATE_VISION",
           visionStatus: VisionResultCodes.Failed,
-          visionMsg: visionResult.message,
+          visionMsg: analysisResults.message,
         });
-        toast.error(visionResult.message, { richColors: true });
+        toast.error(analysisResults.message, { richColors: true });
         break;
       default:
         break;
