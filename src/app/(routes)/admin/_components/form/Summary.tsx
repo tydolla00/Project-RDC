@@ -9,8 +9,6 @@ export const FormSummary = () => {
 
   const sets = getValues("sets");
 
-  console.log(sets);
-
   return (
     <>
       <H2>Form Summary</H2>

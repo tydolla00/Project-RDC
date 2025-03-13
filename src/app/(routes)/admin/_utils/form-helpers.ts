@@ -1,14 +1,17 @@
 import { $Enums, Player } from "@prisma/client";
 import { z } from "zod";
 
-const gameSchema = z.string().trim().min(1);
+const gameSchema = z
+  .string({ required_error: "Game is required" })
+  .trim()
+  .min(1, "Game is required");
 const sessionNameSchema = z.string().trim().min(1).max(100).readonly();
 const sessionUrlSchema = z
-  .string()
+  .string({ required_error: "Session URL is required" })
   .url()
   .toLowerCase()
   .trim()
-  .min(1)
+  .min(1, "Session URL is required")
   .startsWith("https://www.youtube.com", "Please paste in a valid youtube url.")
   .max(100);
 const videoIdSchema = z.string().trim().min(1).readonly();
@@ -24,9 +27,13 @@ const playersSchema = z
   .nonempty("At least one player is required");
 
 const statSchema = z.object({
-  statId: z.string().trim().min(1),
-  stat: z.string().trim().min(1),
-  statValue: z.string().trim().min(1).max(100),
+  statId: z.string().trim().min(1, "StatId is required"),
+  stat: z.string().trim().min(1, "Stat is required"),
+  statValue: z
+    .string()
+    .trim()
+    .min(1, "Stat value is required")
+    .max(100, "Stat value can be no longer than 100 characters"),
 });
 
 const playerSessionSchema = z.object({

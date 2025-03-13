@@ -9,22 +9,31 @@ import {
   insertNewSessionV2,
 } from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
 import { revalidateTag } from "next/cache";
 import { FormValues, getSchema } from "../../_utils/form-helpers";
-import { useAdmin } from "@/lib/adminContext";
+import {
+  AnimatedFormWrapper,
+  NavigationButtons,
+} from "@/components/AnimatedFormWrapper";
+import { motion } from "motion/react";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { VideoInfo } from "./VideoInfo";
+import { cn } from "@/lib/utils";
+import { FormSummary } from "./Summary";
 
 interface AdminFormProps {
   rdcMembers: Player[];
 }
 
-const EntryCreatorForm = (props: AdminFormProps) => {
+const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { rdcMembers } = props;
+  const [step, setStep] = useState(0);
+  const [modifier, setModifier] = useState(0);
+
   const form = useForm<FormValues, any>({
     resolver: async (data, context, options) => {
       // you can debug your validation schema here
@@ -47,11 +56,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     mode: "onChange",
   });
 
-  const {
-    handleSubmit,
-    watch,
-    formState: { errors, defaultValues, isValid: formIsValid },
-  } = form;
+  const { handleSubmit } = form;
 
   /**
    * Handles the form submission for creating a new session.
@@ -103,44 +108,43 @@ const EntryCreatorForm = (props: AdminFormProps) => {
 
   return (
     <FormProvider {...form}>
-      <Form {...form}>
-        <div className="m-2 text-center text-2xl font-bold dark:text-purple-500">
-          Entry Creator Form
-        </div>
-
-        <form
-          method="post"
-          className="relative mx-auto rounded-md border p-4"
-          onSubmit={handleSubmit(onSubmit, onError)}
+      <div className="grid w-full grid-cols-2 place-content-center gap-3">
+        <Card
+          className={cn("relative col-span-1 p-4", step === 1 && "col-span-2")}
         >
-          <div className="mb-10 w-fit items-center gap-4">
-            <SessionInfo form={form} rdcMembers={rdcMembers} />
-          </div>
-          <div className="mx-auto">
-            <SetManager />
-            <Submit formIsValid={formIsValid} loading={isLoading} />
-          </div>
-        </form>
-      </Form>
+          <CardHeader className="dark:text-purple-500">
+            <CardTitle>Entry Creator Form</CardTitle>
+          </CardHeader>
+          <AnimatedFormWrapper>
+            <Form {...form}>
+              <form method="post" onSubmit={handleSubmit(onSubmit, onError)}>
+                <motion.div
+                  key={step} // Necessary in order for animate presence to know when to rerender
+                  className="space-y-4"
+                  initial={{ x: `${-110 * modifier}%`, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: `${110 * modifier}%`, opacity: 0 }}
+                >
+                  {step === 0 && (
+                    <SessionInfo form={form} rdcMembers={rdcMembers} />
+                  )}
+                  {step === 1 && <SetManager />}
+                  {step === 2 && <FormSummary />}
+                </motion.div>
+                <NavigationButtons
+                  form={form}
+                  isPending={isLoading}
+                  step={step}
+                  setStep={setStep}
+                  setModifier={setModifier}
+                />
+              </form>
+            </Form>
+          </AnimatedFormWrapper>
+        </Card>
+        {step === 0 && <VideoInfo form={form} step={step} />}
+      </div>
     </FormProvider>
-  );
-};
-
-const Submit = ({
-  formIsValid,
-  loading,
-}: {
-  formIsValid: boolean;
-  loading: boolean;
-}) => {
-  return (
-    <Button
-      disabled={!formIsValid || loading}
-      type="submit"
-      className="my-2 w-full rounded-md border p-2"
-    >
-      Submit
-    </Button>
   );
 };
 

@@ -1,9 +1,14 @@
-import { FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Controller, UseFormReturn } from "react-hook-form";
-import { AdminDatePicker } from "./AdminDatePicker";
 import GameDropDownForm from "./GameDropDownForm";
 import PlayerSelector from "./PlayerSelector";
 import { useState, useTransition } from "react";
@@ -12,13 +17,6 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Player } from "@prisma/client";
 import { FormValues } from "../../_utils/form-helpers";
 import { getVideoId } from "../../_utils/helper-functions";
@@ -99,17 +97,8 @@ export const SessionInfo = ({
   return (
     <>
       <div className="gap-2">
-        {/* <Card className="absolute top-0 right-0 h-72 w-72">
-          <CardHeader>
-            <CardTitle>{sessionName}</CardTitle>
-            <CardDescription>{new Date(date).toDateString()}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Thumbnail session={session} />
-          </CardContent>
-        </Card> */}
         <FormField
-          control={form.control}
+          control={control}
           name="sessionUrl"
           render={({ field }) => (
             <FormItem>
@@ -119,11 +108,8 @@ export const SessionInfo = ({
                 placeholder="Session URL"
                 {...field}
               />
-              {errors.sessionUrl && (
-                <p className="text-destructive text-sm">
-                  {errors.sessionUrl.message}
-                </p>
-              )}
+              <FormMessage />
+              <FormDescription>A valid video is required</FormDescription>
             </FormItem>
           )}
         />
@@ -151,21 +137,22 @@ export const SessionInfo = ({
           )}
         />
       </div>
-
-      <FormItem>
-        <Controller
-          name="players"
-          control={control}
-          render={({ field }) => (
+      <FormField
+        control={control}
+        name="players"
+        render={({ field }) => (
+          <FormItem>
             <PlayerSelector
               rdcMembers={rdcMembers}
               control={form.control}
               field={field}
+              currentSelectedPlayers={field.value}
               label="Session Players"
             />
-          )}
-        />
-      </FormItem>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 };

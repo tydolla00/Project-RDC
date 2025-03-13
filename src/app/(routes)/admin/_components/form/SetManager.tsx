@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Controller,
-  useFieldArray,
-  useFormContext,
-  useWatch,
-} from "react-hook-form";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { z } from "zod";
 import MatchManager from "./MatchManager";
 import PlayerSelector from "./PlayerSelector";
@@ -19,6 +14,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { formSchema, Matches, SetWinners } from "../../_utils/form-helpers";
 import WinnerDisplay from "./WinnerDisplay";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 const SetManager = () => {
   const { watch, control } = useFormContext<z.infer<typeof formSchema>>();
@@ -29,8 +25,7 @@ const SetManager = () => {
   });
 
   const [openSets, setOpenSets] = useState<boolean[]>(fields.map(() => false));
-  const [textArea, setTextArea] = useState<string[]>(fields.map(() => ""));
-  const [highestSetId, setHighestSetId] = useState(0);
+  const [highestSetId, setHighestSetId] = useState(fields.length);
 
   const toggleSet = (index: number) => {
     setOpenSets((prevOpenSets) =>
@@ -54,12 +49,6 @@ const SetManager = () => {
         .fill(false)
         .map((_, i) => (i === newLength - 1 ? true : (prev[i] ?? false)));
     });
-
-    setTextArea((prev) => {
-      const newArr = [...prev];
-      newArr.push("");
-      return newArr;
-    });
   };
 
   const players = watch(`players`);
@@ -68,7 +57,7 @@ const SetManager = () => {
   const game = watch("game");
 
   useEffect(() => {
-    console.log("Set Rerenders: ", sets);
+    console.log("Set Rerenders: ", sets, fields);
   }, [fields, sets, testSets]);
 
   return (
@@ -92,15 +81,7 @@ const SetManager = () => {
                   <div className="flex" title={`Delete Set ${setIndex + 1}`}>
                     <TrashIcon
                       className="text-sm text-red-500 hover:cursor-pointer hover:text-red-400"
-                      onClick={() => {
-                        setTextArea((prev) => {
-                          const newSet = prev.filter(
-                            (_, index) => setIndex !== index,
-                          );
-                          return newSet;
-                        });
-                        remove(setIndex);
-                      }}
+                      onClick={() => remove(setIndex)}
                       width={24}
                       height={24}
                     />
@@ -109,17 +90,20 @@ const SetManager = () => {
                 </CardHeader>
 
                 <CollapsibleContent>
-                  <Controller
+                  <FormField
                     name={`sets.${setIndex}.setWinners`}
                     control={control}
                     render={({ field }) => (
-                      <PlayerSelector
-                        rdcMembers={players}
-                        control={control}
-                        field={field}
-                        label="Set Winners"
-                        sticky={true}
-                      />
+                      <FormItem>
+                        <PlayerSelector
+                          rdcMembers={players}
+                          control={control}
+                          field={field}
+                          label="Set Winners"
+                          sticky={true}
+                        />
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
                   <MatchManager setIndex={setIndex} />

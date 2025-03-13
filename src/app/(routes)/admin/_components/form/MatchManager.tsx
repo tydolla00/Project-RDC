@@ -1,6 +1,6 @@
 import { Player } from "@prisma/client";
 import React from "react";
-import { Controller, useFieldArray } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import PlayerSessionManager from "./PlayerSessionManager";
 import PlayerSelector from "./PlayerSelector";
@@ -14,6 +14,7 @@ import {
   MatchWinners,
   PlayerSessions,
 } from "../../_utils/form-helpers";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 interface Props {
   setIndex: number;
@@ -127,17 +128,20 @@ const MatchManager = (props: Props) => {
                   <MinusCircledIcon /> Remove Match
                 </Button>
               </div>
-              <Controller
+              <FormField
                 name={`sets.${setIndex}.matches.${matchIndex}.matchWinners`}
                 control={control}
                 render={({ field }) => (
-                  <PlayerSelector
-                    rdcMembers={players}
-                    control={control}
-                    field={field}
-                    currentSelectedPlayers={field.value}
-                    label="Match Winners"
-                  />
+                  <FormItem>
+                    <PlayerSelector
+                      rdcMembers={players}
+                      control={control}
+                      field={field}
+                      currentSelectedPlayers={field.value}
+                      label="Match Winners"
+                    />
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 
