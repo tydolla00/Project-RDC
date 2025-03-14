@@ -49,9 +49,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     [gameStats, getGameStatsFromDb],
   );
 
-  return (
-    <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
-  );
+  return <AdminContext value={value}>{children}</AdminContext>;
 };
 
 export const useAdmin = () => {

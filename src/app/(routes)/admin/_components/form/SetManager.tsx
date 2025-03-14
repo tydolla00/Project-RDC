@@ -1,10 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Controller,
-  useFieldArray,
-  useFormContext,
-  useWatch,
-} from "react-hook-form";
+import React, { useState } from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { z } from "zod";
 import MatchManager from "./MatchManager";
 import PlayerSelector from "./PlayerSelector";
@@ -17,12 +12,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import { randomInt } from "crypto";
-import { formSchema, FormValues } from "../../_utils/form-helpers";
+import { formSchema, Matches, SetWinners } from "../../_utils/form-helpers";
 import WinnerDisplay from "./WinnerDisplay";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 const SetManager = () => {
   const { watch, control } = useFormContext<z.infer<typeof formSchema>>();
@@ -33,8 +25,7 @@ const SetManager = () => {
   });
 
   const [openSets, setOpenSets] = useState<boolean[]>(fields.map(() => false));
-  const [textArea, setTextArea] = useState<string[]>(fields.map(() => ""));
-  const [highestSetId, setHighestSetId] = useState(0);
+  const [highestSetId, setHighestSetId] = useState(fields.length);
 
   const toggleSet = (index: number) => {
     setOpenSets((prevOpenSets) =>
@@ -45,7 +36,11 @@ const SetManager = () => {
   const handleAddSet = () => {
     const newSetId = highestSetId + 1;
     setHighestSetId(newSetId);
-    append({ setId: newSetId, matches: [], setWinners: [] });
+    append({
+      setId: newSetId,
+      matches: [] as unknown as Matches,
+      setWinners: [] as unknown as SetWinners,
+    });
 
     // Then update openSets to match new length with last set open
     setOpenSets((prev) => {
@@ -54,22 +49,9 @@ const SetManager = () => {
         .fill(false)
         .map((_, i) => (i === newLength - 1 ? true : (prev[i] ?? false)));
     });
-
-    setTextArea((prev) => {
-      const newArr = [...prev];
-      newArr.push("");
-      return newArr;
-    });
   };
 
   const players = watch(`players`);
-  const sets = useWatch({ name: "setWinners" });
-  const testSets = useWatch({ control, name: "sets" });
-  const game = watch("game");
-
-  useEffect(() => {
-    console.log("Set Rerenders: ", sets);
-  }, [fields, sets, testSets]);
 
   return (
     <div className="col-span-2 w-full space-y-4">
@@ -92,15 +74,7 @@ const SetManager = () => {
                   <div className="flex" title={`Delete Set ${setIndex + 1}`}>
                     <TrashIcon
                       className="text-sm text-red-500 hover:cursor-pointer hover:text-red-400"
-                      onClick={() => {
-                        setTextArea((prev) => {
-                          const newSet = prev.filter(
-                            (_, index) => setIndex !== index,
-                          );
-                          return newSet;
-                        });
-                        remove(setIndex);
-                      }}
+                      onClick={() => remove(setIndex)}
                       width={24}
                       height={24}
                     />
@@ -109,17 +83,21 @@ const SetManager = () => {
                 </CardHeader>
 
                 <CollapsibleContent>
-                  <Controller
+                  <FormField
                     name={`sets.${setIndex}.setWinners`}
                     control={control}
                     render={({ field }) => (
-                      <PlayerSelector
-                        rdcMembers={players}
-                        control={control}
-                        field={field}
-                        label="Set Winners"
-                        sticky={true}
-                      />
+                      <FormItem>
+                        <PlayerSelector
+                          currentSelectedPlayers={field.value}
+                          rdcMembers={players}
+                          control={control}
+                          field={field}
+                          label="Set Winners"
+                          sticky={true}
+                        />
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
                   <MatchManager setIndex={setIndex} />
@@ -140,7 +118,6 @@ const SetManager = () => {
         })}
       <div className="ml-auto w-fit">
         <Button
-          disabled={!game || players.length === 0}
           type="button"
           onClick={() => handleAddSet()}
           className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"
