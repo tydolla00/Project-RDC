@@ -5,7 +5,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Controller, UseFormReturn } from "react-hook-form";
@@ -13,7 +12,6 @@ import GameDropDownForm from "./GameDropDownForm";
 import PlayerSelector from "./PlayerSelector";
 import { useState, useTransition } from "react";
 import { getRDCVideoDetails } from "@/app/actions/action";
-import Image from "next/image";
 import { toast } from "sonner";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
@@ -36,9 +34,6 @@ export const SessionInfo = ({
     control,
     formState: { errors, defaultValues },
   } = form;
-  const url = form.watch("sessionUrl");
-  const sessionName = form.watch("sessionName");
-  const date = form.watch("date");
 
   /**
    * Handles the URL update process for a session.
@@ -54,13 +49,20 @@ export const SessionInfo = ({
    *
    * @async
    * @function handleUrlUpdated
-   * @returns {Promise<void>} A promise that resolves when the URL update process is complete.
+   * @returns {void} A promise that resolves when the URL update process is complete.
    */
-  const handleUrlUpdated = () => {
+  const handleUrlUpdated = (): void => {
     startTransition(async () => {
       // TODO Debounce/Rate limit
+      const url = form.getValues("sessionUrl");
       const videoId = getVideoId(url);
-      // See if url is valid.
+
+      if (videoId === form.getValues("videoId")) {
+        toast("Video already linked");
+        return;
+      }
+
+      // Check if url is valid.
       if (
         defaultValues?.sessionUrl === url ||
         control.getFieldState("sessionUrl").invalid ||
@@ -71,13 +73,15 @@ export const SessionInfo = ({
       }
 
       const { error, video } = await getRDCVideoDetails(videoId);
-      if (error === errorCodes.NotAuthenticated)
-        await signOut({ redirectTo: "/" });
 
       if (error !== undefined) {
-        form.reset(undefined, { keepIsValid: true });
-        toast.error(error, { richColors: true });
-        setSession(null);
+        if (error === errorCodes.NotAuthenticated)
+          await signOut({ redirectTo: "/" });
+        else {
+          form.reset(undefined, { keepIsValid: true });
+          toast.error(error, { richColors: true });
+          setSession(null);
+        }
       } else {
         const thumbnail =
           typeof video.thumbnail === "string"
@@ -153,40 +157,6 @@ export const SessionInfo = ({
           </FormItem>
         )}
       />
-    </>
-  );
-};
-
-const Thumbnail = ({
-  session,
-}: {
-  session: Awaited<ReturnType<typeof getRDCVideoDetails>>["video"];
-}) => {
-  console.log("Session: ", session);
-  return (
-    <>
-      {session ? (
-        <Image
-          src={
-            typeof session.thumbnail === "string"
-              ? session.thumbnail
-              : session.thumbnail.url
-          }
-          height={
-            typeof session.thumbnail === "string"
-              ? 108
-              : session.thumbnail.height
-          } // 16:9 aspect ratio
-          width={
-            typeof session.thumbnail === "string"
-              ? 192
-              : session.thumbnail.width
-          }
-          alt="RDC Youtube Video Thumbnail"
-        />
-      ) : (
-        <Skeleton className="h-32" />
-      )}
     </>
   );
 };

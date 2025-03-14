@@ -50,7 +50,7 @@ const PlayerStatManager = (props: Props) => {
         const curr =
           `${curPlayerSession}.playerStats.${index}.statValue` as const;
         return (
-          <div key={field.id} className="my-4 flex gap-3">
+          <div key={field.id} className="my-4">
             <span className="sr-only">{field.stat}</span>
             <div className="relative">
               <FormField
@@ -59,7 +59,7 @@ const PlayerStatManager = (props: Props) => {
                 render={({ field: f }) => (
                   <FormItem>
                     <Input
-                      className="peer block w-full appearance-none rounded-t-lg border-2 px-2.5 pt-6 pb-2.5 text-sm focus:border-b-gray-200 focus:ring-0 focus:outline-none dark:focus:border-purple-700"
+                      className="peer block w-[100px] appearance-none rounded-t-lg border-2 px-2.5 pt-6 pb-2.5 text-sm focus:border-b-gray-200 focus:ring-0 focus:outline-none dark:focus:border-purple-700"
                       id={curr}
                       type="text"
                       {...register(curr)}

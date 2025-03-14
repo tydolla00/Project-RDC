@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
+import React, { useState } from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { z } from "zod";
 import MatchManager from "./MatchManager";
 import PlayerSelector from "./PlayerSelector";
@@ -52,13 +52,6 @@ const SetManager = () => {
   };
 
   const players = watch(`players`);
-  const sets = useWatch({ name: "setWinners" });
-  const testSets = useWatch({ control, name: "sets" });
-  const game = watch("game");
-
-  useEffect(() => {
-    console.log("Set Rerenders: ", sets, fields);
-  }, [fields, sets, testSets]);
 
   return (
     <div className="col-span-2 w-full space-y-4">
@@ -125,7 +118,6 @@ const SetManager = () => {
         })}
       <div className="ml-auto w-fit">
         <Button
-          disabled={!game || players.length === 0}
           type="button"
           onClick={() => handleAddSet()}
           className="rounded-md bg-purple-900 p-2 py-2 text-center font-semibold text-white hover:bg-purple-800"
