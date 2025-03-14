@@ -1,12 +1,16 @@
 import { AnimatePresence, motion } from "motion/react";
 import useMeasure from "react-use-measure";
 import { CardContent, CardFooter } from "./ui/card";
-import { useForm } from "react-hook-form";
+import { useForm, useFormContext } from "react-hook-form";
 import { Dispatch, JSX, SetStateAction, useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
-import { FormValues } from "@/app/(routes)/admin/_utils/form-helpers";
+import {
+  formSchema,
+  FormValues,
+} from "@/app/(routes)/admin/_utils/form-helpers";
+import { z } from "zod";
 
 export const AnimatedFormWrapper = ({
   children,
@@ -39,6 +43,7 @@ export const NavigationButtons = ({
   setModifier,
 }: NavigationButtonsProps) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  const { getValues } = useFormContext<z.infer<typeof formSchema>>();
 
   const handleNextClicked = async () => {
     let isValid: boolean = false;
@@ -55,7 +60,14 @@ export const NavigationButtons = ({
         ]);
         break;
       case 1:
-        isValid = await form.trigger(["sets"]);
+        const stats = getValues().sets.flatMap((field, setIndex) =>
+          field.matches.flatMap((match, matchIndex) =>
+            match.playerSessions.flatMap((_, sessionIndex) => [
+              `sets.${setIndex}.matches.${matchIndex}.playerSessions.${sessionIndex}.playerStats` as const,
+            ]),
+          ),
+        );
+        isValid = await form.trigger(["sets", ...stats]);
         break;
     }
     if (!isValid)

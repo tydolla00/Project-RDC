@@ -1,5 +1,6 @@
 import { $Enums, Player } from "@prisma/client";
 import { z } from "zod";
+import { zodInputStringPipe } from "./zod-helpers";
 
 const gameSchema = z
   .string({ required_error: "Game is required" })
@@ -29,11 +30,7 @@ const playersSchema = z
 const statSchema = z.object({
   statId: z.string().trim().min(1, "StatId is required"),
   stat: z.string().trim().min(1, "Stat is required"),
-  statValue: z
-    .string()
-    .trim()
-    .min(1, "Stat value is required")
-    .max(100, "Stat value can be no longer than 100 characters"),
+  statValue: zodInputStringPipe(z.number()),
 });
 
 const playerSessionSchema = z.object({
@@ -62,9 +59,7 @@ const setSchema = z.object({
   setWinners: z
     .array(playerSchema)
     .nonempty("At least one set winner is required"),
-  matches: matchesSchema.refine(() => {
-    return true;
-  }),
+  matches: matchesSchema,
 });
 
 const setsSchema = z.array(setSchema).nonempty("At least one set is required");
@@ -80,7 +75,7 @@ export const formSchema = z.object({
   sets: setsSchema,
 });
 
-export const getSchema = (game: string): typeof formSchema => {
+export const getSchema = (game: string) => {
   switch (game) {
     case "Rocket League":
       return z.object({

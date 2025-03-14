@@ -96,6 +96,7 @@ const SetManager = () => {
                     render={({ field }) => (
                       <FormItem>
                         <PlayerSelector
+                          currentSelectedPlayers={field.value}
                           rdcMembers={players}
                           control={control}
                           field={field}
