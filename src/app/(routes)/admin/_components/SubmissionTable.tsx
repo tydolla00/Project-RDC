@@ -1,4 +1,3 @@
-import { H1 } from "@/components/headings";
 import {
   Table,
   TableBody,
@@ -9,23 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllSessions } from "../../../../prisma/lib/admin";
-import { Suspense } from "react";
+import { getAllSessions } from "../../../../../prisma/lib/admin";
 import Link from "next/link";
-import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function Page() {
-  return (
-    <div className="m-16">
-      <H1>Sessions</H1>
-      <Suspense fallback={<Skeleton className="h-72 w-full" />}>
-        <SubmissionTable />
-      </Suspense>
-    </div>
-  );
-}
-
-const SubmissionTable = async () => {
+export const SubmissionTable = async () => {
   const sessions = await getAllSessions();
 
   return (

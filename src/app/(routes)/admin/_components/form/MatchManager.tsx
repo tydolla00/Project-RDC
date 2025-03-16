@@ -1,15 +1,20 @@
 import { Player } from "@prisma/client";
-import React, { useMemo } from "react";
-import { Controller, useFieldArray } from "react-hook-form";
+import React from "react";
+import { useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import PlayerSessionManager from "./PlayerSessionManager";
 import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
-import { findPlayerByGamerTag, FormValues } from "../_utils/form-helpers";
 import RDCVisionModal from "./RDCVisionModal";
 import { VisionPlayer, VisionResults } from "@/app/actions/visionAction";
+import {
+  FormValues,
+  MatchWinners,
+  PlayerSessions,
+} from "../../_utils/form-helpers";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 interface Props {
   setIndex: number;
@@ -36,13 +41,13 @@ const MatchManager = (props: Props) => {
     console.log("Handling New Match click", players);
     const playerSessions = players.map((player: Player) => ({
       playerId: player.playerId,
-      playerSessionName: player.playerName,
+      playerSessionName: player.playerName, // Discrepancy in what is being assigned to playerSessionName
       playerStats: [],
     }));
     console.log("Player Sessions: ", playerSessions);
     append({
-      matchWinners: [],
-      playerSessions: playerSessions,
+      matchWinners: [] as unknown as MatchWinners,
+      playerSessions: playerSessions as unknown as PlayerSessions,
     });
   };
 
@@ -92,13 +97,13 @@ const MatchManager = (props: Props) => {
     if (visionWinners && visionWinners.length > 0) {
       console.log("Setting Vision Winners!", visionWinners);
       append({
-        matchWinners: visionWinners,
-        playerSessions: visionMatchPlayerSessions,
+        matchWinners: visionWinners as MatchWinners, // Enforce non empty array
+        playerSessions: visionMatchPlayerSessions as PlayerSessions,
       });
     } else {
       append({
-        matchWinners: [],
-        playerSessions: visionMatchPlayerSessions,
+        matchWinners: [] as unknown as MatchWinners, // Enforce non empty array,
+        playerSessions: visionMatchPlayerSessions as PlayerSessions,
       });
     }
   };
@@ -123,18 +128,20 @@ const MatchManager = (props: Props) => {
                   <MinusCircledIcon /> Remove Match
                 </Button>
               </div>
-              <Label className="my-2 text-muted-foreground">Match Winner</Label>
-              <Controller
+              <FormField
                 name={`sets.${setIndex}.matches.${matchIndex}.matchWinners`}
                 control={control}
                 render={({ field }) => (
-                  <PlayerSelector
-                    rdcMembers={players}
-                    control={control}
-                    field={field}
-                    currentSelectedPlayers={field.value}
-                    label="Match Winners"
-                  />
+                  <FormItem>
+                    <PlayerSelector
+                      rdcMembers={players}
+                      control={control}
+                      field={field}
+                      currentSelectedPlayers={field.value}
+                      label="Match Winners"
+                    />
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 

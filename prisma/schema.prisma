@@ -81,6 +81,7 @@ model GameStat {
   
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  // createdBy   String        @map("created_by")  @default("SYSTEM")
   @@map("game_stats")
 }
 
@@ -94,8 +95,11 @@ model Session {
   thumbnail   String
   date        DateTime  @default(now()) // Date video posted
   videoId     String    @unique
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  // isApproved  Boolean   @map("is_approved") @default(false)
+  // createdBy   String    @map("created_by")  @default("SYSTEM")
   @@map("sessions")
 }
 

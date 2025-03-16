@@ -14,8 +14,6 @@ import { Separator } from "@/components/ui/separator";
 // ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,
 
-// TODO May need to revalidatePath/Tag after updating data.
-
 export async function generateStaticParams() {
   const games = await getAllGames();
   return games.map((game) => ({

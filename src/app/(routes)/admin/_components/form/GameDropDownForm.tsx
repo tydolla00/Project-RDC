@@ -30,8 +30,11 @@ import {
 } from "@/components/ui/popover";
 import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
-import { FormValues } from "../_utils/form-helpers";
-import { getAllGames } from "../../../../../prisma/lib/games";
+import { getAllGames } from "../../../../../../prisma/lib/games";
+import { FormValues } from "../../_utils/form-helpers";
+import { useAdmin } from "@/lib/adminContext";
+
+// TODO Cache results
 
 const GameDropDownForm = ({
   control,
@@ -42,6 +45,7 @@ const GameDropDownForm = ({
   reset: UseFormResetField<FormValues>;
 }) => {
   const [testGames, setTestGames] = useState<Game[]>([]);
+  const { getGameStatsFromDb } = useAdmin();
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -90,9 +94,10 @@ const GameDropDownForm = ({
                       <CommandItem
                         value={game.gameName}
                         key={game.gameId}
-                        onSelect={() => {
+                        onSelect={async () => {
                           field.onChange(game.gameName);
                           reset("sets");
+                          await getGameStatsFromDb(game.gameName);
                         }}
                       >
                         {game.gameName}
