@@ -71,7 +71,7 @@ export const TabbedChart = ({
             <YAxis />
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent nameKey="player" />} />
-            <Bar dataKey={activeChart} fill="hsl(var(--chart-4))" />
+            <Bar dataKey={activeChart} fill="var(--chart-4)" />
           </BarChart>
         </ChartContainer>
       </CardContent>

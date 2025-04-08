@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
+import { gameImages } from "@/lib/constants";
 
 const chartConfig = {
   id: {
@@ -46,7 +47,7 @@ const chartConfig = {
   },
   mobile: {
     label: "Mobile",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 
@@ -69,6 +70,59 @@ export function TimelineChart({
 
   return (
     <>
+      <div className="flex items-start">
+        <Image
+          height={200}
+          width={200}
+          src={`/images/${gameImages["rocketleague"]}`}
+          alt="Rocket League"
+        />
+        <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+          <div className="my-4">
+            {session ? (
+              <div className="flex space-x-4">
+                <div className="w-[300px]">
+                  <Link className="block" href={session?.sessionUrl}>
+                    <Image
+                      height={300}
+                      width={300}
+                      alt={session.sessionName}
+                      src={session.thumbnail}
+                    />
+                    <div className="my-4 hover:underline">
+                      {session.sessionName}
+                    </div>
+                  </Link>
+                </div>
+                <MVP session={session} />
+              </div>
+            ) : null}
+          </div>
+          {session && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  className="cursor-pointer"
+                  // onClick={() => setSession(undefined)}
+                >
+                  Show Session Data
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="h-screen max-w-3xl">
+                <DialogHeader className="space-y-0">
+                  <DialogTitle>Session Info</DialogTitle>
+                  <DialogDescription>
+                    Explore the info about this video
+                  </DialogDescription>
+                </DialogHeader>
+                <ScrollArea className="h-[80vh]">
+                  <MatchData session={session} />
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+          )}
+        </Suspense>
+      </div>
       <Card className="my-6">
         <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
           <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
@@ -127,7 +181,7 @@ export function TimelineChart({
               <Line
                 dataKey={"sessionId"}
                 type="monotone"
-                stroke={`hsl(var(--chart-1))`}
+                stroke={`var(--chart-1)`}
                 strokeWidth={2}
                 dot={true}
               />
@@ -135,51 +189,6 @@ export function TimelineChart({
           </ChartContainer>
         </CardContent>
       </Card>
-      <Suspense fallback={<Skeleton className="h-10 w-full" />}>
-        <div className="my-4">
-          {session ? (
-            <div className="flex space-x-4">
-              <div className="w-[300px]">
-                <Link className="block" href={session?.sessionUrl}>
-                  <Image
-                    height={300}
-                    width={300}
-                    alt={session.sessionName}
-                    src={session.thumbnail}
-                  />
-                  <div className="my-4 hover:underline">
-                    {session.sessionName}
-                  </div>
-                </Link>
-              </div>
-              <MVP session={session} />
-            </div>
-          ) : null}
-        </div>
-        {session && (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                className="cursor-pointer"
-                // onClick={() => setSession(undefined)}
-              >
-                Show Session Data
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="h-screen max-w-3xl">
-              <DialogHeader className="space-y-0">
-                <DialogTitle>Session Info</DialogTitle>
-                <DialogDescription>
-                  Explore the info about this video
-                </DialogDescription>
-              </DialogHeader>
-              <ScrollArea className="h-[80vh]">
-                <MatchData session={session} />
-              </ScrollArea>
-            </DialogContent>
-          </Dialog>
-        )}
-      </Suspense>
     </>
   );
 }

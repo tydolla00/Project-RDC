@@ -4,6 +4,7 @@ import { MembersEnum } from "@/lib/constants";
 import { capitalizeFirst } from "@/lib/utils";
 
 async function main() {
+  console.group("Begin seeding Mario Kart Session");
   await seedRDCMembers();
   await seedGames();
   await seedSession(1);
@@ -29,17 +30,14 @@ async function main() {
   await simulateRace(1, 4, set1Results[3]);
 
   await updateSetWinner(1, [3]); // Ben Wins
+  console.groupEnd();
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-
-    console.log("<> ---  Seeded Mario Kart Session successfully  --- <>");
-    console.log("Seeds have been sown. o7");
-  })
   .catch(async (e) => {
     console.error(e);
+  })
+  .finally(async () => {
     await prisma.$disconnect();
     process.exit(1);
   });

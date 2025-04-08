@@ -108,37 +108,37 @@ const data = [
     player: "mark",
     sorryCounter: 100,
     sorryScale: 0.15,
-    fill: "blue",
+    fill: "var(--chart-1)",
   },
   {
     player: "leland",
     sorryCounter: 50,
     sorryScale: 0.15,
-    fill: "purple",
+    fill: "var(--chart-2)",
   },
   {
     player: "ben",
     sorryCounter: 50,
     sorryScale: 0.3,
-    fill: "green",
+    fill: "var(--chart-3)",
   },
   {
     player: "john",
     sorryCounter: 20,
     sorryScale: 0.05,
-    fill: "skyblue",
+    fill: "var(--chart-4)",
   },
   {
     player: "aff",
     sorryCounter: 10,
     sorryScale: 0.3,
-    fill: "orange",
+    fill: "var(--chart-5)",
   },
   {
     player: "dylan",
     sorryCounter: 30,
     sorryScale: 0.05,
-    fill: "red",
+    fill: "green",
   },
 ];
 
