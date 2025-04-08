@@ -57,10 +57,12 @@ export function TimelineChart({
   sessions,
   title,
   desc,
+  gameName,
 }: {
   sessions: Sessions;
   title: string;
   desc: string;
+  gameName: keyof typeof gameImages;
 }) {
   const [session, setSession] = useState<Sessions[0]>();
   const handleSetSession = useCallback((session: Sessions[0]) => {
@@ -74,7 +76,7 @@ export function TimelineChart({
         <Image
           height={200}
           width={200}
-          src={`/images/${gameImages["rocketleague"]}`}
+          src={`/images/${gameImages[gameName]}`}
           alt="Rocket League"
         />
         <Suspense fallback={<Skeleton className="h-10 w-full" />}>

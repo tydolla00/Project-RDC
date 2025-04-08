@@ -16,7 +16,7 @@ const SetData = ({ set, setIndex }: { set: RLStats[][]; setIndex: number }) => (
   <div className="mb-6">
     <div className="text-chart-4 text-2xl font-bold">Set {setIndex + 1}</div>
     <div className="text-muted-foreground my-2 text-sm">
-      Winners: {set.at(0)?.at(0)?.winners.join(", ")}
+      Winners: {set.at(0)?.at(0)?.winners?.join(", ") || "No winners recorded"}
     </div>
     {set.map((match, matchIndex) => {
       return (
@@ -25,58 +25,8 @@ const SetData = ({ set, setIndex }: { set: RLStats[][]; setIndex: number }) => (
           <Separator className="my-2" />
           <span className="text-muted-foreground text-sm">Winning Team</span>
           <div className="flex gap-10 text-white">
-            <Table className="max-w-sm">
-              <TableCaption></TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Player</TableHead>
-                  <TableHead>Score</TableHead>
-                  <TableHead>Goals</TableHead>
-                  <TableHead>Assists</TableHead>
-                  <TableHead>Saves</TableHead>
-                  <TableHead>Shots</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="bg-blue-700">
-                {match.slice(0, 3).map((ps, i) => (
-                  <TableRow key={ps.player}>
-                    <TableCell>{ps.player}</TableCell>
-                    <TableCell>{ps.score}</TableCell>
-                    <TableCell>{ps.goals}</TableCell>
-                    <TableCell>{ps.assists}</TableCell>
-                    <TableCell>{ps.saves}</TableCell>
-                    <TableCell>{ps.shots}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-              <TableFooter></TableFooter>
-            </Table>
-            <Table className="max-w-sm">
-              <TableCaption></TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Player</TableHead>
-                  <TableHead>Score</TableHead>
-                  <TableHead>Goals</TableHead>
-                  <TableHead>Assists</TableHead>
-                  <TableHead>Saves</TableHead>
-                  <TableHead>Shots</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="bg-orange-700">
-                {match.slice(3).map((ps) => (
-                  <TableRow key={ps.player}>
-                    <TableCell>{ps.player}</TableCell>
-                    <TableCell>{ps.score}</TableCell>
-                    <TableCell>{ps.goals}</TableCell>
-                    <TableCell>{ps.assists}</TableCell>
-                    <TableCell>{ps.saves}</TableCell>
-                    <TableCell>{ps.shots}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-              <TableFooter></TableFooter>
-            </Table>
+            <StatsTable players={match.slice(0, 3)} bgColor="bg-blue-700" />
+            <StatsTable players={match.slice(3)} bgColor="bg-orange-700" />
           </div>
         </div>
       );
@@ -84,3 +34,38 @@ const SetData = ({ set, setIndex }: { set: RLStats[][]; setIndex: number }) => (
   </div>
 );
 export default SetData;
+
+const StatsTable = ({
+  players,
+  bgColor,
+}: {
+  players: RLStats[];
+  bgColor: string;
+}) => (
+  <Table className="max-w-sm">
+    <TableCaption></TableCaption>
+    <TableHeader>
+      <TableRow>
+        <TableHead>Player</TableHead>
+        <TableHead>Score</TableHead>
+        <TableHead>Goals</TableHead>
+        <TableHead>Assists</TableHead>
+        <TableHead>Saves</TableHead>
+        <TableHead>Shots</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody className={bgColor}>
+      {players.map((ps) => (
+        <TableRow key={ps.player}>
+          <TableCell>{ps.player}</TableCell>
+          <TableCell>{ps.score}</TableCell>
+          <TableCell>{ps.goals}</TableCell>
+          <TableCell>{ps.assists}</TableCell>
+          <TableCell>{ps.saves}</TableCell>
+          <TableCell>{ps.shots}</TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+    <TableFooter></TableFooter>
+  </Table>
+);

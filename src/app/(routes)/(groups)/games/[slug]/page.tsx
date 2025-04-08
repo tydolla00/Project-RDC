@@ -7,7 +7,7 @@ import RocketLeague from "./_components/rocketleague";
 import Speedrunners from "./_components/speedrunners";
 import LethalCompany from "./_components/lethalcompany";
 import GolfWithFriends from "./_components/golfwithfriends";
-import { GamesEnum } from "@/lib/constants";
+import { gameImages, GamesEnum } from "@/lib/constants";
 import { TimelineChart } from "../../_components/timeline-chart";
 import { Separator } from "@/components/ui/separator";
 
@@ -28,17 +28,26 @@ export default async function Page({
 }) {
   const { slug } = await params;
   const games = await getAllGames();
-  const id = games.find(
-    (g) => g.gameName.replace(/\s/g, "").toLowerCase() === slug,
-  )?.gameId!;
-  const sessions = await getAllSessionsByGame(id); // Fetch sessions
+
+  if (games.length === 0)
+    return (
+      <div className="m-16">
+        <H1 className="my-0">No games found</H1>
+        <p className="text-muted-foreground">
+          No games found. Please check back later.
+        </p>
+      </div>
+    );
+
   const game = games.find(
-    (game) =>
-      game.gameName.replace(/\s/g, "").toLowerCase() === slug.toLowerCase(),
+    (game) => game.gameName.replace(/\s/g, "").toLowerCase() === slug,
   )!;
 
-  const gameName = slug.toLowerCase() as GamesEnum;
+  const sessions = await getAllSessionsByGame(game.gameId); // Fetch sessions
+
+  const gameName = slug as GamesEnum;
   let component: React.ReactNode;
+
   switch (gameName) {
     case GamesEnum.MarioKart8:
       component = <Mariokart game={game} />;
@@ -64,8 +73,13 @@ export default async function Page({
     <div className="m-16">
       <H1 className="my-0">{game.gameName}</H1>
       <TimelineChart
+        gameName={
+          game.gameName
+            .replace(/\s/g, "")
+            .toLowerCase() as keyof typeof gameImages
+        }
         sessions={sessions}
-        title="Rocket League Videos"
+        title={`${game.gameName} Videos`}
         desc="Use the keyboard to view specific data for a video"
       />
       <Separator className="my-4" />

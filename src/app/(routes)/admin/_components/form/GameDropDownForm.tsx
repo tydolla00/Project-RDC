@@ -33,6 +33,7 @@ import { useState, useEffect } from "react";
 import { getAllGames } from "../../../../../../prisma/lib/games";
 import { FormValues } from "../../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
+import { toast } from "sonner";
 
 // TODO Cache results
 
@@ -95,9 +96,16 @@ const GameDropDownForm = ({
                         value={game.gameName}
                         key={game.gameId}
                         onSelect={async () => {
-                          field.onChange(game.gameName);
-                          reset("sets");
-                          await getGameStatsFromDb(game.gameName);
+                          try {
+                            field.onChange(game.gameName);
+                            reset("sets");
+                            await getGameStatsFromDb(game.gameName);
+                          } catch (error) {
+                            console.error("Failed to fetch game stats:", error);
+                            toast.error(
+                              "Failed to fetch game stats. Please try again.",
+                            );
+                          }
                         }}
                       >
                         {game.gameName}

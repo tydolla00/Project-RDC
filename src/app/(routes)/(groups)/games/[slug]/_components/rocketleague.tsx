@@ -29,7 +29,7 @@ const RocketLeague = async ({
           },
           saves: {
             sum: Number(saves?.sum),
-            avg: Math.round(Number(assists?.avg)),
+            avg: Math.round(Number(saves?.avg)),
           },
           score: {
             sum: Number(score?.sum),
@@ -52,10 +52,8 @@ const RocketLeague = async ({
     }),
   );
   membersMap = membersMap.filter((d) => d?.score.sum !== 0);
-  console.log({ membersMap });
   const wins = await getWinsPerPlayer(game.gameId);
   const winsPerPlayer = calcWinsPerPlayer(wins!); // Sets / Wins
-  console.log(winsPerPlayer);
 
   const config = {
     player: { label: "Player" },

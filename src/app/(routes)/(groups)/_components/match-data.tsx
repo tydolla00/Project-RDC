@@ -71,46 +71,49 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
     <div className="my-6">
       {sets.length > 0 && (
         <>
-          <div>
-            <Button
-              className="cursor-pointer"
-              variant="ghost"
-              disabled={currentSet === 0}
-              onClick={() => setCurrentSet((curr) => curr - 1)}
-            >
-              Previous Set
-            </Button>
-            <Button
-              className="cursor-pointer"
-              variant="ghost"
-              disabled={currentSet === sets.length - 1}
-              onClick={() => setCurrentSet((curr) => curr + 1)}
-            >
-              Next Set
-            </Button>
-          </div>
+          <NavigationButtons
+            currentSet={currentSet}
+            setCurrentSet={setCurrentSet}
+            maxSets={sets.length}
+          />
           <SetData set={sets[currentSet]} setIndex={currentSet} />
-          <div>
-            <Button
-              className="cursor-pointer"
-              variant="ghost"
-              disabled={currentSet === 0}
-              onClick={() => setCurrentSet((curr) => curr - 1)}
-            >
-              Previous Set
-            </Button>
-            <Button
-              className="cursor-pointer"
-              variant="ghost"
-              disabled={currentSet === sets.length - 1}
-              onClick={() => setCurrentSet((curr) => curr + 1)}
-            >
-              Next Set
-            </Button>
-          </div>
+          <NavigationButtons
+            currentSet={currentSet}
+            setCurrentSet={setCurrentSet}
+            maxSets={sets.length}
+          />
         </>
       )}
     </div>
   );
 };
 export default MatchData;
+
+const NavigationButtons = ({
+  currentSet,
+  setCurrentSet,
+  maxSets,
+}: {
+  currentSet: number;
+  setCurrentSet: React.Dispatch<React.SetStateAction<number>>;
+  maxSets: number;
+}) => (
+  <div>
+    <Button
+      className="cursor-pointer"
+      variant="ghost"
+      disabled={currentSet === 0}
+      onClick={() => setCurrentSet((curr) => curr - 1)}
+    >
+      Previous Set
+    </Button>
+    <Button
+      className="cursor-pointer"
+      variant="ghost"
+      disabled={currentSet === maxSets - 1}
+      onClick={() => setCurrentSet((curr) => curr + 1)}
+    >
+      Next Set
+    </Button>
+  </div>
+);

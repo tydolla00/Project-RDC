@@ -49,7 +49,7 @@ export const SessionInfo = ({
    *
    * @async
    * @function handleUrlUpdated
-   * @returns {void} A promise that resolves when the URL update process is complete.
+   * @returns {void}
    */
   const handleUrlUpdated = (): void => {
     startTransition(async () => {
