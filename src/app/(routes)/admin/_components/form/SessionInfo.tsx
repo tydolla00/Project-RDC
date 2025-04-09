@@ -38,18 +38,15 @@ export const SessionInfo = ({
   /**
    * Handles the URL update process for a session.
    *
+   * @description
    * This function performs the following steps:
-   * 1. Starts a transition to handle the URL update asynchronously.
-   * 2. Checks if the provided URL is valid and not the same as the default session URL.
-   * 3. If the URL is invalid, displays an error toast message.
-   * 4. Fetches video details using the provided URL.
-   * 5. If the user is not authenticated, signs out and redirects to the home page.
-   * 6. If there is an error fetching video details, resets the form and displays an error toast message.
-   * 7. If the video details are successfully fetched, updates the form with the video details and displays a success toast message.
+   * 1. Validates that the video ID is not already linked
+   * 2. Validates the URL format and ensures it's different from default values
+   * 3. Fetches video details from the YouTube API
+   * 4. Updates form fields with video metadata (title, thumbnail, date)
+   * 5. Handles error cases including authentication failures
    *
-   * @async
-   * @function handleUrlUpdated
-   * @returns {void}
+   * @throws {Error} When video fetch fails or authentication is invalid
    */
   const handleUrlUpdated = (): void => {
     startTransition(async () => {

@@ -33,26 +33,27 @@ export const updateAuthStatus = async (session: Session | null) => {
 };
 
 /**
- * Fetches RDC video details based on the provided video ID.
+ * Fetches and validates YouTube video details for RDC sessions
  *
- * @param videoId - The ID of the video to fetch details for.
- * @returns An object containing the video details or an error message.
+ * @description
+ * This server action:
+ * 1. Validates that the video ID isn't already in use
+ * 2. Fetches video metadata from YouTube API
+ * 3. Formats video data for session storage
+ * 4. Handles errors including authentication failures
+ * 5. Revalidates cached data on successful fetch
  *
- * The function first checks if the user is authenticated. If not, it returns an error.
- * It then attempts to find the video session in the database using the provided video ID.
- * If the video session is not found in the database, it fetches the video details from the YouTube API.
- * The function ensures that the video is uploaded by "RDC Live" and returns the video details.
- * If the video session is found in the database, it returns the database record.
+ * @param videoId - The YouTube video ID to fetch details for
+ * @returns Object containing video details or error information
+ * @throws Returns error object if video fetch fails or authentication is invalid
  *
  * @example
- * ```typescript
- * const videoDetails = await getRDCVideoDetails("someVideoId");
- * if (videoDetails.error) {
- *   console.error(videoDetails.error);
+ * const { video, error } = await getRDCVideoDetails('dQw4w9WgXcQ');
+ * if (error) {
+ *   // Handle error case
  * } else {
- *   console.log(videoDetails.video);
+ *   // Use video details
  * }
- * ```
  */
 export const getRDCVideoDetails = async (
   videoId: string,

@@ -51,6 +51,19 @@ const TEAM_MAPPING = {
   OrangePlayers: "orangeTeam",
 } as const;
 
+/**
+ * Processes raw player data from vision recognition into a structured format
+ *
+ * @description
+ * This function:
+ * 1. Validates and normalizes all player stats (score, goals, assists, saves, shots)
+ * 2. Aggregates validation flags to indicate potential recognition issues
+ * 3. Maps raw data into a standardized player data structure
+ * 4. Handles missing or invalid values with appropriate defaults
+ *
+ * @param player - Raw player data from vision recognition
+ * @returns Object containing processed player data and validation flag
+ */
 const processPlayer = (player: any) => {
   console.log("Processing Player: ", player);
   const statValidations = {
@@ -98,6 +111,21 @@ const processPlayer = (player: any) => {
   };
 };
 
+/**
+ * Processes vision recognition data for a team of players
+ *
+ * @description
+ * This function:
+ * 1. Maps over each player in the team data
+ * 2. Processes individual player stats and validates results
+ * 3. Validates player identities against session players
+ * 4. Aggregates validation flags to indicate if manual review is needed
+ *
+ * @param teamData - The raw team data from vision recognition
+ * @param sessionPlayers - Array of valid players in the current session for validation
+ * @returns Object containing processed player data and validation flags
+ * @throws Logs errors if player processing fails
+ */
 const processTeam = (
   teamData: DocumentFieldOutput,
   sessionPlayers: Player[],
@@ -131,9 +159,20 @@ const processTeam = (
 };
 
 /**
- *  Analyze the screenshot of the game stats and extract the player stats
- * @param base64Source base64 encoded image source : string
- * @returns Object containing teams and player objects with their stats
+ * Analyzes a screenshot using Azure Document Intelligence to extract game stats
+ *
+ * @description
+ * This function:
+ * 1. Sends the image to Azure's Document Intelligence API for analysis
+ * 2. Processes the response to extract team and player information
+ * 3. Validates and normalizes all extracted data
+ * 4. Determines match winners based on team scores
+ * 5. Flags any potential recognition issues that need manual review
+ *
+ * @param base64Source - Base64 encoded image data to analyze
+ * @param sessionPlayers - Array of valid players in the current session for validation
+ * @returns A VisionResult object containing processed data and status information
+ * @throws Returns a Failed status with error details if processing fails
  */
 export const analyzeScreenShot = async (
   base64Source: string,
@@ -220,6 +259,18 @@ export const analyzeScreenShot = async (
   }
 };
 
+/**
+ * Validates and normalizes stat values from vision processing results
+ *
+ * @description
+ * Handles special cases in vision recognition:
+ * - Converts 'Z' or 'Ø' to '0' as they are commonly misrecognized
+ * - Handles undefined values by converting to '0'
+ * - Flags values that need manual verification
+ *
+ * @param statValue - The raw stat value from vision recognition
+ * @returns Object containing normalized stat value and flag indicating if manual verification is needed
+ */
 const validateVisionStatValue = (
   statValue: string | undefined,
 ): { statValue: string; reqCheck: boolean } => {
@@ -233,7 +284,18 @@ const validateVisionStatValue = (
   }
 };
 
-// TODO: RDC Vision grabs the winner text value (most of the time) can see if we can use that to determine winner potentially
+/**
+ * Calculates the winning team in a Rocket League match based on total goals
+ *
+ * @description
+ * This function:
+ * 1. Sums up goals for each team from player stats
+ * 2. Compares total goals between blue and orange teams
+ * 3. Returns the array of players from the winning team
+ *
+ * @param visionResults - Object containing both teams' player data and stats
+ * @returns Array of VisionPlayer objects from the winning team, or empty array if no winner can be determined
+ */
 export const calculateRLWinners = (visionResults: VisionResults) => {
   let blueTeamGoals = 0;
   let orangeTeamGoals = 0;
@@ -263,6 +325,21 @@ export const calculateRLWinners = (visionResults: VisionResults) => {
   }
 };
 
+/**
+ * Validates an entire team's worth of players from vision results
+ *
+ * @description
+ * This function:
+ * 1. Iterates through all players from vision recognition
+ * 2. Validates each player's identity using gamer tags
+ * 3. Verifies all players are part of the current session
+ * 4. Early returns false if any player fails validation
+ *
+ * @param visionPlayers - Array of players from vision recognition
+ * @param sessionPlayers - Array of valid players in the current session
+ * @returns boolean indicating if all players were successfully validated
+ * @throws Logs validation failures to console
+ */
 const validateVisionResultPlayers = (
   visionPlayers: VisionPlayer[],
   sessionPlayers: Player[],
@@ -295,6 +372,21 @@ const validateVisionResultPlayers = (
   }
 };
 
+/**
+ * Validates a player from vision results against session players and normalizes their data
+ *
+ * @description
+ * This function:
+ * 1. Takes a player from vision recognition and attempts to find their real identity
+ * 2. Verifies the player is part of the current session
+ * 3. Normalizes the player data with correct ID and name if valid
+ * 4. Preserves the original stats while updating player identity
+ *
+ * @param visionPlayer - The player data from vision recognition
+ * @param sessionPlayers - Array of valid players in the current session
+ * @returns Normalized VisionPlayer object if valid, false if validation fails
+ * @throws Logs validation errors to console
+ */
 const validateVisionResultPlayer = (
   visionPlayer: VisionPlayer,
   sessionPlayers: Player[],
