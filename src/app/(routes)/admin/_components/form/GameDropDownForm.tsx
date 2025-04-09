@@ -51,7 +51,9 @@ const GameDropDownForm = ({
   useEffect(() => {
     const fetchGames = async () => {
       const games = await getAllGames();
-      setTestGames(games);
+      if (!games.success || !games.data)
+        toast.error("Failed to fetch games. Please try again.");
+      else setTestGames(games.data);
     };
     fetchGames();
   }, []);

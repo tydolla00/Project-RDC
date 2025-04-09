@@ -36,6 +36,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { gameImages } from "@/lib/constants";
+import { QueryResponseData } from "../../../../../prisma/db";
 
 const chartConfig = {
   id: {
@@ -51,7 +52,9 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-type Sessions = Awaited<ReturnType<typeof getAllSessionsByGame>>;
+type Sessions = QueryResponseData<
+  Awaited<ReturnType<typeof getAllSessionsByGame>>
+>;
 
 export function TimelineChart({
   sessions,

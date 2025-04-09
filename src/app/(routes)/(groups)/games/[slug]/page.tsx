@@ -16,7 +16,9 @@ export const dynamicParams = false; // true | false,
 
 export async function generateStaticParams() {
   const games = await getAllGames();
-  return games.map((game) => ({
+
+  if (!games.success || !games.data) games.data = [];
+  return games.data.map((game) => ({
     slug: game.gameName.replace(/\s/g, "").toLowerCase(),
   }));
 }
@@ -29,21 +31,14 @@ export default async function Page({
   const { slug } = await params;
   const games = await getAllGames();
 
-  if (games.length === 0)
-    return (
-      <div className="m-16">
-        <H1 className="my-0">No games found</H1>
-        <p className="text-muted-foreground">
-          No games found. Please check back later.
-        </p>
-      </div>
-    );
+  if (!games.success || !games.data) return <NoGames />;
 
-  const game = games.find(
+  const game = games.data.find(
     (game) => game.gameName.replace(/\s/g, "").toLowerCase() === slug,
   )!;
 
   const sessions = await getAllSessionsByGame(game.gameId); // Fetch sessions
+  if (!sessions.success || !sessions.data) sessions.data = [];
 
   const gameName = slug as GamesEnum;
   let component: React.ReactNode;
@@ -78,7 +73,7 @@ export default async function Page({
             .replace(/\s/g, "")
             .toLowerCase() as keyof typeof gameImages
         }
-        sessions={sessions}
+        sessions={sessions.data}
         title={`${game.gameName} Videos`}
         desc="Use the keyboard to view specific data for a video"
       />
@@ -87,3 +82,12 @@ export default async function Page({
     </div>
   );
 }
+
+const NoGames = () => (
+  <div className="m-16">
+    <H1 className="my-0">No games found</H1>
+    <p className="text-muted-foreground">
+      No games found. Please check back later.
+    </p>
+  </div>
+);

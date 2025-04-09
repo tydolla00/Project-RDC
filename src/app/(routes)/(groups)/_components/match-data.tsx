@@ -3,8 +3,11 @@ import { RLStats } from "./timeline-chart";
 import { getAllSessionsByGame } from "../../../../../prisma/lib/admin";
 import { Button } from "@/components/ui/button";
 import SetData from "./set-data";
+import { QueryResponseData } from "../../../../../prisma/db";
 
-type Sessions = Awaited<ReturnType<typeof getAllSessionsByGame>>;
+type Sessions = QueryResponseData<
+  Awaited<ReturnType<typeof getAllSessionsByGame>>
+>;
 
 const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
   const sets = useMemo(() => {

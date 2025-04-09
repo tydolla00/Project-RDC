@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import prisma from "../db";
+import prisma, { handlePrismaOperation } from "../db";
 
 /**
  * Retrieves all video sessions from the database, including the associated game names.
@@ -11,9 +11,11 @@ import prisma from "../db";
  */
 export const getAllSessions = unstable_cache(
   async () =>
-    await prisma.session.findMany({
-      include: { Game: { select: { gameName: true } } },
-    }),
+    await handlePrismaOperation(() =>
+      prisma.session.findMany({
+        include: { Game: { select: { gameName: true } } },
+      }),
+    ),
   undefined,
   { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
 );
@@ -37,29 +39,35 @@ export const getAllSessions = unstable_cache(
  */
 export const getAllSessionsByGame = unstable_cache(
   async (gameId: number) =>
-    await prisma.session.findMany({
-      where: { gameId },
-      select: {
-        date: true,
-        sessionId: true,
-        sessionName: true,
-        sessionUrl: true,
-        thumbnail: true,
-        Game: { select: { gameName: true } },
-        sets: {
-          select: {
-            setWinners: true,
-            matches: {
-              select: {
-                matchWinners: true,
-                playerSessions: {
-                  select: {
-                    playerStats: {
-                      select: {
-                        value: true,
-                        player: true,
-                        gameStat: {
-                          select: { statName: true, statId: true, type: true },
+    await handlePrismaOperation(() =>
+      prisma.session.findMany({
+        where: { gameId },
+        select: {
+          date: true,
+          sessionId: true,
+          sessionName: true,
+          sessionUrl: true,
+          thumbnail: true,
+          Game: { select: { gameName: true } },
+          sets: {
+            select: {
+              setWinners: true,
+              matches: {
+                select: {
+                  matchWinners: true,
+                  playerSessions: {
+                    select: {
+                      playerStats: {
+                        select: {
+                          value: true,
+                          player: true,
+                          gameStat: {
+                            select: {
+                              statName: true,
+                              statId: true,
+                              type: true,
+                            },
+                          },
                         },
                       },
                     },
@@ -69,8 +77,8 @@ export const getAllSessionsByGame = unstable_cache(
             },
           },
         },
-      },
-    }),
+      }),
+    ),
   undefined,
   { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
 );

@@ -57,43 +57,51 @@ export const updateAuthStatus = async (session: Session | null) => {
 export const getRDCVideoDetails = async (
   videoId: string,
 ): GetRdcVideoDetails => {
-  const isAuthenticated = await auth();
-  if (!isAuthenticated)
-    return { video: null, error: errorCodes.NotAuthenticated };
+  try {
+    const isAuthenticated = await auth();
+    if (!isAuthenticated)
+      return { video: null, error: errorCodes.NotAuthenticated };
 
-  const dbRecord = await prisma.session.findFirst({
-    where: { videoId },
-  });
-  const apiKey = isProduction
-    ? config.YOUTUBE_API_KEY
-    : config.YOUTUBE_LOCAL_API_KEY;
+    const dbRecord = await prisma.session.findFirst({
+      where: { videoId },
+    });
+    const apiKey = isProduction
+      ? config.YOUTUBE_API_KEY
+      : config.YOUTUBE_LOCAL_API_KEY;
 
-  if (!dbRecord) {
-    const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${apiKey}`;
-    const YTvideo = await fetch(apiUrl);
+    if (!dbRecord) {
+      const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${apiKey}`;
+      const YTvideo = await fetch(apiUrl);
 
-    !isProduction &&
-      !config.YOUTUBE_LOCAL_API_KEY &&
-      console.log("LOCAL YOUTUBE API KEY NOT CONFIGURED");
+      !isProduction &&
+        !config.YOUTUBE_LOCAL_API_KEY &&
+        console.log("LOCAL YOUTUBE API KEY NOT CONFIGURED");
 
-    if (!YTvideo.ok)
-      return { error: "Something went wrong. Please try again.", video: null };
+      if (!YTvideo.ok)
+        return {
+          error: "Something went wrong. Please try again.",
+          video: null,
+        };
 
-    const json = (await YTvideo.json()) as YouTubeVideoListResponse;
-    const video = json.items[0];
+      const json = (await YTvideo.json()) as YouTubeVideoListResponse;
+      const video = json.items[0];
 
-    if (video?.snippet.channelTitle !== "RDC Live")
-      return { error: "Please upload a video by RDC Live", video: null };
+      if (video?.snippet.channelTitle !== "RDC Live")
+        return { error: "Please upload a video by RDC Live", video: null };
 
-    const session: YTAPIRequestSession = {
-      sessionUrl: `https://youtube.com/watch?v=${video.id}`,
-      date: new Date(video.snippet.publishedAt),
-      sessionName: video.snippet.title,
-      thumbnail:
-        video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
-    };
-    return { video: session, error: undefined };
-  } else return { video: dbRecord, error: "Video already exists" };
+      const session: YTAPIRequestSession = {
+        sessionUrl: `https://youtube.com/watch?v=${video.id}`,
+        date: new Date(video.snippet.publishedAt),
+        sessionName: video.snippet.title,
+        thumbnail:
+          video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
+      };
+      return { video: session, error: undefined };
+    } else return { video: dbRecord, error: "Video already exists" };
+  } catch (error) {
+    console.error("Error in getRDCVideoDetails:", error);
+    return { video: null, error: "An unexpected error occurred" };
+  }
 };
 
 type YouTubeVideoListResponse = {

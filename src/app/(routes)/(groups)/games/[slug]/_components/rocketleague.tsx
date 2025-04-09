@@ -4,6 +4,7 @@ import { getAllMembers } from "../../../../../../../prisma/lib/members";
 import { calcWinsPerPlayer, getRLStats } from "../_functions/stats";
 import { CustomChart } from "./charts";
 import { TabbedChart } from "../../../_components/tabbed-chart";
+import { NoMembers } from "../../../members/_components/members";
 
 const RocketLeague = async ({
   game,
@@ -11,8 +12,13 @@ const RocketLeague = async ({
   game: { gameId: number; gameName: string };
 }) => {
   const members = await getAllMembers();
+
+  if (!members.success || !members.data) {
+    return <NoMembers />;
+  }
+
   let membersMap = await Promise.all(
-    members.map(async (member) => {
+    members.data.map(async (member) => {
       try {
         const [goals, assists, saves, score, days] = await getRLStats(
           member.playerId,
@@ -53,7 +59,9 @@ const RocketLeague = async ({
   );
   membersMap = membersMap.filter((d) => d?.score.sum !== 0);
   const wins = await getWinsPerPlayer(game.gameId);
-  const winsPerPlayer = calcWinsPerPlayer(wins!); // Sets / Wins
+  if (!wins.success || !wins.data) wins.data = { sessions: [] };
+
+  const winsPerPlayer = calcWinsPerPlayer(wins.data); // Sets / Wins
 
   const config = {
     player: { label: "Player" },
