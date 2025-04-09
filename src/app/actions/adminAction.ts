@@ -264,6 +264,7 @@ export const insertNewSessionFromAdmin = async (
         );
       }),
     );
+    revalidateTag("getAllSessions");
     return { error: null };
   } catch (error) {
     return { error: "Unknown error occurred. Please try again." };

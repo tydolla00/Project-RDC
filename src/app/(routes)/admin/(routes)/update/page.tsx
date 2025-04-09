@@ -13,6 +13,8 @@ import { statDescriptions } from "@/lib/constants";
 
 export default async function Page() {
   const stats = await getAllGameStats();
+
+  if (!stats.success || !stats.data) stats.data = [];
   return (
     <div>
       <H1>Update Database</H1>
@@ -25,7 +27,7 @@ export default async function Page() {
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Cod</SelectLabel>
-            {stats.map((stat) => (
+            {stats.data.map((stat) => (
               <SelectItem key={stat.statId} value={stat.statName}>
                 {statDescriptions[stat.statName]}
               </SelectItem>
