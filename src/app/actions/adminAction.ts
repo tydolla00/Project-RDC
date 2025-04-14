@@ -2,12 +2,13 @@
 
 import { $Enums, Game, GameStat, Player } from "@prisma/client";
 import { v4 } from "uuid";
-import prisma from "../../../prisma/db";
+import prisma, { handlePrismaOperation } from "../../../prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { getAllGames } from "../../../prisma/lib/games";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { randomInt } from "crypto";
+import { revalidateTag } from "next/cache";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -18,23 +19,25 @@ import { randomInt } from "crypto";
  */
 export async function getGameStats(gameName: string): Promise<GameStat[]> {
   console.log("Looking for gameStats for ", gameName);
-  const game = await prisma.game.findFirst({
-    where: {
-      gameName: gameName,
-    },
-  });
+  const game = await handlePrismaOperation(() =>
+    prisma.game.findFirst({ where: { gameName } }),
+  );
 
-  if (!game) {
-    throw new Error(`Game with name ${gameName} not found`);
+  if (!game.success || !game.data) return [];
+
+  const gameId = game.data.gameId;
+  const gameStats = await handlePrismaOperation(() =>
+    prisma.gameStat.findMany({
+      where: {
+        gameId: gameId,
+      },
+    }),
+  );
+
+  if (!gameStats.success || !gameStats.data) {
+    throw new Error("Stats not found.");
   }
-
-  const gameId = game.gameId;
-  const gameStats = await prisma.gameStat.findMany({
-    where: {
-      gameId: gameId,
-    },
-  });
-  return gameStats;
+  return gameStats.data;
 }
 
 /**
@@ -261,6 +264,7 @@ export const insertNewSessionFromAdmin = async (
         );
       }),
     );
+    revalidateTag("getAllSessions");
     return { error: null };
   } catch (error) {
     return { error: "Unknown error occurred. Please try again." };
@@ -294,7 +298,11 @@ export const insertNewSessionV2 = async ({
   date, // Can we remove data from the tables.
   videoId,
 }: FormValues): Promise<{ error: string | null }> => {
-  const gameId = (await getAllGames()).find((g) => g.gameName === game)?.gameId;
+  const games = await getAllGames();
+
+  if (!games.data) return { error: "No games found." };
+
+  const gameId = games.data.find((g) => g.gameName === game)?.gameId;
   const isAuthenticated = await auth();
   if (!isAuthenticated) return { error: errorCodes.NotAuthenticated };
 
@@ -422,3 +430,10 @@ export const insertNewSessionV2 = async ({
 
   return { error: null };
 };
+
+/**
+ * Server action to revalidate a tag so it can be used in client components.
+ * @param path path that you want to revalidate
+ * @returns
+ */
+export const revalidateAction = async (path: string) => revalidateTag(path);

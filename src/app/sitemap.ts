@@ -21,14 +21,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     await getAllMembers(),
   ]);
 
-  const gamesMeta: MetadataRoute.Sitemap = games.map((game) => ({
+  if (!games.success || !games.data) games.data = [];
+  if (!members.success || !members.data) members.data = [];
+
+  const gamesMeta: MetadataRoute.Sitemap = games.data.map((game) => ({
     url: `https://project-rdc.vercel.app/games/${game.gameName.replace(/\s/g, "").toLowerCase()}`,
     lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 1,
   }));
 
-  const membersData: MetadataRoute.Sitemap = members.map((member) => ({
+  const membersData: MetadataRoute.Sitemap = members.data.map((member) => ({
     url: `https://project-rdc.vercel.app/games/${member.playerName.toLowerCase()}`,
     lastModified: new Date(),
     changeFrequency: "weekly",

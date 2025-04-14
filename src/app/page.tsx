@@ -12,7 +12,6 @@ import Image from "next/image";
 export default async function Home() {
   const games = await getGamesNav();
   const session = await auth();
-  console.log(games);
   return (
     <>
       <div className="m-16">
@@ -109,31 +108,31 @@ const data = [
     player: "mark",
     sorryCounter: 100,
     sorryScale: 0.15,
-    fill: "hsl(var(--chart-1))",
+    fill: "var(--chart-1)",
   },
   {
     player: "leland",
     sorryCounter: 50,
     sorryScale: 0.15,
-    fill: "hsl(var(--chart-2))",
+    fill: "var(--chart-2)",
   },
   {
     player: "ben",
     sorryCounter: 50,
     sorryScale: 0.3,
-    fill: "hsl(var(--chart-3))",
+    fill: "var(--chart-3)",
   },
   {
     player: "john",
     sorryCounter: 20,
     sorryScale: 0.05,
-    fill: "hsl(var(--chart-4))",
+    fill: "var(--chart-4)",
   },
   {
     player: "aff",
     sorryCounter: 10,
     sorryScale: 0.3,
-    fill: "hsl(var(--chart-5))",
+    fill: "var(--chart-5)",
   },
   {
     player: "dylan",
@@ -145,10 +144,10 @@ const data = [
 
 const config = {
   player: { label: "Player" },
-  mark: { label: "Mark", color: "hsl(var(--chart-1))" },
-  ben: { label: "Ben", color: "hsl(var(--chart-2))" },
-  leland: { label: "Leland", color: "hsl(var(--chart-3))" },
-  john: { label: "John", color: "hsl(var(--chart-4))" },
-  aff: { label: "Aff", color: "hsl(var(--chart-5))" },
-  dylan: { label: "Dylan", color: "green" },
+  mark: { label: "Mark", color: "blue" },
+  ben: { label: "Ben", color: "yellow" },
+  leland: { label: "Leland", color: "red" },
+  john: { label: "John", color: "purple" },
+  aff: { label: "Aff", color: "orange" },
+  dylan: { label: "Dylan", color: "blue" },
 } satisfies ChartConfig;

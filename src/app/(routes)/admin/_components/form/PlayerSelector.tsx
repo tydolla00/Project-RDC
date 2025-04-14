@@ -55,7 +55,7 @@ const PlayerSelector = ({
       <div
         style={sticky ? { position: "-webkit-sticky" } : undefined}
         className={cn(
-          "mb-10 w-fit rounded-md border p-4",
+          "w-fit rounded-md border p-4",
           sticky && "bg-card sticky top-12 z-20",
         )}
         id="player-selector-container"

@@ -1,9 +1,12 @@
 import { $Enums } from "@prisma/client";
 import { getAllGames } from "../../prisma/lib/games";
 import { getAllMembers } from "../../prisma/lib/members";
+import { capitalizeFirst } from "./utils";
 
 export const getMembersNav = async () => {
   const members = await getAllMembers();
+
+  if (!members.success || !members.data) return [];
 
   const navMembers: {
     alt: string;
@@ -13,7 +16,7 @@ export const getMembersNav = async () => {
     src: string;
     desc: string;
     stats: { prop: string; val: string }[];
-  }[] = members.map((member) => {
+  }[] = members.data.map((member) => {
     const memberKey = member.playerName.toLowerCase();
     const rdcMember = RDCMembers.get(memberKey as MembersEnum)!;
     return {
@@ -173,13 +176,15 @@ const RDCMembers = new Map<MembersEnum, MembersProps>([
 export const getGamesNav = async () => {
   const games = await getAllGames();
 
+  if (!games.success || !games.data) return [];
+
   const navGames: {
     alt?: string;
     name: string;
     url: string;
     src?: string;
     desc?: string;
-  }[] = games.map((game) => {
+  }[] = games.data.map((game) => {
     const gameKey = game.gameName.replace(/\s/g, "").toLowerCase() as GamesEnum;
     return {
       alt: game.gameName,
@@ -216,6 +221,17 @@ export const gameImages = {
   [GamesEnum.SpeedRunners]: "speedrunners.jpeg",
   [GamesEnum.CallOfDuty]: "callofduty.jpeg",
 };
+
+export const memberImages = new Map<MembersEnum, string>([
+  [capitalizeFirst(MembersEnum.Mark), "mark_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Dylan), "dylan_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Ben), "ben_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Lee), "leland_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Des), "desmond_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.John), "john_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Aff), "aff_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Ipi), "ipi_rdc.jpg"],
+]);
 
 export const statDescriptions: { [key in $Enums.StatName]: string } = {
   [$Enums.StatName.MK8_DAY]: "Mario Kart 8 Days",

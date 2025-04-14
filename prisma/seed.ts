@@ -4,6 +4,7 @@ import { MembersEnum } from "@/lib/constants";
 import { capitalizeFirst } from "@/lib/utils";
 
 async function main() {
+  console.group("Begin seeding Mario Kart Session");
   await seedRDCMembers();
   await seedGames();
   await seedSession(1);
@@ -29,19 +30,17 @@ async function main() {
   await simulateRace(1, 4, set1Results[3]);
 
   await updateSetWinner(1, [3]); // Ben Wins
+  console.groupEnd();
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-
-    console.log("<> ---  Seeded Mario Kart Session successfully  --- <>");
-    console.log("Seeds have been sown. o7");
-  })
   .catch(async (e) => {
     console.error(e);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
     await prisma.$disconnect();
-    process.exit(1);
+    process.exit(process.exitCode || 0);
   });
 
 // Seed RDC Members
@@ -228,13 +227,20 @@ async function simulateRace(
 }
 
 /**
- * Creates a match object and inserts into the set of setId
- * Note this currently only handles MK cases as it calculates the match winner assuming such!
- * @param matchId
- * @param setId
- * @param playersInMatch
- * @param raceResults
+ * Creates a match record and associates it with a game set
  *
+ * @description
+ * This function:
+ * 1. Creates player sessions for each player in the match
+ * 2. Calculates and stores the match winners based on racing results
+ * 3. Creates corresponding player stats records
+ *
+ * @param matchId - Unique identifier for the match
+ * @param setId - ID of the parent game set
+ * @param playersInMatch - Array of players participating in the match
+ * @param raceResults - Array of race position results corresponding to players
+ *
+ * @throws Will throw if database operations fail
  */
 async function seedMatch(
   matchId: number,

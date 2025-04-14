@@ -44,6 +44,26 @@ const initialState = {
   previewUrl: null as string | null,
 };
 
+/**
+ * State reducer for RDC Vision modal
+ *
+ * @description
+ * This reducer handles:
+ * 1. File selection and preview state updates
+ * 2. Vision processing status management
+ * 3. Loading state control
+ * 4. State reset functionality
+ *
+ * Actions:
+ * - UPDATE_FILE: Updates selected file and preview URL
+ * - UPDATE_VISION: Updates vision processing status and message
+ * - UPDATE_LOADING: Controls loading state
+ * - RESET: Resets state to initial values
+ *
+ * @param state - Current state object
+ * @param action - Action to process
+ * @returns Updated state object
+ */
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "UPDATE_FILE":
@@ -102,6 +122,27 @@ const RDCVisionModal = (props: Props) => {
     }
   };
 
+  /**
+   * Handles file selection for vision processing
+   *
+   * @description
+   * This function:
+   * 1. Validates file type is an image
+   * 2. Creates an object URL for preview
+   * 3. Updates component state with file info
+   * 4. Handles cleanup of previous object URLs
+   * 5. Updates modal state to reflect file selection
+   *
+   * @param event - The file input change event
+   * @returns void
+   *
+   * @example
+   * <Input
+   *   type="file"
+   *   accept="image/*"
+   *   onChange={handleFileChange}
+   * />
+   */
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
       return;
@@ -117,6 +158,20 @@ const RDCVisionModal = (props: Props) => {
     }
   };
 
+  /**
+   * Validates uploaded files for vision processing
+   *
+   * @description
+   * This function:
+   * 1. Checks that only a single file is selected
+   * 2. Validates file MIME type against allowed image formats
+   * 3. Shows user-friendly error messages via toast
+   * 4. Supports PNG, JPEG, and JPG formats
+   *
+   * @param file - FileList from input element or paste event
+   * @returns boolean indicating if file is valid
+   * @throws Shows toast error if validation fails
+   */
   const validateFile = (file: FileList): boolean => {
     if (file.length > 1) {
       toast.error("Please select only one file", { richColors: true });

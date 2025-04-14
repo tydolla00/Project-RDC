@@ -32,6 +32,10 @@ import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { getAllGames } from "../../../../../../prisma/lib/games";
 import { FormValues } from "../../_utils/form-helpers";
+import { useAdmin } from "@/lib/adminContext";
+import { toast } from "sonner";
+
+// TODO Cache results
 
 const GameDropDownForm = ({
   control,
@@ -42,11 +46,14 @@ const GameDropDownForm = ({
   reset: UseFormResetField<FormValues>;
 }) => {
   const [testGames, setTestGames] = useState<Game[]>([]);
+  const { getGameStatsFromDb } = useAdmin();
 
   useEffect(() => {
     const fetchGames = async () => {
       const games = await getAllGames();
-      setTestGames(games);
+      if (!games.success || !games.data)
+        toast.error("Failed to fetch games. Please try again.");
+      else setTestGames(games.data);
     };
     fetchGames();
   }, []);
@@ -90,9 +97,17 @@ const GameDropDownForm = ({
                       <CommandItem
                         value={game.gameName}
                         key={game.gameId}
-                        onSelect={() => {
-                          field.onChange(game.gameName);
-                          reset("sets");
+                        onSelect={async () => {
+                          try {
+                            field.onChange(game.gameName);
+                            reset("sets");
+                            await getGameStatsFromDb(game.gameName);
+                          } catch (error) {
+                            console.error("Failed to fetch game stats:", error);
+                            toast.error(
+                              "Failed to fetch game stats. Please try again.",
+                            );
+                          }
                         }}
                       >
                         {game.gameName}

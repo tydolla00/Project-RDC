@@ -1,9 +1,14 @@
 "use server";
 
 import { unstable_cache } from "next/cache";
-import prisma from "../db";
+import prisma, { handlePrismaOperation, QueryResponse } from "../db";
 import { StatName } from "@prisma/client";
 import { getSumOfStat } from "@prisma/client/sql";
+
+export type StatEndsWith<
+  T extends string,
+  Y extends StatName = StatName,
+> = Y extends StatName ? (Y extends `${infer u}_${T}` ? Y : never) : never;
 
 // Cache is used for deduping
 // unstable is used for time based caching
@@ -18,13 +23,20 @@ import { getSumOfStat } from "@prisma/client/sql";
  * @returns {Promise<Game[]>} A promise that resolves to an array of games.
  */
 export const getAllGames = unstable_cache(
-  async () => await prisma.game.findMany(),
+  async () => await handlePrismaOperation(() => prisma.game.findMany()),
   undefined,
   {
     tags: ["getAllGames"],
     revalidate: false,
   },
 );
+
+export const getGame = async (gameName: string) =>
+  await handlePrismaOperation(() =>
+    prisma.game.findFirst({
+      where: { gameName },
+    }),
+  );
 
 /**
  * Retrieves the sum of a specific statistic for a given player.
@@ -34,7 +46,9 @@ export const getAllGames = unstable_cache(
  * @returns A promise that resolves to the sum of the specified statistic for the player.
  */
 export const getSumPerStat = async (playerId: number, statName: StatName) =>
-  await prisma.$queryRawTyped(getSumOfStat(playerId, statName));
+  await handlePrismaOperation(() =>
+    prisma.$queryRawTyped(getSumOfStat(playerId, statName)),
+  );
 
 /**
  * Retrieves the sets associated with a specific player in a game.
@@ -45,10 +59,12 @@ export const getSumPerStat = async (playerId: number, statName: StatName) =>
  * each containing the count of sets and their associated matches.
  */
 export const getSetsPerPlayer = async (gameId: number) =>
-  await prisma.session.findMany({
-    where: { gameId },
-    include: { sets: { select: { _count: true, matches: true } } },
-  });
+  await handlePrismaOperation(() =>
+    prisma.session.findMany({
+      where: { gameId },
+      include: { sets: { select: { _count: true, matches: true } } },
+    }),
+  );
 
 /**
  * Retrieves the wins per player for a given game.
@@ -57,23 +73,25 @@ export const getSetsPerPlayer = async (gameId: number) =>
  * @returns {Promise<object | null>} A promise that resolves to an object containing the sessions and their respective match winners and set winners, or null if no game is found.
  */
 export const getWinsPerPlayer = async (gameId: number) =>
-  await prisma.game.findFirst({
-    where: { gameId },
-    select: {
-      sessions: {
-        select: {
-          sessionName: true,
-          sessionUrl: true,
-          sets: {
-            select: {
-              matches: { select: { matchWinners: true } },
-              setWinners: true,
+  await handlePrismaOperation(() =>
+    prisma.game.findFirst({
+      where: { gameId },
+      select: {
+        sessions: {
+          select: {
+            sessionName: true,
+            sessionUrl: true,
+            sets: {
+              select: {
+                matches: { select: { matchWinners: true } },
+                setWinners: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    }),
+  );
 
 /**
  * Retrieves matches per game based on the provided game ID and stat name. It is useful for calculating player stats per match.
@@ -87,23 +105,25 @@ export const getMatchesPerGame = async <T extends StatName = StatName>(
   gameId: number,
   statName: StatEndsWith<"POS", T>,
 ) =>
-  await prisma.session.findMany({
-    where: { gameId },
-    select: {
-      sets: {
-        select: {
-          setWinners: true,
-          matches: {
-            select: {
-              matchWinners: true,
-              date: true,
-              playerSessions: {
-                select: {
-                  player: true,
-                  playerStats: {
-                    where: { gameStat: { statName } },
-                    select: { value: true },
-                    take: 1,
+  await handlePrismaOperation(() =>
+    prisma.session.findMany({
+      where: { gameId },
+      select: {
+        sets: {
+          select: {
+            setWinners: true,
+            matches: {
+              select: {
+                matchWinners: true,
+                date: true,
+                playerSessions: {
+                  select: {
+                    player: true,
+                    playerStats: {
+                      where: { gameStat: { statName } },
+                      select: { value: true },
+                      take: 1,
+                    },
                   },
                 },
               },
@@ -111,8 +131,8 @@ export const getMatchesPerGame = async <T extends StatName = StatName>(
           },
         },
       },
-    },
-  });
+    }),
+  );
 
 /**
  * Retrieves statistics for each player in a specific game. The statistics are filtered by the provided statistic name.
@@ -122,17 +142,16 @@ export const getMatchesPerGame = async <T extends StatName = StatName>(
  * @returns A promise that resolves to an array of player statistics, including the player and the value of the statistic.
  */
 export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
-  await prisma.playerStat.findMany({
-    where: { gameId, AND: { gameStat: { statName } } },
-    select: { player: true, value: true },
-  });
+  await handlePrismaOperation(() =>
+    prisma.playerStat.findMany({
+      where: { gameId, AND: { gameStat: { statName } } },
+      select: { player: true, value: true },
+    }),
+  );
 
 export const getAllGameStats = async () =>
-  await prisma.gameStat.findMany({
-    select: { statName: true, statId: true },
-  });
-
-export type StatEndsWith<
-  T extends string,
-  Y extends StatName = StatName,
-> = Y extends StatName ? (Y extends `${infer u}_${T}` ? Y : never) : never;
+  await handlePrismaOperation(() =>
+    prisma.gameStat.findMany({
+      select: { statName: true, statId: true },
+    }),
+  );
