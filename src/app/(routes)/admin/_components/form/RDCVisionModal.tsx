@@ -38,6 +38,7 @@ interface Props {
     visionWinners: VisionPlayer[],
   ) => void;
   sessionPlayers: Player[];
+  gameName: string;
 }
 
 const initialState = {
@@ -73,7 +74,7 @@ const reducer = (state: State, action: Action): State => {
 };
 
 const RDCVisionModal = (props: Props) => {
-  const { handleCreateMatchFromVision, sessionPlayers } = props;
+  const { handleCreateMatchFromVision, sessionPlayers, gameName } = props;
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -188,6 +189,7 @@ const RDCVisionModal = (props: Props) => {
               dispatch,
               handleCreateMatchFromVision,
               sessionPlayers,
+              gameName,
             )
           }
           type="button"

@@ -263,11 +263,17 @@ export interface GameConfig {
 }
 
 export const GAME_CONFIGS: Record<number, GameConfig> = {
-  3: {
+  1: {
+    type: "SOLO",
+    id: 1,
+    name: "Mario Kart 8",
+    modelId: "RDC-MK8",
+  },
+  2: {
     type: "TEAM",
-    id: 3,
+    id: 2,
     name: "Rocket League",
-    modelId: "RDC-Custom-Model",
+    modelId: "RDC-RL",
   },
 };
 

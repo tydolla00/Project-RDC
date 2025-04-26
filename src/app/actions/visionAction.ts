@@ -5,7 +5,9 @@ import DocumentIntelligence, {
   isUnexpected,
 } from "@azure-rest/ai-document-intelligence";
 import { Player } from "@prisma/client";
-import { GameProcessor, RocketLeagueProcessor } from "@/lib/gameProcessors";
+import { GameProcessor } from "@/lib/gameProcessors";
+import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
+import { RocketLeagueProcessor } from "@/lib/game-processors/RocketLeagueProcessor";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -47,7 +49,9 @@ export type AnalysisResults =
 
 export const getGameProcessor = (gameId: number): GameProcessor => {
   switch (gameId) {
-    case 3:
+    case 1:
+      return MarioKart8Processor;
+    case 2:
       return RocketLeagueProcessor;
     default:
       throw new Error(`Invalid game id: ${gameId}`);
@@ -67,6 +71,12 @@ export const analyzeScreenShot = async (
   try {
     const gameProcessor = getGameProcessor(gameId);
     const gameConfig = GAME_CONFIGS[gameId];
+
+    if (!gameConfig) {
+      throw new Error(`Game config not found for gameId: ${gameId}`);
+    }
+
+    console.log("Game Config: ", gameConfig);
 
     const response = await client
       .path("/documentModels/{modelId}:analyze", gameConfig.modelId)
@@ -104,31 +114,69 @@ export const analyzeScreenShot = async (
     // RL: Blue Team, Orange Team
     // MK: Yoshi, Mario, Luigi, Peach, etc...
     const analyzedPlayers = result.analyzeResult.documents[0].fields;
-    // Returns team objects eg RL returns two arrays of playersStat field Arrays (not typed)
-    console.log("Analyzed Teams: ", analyzedPlayers);
+    // Returns an object containing players (sub-grouped by team if applicable)
+    console.log("Analyzed Players: ", analyzedPlayers);
 
     if (!analyzedPlayers) {
       throw new Error("Vision Analysis Player Results are undefined");
     }
-    // Go into individual game checks
-    const teamsArray: AnalyzedTeamData[] = Object.entries(analyzedPlayers).map(
-      ([teamName, teamData]) => ({
-        teamName,
-        players: teamData as unknown as AnalyzedPlayersObj,
-      }),
-    );
+
+    // Go into individual game checks -- if its not a team game we can skip this
+    // and just return the players
+
+    let teamsArray: AnalyzedTeamData[] = [];
+    let playersData: AnalyzedPlayersObj[] = [];
+
+    if (gameConfig.type === "TEAM") {
+      teamsArray = Object.entries(analyzedPlayers).map(
+        ([teamName, teamData]) => ({
+          teamName,
+          players: teamData as unknown as AnalyzedPlayersObj,
+        }),
+      );
+      console.log("Teams Array: ", teamsArray);
+    } else {
+      playersData = Object.values(
+        analyzedPlayers,
+      ) as unknown as AnalyzedPlayersObj[];
+      console.log("Players Data: ", playersData);
+    }
 
     const processedPlayers = gameProcessor.processPlayers(
-      teamsArray,
+      gameConfig.type === "TEAM" ? teamsArray : playersData,
       sessionPlayers,
     );
     console.log("Processed Players: ", processedPlayers);
-    const winners = gameProcessor.calculateWinners(
-      processedPlayers.processedPlayers,
-    );
+
+    const validatedPlayers: VisionPlayer[] =
+      processedPlayers.processedPlayers.map((player) => {
+        const validatedStats = player.stats.map((stat) => {
+          const validatedStat = gameProcessor.validateStats(
+            stat.statValue,
+            sessionPlayers.length,
+          );
+
+          return {
+            ...stat,
+            statValue: validatedStat.statValue,
+          };
+        });
+
+        return {
+          ...player,
+          stats: validatedStats,
+        };
+      });
+
+    console.log("Validated Players: ", validatedPlayers);
+
+    // Shouldnt this be validatedPlayers?
+    console.log("Processed Players: ", processedPlayers);
+    const winners = gameProcessor.calculateWinners(validatedPlayers);
+    console.log("Winners: ", winners);
 
     const validatedResult: AnalysisResults = gameProcessor.validateResults(
-      processedPlayers.processedPlayers,
+      validatedPlayers,
       winners,
       processedPlayers.reqCheckFlag,
     );
@@ -169,3 +217,5 @@ export type AnalyzedPlayersObj = {
   type: "array";
   valueArray: AnalyzedPlayer[];
 };
+
+export type AnalyzedPlayerRace = {};

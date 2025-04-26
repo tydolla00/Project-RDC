@@ -1,0 +1,123 @@
+import {
+  AnalyzedPlayersObj,
+  AnalyzedTeamData,
+  VisionResult,
+  VisionPlayer,
+} from "@/app/actions/visionAction";
+import { Player } from "@prisma/client";
+import {
+  GameProcessor,
+  isAnalyzedTeamDataArray,
+  processPlayer,
+  validateProcessedPlayer,
+  WinnerConfig,
+  calculateIndividualWinner,
+} from "../gameProcessors";
+import { VisionResultCodes } from "../constants";
+
+// Convert 7 to 1
+const validateMKStatValue = (
+  statValue: string | undefined,
+  numPlayers: number | undefined,
+) => {
+  console.log(
+    `Validating MK stat value. Input: statValue=${statValue}, numPlayers=${numPlayers}`,
+  );
+
+  if (!statValue) {
+    console.log("No stat value provided, returning 0 with check required");
+    return { statValue: "0", reqCheck: true };
+  }
+
+  console.log("Type of statValue: ", typeof statValue);
+
+  const numericValue = parseInt(statValue);
+  console.log("Parsed numeric value: ", numericValue);
+  if (isNaN(numericValue)) {
+    console.log(`Invalid numeric value: ${statValue}`);
+    return { statValue: "0", reqCheck: true };
+  }
+
+  if (numericValue === 7 && numPlayers!! < 7) {
+    console.log(`Converting position 7 to 1 (numPlayers=${numPlayers})`);
+    return { statValue: "1", reqCheck: true };
+  }
+
+  console.log(`Validation successful: ${statValue}`);
+  return { statValue, reqCheck: false };
+};
+
+export const MarioKart8Processor: GameProcessor = {
+  processPlayers: function (
+    mk8Players: AnalyzedPlayersObj[] | AnalyzedTeamData[],
+    sessionPlayers: Player[],
+  ) {
+    console.log("Processing MK8 Players: ", mk8Players);
+
+    let mk8VisionResult: VisionResult = {
+      players: [],
+    };
+    let requiresCheck = false;
+
+    if (isAnalyzedTeamDataArray(mk8Players)) {
+      console.error("Invalid data format for MK8 players.");
+      return { processedPlayers: [], reqCheckFlag: true };
+    }
+    mk8Players[0].valueArray.forEach((player) => {
+      console.log("Processing Player: ", player);
+      const processedPlayer = processPlayer(player);
+      const validatedPlayer = validateProcessedPlayer(
+        processedPlayer,
+        sessionPlayers,
+      );
+      if (!validatedPlayer) {
+        console.error("Player validation failed: ", processedPlayer);
+        return;
+      }
+      mk8VisionResult.players.push(validatedPlayer);
+      console.log("Processed Player: ", processedPlayer);
+    });
+    return {
+      processedPlayers: mk8VisionResult.players,
+      reqCheckFlag: requiresCheck,
+    };
+  },
+  calculateWinners: function (players: VisionPlayer[]): VisionPlayer[] {
+    const config: WinnerConfig = {
+      type: "INDIVIDUAL",
+      winCondition: {
+        statName: "MK8_POS",
+        comparison: "lowest",
+      },
+    };
+    console.log(
+      "Calculating MK8 winners config: ",
+      config,
+      "players: ",
+      players,
+    );
+    const mk8Winners = calculateIndividualWinner(players, config);
+    console.log("MK8 Winners: ", mk8Winners);
+    return mk8Winners;
+  },
+  validateStats: validateMKStatValue,
+  validateResults: (
+    visionPlayers: VisionPlayer[],
+    visionWinners: VisionPlayer[],
+    requiresCheck: boolean,
+  ) => {
+    // VisionResult AKA data is  passed into HandleCreateMatchFromVision
+    return requiresCheck
+      ? {
+          status: VisionResultCodes.CheckRequest,
+          data: { players: visionPlayers, winner: visionWinners },
+          message:
+            "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
+        }
+      : {
+          status: VisionResultCodes.Success,
+          data: { players: visionPlayers, winner: visionWinners },
+          message: "Results have been successfully imported.",
+        };
+  },
+};

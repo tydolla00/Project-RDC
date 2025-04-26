@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import RDCVisionModal from "./RDCVisionModal";
 import { VisionPlayer, VisionResult } from "@/app/actions/visionAction";
 import { FormValues } from "../../_utils/form-helpers";
+import { getGameIdFromName } from "@/app/actions/adminAction";
 
 interface Props {
   setIndex: number;
@@ -23,6 +24,7 @@ const MatchManager = (props: Props) => {
     control,
   });
   const players = getValues(`players`);
+  const gameName = getValues(`game`);
 
   /**
    * Handles the creation of a new match by creating player sessions from the available players.
@@ -56,53 +58,6 @@ const MatchManager = (props: Props) => {
       };
     });
   };
-
-  /**
-   * Processes vision analysis results to create match player sessions
-   * @param visionResults - The results from vision analysis containing blue and orange team player information
-   * @remarks
-   * 1. Maps vision results for both blue and orange teams into player sessions
-   * 2. Finds existing players by gamer tag
-   * 3. Creates player session objects with player IDs and stats
-   */
-  // const handleCreateMatchFromVision = (visionResults: VisionResult) => {
-  //   console.log("Handling Create Match from Vision: ", visionResults);
-
-  //   const blueTeamPlayerSessions = processTeamPlayers(visionResults.blueTeam);
-
-  //   const orangeTeamPlayerSessions = processTeamPlayers(
-  //     visionResults.orangeTeam,
-  //   );
-
-  //   const visionMatchPlayerSessions = [
-  //     ...blueTeamPlayerSessions,
-  //     ...orangeTeamPlayerSessions,
-  //   ];
-
-  //   const visionWinners = visionResults.winner
-  //     ?.map((player: VisionPlayer) => {
-  //       return {
-  //         playerId: player?.playerId,
-  //         playerName: player?.name,
-  //       };
-  //     })
-  //     .filter(
-  //       (winner): winner is { playerId: number; playerName: string } =>
-  //         winner.playerId !== undefined && winner.playerName !== undefined,
-  //     );
-  //   if (visionWinners && visionWinners.length > 0) {
-  //     console.log("Setting Vision Winners!", visionWinners);
-  //     append({
-  //       matchWinners: visionWinners,
-  //       playerSessions: visionMatchPlayerSessions,
-  //     });
-  //   } else {
-  //     append({
-  //       matchWinners: [],
-  //       playerSessions: visionMatchPlayerSessions,
-  //     });
-  //   }
-  // };
 
   const handleCreateMatchFromVision2 = (
     visionPlayers: VisionPlayer[],
@@ -187,6 +142,7 @@ const MatchManager = (props: Props) => {
         <RDCVisionModal
           handleCreateMatchFromVision={handleCreateMatchFromVision2}
           sessionPlayers={players}
+          gameName={gameName}
         />
       </div>
     </div>

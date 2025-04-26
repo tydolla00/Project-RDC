@@ -1,13 +1,12 @@
 import {
   AnalyzedPlayer,
+  AnalyzedPlayersObj,
   AnalyzedTeamData,
   Stat,
   VisionPlayer,
-  VisionResult,
-  VisionTeam,
 } from "@/app/actions/visionAction";
 import { Player } from "@prisma/client";
-import { RL_TEAM_MAPPING, VisionResultCodes } from "./constants";
+import { VisionResultCodes } from "./constants";
 import {
   findPlayerByGamerTag,
   PlayerNotFoundError,
@@ -15,7 +14,7 @@ import {
 
 type WinnerType = "TEAM" | "INDIVIDUAL";
 
-interface WinnerConfig {
+export interface WinnerConfig {
   type: WinnerType;
   winCondition: {
     statName: string;
@@ -24,15 +23,42 @@ interface WinnerConfig {
 }
 
 export type GameProcessor = {
+  /**
+   * Process players from the vision data and return a list of processed players (VisionPlayer)
+   * @param playerData - The player data to process
+   * @param sessionPlayers - The session players to validate against
+   * @returns An object containing processed players and a flag indicating if a check is required
+   */
   processPlayers: (
-    playerData: AnalyzedTeamData[], // TODO: Type this better
+    playerData: AnalyzedTeamData[] | AnalyzedPlayersObj[], // Use a union type here
     sessionPlayers: Player[],
   ) => { processedPlayers: VisionPlayer[]; reqCheckFlag: boolean };
+  /**
+   * Calculate winners based on the processed players' stats and the game configuration
+   * @param players - The processed players
+   * @returns An array of winning players
+   */
   calculateWinners: (players: VisionPlayer[]) => VisionPlayer[];
-  validateStats: (statValue: string | undefined) => {
+  /**
+   * To be used for validating stats of processed players (VisionPlayer)
+   * @param statValue
+   * @param numPlayers = number of players in the match for validations based on player count/team size
+   * @returns
+   */
+  validateStats: (
+    statValue: string | undefined,
+    numPlayers?: number,
+  ) => {
     statValue: string;
     reqCheck: boolean;
   };
+  /**
+   * Final check Validate the results of the game based on the processed players and winners
+   * @param visionPlayers - The processed players
+   * @param winners - The winning players
+   * @param requiresCheck - Flag indicating if a check is required
+   * @returns An object containing the status, data, and message
+   */
   validateResults: (
     visionPlayers: VisionPlayer[],
     winners: VisionPlayer[],
@@ -44,7 +70,7 @@ export type GameProcessor = {
   };
 };
 
-const processTeam = (
+export const processTeam = (
   teamData: AnalyzedTeamData,
   sessionPlayers: Player[],
 ): { processedPlayers: VisionPlayer[]; reqCheckFlag: boolean } => {
@@ -80,7 +106,7 @@ const processTeam = (
   }
 };
 
-const validateProcessedPlayer = (
+export const validateProcessedPlayer = (
   processedPlayer: ProcessedPlayer,
   sessionPlayers: Player[],
 ): VisionPlayer | undefined => {
@@ -122,7 +148,7 @@ type ProcessedPlayer = {
   teamKey?: string;
 };
 
-const processPlayer = (
+export const processPlayer = (
   player: AnalyzedPlayer,
   teamName?: string,
 ): ProcessedPlayer => {
@@ -143,6 +169,7 @@ const processPlayer = (
   const reqCheckFlag = Object.values(statValidations).some((v) => v.reqCheck);
   // Map to RL stat IDs - This could be moved to a config
   const statMapping: Record<string, { id: string; name: string }> = {
+    place: { id: "1", name: "MK8_POS" },
     score: { id: "3", name: "RL_SCORE" },
     goals: { id: "4", name: "RL_GOALS" },
     assists: { id: "5", name: "RL_ASSISTS" },
@@ -156,7 +183,7 @@ const processPlayer = (
       name: player.valueObject?.PlayerName?.content || "Unknown",
       stats: Object.entries(statValidations).map(([statKey, validation]) => ({
         statId: statMapping[statKey]?.id || "0",
-        stat: statMapping[statKey]?.name || `RL_${statKey.toUpperCase()}`,
+        stat: statMapping[statKey]?.name || `RL_${statKey.toUpperCase()}`, // TODO: Append game specific prefix
         statValue: validation.statValue,
       })),
     },
@@ -164,7 +191,8 @@ const processPlayer = (
   };
 };
 
-const validateVisionStatValue = (
+// This is essentially validateRLStatValue
+export const validateVisionStatValue = (
   statValue: string | undefined,
 ): { statValue: string; reqCheck: boolean } => {
   // 0 is sometimes detected as Z | Ø
@@ -177,66 +205,7 @@ const validateVisionStatValue = (
   }
 };
 
-export const calculateRLWinners = (
-  rlPlayers: VisionTeam[],
-  analyzedTeamsData: AnalyzedTeamData[],
-) => {
-  try {
-    let blueTeamGoals = 0;
-    let orangeTeamGoals = 0;
-    // TODO: New Implementation parse through players rather than indiviual team
-
-    // Players should have 2 arrays consisting of blue and orange team players
-    if (rlPlayers.length !== 2) {
-      return []; // Error in vision results
-    }
-
-    // const foundSessionPlayer = sessionPlayers.find(
-    //   (p) => p.playerName === foundPlayer?.playerName,
-    // );
-
-    analyzedTeamsData.forEach((team: AnalyzedTeamData) => {
-      team.players.valueArray.forEach((player) => {
-        const analyzedPlayerValueObject = player.valueObject;
-
-        const playerGoals = Object.entries(analyzedPlayerValueObject).reduce(
-          (acc, [fieldName, field]) => {
-            if (fieldName === "RL_GOALS") {
-              acc += parseInt(field.content, 10);
-            }
-            return acc;
-          },
-          0,
-        );
-
-        if (team.teamName === "BluePlayers") {
-          blueTeamGoals += playerGoals;
-        } else if (team.teamName === "OrangePlayers") {
-          orangeTeamGoals += playerGoals;
-        }
-      });
-    });
-    if (blueTeamGoals > orangeTeamGoals) {
-      return (
-        analyzedTeamsData.find((team) => team.teamName === "Blue")?.players ||
-        []
-      );
-    } else if (orangeTeamGoals > blueTeamGoals) {
-      return (
-        analyzedTeamsData.find((team) => team.teamName === "Orange")?.players ||
-        []
-      );
-      // TODO - Return proper
-    } else {
-      return []; // Error in vision results
-    }
-  } catch (error) {
-    console.error("Error calculating RL winners: ", error);
-    return [];
-  }
-};
-
-const calculateTeamWinners = (
+export const calculateTeamWinners = (
   players: VisionPlayer[],
   teamKey: string,
   config: WinnerConfig,
@@ -287,14 +256,12 @@ const calculateTeamWinners = (
       teamScores[0],
     );
 
-    console.log("Winning Team: ", winningTeam);
-
     return winningTeam.players.players;
   }
   return [];
 };
 
-const calculateIndividualWinner = (
+export const calculateIndividualWinner = (
   players: VisionPlayer[],
   config: WinnerConfig,
 ): VisionPlayer[] => {
@@ -312,79 +279,26 @@ const calculateIndividualWinner = (
       }),
     ];
   }
+  if (config.winCondition.comparison === "lowest") {
+    console.log("Calculating lowest winner");
+    return [
+      players.reduce((winner, current) => {
+        const winnerScore = winner.stats.find(
+          (s) => s.stat === config.winCondition.statName,
+        )?.statValue;
+        const currentScore = current.stats.find(
+          (s) => s.stat === config.winCondition.statName,
+        )?.statValue;
+
+        return Number(currentScore) < Number(winnerScore) ? current : winner;
+      }),
+    ];
+  }
   return [];
 };
 
-export const RocketLeagueProcessor: GameProcessor = {
-  processPlayers: function (
-    rlTeams: AnalyzedTeamData[],
-    sessionPlayers: Player[],
-  ) {
-    let rocketLeagueVisionResult: VisionResult = {
-      players: [],
-    };
-    let requiresCheck = false;
-
-    console.log("Processing Rocket League Players: ", rlTeams);
-
-    rlTeams.forEach((teamData) => {
-      const teamColor =
-        RL_TEAM_MAPPING[teamData.teamName as keyof typeof RL_TEAM_MAPPING];
-      console.log(`Processing Team: ${teamColor}`);
-      console.log("Team Data: ", teamData);
-
-      if (teamColor) {
-        const { processedPlayers, reqCheckFlag } = processTeam(
-          teamData,
-          sessionPlayers,
-        );
-
-        console.log(`Processed Player for: ${teamColor}:`, processedPlayers);
-        rocketLeagueVisionResult.players.push(...processedPlayers);
-        requiresCheck = requiresCheck || reqCheckFlag;
-      }
-    });
-
-    // // Calculate winners after processing all players
-    // const visionWinner = this.calculateWinners(visionResult);
-    // visionResult.winner = visionWinner;
-
-    return {
-      processedPlayers: rocketLeagueVisionResult.players,
-      reqCheckFlag: requiresCheck,
-    };
-  },
-
-  calculateWinners: (players: VisionPlayer[]): VisionPlayer[] => {
-    const config: WinnerConfig = {
-      type: "TEAM",
-      winCondition: {
-        statName: "RL_GOALS",
-        comparison: "sum",
-      },
-    };
-    return calculateTeamWinners(players, "TEAM", config);
-  },
-
-  validateStats: validateVisionStatValue,
-
-  validateResults: (
-    visionPlayers: VisionPlayer[],
-    visionWinners: VisionPlayer[],
-    requiresCheck: boolean,
-  ) => {
-    // VisionResult AKA data is  passed into HandleCreateMatchFromVision
-    return requiresCheck
-      ? {
-          status: VisionResultCodes.CheckRequest,
-          data: { players: visionPlayers, winner: visionWinners },
-          message:
-            "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
-        }
-      : {
-          status: VisionResultCodes.Success,
-          data: { players: visionPlayers, winner: visionWinners },
-          message: "Results have been successfully imported.",
-        };
-  },
-};
+export function isAnalyzedTeamDataArray(
+  data: AnalyzedTeamData[] | AnalyzedPlayersObj[],
+): data is AnalyzedTeamData[] {
+  return (data as AnalyzedTeamData[])[0]?.teamName !== undefined;
+}

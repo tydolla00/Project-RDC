@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Player } from "@prisma/client";
 import { analyzeScreenShot, VisionPlayer } from "@/app/actions/visionAction";
 import { Action, State } from "../_components/form/RDCVisionModal";
+import { getGameIdFromName } from "@/app/actions/adminAction";
 
 export const handleAnalyzeBtnClick = async (
   state: State,
@@ -12,6 +13,7 @@ export const handleAnalyzeBtnClick = async (
     visionWinner: VisionPlayer[],
   ) => void,
   sessionPlayers: Player[],
+  gameName: string,
 ): Promise<void> => {
   try {
     if (!state.selectedFile) return;
@@ -24,6 +26,7 @@ export const handleAnalyzeBtnClick = async (
     });
 
     const base64FileContent = await getFileAsBase64(state.selectedFile);
+    const gameId = await getGameIdFromName(gameName);
 
     if (!base64FileContent) {
       toast.error("Unknown error has occurred, please try again.", {
@@ -35,7 +38,7 @@ export const handleAnalyzeBtnClick = async (
     const analysisResults = await analyzeScreenShot(
       base64FileContent,
       sessionPlayers,
-      3,
+      gameId, // TODO: This should be from the selected game
     );
 
     console.log("analysis Results: ", analysisResults);
