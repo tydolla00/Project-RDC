@@ -76,7 +76,7 @@ export const analyzeScreenShot = async (
       throw new Error(`Game config not found for gameId: ${gameId}`);
     }
 
-    console.log("Game Config: ", gameConfig);
+    console.log("Analzying Screenshot with config: ", gameConfig);
 
     const response = await client
       .path("/documentModels/{modelId}:analyze", gameConfig.modelId)
@@ -114,7 +114,7 @@ export const analyzeScreenShot = async (
     // RL: Blue Team, Orange Team
     // MK: Yoshi, Mario, Luigi, Peach, etc...
     const analyzedPlayers = result.analyzeResult.documents[0].fields;
-    // Returns an object containing players (sub-grouped by team if applicable)
+    // Returns an object containing players (1-grouped by team if applicable)
     console.log("Analyzed Players: ", analyzedPlayers);
 
     if (!analyzedPlayers) {
@@ -168,10 +168,6 @@ export const analyzeScreenShot = async (
         };
       });
 
-    console.log("Validated Players: ", validatedPlayers);
-
-    // Shouldnt this be validatedPlayers?
-    console.log("Processed Players: ", processedPlayers);
     const winners = gameProcessor.calculateWinners(validatedPlayers);
     console.log("Winners: ", winners);
 
