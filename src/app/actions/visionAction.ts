@@ -8,6 +8,7 @@ import { Player } from "@prisma/client";
 import { GameProcessor } from "@/lib/gameProcessors";
 import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
 import { RocketLeagueProcessor } from "@/lib/game-processors/RocketLeagueProcessor";
+import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -53,6 +54,8 @@ export const getGameProcessor = (gameId: number): GameProcessor => {
       return MarioKart8Processor;
     case 2:
       return RocketLeagueProcessor;
+    case 3:
+      return CoDGunGameProcessor;
     default:
       throw new Error(`Invalid game id: ${gameId}`);
   }

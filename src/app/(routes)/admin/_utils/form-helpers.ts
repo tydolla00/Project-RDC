@@ -84,12 +84,23 @@ export const PLAYER_MAPPINGS: PlayerMapping = {
   Mark: {
     playerId: 1,
     playerName: "Mark",
-    gamerTags: ["SupremeMvp0020", "SupremeMvp 0020", "Mark"],
+    gamerTags: [
+      "SupremeMvp0020",
+      "SupremeMvp 0020",
+      "Mark",
+      "SupremeMvp0020#4772468",
+    ],
   },
   Dylan: {
     playerId: 2,
     playerName: "Dylan",
-    gamerTags: ["Dpatel254", "Opatel254", "L. Opatel254", "Dylan"],
+    gamerTags: [
+      "Dpatel254",
+      "Opatel254",
+      "L. Opatel254",
+      "Dylan",
+      "RdcDylan#2869564",
+    ],
   },
   Ben: {
     playerId: 3,
@@ -99,7 +110,13 @@ export const PLAYER_MAPPINGS: PlayerMapping = {
   Lee: {
     playerId: 4,
     playerName: "Lee",
-    gamerTags: ["Leland12123", "Leland23", "Leland", "Lee"],
+    gamerTags: [
+      "Leland12123",
+      "Leland23",
+      "Leland",
+      "Lee",
+      "MysticLeland#1739668",
+    ],
   },
   Des: {
     playerId: 5,
@@ -111,6 +128,7 @@ export const PLAYER_MAPPINGS: PlayerMapping = {
       "IBRUTALXPANIIC",
       "Desmond",
       "Des",
+      "Des#5052521",
     ],
   },
   John: {

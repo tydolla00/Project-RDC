@@ -159,6 +159,7 @@ export const processPlayer = (
       // Skip PlayerName field
       if (fieldName !== "PlayerName") {
         // Add validation for each stat
+        console.log("Processing field: ", fieldName);
         acc[fieldName.toLowerCase()] = validateVisionStatValue(field.content);
       }
       return acc;
@@ -175,6 +176,11 @@ export const processPlayer = (
     assists: { id: "5", name: "RL_ASSISTS" },
     saves: { id: "6", name: "RL_SAVES" },
     shots: { id: "7", name: "RL_SHOTS" },
+    cod_score: { id: "9", name: "COD_SCORE" },
+    cod_kills: { id: "10", name: "COD_KILLS" },
+    cod_deaths: { id: "11", name: "COD_DEATHS" },
+    // cod_pos: { id: "12", name: "COD_POS" }, # Gun game
+    cod_melees: { id: "13", name: "COD_MELEES" },
   };
 
   return {

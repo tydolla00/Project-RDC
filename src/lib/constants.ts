@@ -223,6 +223,7 @@ export const statDescriptions: { [key in $Enums.StatName]: string } = {
   [$Enums.StatName.COD_SCORE]: "Call of Duty Score",
   [$Enums.StatName.COD_KILLS]: "Call of Duty Kills",
   [$Enums.StatName.COD_DEATHS]: "Call of Duty Deaths",
+  [$Enums.StatName.COD_MELEES]: "Call of Duty Melee Kills",
   [$Enums.StatName.COD_POS]: "Call of Duty Position",
   [$Enums.StatName.LC_DEATHS]: "Lethal Company Deaths",
   [$Enums.StatName.SR_SETS]: "Speedrunners Sets",
@@ -274,6 +275,12 @@ export const GAME_CONFIGS: Record<number, GameConfig> = {
     id: 2,
     name: "Rocket League",
     modelId: "RDC-RL",
+  },
+  3: {
+    type: "SOLO",
+    id: 3,
+    name: "Call of Duty",
+    modelId: "RDC-COD",
   },
 };
 

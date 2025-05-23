@@ -15,21 +15,14 @@ import {
 } from "../gameProcessors";
 import { VisionResultCodes } from "../constants";
 
-// Convert 7 to 1
+// Vision Processor sometimes mistakes a 1 for a 7, so we need to validate the stat value
 const validateMKStatValue = (
   statValue: string | undefined,
   numPlayers: number | undefined,
 ) => {
-  console.log(
-    `Validating MK stat value. Input: statValue=${statValue}, numPlayers=${numPlayers}`,
-  );
-
   if (!statValue) {
-    console.log("No stat value provided, returning 0 with check required");
     return { statValue: "0", reqCheck: true };
   }
-
-  console.log("Type of statValue: ", typeof statValue);
 
   const numericValue = parseInt(statValue);
   console.log("Parsed numeric value: ", numericValue);
@@ -63,6 +56,7 @@ export const MarioKart8Processor: GameProcessor = {
       console.error("Invalid data format for MK8 players.");
       return { processedPlayers: [], reqCheckFlag: true };
     }
+
     mk8Players[0].valueArray.forEach((player) => {
       console.log("Processing Player: ", player);
       const processedPlayer = processPlayer(player);
@@ -74,8 +68,8 @@ export const MarioKart8Processor: GameProcessor = {
         console.error("Player validation failed: ", processedPlayer);
         return;
       }
+      console.log("Successfuly validated player: ", validatedPlayer);
       mk8VisionResult.players.push(validatedPlayer);
-      console.log("Processed Player: ", processedPlayer);
     });
     return {
       processedPlayers: mk8VisionResult.players,
