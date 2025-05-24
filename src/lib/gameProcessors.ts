@@ -168,9 +168,13 @@ export const processPlayer = (
   );
 
   const reqCheckFlag = Object.values(statValidations).some((v) => v.reqCheck);
+
   // Map to RL stat IDs - This could be moved to a config
+  /**
+   * Stat Mapping from Document Intelligence Model fields to DB stat names
+   */
   const statMapping: Record<string, { id: string; name: string }> = {
-    place: { id: "1", name: "MK8_POS" },
+    mk8_place: { id: "1", name: "MK8_POS" },
     score: { id: "3", name: "RL_SCORE" },
     goals: { id: "4", name: "RL_GOALS" },
     assists: { id: "5", name: "RL_ASSISTS" },
@@ -179,7 +183,7 @@ export const processPlayer = (
     cod_score: { id: "9", name: "COD_SCORE" },
     cod_kills: { id: "10", name: "COD_KILLS" },
     cod_deaths: { id: "11", name: "COD_DEATHS" },
-    // cod_pos: { id: "12", name: "COD_POS" }, # Gun game
+    // cod_pos: { id: "12", name: "COD_POS" }, # Calculate from kills
     cod_melees: { id: "13", name: "COD_MELEES" },
   };
 
