@@ -11,6 +11,12 @@ import {
   findPlayerByGamerTag,
   PlayerNotFoundError,
 } from "@/app/(routes)/admin/_utils/form-helpers";
+import {
+  STAT_CONFIGS,
+  getStatConfigByFieldKey,
+  GAME_CONFIGS,
+} from "../constants";
+import { $Enums } from "@prisma/client";
 
 type WinnerType = "TEAM" | "INDIVIDUAL";
 
@@ -151,16 +157,26 @@ type ProcessedPlayer = {
 export const processPlayer = (
   player: AnalyzedPlayer,
   teamName?: string,
+  gameId?: number,
 ): ProcessedPlayer => {
   console.log("Processing Player: ", player);
 
   const statValidations = Object.entries(player.valueObject).reduce(
     (acc, [fieldName, field]) => {
-      // Skip PlayerName field
       if (fieldName !== "PlayerName") {
-        // Add validation for each stat
         console.log("Processing field: ", fieldName);
-        acc[fieldName.toLowerCase()] = validateVisionStatValue(field.content);
+        const fieldKey = fieldName.toLowerCase();
+        const statConfig = getStatConfigByFieldKey(fieldKey);
+
+        if (statConfig) {
+          acc[fieldKey] = validateVisionStatValue(
+            field.content,
+            statConfig.validationRules,
+          );
+        } else {
+          console.warn(`No stat config found for field: ${fieldKey}`);
+          acc[fieldKey] = validateVisionStatValue(field.content);
+        }
       }
       return acc;
     },
@@ -169,50 +185,62 @@ export const processPlayer = (
 
   const reqCheckFlag = Object.values(statValidations).some((v) => v.reqCheck);
 
-  // Map to RL stat IDs - This could be moved to a config
-  /**
-   * Stat Mapping from Document Intelligence Model fields to DB stat names
-   */
-  const statMapping: Record<string, { id: string; name: string }> = {
-    mk8_place: { id: "1", name: "MK8_POS" },
-    rl_score: { id: "3", name: "RL_SCORE" },
-    rl_goals: { id: "4", name: "RL_GOALS" },
-    rl_assists: { id: "5", name: "RL_ASSISTS" },
-    rl_saves: { id: "6", name: "RL_SAVES" },
-    rl_shots: { id: "7", name: "RL_SHOTS" },
-    cod_score: { id: "9", name: "COD_SCORE" },
-    cod_kills: { id: "10", name: "COD_KILLS" },
-    cod_deaths: { id: "11", name: "COD_DEATHS" },
-    // cod_pos: { id: "12", name: "COD_POS" }, # Calculate from kills
-    cod_melees: { id: "13", name: "COD_MELEES" },
-  };
-
   return {
     reqCheckFlag,
     playerData: {
       name: player.valueObject?.PlayerName?.content || "Unknown",
-      stats: Object.entries(statValidations).map(([statKey, validation]) => ({
-        statId: statMapping[statKey]?.id || "0",
-        stat: statMapping[statKey]?.name || `RL_${statKey.toUpperCase()}`, // TODO: Append game specific prefix
-        statValue: validation.statValue,
-      })),
+      stats: Object.entries(statValidations).map(([statKey, validation]) => {
+        const statConfig = getStatConfigByFieldKey(statKey);
+        return {
+          statId: statConfig?.id || "0",
+          stat: statConfig?.name || "UNKNOWN_STAT",
+          statValue: validation.statValue,
+        };
+      }),
     },
     teamKey: teamName,
   };
 };
 
-// This is essentially validateRLStatValue
 export const validateVisionStatValue = (
   statValue: string | undefined,
+  validationRules?: {
+    min?: number;
+    max?: number;
+    allowZero?: boolean;
+  },
 ): { statValue: string; reqCheck: boolean } => {
-  // 0 is sometimes detected as Z | Ø
+  // Handle common OCR errors
   if (statValue === "Z" || statValue === "Ø") {
     return { statValue: "0", reqCheck: true };
-  } else if (statValue == undefined) {
-    return { statValue: "0", reqCheck: true };
-  } else {
-    return { statValue: statValue, reqCheck: false };
   }
+
+  if (statValue == undefined) {
+    return { statValue: "0", reqCheck: true };
+  }
+
+  // Additional validation
+  if (validationRules) {
+    const numValue = parseInt(statValue, 10);
+
+    if (isNaN(numValue)) {
+      return { statValue: "0", reqCheck: true };
+    }
+
+    if (validationRules.min !== undefined && numValue < validationRules.min) {
+      return { statValue: statValue, reqCheck: true };
+    }
+
+    if (validationRules.max !== undefined && numValue > validationRules.max) {
+      return { statValue: statValue, reqCheck: true };
+    }
+
+    if (!validationRules.allowZero && numValue === 0) {
+      return { statValue: statValue, reqCheck: true };
+    }
+  }
+
+  return { statValue: statValue, reqCheck: false };
 };
 
 export const calculateTeamWinners = (
@@ -271,10 +299,15 @@ export const calculateTeamWinners = (
   return [];
 };
 
+// Winner calculation with stat config
 export const calculateIndividualWinner = (
   players: VisionPlayer[],
   config: WinnerConfig,
 ): VisionPlayer[] => {
+  const statConfig = Object.values(STAT_CONFIGS).find(
+    (s) => s.name === config.winCondition.statName,
+  );
+
   if (config.winCondition.comparison === "highest") {
     return [
       players.reduce((winner, current) => {
@@ -285,10 +318,16 @@ export const calculateIndividualWinner = (
           (s) => s.stat === config.winCondition.statName,
         )?.statValue;
 
+        // For position stats, lower number is better
+        if (statConfig?.dataType === "position") {
+          return Number(currentScore) < Number(winnerScore) ? current : winner;
+        }
+
         return Number(currentScore) > Number(winnerScore) ? current : winner;
       }),
     ];
   }
+
   if (config.winCondition.comparison === "lowest") {
     console.log("Calculating lowest winner");
     return [
@@ -304,6 +343,7 @@ export const calculateIndividualWinner = (
       }),
     ];
   }
+
   return [];
 };
 
