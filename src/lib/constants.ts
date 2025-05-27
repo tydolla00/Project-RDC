@@ -217,26 +217,6 @@ export const gameImages = {
   [GamesEnum.CallOfDuty]: "callofduty.jpeg",
 };
 
-export const statDescriptions: { [key in $Enums.StatName]: string } = {
-  [$Enums.StatName.MK8_DAY]: "Mario Kart 8 Days",
-  [$Enums.StatName.MK8_POS]: "Mario Kart 8 Position",
-  [$Enums.StatName.COD_SCORE]: "Call of Duty Score",
-  [$Enums.StatName.COD_KILLS]: "Call of Duty Kills",
-  [$Enums.StatName.COD_DEATHS]: "Call of Duty Deaths",
-  [$Enums.StatName.COD_MELEES]: "Call of Duty Melee Kills",
-  [$Enums.StatName.COD_POS]: "Call of Duty Position",
-  [$Enums.StatName.LC_DEATHS]: "Lethal Company Deaths",
-  [$Enums.StatName.SR_SETS]: "Speedrunners Sets",
-  [$Enums.StatName.SR_WINS]: "Speedrunners Wins",
-  [$Enums.StatName.SR_POS]: "Speedrunners Position",
-  [$Enums.StatName.RL_GOALS]: "Rocket League Goals",
-  [$Enums.StatName.RL_ASSISTS]: "Rocket League Assists",
-  [$Enums.StatName.RL_SAVES]: "Rocket League Saves",
-  [$Enums.StatName.RL_SHOTS]: "Rocket League Shots",
-  [$Enums.StatName.RL_SCORE]: "Rocket League Score",
-  [$Enums.StatName.RL_DAY]: "Rocket League Days",
-};
-
 export enum errorCodes {
   NotAuthenticated = "Not Authenticated",
 }
@@ -253,6 +233,251 @@ type MembersProps = {
   stats: { prop: string; val: string }[]; // TODO: Grab stats from database
 };
 
+export interface StatConfig {
+  id: string;
+  name: $Enums.StatName;
+  description: string;
+  gameId: number;
+  fieldKey: string; // The key from Document Intelligence
+  displayName: string;
+  category?: "performance" | "outcome" | "offensive" | "defensive";
+  dataType: "number" | "position" | "boolean";
+  validationRules?: {
+    min?: number;
+    max?: number;
+    allowZero?: boolean;
+  };
+}
+// TODO: Export this to a separate file if it grows too large (Which it has already)
+export const STAT_CONFIGS: Record<string, StatConfig> = {
+  // Mario Kart 8 Stats
+  mk8_place: {
+    id: "1",
+    name: $Enums.StatName.MK8_POS,
+    description: "Mario Kart 8 Position",
+    gameId: 1,
+    fieldKey: "mk8_place",
+    displayName: "Position",
+    category: "outcome",
+    dataType: "position",
+    validationRules: { min: 1, max: 8 },
+  },
+  mk8_day: {
+    id: "2",
+    name: $Enums.StatName.MK8_DAY,
+    description: "Mario Kart 8 Days",
+    gameId: 1,
+    fieldKey: "mk8_day",
+    displayName: "Days Played",
+    category: "performance",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+
+  // Rocket League Stats
+  rl_score: {
+    id: "3",
+    name: $Enums.StatName.RL_SCORE,
+    description: "Rocket League Score",
+    gameId: 2,
+    fieldKey: "rl_score",
+    displayName: "Score",
+    category: "performance",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  rl_goals: {
+    id: "4",
+    name: $Enums.StatName.RL_GOALS,
+    description: "Rocket League Goals",
+    gameId: 2,
+    fieldKey: "rl_goals",
+    displayName: "Goals",
+    category: "offensive",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  rl_assists: {
+    id: "5",
+    name: $Enums.StatName.RL_ASSISTS,
+    description: "Rocket League Assists",
+    gameId: 2,
+    fieldKey: "rl_assists",
+    displayName: "Assists",
+    category: "offensive",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  rl_saves: {
+    id: "6",
+    name: $Enums.StatName.RL_SAVES,
+    description: "Rocket League Saves",
+    gameId: 2,
+    fieldKey: "rl_saves",
+    displayName: "Saves",
+    category: "defensive",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  rl_shots: {
+    id: "7",
+    name: $Enums.StatName.RL_SHOTS,
+    description: "Rocket League Shots",
+    gameId: 2,
+    fieldKey: "rl_shots",
+    displayName: "Shots",
+    category: "offensive",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  rl_day: {
+    id: "8",
+    name: $Enums.StatName.RL_DAY,
+    description: "Rocket League Days",
+    gameId: 2,
+    fieldKey: "rl_day",
+    displayName: "Days Played",
+    category: "performance",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+
+  // Call of Duty Stats
+  cod_score: {
+    id: "9",
+    name: $Enums.StatName.COD_SCORE,
+    description: "Call of Duty Score",
+    gameId: 3,
+    fieldKey: "cod_score",
+    displayName: "Score",
+    category: "performance",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  cod_kills: {
+    id: "10",
+    name: $Enums.StatName.COD_KILLS,
+    description: "Call of Duty Kills",
+    gameId: 3,
+    fieldKey: "cod_kills",
+    displayName: "Kills",
+    category: "offensive",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  cod_deaths: {
+    id: "11",
+    name: $Enums.StatName.COD_DEATHS,
+    description: "Call of Duty Deaths",
+    gameId: 3,
+    fieldKey: "cod_deaths",
+    displayName: "Deaths",
+    category: "defensive",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  cod_pos: {
+    id: "12",
+    name: $Enums.StatName.COD_POS,
+    description: "Call of Duty Position",
+    gameId: 3,
+    fieldKey: "cod_pos",
+    displayName: "Position",
+    category: "outcome",
+    dataType: "position",
+    validationRules: { min: 1, max: 8 },
+  },
+  cod_melees: {
+    id: "13",
+    name: $Enums.StatName.COD_MELEES,
+    description: "Call of Duty Melee Kills",
+    gameId: 3,
+    fieldKey: "cod_melees",
+    displayName: "Melee Kills",
+    category: "offensive",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+
+  // Lethal Company Stats
+  lc_deaths: {
+    id: "14",
+    name: $Enums.StatName.LC_DEATHS,
+    description: "Lethal Company Deaths",
+    gameId: 4,
+    fieldKey: "lc_deaths",
+    displayName: "Deaths",
+    category: "outcome",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+
+  // Speed Runners Stats
+  sr_wins: {
+    id: "15",
+    name: $Enums.StatName.SR_WINS,
+    description: "Speedrunners Wins",
+    gameId: 5,
+    fieldKey: "sr_wins",
+    displayName: "Wins",
+    category: "outcome",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  sr_sets: {
+    id: "16",
+    name: $Enums.StatName.SR_SETS,
+    description: "Speedrunners Sets",
+    gameId: 5,
+    fieldKey: "sr_sets",
+    displayName: "Sets",
+    category: "performance",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
+  },
+  sr_pos: {
+    id: "17",
+    name: $Enums.StatName.SR_POS,
+    description: "Speedrunners Position",
+    gameId: 5,
+    fieldKey: "sr_pos",
+    displayName: "Position",
+    category: "outcome",
+    dataType: "position",
+    validationRules: { min: 1, max: 8 },
+  },
+};
+
+// Utility functions to work with stat configs
+export const getStatConfigByFieldKey = (
+  fieldKey: string,
+): StatConfig | undefined => {
+  return STAT_CONFIGS[fieldKey];
+};
+
+export const getStatConfigsByGame = (gameId: number): StatConfig[] => {
+  return Object.values(STAT_CONFIGS).filter((stat) => stat.gameId === gameId);
+};
+
+export const getStatConfigsByCategory = (
+  category: StatConfig["category"],
+): StatConfig[] => {
+  return Object.values(STAT_CONFIGS).filter(
+    (stat) => stat.category === category,
+  );
+};
+
+// Replace the existing statDescriptions with this derived object
+export const statDescriptions: { [key in $Enums.StatName]: string } =
+  Object.values(STAT_CONFIGS).reduce(
+    (acc, config) => {
+      acc[config.name] = config.description;
+      return acc;
+    },
+    {} as { [key in $Enums.StatName]: string },
+  );
+
+// Enhanced game configs with stat references
 export type GameType = "TEAM" | "SOLO";
 
 export interface GameConfig {
@@ -260,7 +485,7 @@ export interface GameConfig {
   id: number;
   name: string;
   modelId: string;
-  // Stats?? Maybe
+  supportedStats: string[]; // Field keys for this game
 }
 
 export const GAME_CONFIGS: Record<number, GameConfig> = {
@@ -269,18 +494,48 @@ export const GAME_CONFIGS: Record<number, GameConfig> = {
     id: 1,
     name: "Mario Kart 8",
     modelId: "RDC-MK8",
+    supportedStats: ["mk8_place", "mk8_day"],
   },
   2: {
     type: "TEAM",
     id: 2,
     name: "Rocket League",
     modelId: "RDC-RL",
+    supportedStats: [
+      "rl_score",
+      "rl_goals",
+      "rl_assists",
+      "rl_saves",
+      "rl_shots",
+      "rl_day",
+    ],
   },
   3: {
     type: "SOLO",
     id: 3,
     name: "Call of Duty",
     modelId: "RDC-COD",
+    supportedStats: [
+      "cod_score",
+      "cod_kills",
+      "cod_deaths",
+      "cod_pos",
+      "cod_melees",
+    ],
+  },
+  4: {
+    type: "TEAM",
+    id: 4,
+    name: "Lethal Company",
+    modelId: "RDC-LC",
+    supportedStats: ["lc_deaths"],
+  },
+  5: {
+    type: "SOLO",
+    id: 5,
+    name: "Speed Runners",
+    modelId: "RDC-SR",
+    supportedStats: ["sr_wins", "sr_sets", "sr_pos"],
   },
 };
 
