@@ -175,11 +175,11 @@ export const processPlayer = (
    */
   const statMapping: Record<string, { id: string; name: string }> = {
     mk8_place: { id: "1", name: "MK8_POS" },
-    score: { id: "3", name: "RL_SCORE" },
-    goals: { id: "4", name: "RL_GOALS" },
-    assists: { id: "5", name: "RL_ASSISTS" },
-    saves: { id: "6", name: "RL_SAVES" },
-    shots: { id: "7", name: "RL_SHOTS" },
+    rl_score: { id: "3", name: "RL_SCORE" },
+    rl_goals: { id: "4", name: "RL_GOALS" },
+    rl_assists: { id: "5", name: "RL_ASSISTS" },
+    rl_saves: { id: "6", name: "RL_SAVES" },
+    rl_shots: { id: "7", name: "RL_SHOTS" },
     cod_score: { id: "9", name: "COD_SCORE" },
     cod_kills: { id: "10", name: "COD_KILLS" },
     cod_deaths: { id: "11", name: "COD_DEATHS" },
