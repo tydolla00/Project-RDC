@@ -12,8 +12,7 @@ import {
   processTeam,
   WinnerConfig,
   calculateTeamWinners,
-  validateVisionStatValue,
-} from "../gameProcessors";
+} from "./game-processor-utils";
 
 export const RocketLeagueProcessor: GameProcessor = {
   processPlayers: function (

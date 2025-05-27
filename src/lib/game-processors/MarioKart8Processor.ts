@@ -12,7 +12,7 @@ import {
   validateProcessedPlayer,
   WinnerConfig,
   calculateIndividualWinner,
-} from "../gameProcessors";
+} from "./game-processor-utils";
 import { VisionResultCodes } from "../constants";
 
 // Vision Processor sometimes mistakes a 1 for a 7, so we need to validate the stat value

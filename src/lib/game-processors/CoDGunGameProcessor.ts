@@ -11,7 +11,7 @@ import {
   processPlayer,
   validateProcessedPlayer,
   WinnerConfig,
-} from "../gameProcessors";
+} from "./game-processor-utils";
 import { VisionResultCodes } from "../constants";
 import { Player } from "@prisma/client";
 

@@ -6,7 +6,7 @@ import {
   VisionPlayer,
 } from "@/app/actions/visionAction";
 import { Player } from "@prisma/client";
-import { VisionResultCodes } from "./constants";
+import { VisionResultCodes } from "../constants";
 import {
   findPlayerByGamerTag,
   PlayerNotFoundError,
