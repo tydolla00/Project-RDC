@@ -67,7 +67,7 @@ export const CoDGunGameProcessor: GameProcessor = {
 
     // TODO: Handle team versus individual typing better
     if (isAnalyzedTeamDataArray(codPlayers)) {
-      console.error("Invalid data format for MK8 players.");
+      console.error("Invalid data format for CoD Gun Game players.");
       return { processedPlayers: [], reqCheckFlag: true };
     }
 
