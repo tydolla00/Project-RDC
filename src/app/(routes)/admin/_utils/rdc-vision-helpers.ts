@@ -26,7 +26,25 @@ export const handleAnalyzeBtnClick = async (
     });
 
     const base64FileContent = await getFileAsBase64(state.selectedFile);
-    const gameId = await getGameIdFromName(gameName);
+
+    // Get game ID with error handling
+    let gameId: number;
+    try {
+      gameId = await getGameIdFromName(gameName);
+      if (!gameId) {
+        throw new Error(`Game "${gameName}" not found`);
+      }
+    } catch (error) {
+      console.error("Failed to get game ID:", error);
+      dispatch({
+        type: "UPDATE_VISION",
+        visionStatus: VisionResultCodes.Failed,
+        visionMsg: `Unable to find game "${gameName}". Please verify the game name is correct.`,
+        loading: false,
+      });
+      toast.error(`Game "${gameName}" not found`, { richColors: true });
+      return;
+    }
 
     if (!base64FileContent) {
       toast.error("Unknown error has occurred, please try again.", {

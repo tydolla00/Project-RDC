@@ -216,5 +216,3 @@ export type AnalyzedPlayersObj = {
   type: "array";
   valueArray: AnalyzedPlayer[];
 };
-
-export type AnalyzedPlayerRace = {};

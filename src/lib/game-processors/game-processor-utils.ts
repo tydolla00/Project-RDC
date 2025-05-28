@@ -11,12 +11,7 @@ import {
   findPlayerByGamerTag,
   PlayerNotFoundError,
 } from "@/app/(routes)/admin/_utils/form-helpers";
-import {
-  STAT_CONFIGS,
-  getStatConfigByFieldKey,
-  GAME_CONFIGS,
-} from "../constants";
-import { $Enums } from "@prisma/client";
+import { STAT_CONFIGS, getStatConfigByFieldKey } from "../stat-configs";
 
 type WinnerType = "TEAM" | "INDIVIDUAL";
 

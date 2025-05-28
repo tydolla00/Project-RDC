@@ -61,21 +61,21 @@ const MatchManager = (props: Props) => {
 
   const handleCreateMatchFromVision2 = (
     visionPlayers: VisionPlayer[],
-    visionWiners: VisionPlayer[],
+    visionWinners: VisionPlayer[],
   ) => {
     const visionMatchPlayerSessions = processTeamPlayers(visionPlayers);
     console.log("Vision Match Player Sessions: ", visionMatchPlayerSessions);
-    const visionWinners = visionWiners.map((player: VisionPlayer) => {
+    const formattedWinners = visionWinners.map((player: VisionPlayer) => {
       return {
         playerId: player?.playerId || 0,
         playerName: player?.name,
       };
     });
 
-    if (visionWinners && visionWinners.length > 0) {
-      console.log("Setting Vision Winners!", visionWinners);
+    if (formattedWinners && formattedWinners.length > 0) {
+      console.log("Setting Vision Winners!", formattedWinners);
       append({
-        matchWinners: visionWinners,
+        matchWinners: formattedWinners,
         playerSessions: visionMatchPlayerSessions,
       });
     } else {

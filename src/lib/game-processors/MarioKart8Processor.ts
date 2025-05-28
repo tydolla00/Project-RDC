@@ -60,6 +60,10 @@ export const MarioKart8Processor: GameProcessor = {
     mk8Players[0].valueArray.forEach((player) => {
       console.log("Processing Player: ", player);
       const processedPlayer = processPlayer(player);
+      if (processedPlayer.reqCheckFlag) {
+        requiresCheck = true;
+        console.warn("Player requires check: ", processedPlayer);
+      }
       const validatedPlayer = validateProcessedPlayer(
         processedPlayer,
         sessionPlayers,
@@ -71,6 +75,7 @@ export const MarioKart8Processor: GameProcessor = {
       console.log("Successfuly validated player: ", validatedPlayer);
       mk8VisionResult.players.push(validatedPlayer);
     });
+
     return {
       processedPlayers: mk8VisionResult.players,
       reqCheckFlag: requiresCheck,
