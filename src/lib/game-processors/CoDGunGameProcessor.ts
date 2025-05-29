@@ -14,6 +14,7 @@ import {
 } from "./game-processor-utils";
 import { VisionResultCodes } from "../constants";
 import { Player } from "@prisma/client";
+import { getStatConfigByFieldKey } from "../stat-configs";
 
 // Helper function to rank players by COD_KILLS and set COD_POS
 const rankPlayersByKills = (players: VisionPlayer[]): VisionPlayer[] => {
@@ -43,7 +44,7 @@ const rankPlayersByKills = (players: VisionPlayer[]): VisionPlayer[] => {
     } else {
       // Add new COD_POS stat
       player.stats.push({
-        statId: "12", // COD_POS stat ID
+        statId: getStatConfigByFieldKey("cod_pos")?.id || "12", // COD_POS stat ID
         stat: "COD_POS",
         statValue: position.toString(),
       });

@@ -68,7 +68,7 @@ export const RocketLeagueProcessor: GameProcessor = {
   validateStats: (statValue: string | undefined) => {
     if (statValue === "Z" || statValue === "Ø") {
       return { statValue: "0", reqCheck: true };
-    } else if (statValue == undefined) {
+    } else if (statValue === undefined) {
       return { statValue: "0", reqCheck: true };
     } else {
       return { statValue: statValue, reqCheck: false };
