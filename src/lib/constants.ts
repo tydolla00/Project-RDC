@@ -1,7 +1,5 @@
-import { $Enums } from "@prisma/client";
 import { getAllGames } from "../../prisma/lib/games";
 import { getAllMembers } from "../../prisma/lib/members";
-import { STAT_CONFIGS, StatConfig, statDescriptions } from "./stat-configs";
 
 export const getMembersNav = async () => {
   const members = await getAllMembers();
