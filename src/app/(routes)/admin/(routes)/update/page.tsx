@@ -27,11 +27,17 @@ export default async function Page() {
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Cod</SelectLabel>
-            {stats.data.map((stat) => (
-              <SelectItem key={stat.statId} value={stat.statName}>
-                {statDescriptions[stat.statName]}
+            {stats.data.length === 0 ? (
+              <SelectItem value="none" disabled>
+                No stats available
               </SelectItem>
-            ))}
+            ) : (
+              stats.data.map((stat) => (
+                <SelectItem key={stat.statId} value={stat.statName}>
+                  {statDescriptions[stat.statName]}
+                </SelectItem>
+              ))
+            )}
           </SelectGroup>
         </SelectContent>
       </Select>

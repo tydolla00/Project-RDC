@@ -16,6 +16,8 @@ import { revalidateTag } from "next/cache";
  * @param {string} gameName - The name of the game to retrieve statistics for.
  * @returns {Promise<GameStat[]>} A promise that resolves to an array of game statistics.
  * @throws {Error} If the game with the specified name is not found.
+ * @returns {Promise<GameStat[]>} Returns an empty array if the game is not found.
+ * @throws {Error} If the game statistics cannot be retrieved.
  */
 export async function getGameStats(gameName: string): Promise<GameStat[]> {
   console.log("Looking for gameStats for ", gameName);
@@ -264,7 +266,6 @@ export const insertNewSessionFromAdmin = async (
         );
       }),
     );
-    revalidateTag("getAllSessions");
     return { error: null };
   } catch (error) {
     return { error: "Unknown error occurred. Please try again." };

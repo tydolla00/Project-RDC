@@ -80,7 +80,7 @@ export function TimelineChart({
           height={200}
           width={200}
           src={`/images/${gameImages[gameName]}`}
-          alt="Rocket League"
+          alt={gameName}
         />
         <Suspense fallback={<Skeleton className="h-10 w-full" />}>
           <div className="my-4">

@@ -16,6 +16,7 @@ import { getAllMembers } from "../../prisma/lib/members";
  * console.log(sitemap);
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const BASE_URL = "https://project-rdc.vercel.app";
   const [games, members] = await Promise.all([
     await getAllGames(),
     await getAllMembers(),
@@ -25,14 +26,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!members.success || !members.data) members.data = [];
 
   const gamesMeta: MetadataRoute.Sitemap = games.data.map((game) => ({
-    url: `https://project-rdc.vercel.app/games/${game.gameName.replace(/\s/g, "").toLowerCase()}`,
+    url: `${BASE_URL}/games/${game.gameName.replace(/\s/g, "").toLowerCase()}`,
     lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 1,
   }));
 
   const membersData: MetadataRoute.Sitemap = members.data.map((member) => ({
-    url: `https://project-rdc.vercel.app/games/${member.playerName.toLowerCase()}`,
+    url: `${BASE_URL}/members/${member.playerName.toLowerCase()}`,
     lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 1,
@@ -40,25 +41,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: "https://project-rdc.vercel.app",
+      url: BASE_URL,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://project-rdc.vercel.app/about",
+      url: `${BASE_URL}/about`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: "https://project-rdc.vercel.app/games",
+      url: `${BASE_URL}/games`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: "https://project-rdc.vercel.app/members",
+      url: `${BASE_URL}/members`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
