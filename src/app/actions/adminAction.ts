@@ -7,6 +7,7 @@ import { getAllGames } from "../../../prisma/lib/games";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { randomInt } from "crypto";
+import { revalidateTag } from "next/cache";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -274,6 +275,7 @@ export const insertNewSessionFromAdmin = async (
         );
       }),
     );
+    revalidateTag("getAllSessions");
     return { error: null };
   } catch (error) {
     return { error: "Unknown error occurred. Please try again." };
