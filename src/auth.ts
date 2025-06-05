@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import PostHogClient from "./lib/posthog";
+// import PostHogClient from "./lib/posthog";
 
 export const config: NextAuthConfig = {
   providers: [GitHub, Google],
@@ -13,13 +13,13 @@ export const config: NextAuthConfig = {
     async error(error) {
       console.log(error.cause);
       console.log(error.stack);
-      const posthog = PostHogClient();
-      const session = await auth();
-      posthog.capture({
-        event: `Authentication Error - ${error}`,
-        distinctId: session?.user?.email ?? "Unidentified Email",
-      });
-      posthog.shutdown();
+      // const posthog = PostHogClient();
+      // const session = await auth();
+      // posthog.capture({
+      //   event: `Authentication Error - ${error}`,
+      //   distinctId: session?.user?.email ?? "Unidentified Email",
+      // });
+      // posthog.shutdown();
     },
   },
   callbacks: {
