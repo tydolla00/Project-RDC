@@ -142,7 +142,7 @@ async function seedGames() {
           { statName: "COD_SCORE" },
           { statName: "COD_KILLS" },
           { statName: "COD_DEATHS" },
-          { statName: "COD_MELEES" },
+          // { statName: "COD_MELEES" }, // TODO Run Migration to add this
           { statName: "COD_POS" },
         ],
       },

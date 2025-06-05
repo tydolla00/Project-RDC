@@ -2,7 +2,7 @@
 import { Player } from "@prisma/client";
 import React, { useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
-import { Control, ControllerRenderProps } from "react-hook-form";
+import { Control, ControllerRenderProps, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import { formSchema, FormValues } from "../../_utils/form-helpers";
 interface Props {
   rdcMembers: Player[];
   handlePlayerClick?: (player: Player) => void;
-  control?: Control<z.infer<typeof formSchema>>;
+  control?: UseFormReturn<FormValues>["control"];
   sticky?: boolean;
   fieldName?: string;
   field: ControllerRenderProps<FormValues>;

@@ -9,6 +9,7 @@ import { GameProcessor } from "@/lib/game-processors/game-processor-utils";
 import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
 import { RocketLeagueProcessor } from "@/lib/game-processors/RocketLeagueProcessor";
 import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";
+import { PLAYER_MAPPINGS } from "../(routes)/admin/_utils/form-helpers";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -29,7 +30,7 @@ export type VisionTeam = {
 export interface VisionPlayer {
   playerId?: number;
   teamKey?: string;
-  name: string;
+  name: keyof typeof PLAYER_MAPPINGS;
   stats: Stat[];
 }
 

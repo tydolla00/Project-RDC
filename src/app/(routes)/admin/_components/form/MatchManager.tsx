@@ -11,6 +11,7 @@ import RDCVisionModal from "./RDCVisionModal";
 import { VisionPlayer, VisionResult } from "@/app/actions/visionAction";
 import { FormValues } from "../../_utils/form-helpers";
 import { getGameIdFromName } from "@/app/actions/adminAction";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 interface Props {
   setIndex: number;
@@ -43,8 +44,8 @@ const MatchManager = (props: Props) => {
     }));
     console.log("Player Sessions: ", playerSessions);
     append({
-      matchWinners: [] as unknown as MatchWinners,
-      playerSessions: playerSessions as unknown as PlayerSessions,
+      matchWinners: [],
+      playerSessions: playerSessions,
     });
   };
 
@@ -72,16 +73,19 @@ const MatchManager = (props: Props) => {
       };
     });
 
+    // TODO FIX Typings
     if (formattedWinners && formattedWinners.length > 0) {
       console.log("Setting Vision Winners!", formattedWinners);
       append({
         matchWinners: formattedWinners,
+        // @ts-expect-error - Type mismatch, but we know this is correct
         playerSessions: visionMatchPlayerSessions,
       });
     } else {
       append({
-        matchWinners: [] as unknown as MatchWinners, // Enforce non empty array,
-        playerSessions: visionMatchPlayerSessions as PlayerSessions,
+        matchWinners: [],
+        // @ts-expect-error - Type mismatch, but we know this is correct
+        playerSessions: visionMatchPlayerSessions,
       });
     }
   };

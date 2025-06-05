@@ -36,6 +36,7 @@ const PlayerStatManager = (props: Props) => {
     gameStats.forEach((stat) => {
       const isMatch = matchFields.some((f) => f.stat === stat.statName); // Need to do this in dev because useEffect renders twice.
       if (!ignore && !isMatch)
+        // @ts-expect-error Need to exclude unused stats TODO FIX
         append({ statId: uuidv4(), stat: stat.statName, statValue: "" });
     });
 

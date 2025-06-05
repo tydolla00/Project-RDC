@@ -154,17 +154,19 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
     dataType: "position",
     validationRules: { min: 1, max: 8 },
   },
-  cod_melees: {
-    id: "13",
-    name: $Enums.StatName.COD_MELEES,
-    description: "Call of Duty Melee Kills",
-    gameId: 3,
-    fieldKey: "cod_melees",
-    displayName: "Melee Kills",
-    category: "offensive",
-    dataType: "number",
-    validationRules: { min: 0, allowZero: true },
-  },
+  // cod_melees: {
+  //   id: "13",
+  //   name: $Enums.StatName.COD_MELEES,
+  //   description: "Call of Duty Melee Kills",
+  //   gameId: 3,
+  //   fieldKey: "cod_melees",
+  //   displayName: "Melee Kills",
+  //   category: "offensive",
+  //   dataType: "number",
+  //   validationRules: { min: 0, allowZero: true },
+  // },
+
+  // TODO RUN MIGRATION TO ADD THIS STAT ^
 
   // Lethal Company Stats
   lc_deaths: {

@@ -43,7 +43,7 @@ export const NavigationButtons = ({
   setModifier,
 }: NavigationButtonsProps) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const { getValues } = useFormContext<z.infer<typeof formSchema>>();
+  const { getValues } = useFormContext<FormValues>();
 
   const handleNextClicked = async () => {
     let isValid: boolean = false;

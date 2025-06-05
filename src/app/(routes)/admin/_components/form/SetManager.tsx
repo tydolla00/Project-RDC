@@ -12,12 +12,12 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { formSchema, Matches, SetWinners } from "../../_utils/form-helpers";
+import { formSchema, FormValues, SetWinners } from "../../_utils/form-helpers";
 import WinnerDisplay from "./WinnerDisplay";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 const SetManager = () => {
-  const { watch, control } = useFormContext<z.infer<typeof formSchema>>();
+  const { watch, control } = useFormContext<FormValues>();
 
   const { append, remove, fields, update } = useFieldArray({
     name: "sets",
@@ -38,8 +38,8 @@ const SetManager = () => {
     setHighestSetId(newSetId);
     append({
       setId: newSetId,
-      matches: [] as unknown as Matches,
-      setWinners: [] as unknown as SetWinners,
+      matches: [],
+      setWinners: [],
     });
 
     // Then update openSets to match new length with last set open
