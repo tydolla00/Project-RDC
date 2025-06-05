@@ -1,5 +1,5 @@
 import { Player } from "@prisma/client";
-import React from "react";
+import { useEffect } from "react";
 import { FieldValues, useFieldArray, useFormContext } from "react-hook-form";
 import PlayerStatManager from "./PlayerStatManager";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ const PlayerSessionManager = (props: Props) => {
     control,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const finalPlayerSessionValues = getValues(
       `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
     );
