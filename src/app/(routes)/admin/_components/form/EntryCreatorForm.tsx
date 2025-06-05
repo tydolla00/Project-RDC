@@ -16,7 +16,6 @@ import { useFormStatus } from "react-dom";
 import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
-import { revalidateTag } from "next/cache";
 import { formSchema, FormValues } from "../../_utils/form-helpers";
 
 interface AdminFormProps {
@@ -92,7 +91,6 @@ const EntryCreatorForm = (props: AdminFormProps) => {
         : toast.error(err, { richColors: true });
     else {
       toast.success("Session successfully created.", { richColors: true });
-      revalidateTag("getAllSessions");
       form.reset();
     }
     setIsLoading(false);
