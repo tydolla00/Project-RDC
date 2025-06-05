@@ -87,7 +87,6 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
         : toast.error(err, { richColors: true });
     else {
       toast.success("Session successfully created.", { richColors: true });
-      revalidateTag("getAllSessions");
       form.reset();
     }
     setIsLoading(false);
