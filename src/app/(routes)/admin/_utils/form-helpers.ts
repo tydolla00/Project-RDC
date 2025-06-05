@@ -1,40 +1,108 @@
 import { $Enums, Player } from "@prisma/client";
-import { z } from "zod";
-import { zodInputStringPipe } from "./zod-helpers";
+import { z } from "zod/v4";
 
-const gameSchema = z
-  .string({ required_error: "Game is required" })
-  .trim()
-  .min(1, "Game is required");
+// Session Schema Definitions
+const gameSchema = z.union([
+  z.literal([
+    "Rocket League",
+    "Call of Duty",
+    "Mario Kart 8",
+    "Lethal Company",
+    "Speedrunners",
+  ]),
+  z.string().min(1, "Game is required"),
+]);
 const sessionNameSchema = z.string().trim().min(1).max(100).readonly();
 const sessionUrlSchema = z
-  .string({ required_error: "Session URL is required" })
-  .url()
+  .url("Session URL must be a valid URL")
   .toLowerCase()
   .trim()
   .min(1, "Session URL is required")
   .startsWith("https://www.youtube.com", "Please paste in a valid youtube url.")
   .max(100);
 const videoIdSchema = z.string().trim().min(1).readonly();
-const dateSchema = z.date({ required_error: "Date is required" }).readonly();
+const dateSchema = z.date({ error: "Date is required" }).readonly();
 const thumbnailSchema = z.string().trim().min(1).readonly();
 
+// ! End of Session Schema Definitions
+
 const playerSchema = z.object({
-  playerId: z.number(),
-  playerName: z.string().trim().min(1),
+  playerId: z.int(),
+  playerName: z.literal([
+    "Mark",
+    "Dylan",
+    "Ben",
+    "Lee",
+    "Des",
+    "John",
+    "Aff",
+    "Ipi",
+  ]),
 });
 const playersSchema = z
   .array(playerSchema)
   .nonempty("At least one player is required");
 
-const statSchema = z.object({
+// Stat Schema Definitions
+
+// ? Rocket League
+const rocketLeagueStats = z.object({
   statId: z.string().trim().min(1, "StatId is required"),
-  stat: z.string().trim().min(1, "Stat is required"),
-  statValue: zodInputStringPipe(z.number()),
+  stat: z.literal([
+    $Enums.StatName.RL_GOALS,
+    $Enums.StatName.RL_ASSISTS,
+    $Enums.StatName.RL_SAVES,
+    $Enums.StatName.RL_SHOTS,
+    $Enums.StatName.RL_SCORE,
+  ]),
+  statValue: z
+    .string()
+    .nonempty("Required")
+    .transform((val) => String(parseInt(val) || 0)),
 });
 
+// ? Mario Kart 8
+
+const marioKart8Stats = z.object({
+  statId: z.string().trim().min(1, "StatId is required"),
+  stat: z.literal($Enums.StatName.MK8_POS),
+  statValue: z
+    .string()
+    .nonempty("Required")
+    .transform((val) => String(parseInt(val) || 0)),
+});
+
+// ? COD
+
+const codStats = z.object({
+  statId: z.string().trim().min(1, "StatId is required"),
+  stat: z.literal([
+    $Enums.StatName.COD_KILLS,
+    $Enums.StatName.COD_DEATHS,
+    $Enums.StatName.COD_POS,
+    $Enums.StatName.COD_SCORE,
+  ]),
+  statValue: z
+    .string()
+    .nonempty("Required")
+    .transform((val) => String(parseInt(val) || 0)),
+});
+
+// Stat Schema Union
+const statSchema = z.discriminatedUnion("stat", [
+  rocketLeagueStats,
+  marioKart8Stats,
+  codStats,
+]);
+
+// ! End of Stat Schema Definitions
+
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
 const playerSessionSchema = z.object({
-  playerId: z.number(),
+  playerId: z.int(),
   playerSessionName: z.string().trim().min(1),
   playerStats: z
     .array(statSchema)
@@ -55,7 +123,7 @@ const matchesSchema = z
   .nonempty("At least one match is required");
 
 const setSchema = z.object({
-  setId: z.number(),
+  setId: z.int(),
   setWinners: z
     .array(playerSchema)
     .nonempty("At least one set winner is required"),
@@ -64,7 +132,8 @@ const setSchema = z.object({
 
 const setsSchema = z.array(setSchema).nonempty("At least one set is required");
 
-export const formSchema = z.object({
+// Base schema for common fields
+const baseSessionSchema = z.object({
   game: gameSchema,
   sessionName: sessionNameSchema,
   sessionUrl: sessionUrlSchema,
@@ -72,77 +141,103 @@ export const formSchema = z.object({
   date: dateSchema,
   thumbnail: thumbnailSchema,
   players: playersSchema,
+  sets: z.array(setSchema).nonempty("At least one set is required"),
+});
+
+const rocketLeagueSchema = baseSessionSchema.extend({
+  game: z.literal("Rocket League"),
+  sets: z
+    .array(
+      setSchema.extend({
+        matches: z.array(matchSchema).refine(
+          (data) => {
+            return data.every((match, i) => {
+              let winningTeam = 0;
+              let losingTeam = 0;
+
+              match.playerSessions.forEach((ps) => {
+                const onWinningTeam = match.matchWinners.some(
+                  (mw) => mw.playerId === ps.playerId,
+                );
+                ps.playerStats.forEach((stat) => {
+                  if (stat.stat === $Enums.StatName.RL_GOALS) {
+                    if (onWinningTeam)
+                      winningTeam += Number(stat.statValue) || 0;
+                    else losingTeam += Number(stat.statValue) || 0;
+                  }
+                });
+              });
+              if (winningTeam <= losingTeam)
+                console.warn(
+                  `Error in match ${i + 1}. Winning team should have more goals. Winners: ${winningTeam} Losers: ${losingTeam}`,
+                );
+              return winningTeam > losingTeam;
+            });
+          },
+          {
+            message: "Winning team should have more goals in each match",
+          },
+        ),
+      }),
+    )
+    .nonempty(),
+});
+
+const marioKart8MatchSchema = baseSessionSchema.extend({
+  game: z.literal("Mario Kart 8"),
+  sets: z.array(
+    setSchema.extend({
+      matches: z.array(matchSchema).refine(
+        (data) => {
+          return data.every((match, i) => {
+            let passed = true;
+            match.playerSessions.forEach((ps) => {
+              ps.playerStats.forEach((stat) => {
+                if (
+                  stat.stat === $Enums.StatName.MK8_POS &&
+                  parseInt(stat.statValue) === 1
+                ) {
+                  passed =
+                    match.matchWinners.length === 1 &&
+                    match.matchWinners.some((p) => p.playerId === ps.playerId);
+                }
+              });
+            });
+            return passed;
+          });
+        },
+        { error: "The first placed player must be the only match winner." },
+      ),
+    }),
+  ),
+});
+
+// Other game schemas...
+const defaultGameSchema = baseSessionSchema.extend({
+  game: z.literal("Call of Duty"),
   sets: setsSchema,
 });
 
-export const getSchema = (game: string) => {
-  switch (game) {
-    case "Rocket League":
-      return z.object({
-        game: gameSchema,
-        sessionName: sessionNameSchema,
-        sessionUrl: sessionUrlSchema,
-        videoId: videoIdSchema,
-        date: dateSchema,
-        thumbnail: thumbnailSchema,
-        players: playersSchema,
-        sets: z
-          .array(
-            z.object({
-              setId: z.number(),
-              setWinners: z
-                .array(playerSchema)
-                .nonempty("At least one set winner is required"),
-              matches: matchesSchema.refine(
-                (data) => {
-                  return data.every((match, i) => {
-                    let winningTeam = 0;
-                    let losingTeam = 0;
+// ! End of Game specific schemas
 
-                    match.playerSessions.forEach((ps) => {
-                      const onWinningTeam = match.matchWinners.some(
-                        (mw) => mw.playerId === ps.playerId,
-                      );
-                      ps.playerStats.forEach((stat) => {
-                        if (stat.stat === $Enums.StatName.RL_GOALS) {
-                          if (onWinningTeam)
-                            winningTeam += Number(stat.statValue) || 0;
-                          else losingTeam += Number(stat.statValue) || 0;
-                        }
-                      });
-                    });
-                    if (winningTeam <= losingTeam)
-                      console.warn(
-                        `Error in match ${i + 1}. Winning team should have more goals. Winners: ${winningTeam} Losers: ${losingTeam}`,
-                      );
-                    return winningTeam > losingTeam;
-                  });
-                },
-                {
-                  message: "Winning team should have more goals in each match",
-                },
-              ),
-            }),
-          )
-          .nonempty(),
-      });
-    default:
-      return formSchema;
-  }
-};
+// Combined schema with discriminated union
+export const formSchema = z.discriminatedUnion("game", [
+  defaultGameSchema,
+  rocketLeagueSchema,
+  marioKart8MatchSchema,
+]);
 
-// TODO Do we want to conditionally apply input types/validations based on the stat name? Most will be numbers
+// Define types based on the Zod schema
 export type FormValues = z.infer<typeof formSchema>;
 
-export type Matches = FormValues["sets"][number]["matches"];
-export type MatchWinners =
-  FormValues["sets"][number]["matches"][number]["matchWinners"];
-export type PlayerSessions =
-  FormValues["sets"][number]["matches"][number]["playerSessions"];
+// Derive specific types from the FormValues type
+export type Match = FormValues["sets"][number]["matches"][number];
+export type MatchWinners = Match["matchWinners"];
+export type PlayerSessions = Match["playerSessions"];
 export type SetWinners = FormValues["sets"][number]["setWinners"];
 
 type PlayerMapping = {
-  [key: string]: {
+  [key in z.infer<typeof playerSchema>["playerName"]]: {
     playerId: number;
     playerName: string;
     gamerTags: string[];
@@ -150,7 +245,7 @@ type PlayerMapping = {
 };
 
 // TODO: Fuzzy Matching
-export const PLAYER_MAPPINGS: PlayerMapping = {
+export const PLAYER_MAPPINGS: PlayerMapping & {} = {
   Mark: {
     playerId: 1,
     playerName: "Mark",
