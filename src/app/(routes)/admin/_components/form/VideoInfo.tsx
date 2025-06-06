@@ -19,7 +19,11 @@ export const VideoInfo = ({
     return null;
   }
   return (
-    <motion.div initial={{ y: 10 }} animate={{ y: 0 }} className="relative">
+    <motion.div
+      initial={{ y: 10 }}
+      animate={{ y: 0 }}
+      className="relative flex-1"
+    >
       <H3>{sessionName}</H3>
       <div className="text-muted-foreground text-sm">{date.toDateString()}</div>
       <motion.div

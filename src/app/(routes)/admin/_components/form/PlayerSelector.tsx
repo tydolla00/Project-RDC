@@ -62,7 +62,7 @@ const PlayerSelector = ({
       >
         <Label className="text-muted-foreground mb-6 block">{label}</Label>
         {rdcMembers?.length !== 0 ? (
-          <div className="mt-2 flex flex-wrap gap-y-1 sm:grid sm:grid-cols-8">
+          <div className="mt-2 flex flex-wrap gap-y-4 md:grid md:grid-cols-8">
             {rdcMembers.map((player, index) => (
               <div key={player.playerId} className="relative">
                 <div

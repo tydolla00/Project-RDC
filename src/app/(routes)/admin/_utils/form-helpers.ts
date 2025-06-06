@@ -212,6 +212,13 @@ const marioKart8MatchSchema = baseSessionSchema.extend({
   ),
 });
 
+const lethalCompanySchema = baseSessionSchema.extend({
+  game: z.literal("Lethal Company"),
+});
+
+const speedrunnersSchema = baseSessionSchema.extend({
+  game: z.literal("Speedrunners"),
+});
 // Other game schemas...
 const defaultGameSchema = baseSessionSchema.extend({
   game: z.literal("Call of Duty"),
@@ -225,6 +232,8 @@ export const formSchema = z.discriminatedUnion("game", [
   defaultGameSchema,
   rocketLeagueSchema,
   marioKart8MatchSchema,
+  lethalCompanySchema,
+  speedrunnersSchema,
 ]);
 
 // Define types based on the Zod schema

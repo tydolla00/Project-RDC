@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 // import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
@@ -51,7 +51,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     //   return zodResolver(formSchema)(data, context, options);
     // },
     defaultValues: {
-      game: "Rocket League",
+      game: "Mario Kart 8",
       sessionName: "",
       sessionUrl: "https://www.youtube.com/watch?v=",
       thumbnail: "",
@@ -97,6 +97,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     else {
       toast.success("Session successfully created.", { richColors: true });
       form.reset();
+      setStep(0);
     }
     setIsLoading(false);
   };
@@ -114,12 +115,13 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     });
   };
 
+  useEffect(() => {
+    document.documentElement.scrollTop = 0; // Scroll to top when a new set is added
+  }, []);
   return (
     <FormProvider {...form}>
-      <div className="grid w-full grid-cols-2 place-content-center gap-3">
-        <Card
-          className={cn("relative col-span-1 p-4", step === 1 && "col-span-2")}
-        >
+      <div className="flex w-full gap-3">
+        <Card className={cn("relative col-auto flex-1 p-4")}>
           <CardHeader className="dark:text-purple-500">
             <CardTitle>Entry Creator Form</CardTitle>
           </CardHeader>

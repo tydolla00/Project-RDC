@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { z } from "zod";
 import MatchManager from "./MatchManager";
@@ -52,6 +52,10 @@ const SetManager = () => {
   };
 
   const players = watch(`players`);
+
+  useEffect(() => {
+    document.documentElement.scrollTop = 0; // Scroll to top when a new set is added
+  }, []);
 
   return (
     <div className="col-span-2 w-full space-y-4">
