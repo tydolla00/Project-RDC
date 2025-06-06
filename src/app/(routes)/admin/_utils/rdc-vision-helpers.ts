@@ -14,6 +14,7 @@ export const handleAnalyzeBtnClick = async (
   ) => void,
   sessionPlayers: Player[],
   gameName: string,
+  onSuccessClose?: () => void,
 ): Promise<void> => {
   try {
     if (!state.selectedFile) return;
@@ -73,6 +74,8 @@ export const handleAnalyzeBtnClick = async (
           visionMsg: analysisResults.message,
         });
         toast.success("Success", { richColors: true });
+        // Only close modal on success
+        if (onSuccessClose) onSuccessClose();
         break;
       case VisionResultCodes.CheckRequest:
         handleCreateMatchFromVision(
