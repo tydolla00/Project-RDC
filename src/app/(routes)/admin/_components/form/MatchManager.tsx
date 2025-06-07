@@ -93,7 +93,7 @@ const MatchManager = (props: Props) => {
   return (
     <div>
       {(fields.length === 0 && (
-        <div className="text-center text-gray-500">
+        <div className="my-2 text-center text-gray-500">
           No Matches! Click Add Match to start!
         </div>
       )) ||

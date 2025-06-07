@@ -52,7 +52,6 @@ const PlayerStatManager = (props: Props) => {
           `${curPlayerSession}.playerStats.${index}.statValue` as const;
         return (
           <div key={field.id} className="my-4">
-            <span className="sr-only">{field.stat}</span>
             <div className="relative">
               <FormField
                 control={control}

@@ -61,7 +61,7 @@ const PlayerSessionManager = (props: Props) => {
         return (
           <div className="col-span-2 @xs:col-span-1" key={field.id}>
             <Label className="font-bold">{getPlayerNameFromField(field)}</Label>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <PlayerStatManager
                 {...props}
                 playerSessionIndex={sessionIndex}
