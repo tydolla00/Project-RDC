@@ -57,6 +57,9 @@ const rocketLeagueStats = z.object({
   ]),
   statValue: z
     .string()
+    .trim()
+    .min(1, "Stat value is required")
+    .regex(/^\d+$/, "Stat value must be a number")
     .nonempty("Required")
     .transform((val) => String(parseInt(val) || 0)),
 });
@@ -68,7 +71,9 @@ const marioKart8Stats = z.object({
   stat: z.literal($Enums.StatName.MK8_POS),
   statValue: z
     .string()
-    .nonempty("Required")
+    .trim()
+    .min(1, "Stat value is required")
+    .regex(/^\d+$/, "Stat value must be a number")
     .transform((val) => String(parseInt(val) || 0)),
 });
 
@@ -84,7 +89,9 @@ const codStats = z.object({
   ]),
   statValue: z
     .string()
-    .nonempty("Required")
+    .trim()
+    .min(1, "Stat value is required")
+    .regex(/^\d+$/, "Stat value must be a number")
     .transform((val) => String(parseInt(val) || 0)),
 });
 
