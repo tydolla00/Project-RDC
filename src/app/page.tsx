@@ -8,10 +8,81 @@ import { getGamesNav } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
 import Image from "next/image";
+import prisma from "../../prisma/db";
 
 export default async function Home() {
   const games = await getGamesNav();
   const session = await auth();
+
+  // let sessions = [];
+  // try {
+  //   sessions = await prisma.session.findMany({
+  //     select: {
+  //       sessionId: true,
+  //       sessionName: true,
+  //       sessionUrl: true,
+  //       thumbnail: true,
+  //       videoId: true,
+  //       Game: {
+  //         select: {
+  //           gameId: true,
+  //           gameName: true,
+  //         },
+  //       },
+  //       sets: {
+  //         select: {
+  //           setId: true,
+  //           matches: {
+  //             select: {
+  //               matchId: true,
+  //               date: true,
+  //               playerSessions: {
+  //                 select: {
+  //                   playerSessionId: true,
+  //                   player: {
+  //                     select: {
+  //                       playerId: true,
+  //                       playerName: true,
+  //                     },
+  //                   },
+  //                   playerStats: {
+  //                     select: {
+  //                       playerStatId: true,
+  //                       value: true,
+  //                       date: true,
+  //                       gameStat: {
+  //                         select: {
+  //                           statId: true,
+  //                           statName: true,
+  //                           gameId: true,
+  //                           type: true,
+  //                         },
+  //                       },
+  //                     },
+  //                   },
+  //                 },
+  //               },
+  //               matchWinners: {
+  //                 select: {
+  //                   playerId: true,
+  //                   playerName: true,
+  //                 },
+  //               },
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   });
+  // } catch (error) {
+  //   console.error("Failed to fetch sessions:", error);
+  //   sessions = []; // Fallback to empty array if query fails
+  // }
+  // console.log(sessions[0]);
+  // console.log(
+  //   "Sessions with all relations:",
+  //   JSON.stringify(sessions, null, 2),
+  // );
   return (
     <>
       <div className="m-16">
