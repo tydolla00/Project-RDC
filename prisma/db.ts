@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { Pool, neonConfig } from "@neondatabase/serverless";
-import config from "@/lib/config";
-import { Prisma } from "@prisma/client";
+// import config from "../lib/config";
+
 import ws from "ws";
 
 neonConfig.webSocketConstructor = ws;
@@ -63,12 +63,10 @@ export async function handlePrismaOperation<T>(
   }
 }
 
-const connectionString = config.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
 
-const pool = new Pool({ connectionString });
-const adapter = new PrismaNeon(pool);
-const prisma =
-  global.prisma || new PrismaClient({ adapter, log: ["warn", "error"] });
+const adapter = new PrismaNeon({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV === "development") global.prisma = prisma;
 
