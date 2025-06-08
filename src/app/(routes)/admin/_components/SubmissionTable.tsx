@@ -37,6 +37,9 @@ export const SubmissionTable = async () => {
                 <Link href={session.sessionUrl}>{session.sessionUrl}</Link>
               </TableCell>
               <TableCell>{`${new Date(session.createdAt).toLocaleString()}`}</TableCell>
+              <TableCell>
+                {session.isApproved ? "Approved" : "Pending"}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

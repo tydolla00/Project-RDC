@@ -1,4 +1,4 @@
-import { StatName } from "@prisma/client";
+import { $Enums, StatName } from "@prisma/client";
 import {
   getWinsPerPlayer,
   getMatchesPerGame,
@@ -6,16 +6,15 @@ import {
   getStatPerPlayer,
   getSumPerStat,
 } from "../../../../../../../prisma/lib/games";
-import { StatNames } from "../../../../../../../prisma/lib/utils";
 import PostHogClient from "@/lib/posthog";
 
 export const getRLStats = async (playerId: number) =>
   await Promise.all([
-    (await getSumPerStat(playerId, StatNames.RLGoals)).at(0),
-    (await getSumPerStat(playerId, StatNames.RLAssists)).at(0),
-    (await getSumPerStat(playerId, StatNames.RLSaves)).at(0),
-    (await getSumPerStat(playerId, StatNames.RLScore)).at(0),
-    (await getSumPerStat(playerId, StatNames.RLDay)).at(0),
+    (await getSumPerStat(playerId, $Enums.StatName.RL_GOALS)).at(0),
+    (await getSumPerStat(playerId, $Enums.StatName.RL_ASSISTS)).at(0),
+    (await getSumPerStat(playerId, $Enums.StatName.RL_SAVES)).at(0),
+    (await getSumPerStat(playerId, $Enums.StatName.RL_SCORE)).at(0),
+    (await getSumPerStat(playerId, $Enums.StatName.RL_DAY)).at(0),
   ]);
 
 /**
