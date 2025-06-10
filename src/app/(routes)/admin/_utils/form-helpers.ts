@@ -12,7 +12,13 @@ const gameSchema = z.union([
   ]),
   z.string().min(1, "Game is required"),
 ]);
-const sessionNameSchema = z.string().trim().min(1).max(100).readonly();
+const sessionNameSchema = z
+  .string()
+  .trim()
+  .min(1, "Session name is required")
+  .max(100)
+  .readonly();
+// TODO Add logic to surface error since other fields aren't being shown
 const sessionUrlSchema = z
   .url("Session URL must be a valid URL")
   .toLowerCase()

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
 import {
@@ -23,7 +23,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoInfo } from "./VideoInfo";
 import { cn } from "@/lib/utils";
 import { FormSummary } from "./Summary";
-import { zodResolver } from "../../_utils/temp-zodv4-resolver";
+// import { zodResolver } from "../../_utils/temp-zodv4-resolver";
 
 interface AdminFormProps {
   rdcMembers: Player[];
