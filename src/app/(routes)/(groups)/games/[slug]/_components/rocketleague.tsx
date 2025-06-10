@@ -59,9 +59,17 @@ const RocketLeague = async ({
   );
   membersMap = membersMap.filter((d) => d?.score.sum !== 0);
   const wins = await getWinsPerPlayer(game.gameId);
+  const wins2 = await getWinsPerPlayer(1); // For testing purposes, remove later
   if (!wins.success || !wins.data) wins.data = { sessions: [] };
 
   const winsPerPlayer = calcWinsPerPlayer(wins.data); // Sets / Wins
+  // console.log(winsPerPlayer);
+  // console.dir({ wins }, { depth: null });
+  // console.log("Last session", wins.data.sessions.at(-1));
+  // console.dir({ wins2 }, { depth: null });
+  // console.log("Last session", wins2.data?.sessions.at(-1));
+  console.log(JSON.stringify(wins.data.sessions, null, 2));
+  console.log(JSON.stringify(wins2.data?.sessions, null, 2));
 
   const config = {
     player: { label: "Player" },
