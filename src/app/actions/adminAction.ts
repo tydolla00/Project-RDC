@@ -1,13 +1,13 @@
 "use server";
 
 import { $Enums, Game, GameStat, Player } from "@prisma/client";
-import { v4 } from "uuid";
 import prisma from "../../../prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { getAllGames } from "../../../prisma/lib/games";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { randomInt } from "crypto";
+import { revalidateTag } from "next/cache";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -35,6 +35,20 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
     },
   });
   return gameStats;
+}
+
+export async function getGameIdFromName(gameName: string) {
+  const game = await prisma.game.findFirst({
+    where: {
+      gameName: gameName,
+    },
+  });
+
+  if (!game) {
+    throw new Error(`Game with name ${gameName} not found`);
+  }
+
+  return game.gameId;
 }
 
 /**
@@ -261,6 +275,7 @@ export const insertNewSessionFromAdmin = async (
         );
       }),
     );
+    revalidateTag("getAllSessions");
     return { error: null };
   } catch (error) {
     return { error: "Unknown error occurred. Please try again." };

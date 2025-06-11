@@ -1,14 +1,19 @@
 import { VisionResultCodes } from "@/lib/constants";
 import { toast } from "sonner";
 import { Player } from "@prisma/client";
-import { analyzeScreenShot } from "@/app/actions/visionAction";
+import { analyzeScreenShot, VisionPlayer } from "@/app/actions/visionAction";
 import { Action, State } from "../_components/form/RDCVisionModal";
+import { getGameIdFromName } from "@/app/actions/adminAction";
 
 export const handleAnalyzeBtnClick = async (
   state: State,
   dispatch: (action: Action) => void,
-  handleCreateMatchFromVision: (vr: any) => void,
+  handleCreateMatchFromVision: (
+    visionPlayers: VisionPlayer[],
+    visionWinner: VisionPlayer[],
+  ) => void,
   sessionPlayers: Player[],
+  gameName: string,
 ): Promise<void> => {
   try {
     if (!state.selectedFile) return;
@@ -22,6 +27,25 @@ export const handleAnalyzeBtnClick = async (
 
     const base64FileContent = await getFileAsBase64(state.selectedFile);
 
+    // Get game ID with error handling
+    let gameId: number;
+    try {
+      gameId = await getGameIdFromName(gameName);
+      if (!gameId) {
+        throw new Error(`Game "${gameName}" not found`);
+      }
+    } catch (error) {
+      console.error("Failed to get game ID:", error);
+      dispatch({
+        type: "UPDATE_VISION",
+        visionStatus: VisionResultCodes.Failed,
+        visionMsg: `Unable to find game "${gameName}". Please verify the game name is correct.`,
+        loading: false,
+      });
+      toast.error(`Game "${gameName}" not found`, { richColors: true });
+      return;
+    }
+
     if (!base64FileContent) {
       toast.error("Unknown error has occurred, please try again.", {
         richColors: true,
@@ -29,37 +53,46 @@ export const handleAnalyzeBtnClick = async (
       return;
     }
 
-    const visionResult = await analyzeScreenShot(
+    const analysisResults = await analyzeScreenShot(
       base64FileContent,
       sessionPlayers,
+      gameId, // TODO: This should be from the selected game
     );
 
-    switch (visionResult.status) {
+    console.log("analysis Results: ", analysisResults);
+
+    switch (analysisResults.status) {
       case VisionResultCodes.Success:
-        handleCreateMatchFromVision(visionResult.data);
+        handleCreateMatchFromVision(
+          analysisResults.data.players,
+          analysisResults.data.winner || [],
+        );
         dispatch({
           type: "UPDATE_VISION",
           visionStatus: VisionResultCodes.Success,
-          visionMsg: visionResult.message,
+          visionMsg: analysisResults.message,
         });
         toast.success("Success", { richColors: true });
         break;
       case VisionResultCodes.CheckRequest:
-        handleCreateMatchFromVision(visionResult.data);
+        handleCreateMatchFromVision(
+          analysisResults.data.players,
+          analysisResults.data.winner || [],
+        );
         dispatch({
           type: "UPDATE_VISION",
           visionStatus: VisionResultCodes.CheckRequest,
-          visionMsg: visionResult.message,
+          visionMsg: analysisResults.message,
         });
-        toast.warning(visionResult.message, { richColors: true });
+        toast.warning(analysisResults.message, { richColors: true });
         break;
       case VisionResultCodes.Failed:
         dispatch({
           type: "UPDATE_VISION",
           visionStatus: VisionResultCodes.Failed,
-          visionMsg: visionResult.message,
+          visionMsg: analysisResults.message,
         });
-        toast.error(visionResult.message, { richColors: true });
+        toast.error(analysisResults.message, { richColors: true });
         break;
       default:
         break;
