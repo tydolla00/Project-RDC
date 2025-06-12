@@ -127,7 +127,7 @@ export const validateProcessedPlayer = (
     } else {
       return {
         playerId: foundSessionPlayer?.playerId,
-        name: foundSessionPlayer?.playerName as FormValues["players"][number]["playerName"],
+        name: foundSessionPlayer.playerName as FormValues["players"][number]["playerName"],
         stats: [...processedPlayer.playerData.stats],
         teamKey: processedPlayer.teamKey,
       };

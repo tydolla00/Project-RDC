@@ -25,6 +25,7 @@ export const SubmissionTable = async () => {
             <TableHead>Game</TableHead>
             <TableHead>Session URL</TableHead>
             <TableHead>Created At (EST)</TableHead>
+            <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

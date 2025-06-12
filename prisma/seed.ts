@@ -234,19 +234,17 @@ async function importSessions() {
                   },
                 });
 
-                // Create player stats one by one
-                for (const statData of playerSessionData.playerStats) {
-                  await tx.playerStat.create({
-                    data: {
-                      value: statData.value,
-                      date: new Date(statData.date),
-                      playerId: playerSessionData.player.playerId,
-                      gameId: game.gameId,
-                      playerSessionId: playerSession.playerSessionId,
-                      statId: statData.gameStat.statId,
-                    },
-                  });
-                }
+                // Create player stats in batch using createMany
+                await tx.playerStat.createMany({
+                  data: playerSessionData.playerStats.map((statData) => ({
+                    value: statData.value,
+                    date: new Date(statData.date),
+                    playerId: playerSessionData.player.playerId,
+                    gameId: game.gameId,
+                    playerSessionId: playerSession.playerSessionId,
+                    statId: statData.gameStat.statId,
+                  })),
+                });
               }
 
               // Set match winners

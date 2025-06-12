@@ -11,14 +11,14 @@ const RocketLeague = async ({
   let membersMap = await Promise.all(
     members.map(async (member) => {
       try {
-        const [goals, assists, saves, score, days] = await getRLStats(
+        const { goals, assists, saves, score, days } = await getRLStats(
           member.playerId,
         );
         return {
           ...member,
           goals: { sum: Number(goals?.sum), avg: Number(goals?.avg) },
           assists: { sum: Number(assists?.sum), avg: Number(assists?.avg) },
-          saves: { sum: Number(saves?.sum), avg: Number(assists?.avg) },
+          saves: { sum: Number(saves?.sum), avg: Number(saves?.avg) },
           score: { sum: Number(score?.sum), avg: Number(score?.avg) },
           days: { sum: Number(days?.sum), avg: Number(days?.avg) },
         };

@@ -9,7 +9,7 @@ interface Props {
 
 const WinnerDisplay = (props: Props) => {
   const { setIndex } = props;
-  const { watch, control } = useFormContext<FormValues>();
+  const { control } = useFormContext<FormValues>();
   const winners = useWatch({ name: `sets.${setIndex}.setWinners`, control });
   return (
     <div
