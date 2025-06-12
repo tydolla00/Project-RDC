@@ -7,6 +7,7 @@ import { EnrichedSession } from "./types/session";
 
 async function main() {
   console.group("Begin seeding database");
+  console.time("Seeding Time");
   try {
     await seedRDCMembers();
     await seedGames();
@@ -16,6 +17,7 @@ async function main() {
     console.error("Error seeding database:", error);
     throw error;
   } finally {
+    console.timeEnd("Seeding Time");
     console.groupEnd();
   }
 }
