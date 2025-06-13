@@ -48,7 +48,6 @@ const RocketLeague = async ({
   );
   membersMap = membersMap.filter((d) => d?.score.sum !== 0);
   const wins = await getWinsPerPlayer(game.gameId);
-  const wins2 = await getWinsPerPlayer(1); // For testing purposes, remove later
   if (!wins.success || !wins.data) wins.data = { sessions: [] };
 
   const winsPerPlayer = calcWinsPerPlayer(wins.data); // Sets / Wins

@@ -135,11 +135,10 @@ export function TimelineChart({
             <CardDescription>{desc}</CardDescription>
           </div>
           <div className="flex items-center justify-center gap-3 p-6">
-            <Label htmlFor="showMatchData">Turn off hover effect</Label>
+            <Label htmlFor="showMatchData">Disable hover effects</Label>
             <Switch
               id="showMatchData"
               onCheckedChange={(val) => {
-                console.log(val);
                 if (val) setSession(undefined);
                 setShowMatchData(!val);
               }}
