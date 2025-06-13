@@ -5,11 +5,10 @@ import { getAllMembers } from "../../prisma/lib/members";
 /**
  * Generates a sitemap for the Project-RDC application.
  *
- * This function fetches all games and members data, then constructs a sitemap
- * with URLs for the main pages, games, and members. Each URL entry includes
- * metadata such as the last modified date, change frequency, and priority.
+ * Fetches all games and members, then constructs a sitemap with URLs for main pages, games, and members.
+ * Each entry includes metadata such as last modified date, change frequency, and priority.
  *
- * @returns {Promise<MetadataRoute.Sitemap>} A promise that resolves to the sitemap.
+ * @returns A promise resolving to the sitemap array.
  *
  * @example
  * const sitemap = await sitemap();

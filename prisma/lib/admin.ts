@@ -2,12 +2,11 @@ import { unstable_cache } from "next/cache";
 import prisma, { handlePrismaOperation } from "../db";
 
 /**
- * Retrieves all video sessions from the database, including the associated game names.
+ * Retrieves all video sessions from the database, including associated game names.
  *
- * This function uses `unstable_cache` to cache the results for 1 week (604800 seconds).
- * The cache is tagged with "getAllSessions" for easy invalidation.
+ * Uses cache for 1 week (604800 seconds), tagged with "getAllSessions".
  *
- * @returns {Promise<Array>} A promise that resolves to an array of video sessions with game names.
+ * @returns Promise resolving to an array of video sessions with game names.
  */
 export const getAllSessions = unstable_cache(
   async () =>
@@ -20,22 +19,18 @@ export const getAllSessions = unstable_cache(
   { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
 );
 
-// TODO Update the documentation
 /**
- * Retrieves all sessions associated with a specific game.
+ * Retrieves all sessions for a specific game.
  *
- * @param gameId - The unique identifier of the game.
- * @returns A promise that resolves to an array of session objects, each including the game name.
+ * @param gameId - Game ID
+ * @returns Promise resolving to an array of session objects, each including the game name.
  *
  * @remarks
- * This function uses the `unstable_cache` to cache the results for 1 week (604800 seconds).
- * The cache is tagged with "getAllSessions".
+ * Uses cache for 1 week (604800 seconds), tagged with "getAllSessions".
  *
  * @example
- * ```typescript
  * const sessions = await getAllSessionsByGame(1);
  * console.log(sessions);
- * ```
  */
 export const getAllSessionsByGame = unstable_cache(
   async (gameId: number) =>

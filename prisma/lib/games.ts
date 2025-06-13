@@ -15,12 +15,9 @@ export type StatEndsWith<
 // perks of using this method is we can invalidate certain paths.
 
 /**
- * Retrieves all games from the database.
+ * Retrieves all games from the database, using cache for deduplication.
  *
- * This function uses the `unstable_cache` to cache the results of the database query.
- * The cache is tagged with "getAllGames" and does not revalidate.
- *
- * @returns {Promise<Game[]>} A promise that resolves to an array of games.
+ * @returns Promise resolving to an array of games.
  */
 export const getAllGames = unstable_cache(
   async () => await handlePrismaOperation(() => prisma.game.findMany()),
@@ -96,12 +93,13 @@ export const getWinsPerPlayer = async (gameId: number) =>
   );
 
 /**
- * Retrieves matches per game based on the provided game ID and stat name. It is useful for calculating player stats per match.
+ * Retrieves matches per game for a given game ID and stat name (ending with 'POS').
+ * Useful for calculating player stats per match.
  *
- * @template T - The type of the stat name, extending from `StatName`.
- * @param {number} gameId - The ID of the game to retrieve matches for.
- * @param {StatEndsWith<"POS", T>} statName - The stat name ending with "POS" to filter player stats.
- * @returns {Promise<Array>} A promise that resolves to an array of video sessions with nested sets, matches, and player sessions.
+ * @template T - Stat name type
+ * @param gameId - Game ID
+ * @param statName - Stat name ending with 'POS'
+ * @returns Promise resolving to an array of sessions with nested sets, matches, and player sessions.
  */
 export const getMatchesPerGame = async <T extends StatName = StatName>(
   gameId: number,
@@ -137,11 +135,11 @@ export const getMatchesPerGame = async <T extends StatName = StatName>(
   );
 
 /**
- * Retrieves statistics for each player in a specific game. The statistics are filtered by the provided statistic name.
+ * Retrieves statistics for each player in a specific game, filtered by stat name.
  *
- * @param gameId - The unique identifier of the game.
- * @param statName - The name of the statistic to retrieve.
- * @returns A promise that resolves to an array of player statistics, including the player and the value of the statistic.
+ * @param gameId - Game ID
+ * @param statName - Stat name to filter
+ * @returns Promise resolving to an array of player statistics.
  */
 export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
   await handlePrismaOperation(() =>
@@ -151,6 +149,11 @@ export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
     }),
   );
 
+/**
+ * Retrieves all game stats from the database.
+ *
+ * @returns Promise resolving to an array of game stats.
+ */
 export const getAllGameStats = async () =>
   await handlePrismaOperation(() =>
     prisma.gameStat.findMany({

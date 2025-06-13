@@ -12,31 +12,19 @@ export type FeatureFlagName = keyof typeof FEATURE_FLAGS;
 type Roles = "admin" | "user" | "tester";
 
 /**
- * A component that gates feature access based on user roles and environment
+ * Component for feature access control based on user roles and environment.
  *
- * @description
- * This component provides feature access control by:
- * - Checking user roles against required roles for each feature
- * - Supporting development-only features
- * - Optionally redirecting users without access
- * - Handling both client and server-side feature gating
- *
- * The component uses a constant FEATURE_FLAGS object that defines all available
- * feature flags and their required roles. This ensures consistent feature
- * access control across the application.
+ * Checks user roles against required roles for each feature, supports development-only features,
+ * and can redirect unauthorized users. Uses FEATURE_FLAGS for configuration.
  *
  * @param children - Content to render if feature is enabled
- * @param devOnly - Whether the feature should only be available in development
- * @param shouldRedirect - Whether to redirect unauthorized users
- * @param flagName - The feature flag to check from FEATURE_FLAGS
- * @param user - Current user session for role checking
+ * @param devOnly - If true, feature is only available in development
+ * @param shouldRedirect - If true, redirects unauthorized users
+ * @param flagName - The feature flag to check
+ * @param user - Current user session
  *
  * @example
- * <FeatureFlag
- *   flagName="ADMIN_FORM"
- *   shouldRedirect={true}
- *   user={session}
- * >
+ * <FeatureFlag flagName="ADMIN_FORM" shouldRedirect user={session}>
  *   <AdminPanel />
  * </FeatureFlag>
  */

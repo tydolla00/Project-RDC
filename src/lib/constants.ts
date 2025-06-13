@@ -3,6 +3,11 @@ import { getAllGames } from "../../prisma/lib/games";
 import { getAllMembers } from "../../prisma/lib/members";
 import { capitalizeFirst } from "./utils";
 
+/**
+ * Returns navigation data for all RDC members.
+ *
+ * @returns Promise resolving to an array of member navigation objects.
+ */
 export const getMembersNav = async () => {
   const members = await getAllMembers();
 
@@ -32,7 +37,9 @@ export const getMembersNav = async () => {
   return navMembers;
 };
 
-// TODO Replace src with player avatars
+/**
+ * Enum of RDC member names.
+ */
 export enum MembersEnum {
   Mark = "mark",
   Ipi = "ipi",
@@ -173,6 +180,11 @@ const RDCMembers = new Map<MembersEnum, MembersProps>([
   ],
 ]);
 
+/**
+ * Returns navigation data for all games.
+ *
+ * @returns Promise resolving to an array of game navigation objects.
+ */
 export const getGamesNav = async () => {
   const games = await getAllGames();
 
