@@ -10,36 +10,32 @@ import PostHogClient from "@/lib/posthog";
 
 type Result = Awaited<ReturnType<typeof getSumPerStat>>[number];
 
-type Test<T extends string[]> = T extends [infer U, ...infer Rest]
-  ? Rest
-  : never;
-
-const lol: Test<["HI", "Bye"]> = ["Bye"];
-type Temp = {
-  [k in keyof $Enums.StatName]: k extends `RL_${infer U}` ? `RL_${U}` : never;
+type SumAndAvg<T extends string[], Y extends "RL"> = {
+  [K in T[number] as K extends `${Y}_${infer U}` ? Lowercase<`${U}`> : never]:
+    | Result
+    | { avg: -1; sum: -1 };
 };
 
-type Temporary = {
-  goals: Result | { avg: -1; sum: -1 };
-  assists: Result | { avg: -1; sum: -1 };
-  saves: Result | { avg: -1; sum: -1 };
-  score: Result | { avg: -1; sum: -1 };
-  days: Result | { avg: -1; sum: -1 };
+export const getAvgAndSum = async (
+  playerId: number,
+  stats: $Enums.StatName[],
+): Promise<SumAndAvg<typeof stats, "RL">> => {
+  return await Promise.all(
+    stats.map((stat) => getSumPerStat(Number(playerId), stat)),
+  ).then((results) =>
+    results.reduce(
+      (acc, result, index) => {
+        const i = stats[index].indexOf("_");
+        const statName = stats[index]
+          .slice(i + 1)
+          .toLowerCase() as keyof SumAndAvg<typeof stats, "RL">;
+        acc[statName] = result.at(0) || { avg: -1, sum: -1 };
+        return acc;
+      },
+      {} as SumAndAvg<typeof stats, "RL">,
+    ),
+  );
 };
-export const getRLStats = async (playerId: number): Promise<Temporary> =>
-  await Promise.all([
-    getSumPerStat(playerId, $Enums.StatName.RL_GOALS),
-    getSumPerStat(playerId, $Enums.StatName.RL_ASSISTS),
-    getSumPerStat(playerId, $Enums.StatName.RL_SAVES),
-    getSumPerStat(playerId, $Enums.StatName.RL_SCORE),
-    getSumPerStat(playerId, $Enums.StatName.RL_DAY),
-  ]).then(([goals, assists, saves, score, day]) => ({
-    goals: goals.at(0) || { avg: -1, sum: -1 },
-    assists: assists.at(0) || { avg: -1, sum: -1 },
-    saves: saves.at(0) || { avg: -1, sum: -1 },
-    score: score.at(0) || { avg: -1, sum: -1 },
-    days: day.at(0) || { avg: -1, sum: -1 },
-  }));
 
 /**
  * Computes set wins and match wins for each player.
