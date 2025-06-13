@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
@@ -9,26 +9,49 @@ import {
   insertNewSessionV2,
 } from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useAdmin } from "@/lib/adminContext";
-import { useFormStatus } from "react-dom";
 import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
 import { formSchema, FormValues } from "../../_utils/form-helpers";
+import {
+  AnimatedFormWrapper,
+  NavigationButtons,
+} from "@/components/AnimatedFormWrapper";
+import { motion } from "motion/react";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { VideoInfo } from "./VideoInfo";
+import { cn } from "@/lib/utils";
+import { FormSummary } from "./Summary";
+// import { zodResolver } from "../../_utils/temp-zodv4-resolver";
 
 interface AdminFormProps {
   rdcMembers: Player[];
 }
 
-const EntryCreatorForm = (props: AdminFormProps) => {
+const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { rdcMembers } = props;
-  const form = useForm<FormValues>({
+  const [step, setStep] = useState(0);
+  const [modifier, setModifier] = useState(0);
+
+  const form = useForm<FormValues, any>({
     resolver: zodResolver(formSchema),
+    // async (data, context, options) => {
+    //   try {
+    //     // Validate the form data against the Zod schema
+    //     console.log(await formSchema.parseAsync(data));
+    //   } catch (error) {
+    //     // If validation fails, return the error to the resolver
+    //     console.log(error);
+    //     return {
+    //       values: {},
+    //       errors: error.flatten().fieldErrors,
+    //     };
+    //   }
+    //   return zodResolver(formSchema)(data, context, options);
+    // },
     defaultValues: {
-      game: "",
+      game: "Mario Kart 8",
       sessionName: "",
       sessionUrl: "https://www.youtube.com/watch?v=",
       thumbnail: "",
@@ -38,29 +61,10 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     mode: "onChange",
   });
 
-  const {
-    handleSubmit,
-    control,
-    watch,
-    formState: { errors, defaultValues, isValid: formIsValid },
-    setValue,
-    getValues,
-  } = form;
+  console.log(form.formState.errors);
+  console.log({ form });
 
-  const { gameStats, getGameStatsFromDb } = useAdmin();
-  const game = watch("game");
-
-  // console.log(watch());
-
-  // TODO Can we pass this down as a prop, fetch all stats at once.
-  useEffect(() => {
-    const fetchData = async () => {
-      if (game) {
-        await getGameStatsFromDb(game);
-      }
-    };
-    fetchData();
-  }, [game, getGameStatsFromDb]);
+  const { handleSubmit } = form;
 
   /**
    * Handles the form submission for creating a new session.
@@ -74,8 +78,9 @@ const EntryCreatorForm = (props: AdminFormProps) => {
    * or displaying an error toast message.
    * If the insertion is successful, displays a success toast message and revalidates the session data.
    */
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: FormValues): Promise<void> => {
     setIsLoading(true);
+
     console.log("Form Data Being Submitted:", {
       data,
       stringified: JSON.stringify(data, null, 2),
@@ -92,6 +97,7 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     else {
       toast.success("Session successfully created.", { richColors: true });
       form.reset();
+      setStep(0);
     }
     setIsLoading(false);
   };
@@ -109,47 +115,46 @@ const EntryCreatorForm = (props: AdminFormProps) => {
     });
   };
 
+  useEffect(() => {
+    document.documentElement.scrollTop = 0; // Scroll to top when a new set is added
+  }, []);
   return (
     <FormProvider {...form}>
-      <Form {...form}>
-        <div className="m-2 text-center text-2xl font-bold dark:text-purple-500">
-          Entry Creator Form
-        </div>
-
-        <form
-          method="post"
-          className="relative mx-auto rounded-md border p-4"
-          onSubmit={handleSubmit(onSubmit, onError)}
-        >
-          <div className="mb-10 w-fit items-center gap-4">
-            <SessionInfo form={form} rdcMembers={rdcMembers} />
-          </div>
-          {/* <FormSummary /> */}
-          <div className="mx-auto">
-            <SetManager />
-            <Submit formIsValid={formIsValid} loading={isLoading} />
-          </div>
-        </form>
-      </Form>
+      <div className="flex w-full gap-3">
+        <Card className={cn("relative col-auto flex-1 p-4")}>
+          <CardHeader className="dark:text-purple-500">
+            <CardTitle>Entry Creator Form</CardTitle>
+          </CardHeader>
+          <AnimatedFormWrapper>
+            <Form {...form}>
+              <form method="post" onSubmit={handleSubmit(onSubmit, onError)}>
+                <motion.div
+                  key={step} // Necessary in order for animate presence to know when to rerender
+                  className="space-y-4"
+                  initial={{ x: `${-110 * modifier}%`, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: `${110 * modifier}%`, opacity: 0 }}
+                >
+                  {step === 0 && (
+                    <SessionInfo form={form} rdcMembers={rdcMembers} />
+                  )}
+                  {step === 1 && <SetManager />}
+                  {step === 2 && <FormSummary />}
+                </motion.div>
+                <NavigationButtons
+                  form={form}
+                  isPending={isLoading}
+                  step={step}
+                  setStep={setStep}
+                  setModifier={setModifier}
+                />
+              </form>
+            </Form>
+          </AnimatedFormWrapper>
+        </Card>
+        {step === 0 && <VideoInfo form={form} step={step} />}
+      </div>
     </FormProvider>
-  );
-};
-
-const Submit = ({
-  formIsValid,
-  loading,
-}: {
-  formIsValid: boolean;
-  loading: boolean;
-}) => {
-  return (
-    <Button
-      disabled={!formIsValid || loading}
-      type="submit"
-      className="my-2 w-full rounded-md border p-2"
-    >
-      Submit
-    </Button>
   );
 };
 

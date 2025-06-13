@@ -1,2 +1,0 @@
--- AlterEnum
-ALTER TYPE "StatName" ADD VALUE 'COD_MELEES';

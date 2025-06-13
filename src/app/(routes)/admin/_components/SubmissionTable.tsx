@@ -25,6 +25,7 @@ export const SubmissionTable = async () => {
             <TableHead>Game</TableHead>
             <TableHead>Session URL</TableHead>
             <TableHead>Created At (EST)</TableHead>
+            <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -37,6 +38,9 @@ export const SubmissionTable = async () => {
                 <Link href={session.sessionUrl}>{session.sessionUrl}</Link>
               </TableCell>
               <TableCell>{`${new Date(session.createdAt).toLocaleString()}`}</TableCell>
+              <TableCell>
+                {session.isApproved ? "Approved" : "Pending"}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

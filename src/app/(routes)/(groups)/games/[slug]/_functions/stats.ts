@@ -1,4 +1,4 @@
-import { StatName } from "@prisma/client";
+import { $Enums, StatName } from "@prisma/client";
 import {
   getWinsPerPlayer,
   getMatchesPerGame,
@@ -6,17 +6,36 @@ import {
   getStatPerPlayer,
   getSumPerStat,
 } from "../../../../../../../prisma/lib/games";
-import { StatNames } from "../../../../../../../prisma/lib/utils";
 import PostHogClient from "@/lib/posthog";
 
-export const getRLStats = async (playerId: number) =>
-  await Promise.all([
-    (await getSumPerStat(playerId, StatNames.RLGoals)).at(0),
-    (await getSumPerStat(playerId, StatNames.RLAssists)).at(0),
-    (await getSumPerStat(playerId, StatNames.RLSaves)).at(0),
-    (await getSumPerStat(playerId, StatNames.RLScore)).at(0),
-    (await getSumPerStat(playerId, StatNames.RLDay)).at(0),
-  ]);
+type Result = Awaited<ReturnType<typeof getSumPerStat>>[number];
+
+type SumAndAvg<T extends string[], Y extends "RL"> = {
+  [K in T[number] as K extends `${Y}_${infer U}` ? Lowercase<`${U}`> : never]:
+    | Result
+    | { avg: -1; sum: -1 };
+};
+
+export const getAvgAndSum = async (
+  playerId: number,
+  stats: $Enums.StatName[],
+): Promise<SumAndAvg<typeof stats, "RL">> => {
+  return await Promise.all(
+    stats.map((stat) => getSumPerStat(Number(playerId), stat)),
+  ).then((results) =>
+    results.reduce(
+      (acc, result, index) => {
+        const i = stats[index].indexOf("_");
+        const statName = stats[index]
+          .slice(i + 1)
+          .toLowerCase() as keyof SumAndAvg<typeof stats, "RL">;
+        acc[statName] = result.at(0) || { avg: -1, sum: -1 };
+        return acc;
+      },
+      {} as SumAndAvg<typeof stats, "RL">,
+    ),
+  );
+};
 
 /**
  * Computes set wins and match wins for each player.

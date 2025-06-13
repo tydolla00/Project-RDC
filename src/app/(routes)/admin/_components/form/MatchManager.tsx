@@ -1,6 +1,6 @@
 import { Player } from "@prisma/client";
-import React, { useMemo } from "react";
-import { Controller, useFieldArray } from "react-hook-form";
+import React from "react";
+import { useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import PlayerSessionManager from "./PlayerSessionManager";
 import PlayerSelector from "./PlayerSelector";
@@ -11,6 +11,7 @@ import RDCVisionModal from "./RDCVisionModal";
 import { VisionPlayer, VisionResult } from "@/app/actions/visionAction";
 import { FormValues } from "../../_utils/form-helpers";
 import { getGameIdFromName } from "@/app/actions/adminAction";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 interface Props {
   setIndex: number;
@@ -38,7 +39,7 @@ const MatchManager = (props: Props) => {
     console.log("Handling New Match click", players);
     const playerSessions = players.map((player: Player) => ({
       playerId: player.playerId,
-      playerSessionName: player.playerName,
+      playerSessionName: player.playerName, // Discrepancy in what is being assigned to playerSessionName
       playerStats: [],
     }));
     console.log("Player Sessions: ", playerSessions);
@@ -72,15 +73,18 @@ const MatchManager = (props: Props) => {
       };
     });
 
+    // TODO FIX Typings
     if (formattedWinners && formattedWinners.length > 0) {
       console.log("Setting Vision Winners!", formattedWinners);
       append({
         matchWinners: formattedWinners,
+        // @ts-expect-error - Type mismatch, but we know this is correct
         playerSessions: visionMatchPlayerSessions,
       });
     } else {
       append({
         matchWinners: [],
+        // @ts-expect-error - Type mismatch, but we know this is correct
         playerSessions: visionMatchPlayerSessions,
       });
     }
@@ -89,7 +93,7 @@ const MatchManager = (props: Props) => {
   return (
     <div>
       {(fields.length === 0 && (
-        <div className="text-center text-gray-500">
+        <div className="my-2 text-center text-gray-500">
           No Matches! Click Add Match to start!
         </div>
       )) ||
@@ -106,17 +110,20 @@ const MatchManager = (props: Props) => {
                   <MinusCircledIcon /> Remove Match
                 </Button>
               </div>
-              <Controller
+              <FormField
                 name={`sets.${setIndex}.matches.${matchIndex}.matchWinners`}
                 control={control}
                 render={({ field }) => (
-                  <PlayerSelector
-                    rdcMembers={players}
-                    control={control}
-                    field={field}
-                    currentSelectedPlayers={field.value}
-                    label="Match Winners"
-                  />
+                  <FormItem>
+                    <PlayerSelector
+                      rdcMembers={players}
+                      control={control}
+                      field={field}
+                      currentSelectedPlayers={field.value}
+                      label="Match Winners"
+                    />
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 

@@ -32,6 +32,9 @@ import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { getAllGames } from "../../../../../../prisma/lib/games";
 import { FormValues } from "../../_utils/form-helpers";
+import { useAdmin } from "@/lib/adminContext";
+
+// TODO Cache results
 
 const GameDropDownForm = ({
   control,
@@ -42,6 +45,7 @@ const GameDropDownForm = ({
   reset: UseFormResetField<FormValues>;
 }) => {
   const [testGames, setTestGames] = useState<Game[]>([]);
+  const { getGameStatsFromDb } = useAdmin();
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -49,6 +53,7 @@ const GameDropDownForm = ({
       setTestGames(games);
     };
     fetchGames();
+    getGameStatsFromDb("Mario Kart 8"); // ! TODO TEMP FIX to load games due to needing to pass game as default value in form
   }, []);
 
   return (
@@ -90,9 +95,10 @@ const GameDropDownForm = ({
                       <CommandItem
                         value={game.gameName}
                         key={game.gameId}
-                        onSelect={() => {
+                        onSelect={async () => {
                           field.onChange(game.gameName);
                           reset("sets");
+                          await getGameStatsFromDb(game.gameName);
                         }}
                       >
                         {game.gameName}

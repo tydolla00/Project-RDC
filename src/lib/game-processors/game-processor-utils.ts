@@ -9,6 +9,7 @@ import { Player } from "@prisma/client";
 import { VisionResultCodes } from "../constants";
 import {
   findPlayerByGamerTag,
+  FormValues,
   PlayerNotFoundError,
 } from "@/app/(routes)/admin/_utils/form-helpers";
 import { STAT_CONFIGS, getStatConfigByFieldKey } from "../stat-configs";
@@ -126,7 +127,7 @@ export const validateProcessedPlayer = (
     } else {
       return {
         playerId: foundSessionPlayer?.playerId,
-        name: foundSessionPlayer?.playerName,
+        name: foundSessionPlayer.playerName as FormValues["players"][number]["playerName"],
         stats: [...processedPlayer.playerData.stats],
         teamKey: processedPlayer.teamKey,
       };
