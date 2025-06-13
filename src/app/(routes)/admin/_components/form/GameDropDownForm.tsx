@@ -56,6 +56,7 @@ const GameDropDownForm = ({
       else setTestGames(games.data);
     };
     fetchGames();
+    getGameStatsFromDb("Mario Kart 8"); // ! TODO TEMP FIX to load games due to needing to pass game as default value in form
   }, []);
 
   return (

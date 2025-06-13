@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "StatName" AS ENUM ('MK8_POS', 'MK8_DAY', 'RL_SCORE', 'RL_GOALS', 'RL_ASSISTS', 'RL_SAVES', 'RL_SHOTS', 'RL_DAY', 'COD_KILLS', 'COD_DEATHS', 'COD_SCORE', 'COD_POS', 'COD_MELEES', 'LC_DEATHS', 'SR_WINS', 'SR_SETS', 'SR_POS');
+
 -- CreateTable
 CREATE TABLE "players" (
     "player_id" SERIAL NOT NULL,
@@ -10,6 +13,8 @@ CREATE TABLE "players" (
 CREATE TABLE "games" (
     "game_id" SERIAL NOT NULL,
     "game_name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "games_pkey" PRIMARY KEY ("game_id")
 );
@@ -17,9 +22,12 @@ CREATE TABLE "games" (
 -- CreateTable
 CREATE TABLE "game_stats" (
     "stat_id" SERIAL NOT NULL,
-    "stat_name" TEXT NOT NULL,
+    "stat_name" "StatName" NOT NULL,
     "game_id" INTEGER NOT NULL,
     "type" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "created_by" TEXT NOT NULL DEFAULT 'SYSTEM',
 
     CONSTRAINT "game_stats_pkey" PRIMARY KEY ("stat_id")
 );
@@ -32,6 +40,11 @@ CREATE TABLE "sessions" (
     "game_id" INTEGER NOT NULL,
     "thumbnail" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "videoId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "is_approved" BOOLEAN NOT NULL DEFAULT false,
+    "created_by" TEXT NOT NULL DEFAULT 'SYSTEM',
 
     CONSTRAINT "sessions_pkey" PRIMARY KEY ("session_id")
 );
@@ -40,6 +53,8 @@ CREATE TABLE "sessions" (
 CREATE TABLE "sets" (
     "set_id" SERIAL NOT NULL,
     "session_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "sets_pkey" PRIMARY KEY ("set_id")
 );
@@ -49,6 +64,8 @@ CREATE TABLE "matches" (
     "match_id" SERIAL NOT NULL,
     "set_id" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "matches_pkey" PRIMARY KEY ("match_id")
 );
@@ -60,6 +77,8 @@ CREATE TABLE "player_sessions" (
     "session_id" INTEGER NOT NULL,
     "match_id" INTEGER NOT NULL,
     "set_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "player_sessions_pkey" PRIMARY KEY ("player_session_id")
 );
@@ -78,25 +97,42 @@ CREATE TABLE "player_stats" (
 );
 
 -- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT,
+    "email" TEXT NOT NULL,
+    "emailVerified" TIMESTAMP(3),
+    "image" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_GameSetToPlayer" (
     "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL
+    "B" INTEGER NOT NULL,
+
+    CONSTRAINT "_GameSetToPlayer_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_MatchToPlayer" (
     "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL
+    "B" INTEGER NOT NULL,
+
+    CONSTRAINT "_MatchToPlayer_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_GameSetToPlayer_AB_unique" ON "_GameSetToPlayer"("A", "B");
+CREATE UNIQUE INDEX "sessions_videoId_key" ON "sessions"("videoId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE INDEX "_GameSetToPlayer_B_index" ON "_GameSetToPlayer"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_MatchToPlayer_AB_unique" ON "_MatchToPlayer"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_MatchToPlayer_B_index" ON "_MatchToPlayer"("B");

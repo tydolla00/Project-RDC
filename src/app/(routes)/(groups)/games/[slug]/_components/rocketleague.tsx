@@ -1,10 +1,10 @@
 import { ChartConfig } from "@/components/ui/chart";
 import { getWinsPerPlayer } from "../../../../../../../prisma/lib/games";
 import { getAllMembers } from "../../../../../../../prisma/lib/members";
-import { calcWinsPerPlayer, getRLStats } from "../_functions/stats";
 import { CustomChart } from "./charts";
 import { TabbedChart } from "../../../_components/tabbed-chart";
 import { NoMembers } from "../../../members/_components/members";
+import { calcWinsPerPlayer, getAvgAndSum } from "../_functions/stats";
 
 const RocketLeague = async ({
   game,
@@ -20,28 +20,17 @@ const RocketLeague = async ({
   let membersMap = await Promise.all(
     members.data.map(async (member) => {
       try {
-        const [goals, assists, saves, score, days] = await getRLStats(
+        const { goals, assists, saves, score, day } = await getAvgAndSum(
           member.playerId,
+          ["RL_GOALS", "RL_ASSISTS", "RL_SAVES", "RL_SCORE", "RL_DAY"],
         );
         return {
           ...member,
-          goals: {
-            sum: Number(goals?.sum),
-            avg: Math.round(Number(goals?.avg)),
-          },
-          assists: {
-            sum: Number(assists?.sum),
-            avg: Math.round(Number(assists?.avg)),
-          },
-          saves: {
-            sum: Number(saves?.sum),
-            avg: Math.round(Number(saves?.avg)),
-          },
-          score: {
-            sum: Number(score?.sum),
-            avg: Math.round(Number(score?.avg)),
-          },
-          days: { sum: Number(days?.sum), avg: Math.round(Number(days?.avg)) },
+          goals: { sum: Number(goals?.sum), avg: Number(goals?.avg) },
+          assists: { sum: Number(assists?.sum), avg: Number(assists?.avg) },
+          saves: { sum: Number(saves?.sum), avg: Number(saves?.avg) },
+          score: { sum: Number(score?.sum), avg: Number(score?.avg) },
+          day: { sum: Number(day?.sum), avg: Number(day?.avg) },
         };
       } catch (error) {
         // TODO Do something if one of the requests fail.
@@ -63,13 +52,6 @@ const RocketLeague = async ({
   if (!wins.success || !wins.data) wins.data = { sessions: [] };
 
   const winsPerPlayer = calcWinsPerPlayer(wins.data); // Sets / Wins
-  // console.log(winsPerPlayer);
-  // console.dir({ wins }, { depth: null });
-  // console.log("Last session", wins.data.sessions.at(-1));
-  // console.dir({ wins2 }, { depth: null });
-  // console.log("Last session", wins2.data?.sessions.at(-1));
-  console.log(JSON.stringify(wins.data.sessions, null, 2));
-  console.log(JSON.stringify(wins2.data?.sessions, null, 2));
 
   const config = {
     player: { label: "Player" },

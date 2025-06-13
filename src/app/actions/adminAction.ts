@@ -42,6 +42,20 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
   return gameStats.data;
 }
 
+export async function getGameIdFromName(gameName: string) {
+  const game = await prisma.game.findFirst({
+    where: {
+      gameName: gameName,
+    },
+  });
+
+  if (!game) {
+    throw new Error(`Game with name ${gameName} not found`);
+  }
+
+  return game.gameId;
+}
+
 /**
  * Inserts a new session from the admin form.
  *
@@ -266,6 +280,7 @@ export const insertNewSessionFromAdmin = async (
         );
       }),
     );
+    revalidateTag("getAllSessions");
     return { error: null };
   } catch (error) {
     return { error: "Unknown error occurred. Please try again." };

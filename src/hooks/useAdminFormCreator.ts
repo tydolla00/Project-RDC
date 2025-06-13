@@ -28,7 +28,10 @@ import { EnrichedPlayerSession } from "../../prisma/types/playerSession";
  */
 const useAdminFormCreator = () => {
   const [session, setSession] = useState<
-    Omit<EnrichedSession, "createdAt" | "updatedAt">
+    Omit<
+      EnrichedSession,
+      "createdAt" | "updatedAt" | "createdBy" | "Game" | "isApproved"
+    >
   >({
     sessionId: 0,
     sessionName: "",

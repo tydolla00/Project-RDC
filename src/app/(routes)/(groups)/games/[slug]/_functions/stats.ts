@@ -1,4 +1,4 @@
-import { StatName } from "@prisma/client";
+import { $Enums, StatName } from "@prisma/client";
 import {
   getWinsPerPlayer,
   getMatchesPerGame,
@@ -6,32 +6,48 @@ import {
   getStatPerPlayer,
   getSumPerStat,
 } from "../../../../../../../prisma/lib/games";
-import { StatNames } from "../../../../../../../prisma/lib/utils";
 import PostHogClient from "@/lib/posthog";
-import { Decimal } from "@prisma/client/runtime/library";
 import { QueryResponseData } from "../../../../../../../prisma/db";
+import { Decimal } from "@prisma/client/runtime/library";
 
-/**
- * Fetches the sum and average of each stat from the database.
- * @param playerId id of the player
- * @returns An array of objects for each member in the order [goals, assists, saves, score, days]
- */
-export const getRLStats = async (playerId: number) => {
-  let [goals, assists, saves, score, day] = await Promise.all([
-    await getSumPerStat(playerId, StatNames.RLGoals),
-    await getSumPerStat(playerId, StatNames.RLAssists),
-    await getSumPerStat(playerId, StatNames.RLSaves),
-    await getSumPerStat(playerId, StatNames.RLScore),
-    await getSumPerStat(playerId, StatNames.RLDay),
-  ]);
+type Result = NonNullable<
+  NonNullable<Awaited<ReturnType<typeof getSumPerStat>>["data"]>[number]
+> & {
+  avg: number;
+  sum: number;
+};
 
-  return [
-    goals.data?.at(0) || { avg: new Decimal(-1), sum: BigInt(-1) },
-    assists.data?.at(0) || { avg: new Decimal(-1), sum: BigInt(-1) },
-    saves.data?.at(0) || { avg: new Decimal(-1), sum: BigInt(-1) },
-    score.data?.at(0) || { avg: new Decimal(-1), sum: BigInt(-1) },
-    day.data?.at(0) || { avg: new Decimal(-1), sum: BigInt(-1) },
-  ];
+type SumAndAvg<T extends string[], Y extends "RL"> = {
+  [K in T[number] as K extends `${Y}_${infer U}` ? Lowercase<`${U}`> : never]:
+    | Result
+    | { readonly avg: Decimal | number; readonly sum: bigint | number };
+};
+
+export const getAvgAndSum = async (
+  playerId: number,
+  stats: $Enums.StatName[],
+): Promise<SumAndAvg<typeof stats, "RL">> => {
+  return await Promise.all(
+    stats.map((stat) => getSumPerStat(Number(playerId), stat)),
+  ).then((results) =>
+    results.reduce(
+      (acc, result, index) => {
+        const i = stats[index].indexOf("_");
+        const statName = stats[index]
+          .slice(i + 1)
+          .toLowerCase() as keyof SumAndAvg<typeof stats, "RL">;
+
+        const res = {
+          avg: result.data?.at(0)?.avg ?? 0,
+          sum: result.data?.at(0)?.sum ?? 0,
+        };
+
+        acc[statName] = res;
+        return acc;
+      },
+      {} as SumAndAvg<typeof stats, "RL">,
+    ),
+  );
 };
 
 /**

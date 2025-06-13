@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
 import { signOut } from "@/auth";
-import { FormValues, getSchema } from "../../_utils/form-helpers";
+import { formSchema, FormValues } from "../../_utils/form-helpers";
 import {
   AnimatedFormWrapper,
   NavigationButtons,
@@ -24,6 +24,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoInfo } from "./VideoInfo";
 import { cn } from "@/lib/utils";
 import { FormSummary } from "./Summary";
+// import { zodResolver } from "../../_utils/temp-zodv4-resolver";
 
 interface AdminFormProps {
   rdcMembers: Player[];
@@ -35,18 +36,23 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
   const [modifier, setModifier] = useState(0);
 
   const form = useForm<FormValues, any>({
-    resolver: async (data, context, options) => {
-      // you can debug your validation schema here
-      const schema = getSchema(data.game);
-      console.log("formData", { data, context, options });
-      console.log(
-        "validation result",
-        await zodResolver(schema)(data, context, options),
-      );
-      return zodResolver(schema)(data, context, options);
-    },
+    resolver: zodResolver(formSchema),
+    // async (data, context, options) => {
+    //   try {
+    //     // Validate the form data against the Zod schema
+    //     console.log(await formSchema.parseAsync(data));
+    //   } catch (error) {
+    //     // If validation fails, return the error to the resolver
+    //     console.log(error);
+    //     return {
+    //       values: {},
+    //       errors: error.flatten().fieldErrors,
+    //     };
+    //   }
+    //   return zodResolver(formSchema)(data, context, options);
+    // },
     defaultValues: {
-      game: "",
+      game: "Mario Kart 8",
       sessionName: "",
       sessionUrl: "https://www.youtube.com/watch?v=",
       thumbnail: "",
@@ -72,6 +78,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
    */
   const onSubmit = async (data: FormValues): Promise<void> => {
     setIsLoading(true);
+
     console.log("Form Data Being Submitted:", {
       data,
       stringified: JSON.stringify(data, null, 2),
@@ -88,7 +95,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     else {
       toast.success("Session successfully created.", { richColors: true });
       form.reset();
-      revalidateAction("getAllSessions");
+      setStep(0);
     }
     setIsLoading(false);
   };
@@ -106,12 +113,13 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     });
   };
 
+  useEffect(() => {
+    document.documentElement.scrollTop = 0; // Scroll to top when a new set is added
+  }, []);
   return (
     <FormProvider {...form}>
-      <div className="grid w-full grid-cols-2 place-content-center gap-3">
-        <Card
-          className={cn("relative col-span-1 p-4", step === 1 && "col-span-2")}
-        >
+      <div className="flex w-full gap-3">
+        <Card className={cn("relative col-auto flex-1 p-4")}>
           <CardHeader className="dark:text-purple-500">
             <CardTitle>Entry Creator Form</CardTitle>
           </CardHeader>

@@ -36,6 +36,7 @@ const PlayerStatManager = (props: Props) => {
     gameStats.forEach((stat) => {
       const isMatch = matchFields.some((f) => f.stat === stat.statName); // Need to do this in dev because useEffect renders twice.
       if (!ignore && !isMatch)
+        // @ts-expect-error Need to exclude unused stats TODO FIX
         append({ statId: uuidv4(), stat: stat.statName, statValue: "" });
     });
 
@@ -51,7 +52,6 @@ const PlayerStatManager = (props: Props) => {
           `${curPlayerSession}.playerStats.${index}.statValue` as const;
         return (
           <div key={field.id} className="my-4">
-            <span className="sr-only">{field.stat}</span>
             <div className="relative">
               <FormField
                 control={control}
@@ -59,7 +59,7 @@ const PlayerStatManager = (props: Props) => {
                 render={({ field: f }) => (
                   <FormItem>
                     <Input
-                      className="peer block w-[100px] appearance-none rounded-t-lg border-2 px-2.5 pt-6 pb-2.5 text-sm focus:border-b-gray-200 focus:ring-0 focus:outline-none dark:focus:border-purple-700"
+                      className="peer block w-[100px] appearance-none rounded-t-lg border-2 px-2.5 pb-2.5 pt-6 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0 dark:focus:border-purple-700"
                       id={curr}
                       type="text"
                       {...register(curr)}

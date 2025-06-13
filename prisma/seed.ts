@@ -1,102 +1,81 @@
-import { Player, PlayerSession } from "@prisma/client";
+import { Session, StatName } from "@prisma/client";
+import * as fs from "fs";
 import prisma from "./db";
-import { MembersEnum } from "@/lib/constants";
 import { capitalizeFirst } from "@/lib/utils";
+import { MembersEnum } from "@/lib/constants";
+import { EnrichedSession } from "./types/session";
 
 async function main() {
-  console.group("Begin seeding Mario Kart Session");
-  await seedRDCMembers();
-  await seedGames();
-  await seedSession(1);
-
-  /**
-   * Here is where you would put in match results. Each list is
-   * a match and the index is the playerId -1
-   * e.g Ben's results are all index 2
-   */
-  const set1Results = [
-    [1, 3, 2, 4, 5],
-    [2, 3, 1, 4, 5],
-    [2, 1, 4, 5, 3],
-    [4, 2, 1, 3, 5],
-  ];
-
-  // Seed 1st set
-  await seedSet(1, 1);
-  // Simulate Race (Seed Match, PlayerSessions, PlayerStats)
-  await simulateRace(1, 1, set1Results[0]);
-  await simulateRace(1, 2, set1Results[1]);
-  await simulateRace(1, 3, set1Results[2]);
-  await simulateRace(1, 4, set1Results[3]);
-
-  await updateSetWinner(1, [3]); // Ben Wins
-  console.groupEnd();
+  console.group("Begin seeding database");
+  console.time("Seeding Time");
+  try {
+    await seedRDCMembers();
+    await seedGames();
+    await importSessions();
+    console.log("Database seeded successfully");
+  } catch (error) {
+    console.error("Error seeding database:", error);
+    throw error;
+  } finally {
+    console.timeEnd("Seeding Time");
+    console.groupEnd();
+  }
 }
-
-main()
-  .catch(async (e) => {
-    console.error(e);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-    process.exit(process.exitCode || 0);
-  });
 
 // Seed RDC Members
 async function seedRDCMembers() {
   console.log("--- Seeding RDC Members ---");
 
-  const mark = await prisma.player.create({
+  await prisma.player.create({
     data: {
       playerId: 1,
       playerName: capitalizeFirst(MembersEnum.Mark),
     },
   });
 
-  const aff = await prisma.player.create({
+  await prisma.player.create({
     data: {
       playerId: 2,
       playerName: capitalizeFirst(MembersEnum.Dylan),
     },
   });
 
-  const des = await prisma.player.create({
+  await prisma.player.create({
     data: {
       playerId: 3,
       playerName: capitalizeFirst(MembersEnum.Ben),
     },
   });
 
-  const ben = await prisma.player.create({
+  await prisma.player.create({
     data: {
       playerId: 4,
       playerName: capitalizeFirst(MembersEnum.Lee),
     },
   });
 
-  const lee = await prisma.player.create({
+  await prisma.player.create({
     data: {
       playerId: 5,
       playerName: capitalizeFirst(MembersEnum.Des),
     },
   });
 
-  const dylan = await prisma.player.create({
+  await prisma.player.create({
     data: {
       playerId: 6,
       playerName: capitalizeFirst(MembersEnum.John),
     },
   });
 
-  const john = await prisma.player.create({
+  await prisma.player.create({
     data: {
       playerId: 7,
       playerName: capitalizeFirst(MembersEnum.Aff),
     },
   });
 
-  const ipi = await prisma.player.create({
+  await prisma.player.create({
     data: {
       playerId: 8,
       playerName: capitalizeFirst(MembersEnum.Ipi),
@@ -106,244 +85,225 @@ async function seedRDCMembers() {
   console.log("RDC Members Seeded Successfully.\n");
 }
 
+// Seed Games
 async function seedGames() {
   console.log("--- Seeding Games ---");
-  const marioKart = await prisma.game.create({
+
+  await prisma.game.create({
     data: {
       gameName: "Mario Kart 8",
       gameStats: {
-        create: [{ statName: "MK8_POS" }, { statName: "MK8_DAY" }],
+        create: [
+          { statName: StatName.MK8_POS },
+          { statName: StatName.MK8_DAY },
+        ],
       },
     },
   });
 
-  const rocketLeague = await prisma.game.create({
+  await prisma.game.create({
     data: {
       gameName: "Rocket League",
       gameStats: {
         create: [
-          { statName: "RL_SCORE" },
-          { statName: "RL_GOALS" },
-          { statName: "RL_ASSISTS" },
-          { statName: "RL_SAVES" },
-          { statName: "RL_SHOTS" },
-          { statName: "RL_DAY" },
+          { statName: StatName.RL_SCORE },
+          { statName: StatName.RL_GOALS },
+          { statName: StatName.RL_ASSISTS },
+          { statName: StatName.RL_SAVES },
+          { statName: StatName.RL_SHOTS },
+          { statName: StatName.RL_DAY },
         ],
       },
     },
   });
 
-  const callOfDuty = await prisma.game.create({
+  await prisma.game.create({
     data: {
       gameName: "Call of Duty",
       gameStats: {
         create: [
-          { statName: "COD_SCORE" },
-          { statName: "COD_KILLS" },
-          { statName: "COD_DEATHS" },
-          { statName: "COD_POS" },
+          { statName: StatName.COD_SCORE },
+          { statName: StatName.COD_KILLS },
+          { statName: StatName.COD_DEATHS },
+          // { statName: StatName.COD_MELEES }, // TODO Run Migration to add this
+          { statName: StatName.COD_POS },
         ],
       },
     },
   });
-  const lethalCompany = await prisma.game.create({
+
+  await prisma.game.create({
     data: {
       gameName: "Lethal Company",
       gameStats: {
-        create: [{ statName: "LC_DEATHS" }],
+        create: [{ statName: StatName.LC_DEATHS }],
       },
     },
   });
-  const speedRunners = await prisma.game.create({
+
+  await prisma.game.create({
     data: {
       gameName: "Speedrunners",
       gameStats: {
         create: [
-          { statName: "SR_SETS" },
-          { statName: "SR_WINS" },
-          { statName: "SR_POS" },
+          { statName: StatName.SR_SETS },
+          { statName: StatName.SR_WINS },
+          { statName: StatName.SR_POS },
         ],
       },
     },
   });
 
-  console.log("Mario Kart Game Seeded.");
+  console.log("Games seeded successfully\n");
 }
 
-// Seed game session with RDC Stream Five
-async function seedSession(sessionId: number) {
-  console.log(`\n--- Seeding Game Session ${sessionId} ---`);
+async function importSessions() {
+  console.log("Importing sessions from sessions.json...");
 
-  const marioKartSession = await prisma.session.create({
-    data: {
-      gameId: 1,
-      sessionName: "TEST MK8 SESSION YOU WON'T BELIEVE WHAT HAPPENS NEXT",
-      sessionUrl: "https://example.com",
-      thumbnail: "https://example.com/thumbnail.jpg",
-      videoId: "example",
-    },
-  });
-  console.log("Seeded MK8 Session Successfully.\n");
-}
+  // Read the sessions.json file
+  // ! Add File Path Here
+  const sessionsPath = "";
+  let sessionsData: EnrichedSession[];
 
-/**
- *
- * @param setId - setId of the set to seed
- * @param sessionId - sessionId of parent session of seeded set
- */
-async function seedSet(setId: number, sessionId: number = 1) {
-  const marioKartSet = await prisma.gameSet.create({
-    data: {
-      sessionId: sessionId,
-    },
-  });
-
-  console.log(`Seeded Set ${setId} Successfully.\n`);
-}
-
-/**
- * Get the RDC Stream Five as an array of Players
- * @returns Player[] - Array of players in RDC Stream Five
- */
-async function getStreamFive() {
-  const mk8Players: Player[] = await prisma.player.findMany({
-    where: {
-      playerId: {
-        in: [1, 2, 3, 4, 5],
-      },
-    },
-  });
-  return mk8Players;
-}
-
-async function simulateRace(
-  setId: number,
-  matchId: number,
-  raceResults: number[] = [1, 2, 3, 4, 5],
-) {
-  const streamFive = await getStreamFive();
-  // Create new match
-  await seedMatch(matchId, setId, streamFive, raceResults);
-}
-
-/**
- * Creates a match record and associates it with a game set
- *
- * @description
- * This function:
- * 1. Creates player sessions for each player in the match
- * 2. Calculates and stores the match winners based on racing results
- * 3. Creates corresponding player stats records
- *
- * @param matchId - Unique identifier for the match
- * @param setId - ID of the parent game set
- * @param playersInMatch - Array of players participating in the match
- * @param raceResults - Array of race position results corresponding to players
- *
- * @throws Will throw if database operations fail
- */
-async function seedMatch(
-  matchId: number,
-  setId: number,
-  playersInMatch: Player[],
-  raceResults: number[],
-) {
-  const marioKartMatch = await prisma.match.create({
-    data: {
-      setId: setId,
-    },
-  });
-
-  // Should seed player sessions here
-  await seedPlayerSessions(matchId, playersInMatch, setId, raceResults);
-
-  console.log(`Seeded Match ${matchId} Successfully.\n`);
-
-  // Assign Match Winner
-  const matchWinnerId = raceResults.indexOf(1) + 1;
-
-  const matchWinner = await prisma.player.findFirst({
-    where: {
-      playerId: matchWinnerId,
-    },
-  });
-
-  // Update match with match winner
-  if (matchWinner) {
-    await prisma.match.update({
-      where: { matchId: matchId },
-      data: { matchWinners: { connect: { playerId: matchWinner.playerId } } },
-    });
-  }
-}
-
-/**
- * Inserts
- * @param matchId
- * @param players
- * @param setId
- * @param raceResults
- */
-async function seedPlayerSessions(
-  matchId: number,
-  players: Player[],
-  setId: number,
-  raceResults: number[],
-) {
-  // Create player sessions and attach to match
-  // Every race there are n number of playerSessions created per player
-  // so we need to offset the playerSessionId by the number of previous player sessions
-  const playerSessionIdOffset = (matchId - 1) * players.length;
-  for (const player of players) {
-    console.log(`Seeding player session  for player: ${player.playerName}`);
-
-    const playerSession = await prisma.playerSession.create({
-      data: {
-        matchId: matchId,
-        sessionId: 1,
-        setId: setId,
-        playerId: player.playerId,
-      },
-    });
-
-    const resultIndex = playerSession.playerId - 1; // Player ID is 1-indexed
-
-    // Create player stats and attach to player sessions
-    const playerResult = await seedPlayerStat(
-      playerSession,
-      1,
-      raceResults[resultIndex],
+  try {
+    sessionsData = JSON.parse(fs.readFileSync(sessionsPath, "utf-8"));
+  } catch (error) {
+    console.error(
+      `Failed to read sessions.json: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
+    throw error;
   }
+
+  // Process each session
+  for (const sessionData of sessionsData) {
+    try {
+      // First find the game outside of transaction
+      let game = await prisma.game.findFirst({
+        where: { gameName: sessionData.Game.gameName },
+      });
+
+      if (!game) {
+        console.log(
+          `Skipping session ${sessionData.sessionId} (${sessionData.sessionName}) - game ${sessionData.Game.gameName} not found`,
+        );
+        continue;
+      }
+
+      console.log(
+        `Processing session ${sessionData.sessionId}: ${sessionData.sessionName}`,
+      );
+
+      // Create session
+      const session = await prisma.session.create({
+        data: {
+          sessionName: sessionData.sessionName,
+          sessionUrl: sessionData.sessionUrl,
+          thumbnail: sessionData.thumbnail,
+          videoId: sessionData.videoId,
+          gameId: game.gameId,
+        },
+      });
+
+      // Process each set in its own transaction
+      for (const setData of sessionData.sets) {
+        await prisma.$transaction(
+          async (tx) => {
+            const set = await tx.gameSet.create({
+              data: {
+                sessionId: session.sessionId,
+              },
+            });
+
+            // Process matches
+            for (const matchData of setData.matches) {
+              const match = await tx.match.create({
+                data: {
+                  setId: set.setId,
+                  date: new Date(matchData.date),
+                },
+              });
+
+              // Process player sessions and stats
+              for (const playerSessionData of matchData.playerSessions) {
+                const playerSession = await tx.playerSession.create({
+                  data: {
+                    playerId: playerSessionData.player.playerId,
+                    matchId: match.matchId,
+                    setId: set.setId,
+                    sessionId: session.sessionId,
+                  },
+                });
+
+                // Create player stats in batch using createMany
+                await tx.playerStat.createMany({
+                  data: playerSessionData.playerStats.map((statData) => ({
+                    value: statData.value,
+                    date: new Date(statData.date),
+                    playerId: playerSessionData.player.playerId,
+                    gameId: game.gameId,
+                    playerSessionId: playerSession.playerSessionId,
+                    statId: statData.gameStat.statId,
+                  })),
+                });
+              }
+
+              // Set match winners
+              if (matchData.matchWinners?.length) {
+                await tx.match.update({
+                  where: { matchId: match.matchId },
+                  data: {
+                    matchWinners: {
+                      connect: matchData.matchWinners.map((winner) => ({
+                        playerId: winner.playerId,
+                      })),
+                    },
+                  },
+                });
+              }
+            }
+
+            // Set set winners if they exist
+            if (setData.setWinners?.length) {
+              await tx.gameSet.update({
+                where: { setId: set.setId },
+                data: {
+                  setWinners: {
+                    connect: setData.setWinners.map((winner) => ({
+                      playerId: winner.playerId,
+                    })),
+                  },
+                },
+              });
+            }
+          },
+          {
+            timeout: 20000, // 20 second timeout for each set transaction
+            maxWait: 25000, // Maximum time to wait for transaction
+          },
+        );
+      }
+
+      console.log(
+        `Successfully imported session ${sessionData.sessionId}: ${sessionData.sessionName}`,
+      );
+    } catch (error) {
+      console.error(
+        `Failed to import session ${sessionData.sessionId} (${sessionData.sessionName}):`,
+        error instanceof Error ? error.message : "Unknown error",
+      );
+      // Continue with next session instead of throwing
+      continue;
+    }
+  }
+
+  console.log("All sessions imported successfully");
 }
 
-async function seedPlayerStat(
-  playerSession: PlayerSession,
-  statId: number,
-  statValue: number,
-) {
-  const newPlayerStatId = playerSession.playerSessionId;
-  return await prisma.playerStat.create({
-    data: {
-      playerId: playerSession.playerId,
-      statId: statId,
-      playerSessionId: playerSession.playerSessionId,
-      gameId: 1,
-      value: statValue.toString(),
-      date: new Date(),
-    },
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });
-}
-
-const updateSetWinner = async (setId: number, winnerIds: number[]) => {
-  const setWinnerConnect = winnerIds.map((winnerId: number) => ({
-    playerId: winnerId,
-  }));
-
-  if (setWinnerConnect) {
-    await prisma.gameSet.update({
-      where: { setId: setId },
-      data: { setWinners: { connect: setWinnerConnect } },
-    });
-  }
-};

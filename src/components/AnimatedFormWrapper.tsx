@@ -43,7 +43,7 @@ export const NavigationButtons = ({
   setModifier,
 }: NavigationButtonsProps) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const { getValues } = useFormContext<z.infer<typeof formSchema>>();
+  const { getValues } = useFormContext<FormValues>();
 
   const handleNextClicked = async () => {
     let isValid: boolean = false;
@@ -60,19 +60,16 @@ export const NavigationButtons = ({
         ]);
         break;
       case 1:
-        {
-          const stats = getValues().sets.flatMap((field, setIndex) =>
-            field.matches.flatMap((match, matchIndex) =>
-              match.playerSessions.flatMap((_, sessionIndex) => [
-                `sets.${setIndex}.matches.${matchIndex}.playerSessions.${sessionIndex}.playerStats` as const,
-              ]),
-            ),
-          );
-          isValid = await form.trigger(["sets", ...stats]);
-        }
+        const stats = getValues().sets.flatMap((field, setIndex) =>
+          field.matches.flatMap((match, matchIndex) =>
+            match.playerSessions.flatMap((_, sessionIndex) => [
+              `sets.${setIndex}.matches.${matchIndex}.playerSessions.${sessionIndex}.playerStats` as const,
+            ]),
+          ),
+        );
+        isValid = await form.trigger(["sets", ...stats]);
         break;
     }
-
     if (!isValid)
       return toast.error("Form is invalid", {
         richColors: true,

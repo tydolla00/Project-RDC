@@ -1,7 +1,7 @@
 import React from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { z } from "zod";
-import { formSchema } from "../../_utils/form-helpers";
+import { formSchema, FormValues } from "../../_utils/form-helpers";
 
 interface Props {
   setIndex: number;
@@ -9,7 +9,7 @@ interface Props {
 
 const WinnerDisplay = (props: Props) => {
   const { setIndex } = props;
-  const { watch, control } = useFormContext<z.infer<typeof formSchema>>();
+  const { control } = useFormContext<FormValues>();
   const winners = useWatch({ name: `sets.${setIndex}.setWinners`, control });
   return (
     <div

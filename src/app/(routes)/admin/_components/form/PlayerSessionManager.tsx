@@ -1,5 +1,5 @@
 import { Player } from "@prisma/client";
-import React from "react";
+import { useEffect } from "react";
 import { FieldValues, useFieldArray, useFormContext } from "react-hook-form";
 import PlayerStatManager from "./PlayerStatManager";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ const PlayerSessionManager = (props: Props) => {
     control,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const finalPlayerSessionValues = getValues(
       `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
     );
@@ -59,9 +59,9 @@ const PlayerSessionManager = (props: Props) => {
     <div className="@container grid grid-cols-2">
       {fields.map((field, sessionIndex) => {
         return (
-          <div className="col-span-2 @xs:col-span-1" key={field.id}>
+          <div className="@xs:col-span-1 col-span-2" key={field.id}>
             <Label className="font-bold">{getPlayerNameFromField(field)}</Label>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <PlayerStatManager
                 {...props}
                 playerSessionIndex={sessionIndex}

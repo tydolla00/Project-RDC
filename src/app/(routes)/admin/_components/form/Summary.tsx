@@ -1,11 +1,10 @@
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { H2 } from "@/components/headings";
-import { formSchema } from "../../_utils/form-helpers";
+import { formSchema, FormValues } from "../../_utils/form-helpers";
 
 export const FormSummary = () => {
-  const { watch, control, getValues } =
-    useFormContext<z.infer<typeof formSchema>>();
+  const { watch, control, getValues } = useFormContext<FormValues>();
 
   const sets = getValues("sets");
 

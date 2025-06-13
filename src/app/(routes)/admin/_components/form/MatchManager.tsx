@@ -8,12 +8,9 @@ import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import RDCVisionModal from "./RDCVisionModal";
-import { VisionPlayer, VisionResults } from "@/app/actions/visionAction";
-import {
-  FormValues,
-  MatchWinners,
-  PlayerSessions,
-} from "../../_utils/form-helpers";
+import { VisionPlayer, VisionResult } from "@/app/actions/visionAction";
+import { FormValues } from "../../_utils/form-helpers";
+import { getGameIdFromName } from "@/app/actions/adminAction";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 interface Props {
@@ -28,6 +25,7 @@ const MatchManager = (props: Props) => {
     control,
   });
   const players = getValues(`players`);
+  const gameName = getValues(`game`);
 
   /**
    * Handles the creation of a new match by creating player sessions from the available players.
@@ -46,12 +44,13 @@ const MatchManager = (props: Props) => {
     }));
     console.log("Player Sessions: ", playerSessions);
     append({
-      matchWinners: [] as unknown as MatchWinners,
-      playerSessions: playerSessions as unknown as PlayerSessions,
+      matchWinners: [],
+      playerSessions: playerSessions,
     });
   };
 
   const processTeamPlayers = (teamPlayers: VisionPlayer[]) => {
+    console.log("Processing Team Players: ", teamPlayers);
     return teamPlayers.map((player) => {
       return {
         playerId: player?.playerId || 0,
@@ -61,49 +60,32 @@ const MatchManager = (props: Props) => {
     });
   };
 
-  /**
-   * Processes vision analysis results to create match player sessions
-   * @param visionResults - The results from vision analysis containing blue and orange team player information
-   * @remarks
-   * 1. Maps vision results for both blue and orange teams into player sessions
-   * 2. Finds existing players by gamer tag
-   * 3. Creates player session objects with player IDs and stats
-   */
-  const handleCreateMatchFromVision = (visionResults: VisionResults) => {
-    console.log("Handling Create Match from Vision: ", visionResults);
+  const handleCreateMatchFromVision2 = (
+    visionPlayers: VisionPlayer[],
+    visionWinners: VisionPlayer[],
+  ) => {
+    const visionMatchPlayerSessions = processTeamPlayers(visionPlayers);
+    console.log("Vision Match Player Sessions: ", visionMatchPlayerSessions);
+    const formattedWinners = visionWinners.map((player: VisionPlayer) => {
+      return {
+        playerId: player?.playerId || 0,
+        playerName: player?.name,
+      };
+    });
 
-    const blueTeamPlayerSessions = processTeamPlayers(visionResults.blueTeam);
-
-    const orangeTeamPlayerSessions = processTeamPlayers(
-      visionResults.orangeTeam,
-    );
-
-    const visionMatchPlayerSessions = [
-      ...blueTeamPlayerSessions,
-      ...orangeTeamPlayerSessions,
-    ];
-
-    const visionWinners = visionResults.winner
-      ?.map((player: VisionPlayer) => {
-        return {
-          playerId: player?.playerId,
-          playerName: player?.name,
-        };
-      })
-      .filter(
-        (winner): winner is { playerId: number; playerName: string } =>
-          winner.playerId !== undefined && winner.playerName !== undefined,
-      );
-    if (visionWinners && visionWinners.length > 0) {
-      console.log("Setting Vision Winners!", visionWinners);
+    // TODO FIX Typings
+    if (formattedWinners && formattedWinners.length > 0) {
+      console.log("Setting Vision Winners!", formattedWinners);
       append({
-        matchWinners: visionWinners as MatchWinners, // Enforce non empty array
-        playerSessions: visionMatchPlayerSessions as PlayerSessions,
+        matchWinners: formattedWinners,
+        // @ts-expect-error - Type mismatch, but we know this is correct
+        playerSessions: visionMatchPlayerSessions,
       });
     } else {
       append({
-        matchWinners: [] as unknown as MatchWinners, // Enforce non empty array,
-        playerSessions: visionMatchPlayerSessions as PlayerSessions,
+        matchWinners: [],
+        // @ts-expect-error - Type mismatch, but we know this is correct
+        playerSessions: visionMatchPlayerSessions,
       });
     }
   };
@@ -111,7 +93,7 @@ const MatchManager = (props: Props) => {
   return (
     <div>
       {(fields.length === 0 && (
-        <div className="text-center text-gray-500">
+        <div className="my-2 text-center text-gray-500">
           No Matches! Click Add Match to start!
         </div>
       )) ||
@@ -165,8 +147,9 @@ const MatchManager = (props: Props) => {
           Add Match
         </Button>
         <RDCVisionModal
-          handleCreateMatchFromVision={handleCreateMatchFromVision}
+          handleCreateMatchFromVision={handleCreateMatchFromVision2}
           sessionPlayers={players}
+          gameName={gameName}
         />
       </div>
     </div>

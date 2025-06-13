@@ -46,7 +46,9 @@ export const SessionInfo = ({
    * 4. Updates form fields with video metadata (title, thumbnail, date)
    * 5. Handles error cases including authentication failures
    *
-   * @throws {Error} When video fetch fails or authentication is invalid
+   * @async
+   * @function handleUrlUpdated
+   * @returns {void} A promise that resolves when the URL update process is complete.
    */
   const handleUrlUpdated = (): void => {
     startTransition(async () => {

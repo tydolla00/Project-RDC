@@ -9,7 +9,6 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/sonner";
 import { CSPostHogProvider } from "@/lib/providers";
-import { AdminProvider } from "@/lib/adminContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,21 +26,19 @@ export default function RootLayout({
     <html className="h-screen" lang="en" suppressHydrationWarning>
       <ReactScan />
       <body className={inter.className}>
-        <AdminProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <CSPostHogProvider>
-              <Navbar />
-              <main>{children}</main>
-              <Toaster />
-              <Footer />
-            </CSPostHogProvider>
-          </ThemeProvider>
-        </AdminProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <CSPostHogProvider>
+            <Navbar />
+            <main>{children}</main>
+            <Toaster />
+            <Footer />
+          </CSPostHogProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

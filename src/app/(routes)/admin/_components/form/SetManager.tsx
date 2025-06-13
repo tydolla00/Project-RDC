@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { z } from "zod";
 import MatchManager from "./MatchManager";
@@ -12,12 +12,16 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { formSchema, Matches, SetWinners } from "../../_utils/form-helpers";
+import { formSchema, FormValues, SetWinners } from "../../_utils/form-helpers";
 import WinnerDisplay from "./WinnerDisplay";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 const SetManager = () => {
-  const { watch, control } = useFormContext<z.infer<typeof formSchema>>();
+  const {
+    watch,
+    control,
+    formState: { errors },
+  } = useFormContext<FormValues>();
 
   const { append, remove, fields, update } = useFieldArray({
     name: "sets",
@@ -38,8 +42,8 @@ const SetManager = () => {
     setHighestSetId(newSetId);
     append({
       setId: newSetId,
-      matches: [] as unknown as Matches,
-      setWinners: [] as unknown as SetWinners,
+      matches: [],
+      setWinners: [],
     });
 
     // Then update openSets to match new length with last set open
@@ -53,6 +57,10 @@ const SetManager = () => {
 
   const players = watch(`players`);
 
+  useEffect(() => {
+    document.documentElement.scrollTop = 0; // Scroll to top when a new set is added
+  }, []);
+
   return (
     <div className="col-span-2 w-full space-y-4">
       {/* Loop through set fields */}
@@ -63,13 +71,16 @@ const SetManager = () => {
         </div>
       )) ||
         fields.map((set, setIndex) => {
+          // Get errors for this set
+          const setError = errors.sets?.[setIndex];
+          console.log(setError);
           return (
             <Collapsible open={openSets[setIndex]} key={set.setId}>
               <Card className="flex flex-col space-y-3 rounded-lg p-6 shadow-lg">
-                <CardHeader className="flex flex-row justify-between space-y-0 pr-0 pb-0 pl-0">
+                <CardHeader className="flex flex-row justify-between space-y-0 pb-0 pl-0 pr-0">
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
-                  </div>{" "}
+                  </div>
                   <WinnerDisplay setIndex={setIndex} />
                   <div className="flex" title={`Delete Set ${setIndex + 1}`}>
                     <TrashIcon
@@ -81,7 +92,6 @@ const SetManager = () => {
                     <span className="sr-only">Delete Set {setIndex}</span>
                   </div>
                 </CardHeader>
-
                 <CollapsibleContent>
                   <FormField
                     name={`sets.${setIndex}.setWinners`}
@@ -102,6 +112,12 @@ const SetManager = () => {
                   />
                   <MatchManager setIndex={setIndex} />
                 </CollapsibleContent>
+                {/* TODO Surface Set Level Error Messages Here */}
+                {setError && setError.matches && (
+                  <div className="text-sm text-red-500">
+                    {setError.matches.root?.message}
+                  </div>
+                )}
                 <CardFooter className="flex flex-row-reverse pb-0">
                   <CollapsibleTrigger onClick={() => toggleSet(setIndex)}>
                     {" "}

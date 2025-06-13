@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { statDescriptions } from "@/lib/constants";
+import { statDescriptions } from "@/lib/stat-configs";
 
 export default async function Page() {
   const stats = await getAllGameStats();
