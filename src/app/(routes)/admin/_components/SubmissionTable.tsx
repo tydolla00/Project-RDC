@@ -14,6 +14,7 @@ import Link from "next/link";
 export const SubmissionTable = async () => {
   const sessions = await getAllSessions();
 
+  if (!sessions.success || !sessions.data) sessions.data = [];
   return (
     <>
       <Table>
@@ -29,7 +30,7 @@ export const SubmissionTable = async () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sessions.map((session) => (
+          {sessions.data.map((session) => (
             <TableRow key={session.sessionId}>
               <TableCell>{session.sessionId}</TableCell>
               <TableCell>{session.sessionName}</TableCell>

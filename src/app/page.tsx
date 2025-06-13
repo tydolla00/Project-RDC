@@ -13,7 +13,6 @@ import prisma from "../../prisma/db";
 export default async function Home() {
   const games = await getGamesNav();
   const session = await auth();
-
   return (
     <>
       <div className="m-16">
@@ -46,7 +45,7 @@ export default async function Home() {
           </div>
           <PieChartRDC config={config} data={data} />
         </div>
-        <H2 className="text-chart-4 mx-auto mt-40 mb-6 w-fit md:my-10">
+        <H2 className="text-chart-4 mx-auto mb-6 mt-40 w-fit md:my-10">
           Games
         </H2>
         <div className="flex flex-wrap justify-center gap-10">
@@ -110,31 +109,31 @@ const data = [
     player: "mark",
     sorryCounter: 100,
     sorryScale: 0.15,
-    fill: "blue",
+    fill: "var(--chart-1)",
   },
   {
     player: "leland",
     sorryCounter: 50,
     sorryScale: 0.15,
-    fill: "purple",
+    fill: "var(--chart-2)",
   },
   {
     player: "ben",
     sorryCounter: 50,
     sorryScale: 0.3,
-    fill: "green",
+    fill: "var(--chart-3)",
   },
   {
     player: "john",
     sorryCounter: 20,
     sorryScale: 0.05,
-    fill: "skyblue",
+    fill: "var(--chart-4)",
   },
   {
     player: "aff",
     sorryCounter: 10,
     sorryScale: 0.3,
-    fill: "orange",
+    fill: "var(--chart-5)",
   },
   {
     player: "dylan",

@@ -50,6 +50,26 @@ const initialState = {
   previewUrl: null as string | null,
 };
 
+/**
+ * State reducer for RDC Vision modal
+ *
+ * @description
+ * This reducer handles:
+ * 1. File selection and preview state updates
+ * 2. Vision processing status management
+ * 3. Loading state control
+ * 4. State reset functionality
+ *
+ * Actions:
+ * - UPDATE_FILE: Updates selected file and preview URL
+ * - UPDATE_VISION: Updates vision processing status and message
+ * - UPDATE_LOADING: Controls loading state
+ * - RESET: Resets state to initial values
+ *
+ * @param state - Current state object
+ * @param action - Action to process
+ * @returns Updated state object
+ */
 const zodFile = z
   .file({ error: "File is required." })
   .mime(["image/jpeg", "image/png", "image/jpg"], {
@@ -212,7 +232,7 @@ const RDCVisionModal = (props: Props) => {
         />
         <Button
           ref={visionButton}
-          className="focus:ring-primary focus:bg-primary/90 w-full max-w-[200px] transition-all duration-150 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto"
+          className="focus:ring-primary focus:bg-primary/90 w-full max-w-[200px] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto"
           disabled={!selectedFile || sessionPlayers.length === 0 || isLoading}
           onClick={handleAnalyzeAndMaybeClose}
           type="button"
