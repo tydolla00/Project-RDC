@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { useEffect, useReducer, useRef } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,10 +30,16 @@ import {
   handleClose,
   handleAnalyzeBtnClick,
 } from "../../_utils/rdc-vision-helpers";
+import { VisionPlayer } from "@/app/actions/visionAction";
+import { z } from "zod/v4";
 
 interface Props {
-  handleCreateMatchFromVision: (visionResults: any) => void;
+  handleCreateMatchFromVision: (
+    visionPlayers: VisionPlayer[],
+    visionWinners: VisionPlayer[],
+  ) => void;
   sessionPlayers: Player[];
+  gameName: string;
 }
 
 const initialState = {
@@ -43,6 +49,12 @@ const initialState = {
   visionMsg: "",
   previewUrl: null as string | null,
 };
+
+const zodFile = z
+  .file({ error: "File is required." })
+  .mime(["image/jpeg", "image/png", "image/jpg"], {
+    error: "Invalid file type. Please upload a valid image.",
+  });
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -69,14 +81,41 @@ const reducer = (state: State, action: Action): State => {
 };
 
 const RDCVisionModal = (props: Props) => {
-  const { handleCreateMatchFromVision, sessionPlayers } = props;
+  const { handleCreateMatchFromVision, sessionPlayers, gameName } = props;
 
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [open, setOpen] = useState(false);
 
   const { selectedFile, isLoading, visionStatus, visionMsg, previewUrl } =
     state;
 
   const visionButton = useRef<HTMLButtonElement>(null);
+
+  const handlePaste = async (e: ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    let file: File | null = null;
+    if (!items) return;
+    for (const item of Array.from(items)) {
+      file = item.getAsFile();
+
+      try {
+        zodFile.parse(file);
+      } catch (error) {
+        console.warn("Invalid file pasted", error);
+        continue;
+      }
+
+      const url = URL.createObjectURL(file!);
+      dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
+      // Focus after state update
+      setTimeout(() => {
+        visionButton.current?.focus();
+      }, 0);
+      return;
+    }
+    toast.error("No valid image file found in clipboard", { richColors: true });
+    dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
+  };
 
   useEffect(() => {
     document.addEventListener("paste", handlePaste);
@@ -85,55 +124,51 @@ const RDCVisionModal = (props: Props) => {
     };
   }, []);
 
-  const handlePaste = async (e: ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-
-    if (!items) return;
-    for (const item of Array.from(items)) {
-      const file = item.getAsFile();
-
-      if (item.type.indexOf("image") !== -1 && file) {
-        const url = URL.createObjectURL(file);
-        dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
-        if (visionButton.current) visionButton.current.focus();
-
-        break;
-      }
-    }
-  };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) {
+    if (!event.target.files || event.target.files.length === 0) return;
+
+    const uploadedFile = event.target.files[0];
+    try {
+      zodFile.parse(uploadedFile);
+    } catch (err) {
+      console.error(err);
+      if (err instanceof z.ZodError) {
+        toast.error(err.message, { richColors: true });
+        dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
+        event.target.value = "";
+      }
       return;
     }
-    if (validateFile(event.target.files)) {
-      const file = event.target.files?.[0];
 
-      const url = URL.createObjectURL(file);
-      dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
-    } else {
-      dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
-      event.target.value = "";
-    }
+    const url = URL.createObjectURL(uploadedFile);
+    dispatch({ type: "UPDATE_FILE", file: uploadedFile, previewUrl: url });
+    // Focus after state update
+    setTimeout(() => {
+      visionButton.current?.focus();
+    }, 0);
   };
 
-  const validateFile = (file: FileList): boolean => {
-    if (file.length > 1) {
-      toast.error("Please select only one file", { richColors: true });
-      return false;
-    }
-
-    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
-    if (!allowedTypes.includes(file[0].type)) {
-      toast.error("Please select a valid image file", { richColors: true });
-      return false;
-    }
-
-    return true;
+  // Wrap analyze click to close modal on success
+  const handleAnalyzeAndMaybeClose = async () => {
+    await handleAnalyzeBtnClick(
+      state,
+      dispatch,
+      handleCreateMatchFromVision,
+      sessionPlayers,
+      gameName,
+      // Pass a callback to close modal on success
+      () => setOpen(false),
+    );
   };
 
   return (
-    <Dialog onOpenChange={() => handleClose(previewUrl, dispatch)}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) handleClose(previewUrl, dispatch);
+      }}
+    >
       <DialogTrigger asChild>
         <Button className="bg-primary text-primary-foreground my-2 rounded-sm p-4">
           <ScanEye />
@@ -170,22 +205,16 @@ const RDCVisionModal = (props: Props) => {
         <Input
           type="file"
           accept="image/*"
+          multiple={false}
           onChange={handleFileChange}
           className="hover:bg-primary-foreground hover:cursor-pointer"
           tabIndex={1}
         />
         <Button
           ref={visionButton}
-          className="w-full max-w-[200px] sm:w-auto"
-          disabled={!selectedFile || sessionPlayers.length === 0}
-          onClick={() =>
-            handleAnalyzeBtnClick(
-              state,
-              dispatch,
-              handleCreateMatchFromVision,
-              sessionPlayers,
-            )
-          }
+          className="focus:ring-primary focus:bg-primary/90 w-full max-w-[200px] transition-all duration-150 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto"
+          disabled={!selectedFile || sessionPlayers.length === 0 || isLoading}
+          onClick={handleAnalyzeAndMaybeClose}
           type="button"
         >
           Extract Stats from Image

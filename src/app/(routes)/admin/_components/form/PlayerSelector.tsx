@@ -2,7 +2,7 @@
 import { Player } from "@prisma/client";
 import React, { useState } from "react";
 import PlayerAvatar from "./PlayerAvatar";
-import { Control, ControllerRenderProps } from "react-hook-form";
+import { Control, ControllerRenderProps, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import { formSchema, FormValues } from "../../_utils/form-helpers";
 interface Props {
   rdcMembers: Player[];
   handlePlayerClick?: (player: Player) => void;
-  control?: Control<z.infer<typeof formSchema>>;
+  control?: UseFormReturn<FormValues>["control"];
   sticky?: boolean;
   fieldName?: string;
   field: ControllerRenderProps<FormValues>;
@@ -55,14 +55,14 @@ const PlayerSelector = ({
       <div
         style={sticky ? { position: "-webkit-sticky" } : undefined}
         className={cn(
-          "mb-10 w-fit rounded-md border p-4",
+          "w-fit rounded-md border p-4",
           sticky && "bg-card sticky top-12 z-20",
         )}
         id="player-selector-container"
       >
         <Label className="text-muted-foreground mb-6 block">{label}</Label>
         {rdcMembers?.length !== 0 ? (
-          <div className="mt-2 flex flex-wrap gap-y-1 sm:grid sm:grid-cols-8">
+          <div className="mt-2 flex flex-wrap gap-y-4 md:grid md:grid-cols-8">
             {rdcMembers.map((player, index) => (
               <div key={player.playerId} className="relative">
                 <div

@@ -1,5 +1,5 @@
 import { Player } from "@prisma/client";
-import React from "react";
+import { useEffect } from "react";
 import { FieldValues, useFieldArray, useFormContext } from "react-hook-form";
 import PlayerStatManager from "./PlayerStatManager";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ const PlayerSessionManager = (props: Props) => {
     control,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const finalPlayerSessionValues = getValues(
       `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
     );
@@ -49,22 +49,25 @@ const PlayerSessionManager = (props: Props) => {
   }, [props.players, append, getValues, setIndex, matchIndex, players, remove]);
 
   const getPlayerNameFromField = (field: any): boolean => {
-    return field?.playerSessionName ?? 0;
+    return field?.playerSessionName ?? 0; // Discrepancy in what is being assigned to playerSessionName
   };
 
   console.log("PlayerSessionManager Fields: ", fields);
 
+  // TODO Continue working on responsive design
   return (
-    <div className="flex flex-wrap gap-5">
+    <div className="@container grid grid-cols-2">
       {fields.map((field, sessionIndex) => {
         return (
-          <div className="flex flex-col" key={field.id}>
+          <div className="col-span-2 @xs:col-span-1" key={field.id}>
             <Label className="font-bold">{getPlayerNameFromField(field)}</Label>
-            <PlayerStatManager
-              {...props}
-              playerSessionIndex={sessionIndex}
-              player={players[sessionIndex]}
-            />
+            <div className="flex flex-wrap gap-3">
+              <PlayerStatManager
+                {...props}
+                playerSessionIndex={sessionIndex}
+                player={players[sessionIndex]}
+              />
+            </div>
           </div>
         );
       })}

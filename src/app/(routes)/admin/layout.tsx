@@ -13,6 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { AdminProvider } from "@/lib/adminContext";
 
 import { Home, Gamepad, Notebook } from "lucide-react";
 import { cookies } from "next/headers";
@@ -36,8 +37,10 @@ export default async function Layout({
       <SidebarProvider defaultOpen={defaultOpen}>
         <AdminSidebar />
         <SidebarInset>
-          <SidebarTrigger className="-ml-1" />
-          {children}
+          <AdminProvider>
+            <SidebarTrigger className="-ml-1" />
+            {children}
+          </AdminProvider>
         </SidebarInset>
       </SidebarProvider>
     </div>
