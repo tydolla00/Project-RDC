@@ -11,7 +11,11 @@ export const dynamicParams = false; // true | false,
 
 export async function generateStaticParams() {
   const members = await getAllMembers();
-  return members.map((member) => ({
+  if (!members.success || !members.data) {
+    console.error("Failed to fetch members");
+    return [];
+  }
+  return members.data.map((member) => ({
     slug: member.playerName.toLowerCase(),
   }));
 }
