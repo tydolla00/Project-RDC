@@ -45,7 +45,7 @@ export default async function Home() {
           </div>
           <PieChartRDC config={config} data={data} />
         </div>
-        <H2 className="text-chart-4 mx-auto mb-6 mt-40 w-fit md:my-10">
+        <H2 className="text-chart-4 mx-auto mt-40 mb-6 w-fit md:my-10">
           Games
         </H2>
         <div className="flex flex-wrap justify-center gap-10">

@@ -6,7 +6,13 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -106,36 +112,51 @@ const RDCVisionModal = (props: Props) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [open, setOpen] = useState(false);
 
+  // Add a ref to always have the latest value of open
+  const openRef = useRef(open);
+
+  useEffect(() => {
+    openRef.current = open;
+  }, [open]);
+
   const { selectedFile, isLoading, visionStatus, visionMsg, previewUrl } =
     state;
 
   const visionButton = useRef<HTMLButtonElement>(null);
 
-  const handlePaste = async (e: ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    let file: File | null = null;
-    if (!items) return;
-    for (const item of Array.from(items)) {
-      file = item.getAsFile();
+  const handlePaste = useCallback(
+    async (e: ClipboardEvent) => {
+      // Use openRef.current instead of open
+      if (!openRef.current) return; // Only handle paste if modal is open
 
-      try {
-        zodFile.parse(file);
-      } catch (error) {
-        console.warn("Invalid file pasted", error);
-        continue;
+      const items = e.clipboardData?.items;
+      let file: File | null = null;
+      if (!items) return;
+      for (const item of Array.from(items)) {
+        file = item.getAsFile();
+
+        try {
+          zodFile.parse(file);
+        } catch (error) {
+          console.warn("Invalid file pasted", error);
+          continue;
+        }
+
+        const url = URL.createObjectURL(file!);
+        dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
+        // Focus after state update
+        setTimeout(() => {
+          visionButton.current?.focus();
+        }, 0);
+        return;
       }
-
-      const url = URL.createObjectURL(file!);
-      dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
-      // Focus after state update
-      setTimeout(() => {
-        visionButton.current?.focus();
-      }, 0);
-      return;
-    }
-    toast.error("No valid image file found in clipboard", { richColors: true });
-    dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
-  };
+      toast.error("No valid image file found in clipboard", {
+        richColors: true,
+      });
+      dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
+    },
+    [], // Remove open from dependencies
+  );
 
   useEffect(() => {
     document.addEventListener("paste", handlePaste);
@@ -232,7 +253,7 @@ const RDCVisionModal = (props: Props) => {
         />
         <Button
           ref={visionButton}
-          className="focus:ring-primary focus:bg-primary/90 w-full max-w-[200px] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto"
+          className="focus:ring-primary focus:bg-primary/90 w-full max-w-[200px] transition-all duration-150 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto"
           disabled={!selectedFile || sessionPlayers.length === 0 || isLoading}
           onClick={handleAnalyzeAndMaybeClose}
           type="button"
