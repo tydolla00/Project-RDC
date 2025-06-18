@@ -2,9 +2,8 @@ import {
   AnalyzedPlayer,
   AnalyzedPlayersObj,
   AnalyzedTeamData,
-  Stat,
-  VisionPlayer,
 } from "@/app/actions/visionAction";
+import { VisionPlayer, Stat } from "../visionTypes";
 import { Player } from "@prisma/client";
 import { VisionResultCodes } from "../constants";
 import {

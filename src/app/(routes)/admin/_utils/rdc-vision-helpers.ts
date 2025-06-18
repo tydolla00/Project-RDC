@@ -1,9 +1,10 @@
 import { VisionResultCodes } from "@/lib/constants";
 import { toast } from "sonner";
 import { Player } from "@prisma/client";
-import { analyzeScreenShot, VisionPlayer } from "@/app/actions/visionAction";
+import { analyzeScreenShot } from "@/app/actions/visionAction";
 import { Action, State } from "../_components/form/RDCVisionModal";
 import { getGameIdFromName } from "@/app/actions/adminAction";
+import { VisionPlayer } from "../../../../lib/visionTypes";
 
 export const handleAnalyzeBtnClick = async (
   state: State,

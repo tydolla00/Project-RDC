@@ -30,7 +30,7 @@ import {
   handleClose,
   handleAnalyzeBtnClick,
 } from "../../_utils/rdc-vision-helpers";
-import { VisionPlayer } from "@/app/actions/visionAction";
+import { VisionPlayer } from "../../../../../lib/visionTypes";
 import { z } from "zod/v4";
 
 interface Props {
@@ -149,7 +149,7 @@ const RDCVisionModal = (props: Props) => {
   };
 
   // Wrap analyze click to close modal on success
-  const handleAnalyzeAndMaybeClose = async () => {
+  const handleAnalyzeWithModalClose = async () => {
     await handleAnalyzeBtnClick(
       state,
       dispatch,
@@ -214,7 +214,7 @@ const RDCVisionModal = (props: Props) => {
           ref={visionButton}
           className="focus:ring-primary focus:bg-primary/90 w-full max-w-[200px] transition-all duration-150 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto"
           disabled={!selectedFile || sessionPlayers.length === 0 || isLoading}
-          onClick={handleAnalyzeAndMaybeClose}
+          onClick={handleAnalyzeWithModalClose}
           type="button"
         >
           Extract Stats from Image

@@ -9,7 +9,7 @@ import { GameProcessor } from "@/lib/game-processors/game-processor-utils";
 import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
 import { RocketLeagueProcessor } from "@/lib/game-processors/RocketLeagueProcessor";
 import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";
-import { PLAYER_MAPPINGS } from "../(routes)/admin/_utils/form-helpers";
+import { AnalysisResults, Stat, VisionPlayer } from "../../lib/visionTypes";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -17,37 +17,6 @@ const client = DocumentIntelligence(
     key: process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_API_KEY"]!,
   },
 );
-
-export interface VisionResult {
-  players: VisionPlayer[];
-  winner?: VisionPlayer[];
-}
-
-export type VisionTeam = {
-  [key: string]: VisionPlayer[];
-};
-
-export interface VisionPlayer {
-  playerId?: number;
-  teamKey?: string;
-  name: keyof typeof PLAYER_MAPPINGS;
-  stats: Stat[];
-}
-
-export interface Stat {
-  statId: string;
-  stat: string;
-  statValue: string; // TODO: This should be allowed to be undefined but throw an error maybe?
-}
-
-export type AnalysisResults =
-  | { status: VisionResultCodes.Success; data: VisionResult; message: string }
-  | {
-      status: VisionResultCodes.CheckRequest;
-      data: VisionResult;
-      message: string;
-    }
-  | { status: VisionResultCodes.Failed; message: string };
 
 export const getGameProcessor = (gameId: number): GameProcessor => {
   switch (gameId) {
@@ -154,7 +123,7 @@ export const analyzeScreenShot = async (
 
     const validatedPlayers: VisionPlayer[] =
       processedPlayers.processedPlayers.map((player) => {
-        const validatedStats = player.stats.map((stat) => {
+        const validatedStats = player.stats.map((stat: Stat) => {
           const validatedStat = gameProcessor.validateStats(
             stat.statValue,
             sessionPlayers.length,

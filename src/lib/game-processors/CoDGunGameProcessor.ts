@@ -1,9 +1,8 @@
 import {
   AnalyzedPlayersObj,
   AnalyzedTeamData,
-  VisionPlayer,
-  VisionResult,
 } from "@/app/actions/visionAction";
+import { VisionPlayer, VisionResult } from "../../lib/visionTypes";
 import {
   calculateIndividualWinner,
   GameProcessor,
