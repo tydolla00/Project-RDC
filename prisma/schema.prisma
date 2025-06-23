@@ -33,6 +33,7 @@ model Player {
   playerStats    PlayerStat[]
   matchWins      Match[]
   setWins        GameSet[]
+  dayWins        Session[]      
 
   @@map("players")
 }
@@ -72,6 +73,11 @@ enum StatName {
   SR_POS
 }
 
+enum StatType {
+  INT
+  STRING
+} 
+
 // { stat_id: 1, game_id: 1, stat_name: 'MK_POS', playerStats: [], type: 'int' }
 model GameStat {
   statId      Int          @id @default(autoincrement()) @map("stat_id")
@@ -79,7 +85,7 @@ model GameStat {
   gameId      Int          @map("game_id")
   game        Game         @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
   playerStats PlayerStat[]
-  type        String?      @map("type") // Don't think there is any stat there is not an int can probably remove
+  type        StatType     @map("type") @default(INT)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -96,6 +102,7 @@ model Session {
   gameId      Int       @map("game_id")
   Game        Game      @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
   sets        GameSet[]
+  dayWinners  Player[]  
   thumbnail   String
   date        DateTime  @default(now()) // Date video posted
   videoId     String    @unique
