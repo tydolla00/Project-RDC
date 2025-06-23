@@ -2,6 +2,25 @@ import { PostHog } from "posthog-node";
 import config from "@/lib/config";
 import { Session } from "next-auth";
 
+/**
+ * Creates and configures a new PostHog client instance
+ *
+ * @description
+ * This factory function:
+ * 1. Creates a new PostHog client with environment configuration
+ * 2. Sets up immediate event flushing for real-time analytics
+ * 3. Configures the host URL from environment settings
+ * 4. Disables automatic flush intervals for better control
+ * 5. Returns a properly configured singleton instance
+ *
+ * Configuration includes:
+ * - API key from environment config
+ * - Host from environment config
+ * - Immediate flushing (flushAt: 1)
+ * - Disabled flush intervals (flushInterval: 0)
+ *
+ * @returns Configured PostHog client instance
+ */
 export default function PostHogClient() {
   const posthogClient = new PostHog(config.NEXT_PUBLIC_POSTHOG_KEY, {
     host: config.NEXT_PUBLIC_POSTHOG_HOST,
@@ -12,13 +31,24 @@ export default function PostHogClient() {
 }
 
 /**
- * Identifies a user in PostHog using the provided session information.
+ * Identifies a user in PostHog analytics using their session data
  *
- * @param session - The session object containing user information. If the session is null, the function does nothing.
+ * @description
+ * This function:
+ * 1. Creates or updates a PostHog user profile from session data
+ * 2. Uses email as the distinct ID for consistent user tracking
+ * 3. Handles missing email cases with a fallback identifier
+ * 4. Properly cleans up PostHog client after identification
+ * 5. Safely handles null sessions by doing nothing
  *
- * @remarks
- * This function initializes a PostHog client, identifies the user with their email (or "Unidentified Email" if the email is not available),
- * and then shuts down the PostHog client.
+ * @param session - The user's session object, or null if not authenticated
+ *
+ * @example
+ * // After user signs in
+ * identifyUser(session);
+ *
+ * // When user signs out
+ * identifyUser(null);
  */
 export const identifyUser = (session: Session | null) => {
   if (session) {
