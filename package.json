@@ -8,11 +8,10 @@
     "build": "next build",
     "build-memory": "next build --experimental-debug-memory-usage",
     "start": "next start",
-    "lint": "next lint",
-    "dbcrashout": "npx prisma db push --force-reset && npx prisma db push && npx tsx prisma/seed.ts"
+    "lint": "next lint"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",

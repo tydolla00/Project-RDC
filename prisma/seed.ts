@@ -34,57 +34,73 @@ async function seedRDCMembers() {
    */
   console.log("--- Seeding RDC Members ---");
 
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { playerId: 1 },
+    update: {},
+    create: {
       playerId: 1,
       playerName: capitalizeFirst(MembersEnum.Mark),
     },
   });
 
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { playerId: 2 },
+    update: {},
+    create: {
       playerId: 2,
       playerName: capitalizeFirst(MembersEnum.Dylan),
     },
   });
 
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { playerId: 3 },
+    update: {},
+    create: {
       playerId: 3,
       playerName: capitalizeFirst(MembersEnum.Ben),
     },
   });
 
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { playerId: 4 },
+    update: {},
+    create: {
       playerId: 4,
       playerName: capitalizeFirst(MembersEnum.Lee),
     },
   });
 
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { playerId: 5 },
+    update: {},
+    create: {
       playerId: 5,
       playerName: capitalizeFirst(MembersEnum.Des),
     },
   });
 
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { playerId: 6 },
+    update: {},
+    create: {
       playerId: 6,
       playerName: capitalizeFirst(MembersEnum.John),
     },
   });
 
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { playerId: 7 },
+    update: {},
+    create: {
       playerId: 7,
       playerName: capitalizeFirst(MembersEnum.Aff),
     },
   });
 
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { playerId: 8 },
+    update: {},
+    create: {
       playerId: 8,
       playerName: capitalizeFirst(MembersEnum.Ipi),
     },
@@ -100,8 +116,10 @@ async function seedGames() {
    */
   console.log("--- Seeding Games ---");
 
-  await prisma.game.create({
-    data: {
+  await prisma.game.upsert({
+    where: { gameName: "Mario Kart 8" },
+    update: {},
+    create: {
       gameName: "Mario Kart 8",
       gameStats: {
         create: [
@@ -112,8 +130,10 @@ async function seedGames() {
     },
   });
 
-  await prisma.game.create({
-    data: {
+  await prisma.game.upsert({
+    where: { gameName: "Rocket League" },
+    update: {},
+    create: {
       gameName: "Rocket League",
       gameStats: {
         create: [
@@ -128,23 +148,27 @@ async function seedGames() {
     },
   });
 
-  await prisma.game.create({
-    data: {
+  await prisma.game.upsert({
+    where: { gameName: "Call of Duty" },
+    update: {},
+    create: {
       gameName: "Call of Duty",
       gameStats: {
         create: [
           { statName: StatName.COD_SCORE },
           { statName: StatName.COD_KILLS },
           { statName: StatName.COD_DEATHS },
-          // { statName: StatName.COD_MELEES }, // TODO Run Migration to add this
+          { statName: StatName.COD_MELEES },
           { statName: StatName.COD_POS },
         ],
       },
     },
   });
 
-  await prisma.game.create({
-    data: {
+  await prisma.game.upsert({
+    where: { gameName: "Lethal Company" },
+    update: {},
+    create: {
       gameName: "Lethal Company",
       gameStats: {
         create: [{ statName: StatName.LC_DEATHS }],
@@ -152,8 +176,10 @@ async function seedGames() {
     },
   });
 
-  await prisma.game.create({
-    data: {
+  await prisma.game.upsert({
+    where: { gameName: "Speedrunners" },
+    update: {},
+    create: {
       gameName: "Speedrunners",
       gameStats: {
         create: [
