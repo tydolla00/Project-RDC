@@ -36,20 +36,6 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
 
   const form = useForm<FormValues, any>({
     resolver: zodResolver(formSchema),
-    // async (data, context, options) => {
-    //   try {
-    //     // Validate the form data against the Zod schema
-    //     console.log(await formSchema.parseAsync(data));
-    //   } catch (error) {
-    //     // If validation fails, return the error to the resolver
-    //     console.log(error);
-    //     return {
-    //       values: {},
-    //       errors: error.flatten().fieldErrors,
-    //     };
-    //   }
-    //   return zodResolver(formSchema)(data, context, options);
-    // },
     defaultValues: {
       game: "Mario Kart 8",
       sessionName: "",
@@ -61,8 +47,8 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     mode: "onChange",
   });
 
-  console.log(form.formState.errors);
-  console.log({ form });
+  console.log("FORM ERRORS", form.formState.errors);
+  console.log("FORM", { form });
 
   const { handleSubmit } = form;
 
@@ -88,7 +74,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     console.time("Form Submission Time Start: ");
     const { error: err } = await insertNewSessionFromAdmin(data);
     // const { error: err } = await insertNewSessionV2(data);
-    console.timeEnd("Form Submission Time End: ");
+    // console.timeEnd("Form Submission Time End: ");
 
     if (err)
       err === errorCodes.NotAuthenticated

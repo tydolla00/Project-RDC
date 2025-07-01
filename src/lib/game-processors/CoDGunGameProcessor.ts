@@ -16,14 +16,14 @@ import { Player } from "@prisma/client";
 import { getStatConfigByFieldKey } from "../stat-configs";
 
 // Helper function to rank players by COD_KILLS and set COD_POS
-const rankPlayersByKills = (players: VisionPlayer[]): VisionPlayer[] => {
+const rankPlayersByScore = (players: VisionPlayer[]): VisionPlayer[] => {
   // Sort players by COD_KILLS in descending order (highest kills first)
   const sortedPlayers = [...players].sort((a, b) => {
     const aKills = parseInt(
-      a.stats.find((stat) => stat.stat === "COD_KILLS")?.statValue || "0",
+      a.stats.find((stat) => stat.stat === "COD_SCORE")?.statValue || "0",
     );
     const bKills = parseInt(
-      b.stats.find((stat) => stat.stat === "COD_KILLS")?.statValue || "0",
+      b.stats.find((stat) => stat.stat === "COD_SCORE")?.statValue || "0",
     );
     return bKills - aKills;
   });
@@ -86,7 +86,7 @@ export const CoDGunGameProcessor: GameProcessor = {
     });
 
     // Rank players by COD_KILLS and set COD_POS
-    codVisionResult.players = rankPlayersByKills(codVisionResult.players);
+    codVisionResult.players = rankPlayersByScore(codVisionResult.players);
     console.log("Players ranked by kills: ", codVisionResult.players);
 
     return {
@@ -98,7 +98,7 @@ export const CoDGunGameProcessor: GameProcessor = {
     const config: WinnerConfig = {
       type: "INDIVIDUAL",
       winCondition: {
-        statName: "COD_KILLS", // TODO Verify stat name
+        statName: "COD_SCORE", // TODO Verify stat name
         comparison: "highest",
       },
     };
