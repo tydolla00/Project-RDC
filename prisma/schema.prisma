@@ -105,7 +105,7 @@ model Session {
   dayWinners  Player[]  
   thumbnail   String
   date        DateTime  @default(now()) // Date video posted
-  videoId     String    @unique
+  videoId     String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -113,6 +113,7 @@ model Session {
   isApproved Boolean @default(false) @map("is_approved")
   createdBy  String  @default("SYSTEM") @map("created_by")
 
+  @@unique([gameId, videoId]) // not in migrations
   @@map("sessions")
 }
 

@@ -71,7 +71,10 @@ export const SessionInfo = ({
         return;
       }
 
-      const { error, video } = await getRDCVideoDetails(videoId);
+      const { error, video } = await getRDCVideoDetails(
+        videoId,
+        form.getValues("game"),
+      );
 
       if (error !== undefined) {
         if (error === errorCodes.NotAuthenticated)

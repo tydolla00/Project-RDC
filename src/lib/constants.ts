@@ -267,6 +267,7 @@ export const statDescriptions: { [key in $Enums.StatName]: string } = {
 
 export enum errorCodes {
   NotAuthenticated = "Not Authenticated",
+  NotAuthorized = "Not Authorized",
 }
 
 export enum VisionResultCodes {

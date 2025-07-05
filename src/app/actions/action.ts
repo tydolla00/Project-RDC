@@ -3,10 +3,9 @@
 import prisma from "../../../prisma/db";
 import config from "@/lib/config";
 import { Session } from "next-auth";
-import { signOut, signIn, auth } from "@/auth";
+import { signOut, auth } from "@/auth";
 import { isProduction } from "@/lib/utils";
 import { errorCodes } from "@/lib/constants";
-import { identifyUser } from "@/lib/posthog";
 import { redirect } from "next/navigation";
 
 /**
@@ -57,7 +56,9 @@ export const updateAuthStatus = async (session: Session | null) => {
  */
 export const getRDCVideoDetails = async (
   videoId: string,
+  gameName: string,
 ): GetRdcVideoDetails => {
+  // TODO Maybe only validate if it's a valid video when clicking next.
   try {
     const isAuthenticated = await auth();
     if (!isAuthenticated)
@@ -65,6 +66,7 @@ export const getRDCVideoDetails = async (
 
     const dbRecord = await prisma.session.findFirst({
       where: { videoId },
+      include: { Game: true },
     });
     const apiKey = isProduction
       ? config.YOUTUBE_API_KEY
@@ -98,7 +100,9 @@ export const getRDCVideoDetails = async (
           video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
       };
       return { video: session, error: undefined };
-    } else return { video: dbRecord, error: "Video already exists" };
+    } else if (dbRecord.Game.gameName === gameName)
+      return { video: dbRecord, error: "Video already exists" };
+    else return { video: dbRecord, error: undefined };
   } catch (error) {
     console.error("Error in getRDCVideoDetails:", error);
     return { video: null, error: "An unexpected error occurred" };
