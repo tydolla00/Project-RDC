@@ -64,16 +64,16 @@ export default async function Page({
     //   break;
   }
 
+  const normalGameName = game.gameName
+    .replace(/\s/g, "")
+    .toLowerCase() as keyof typeof gameImages;
+
   return (
     <div className="m-16">
       <H1 className="my-0">{game.gameName}</H1>
       <TimelineChart
-        gameName={
-          game.gameName
-            .replace(/\s/g, "")
-            .toLowerCase() as keyof typeof gameImages
-        }
-        sessions={sessions.data}
+        gameName={normalGameName}
+        sessions={sessions.data.slice(1)}
         title={`${game.gameName} Videos`}
         desc="Use the keyboard to view specific data for a video"
       />

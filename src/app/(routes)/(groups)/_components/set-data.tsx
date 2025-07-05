@@ -9,10 +9,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { RLStats } from "./timeline-chart";
 
-// TODO Show Set Results - Who Won and what was the score.
-const SetData = ({ set, setIndex }: { set: RLStats[][]; setIndex: number }) => (
+// Accepts either RLStats[][] or MarioKartStats[][]
+type RLStats = import("./timeline-chart").RLStats;
+type MarioKartStats = { player: string; position: number; winners: string[] };
+
+type StatsType = RLStats | MarioKartStats;
+
+type SetDataProps = {
+  set: StatsType[][];
+  setIndex: number;
+  game: string | undefined;
+};
+
+const SetData = ({ set, setIndex, game }: SetDataProps) => (
   <div className="mb-6">
     <div className="text-chart-4 text-2xl font-bold">Set {setIndex + 1}</div>
     <div className="text-muted-foreground my-2 text-sm">
@@ -25,8 +35,14 @@ const SetData = ({ set, setIndex }: { set: RLStats[][]; setIndex: number }) => (
           <Separator className="my-2" />
           <span className="text-muted-foreground text-sm">Winning Team</span>
           <div className="flex gap-10 text-white">
-            <StatsTable players={match.slice(0, 3)} bgColor="bg-blue-700" />
-            <StatsTable players={match.slice(3)} bgColor="bg-orange-700" />
+            {game === "Rocket League" ? (
+              <>
+                <StatsTable players={match.slice(0, 3)} bgColor="bg-blue-700" />
+                <StatsTable players={match.slice(3)} bgColor="bg-orange-700" />
+              </>
+            ) : (
+              <StatsTable players={match} bgColor="bg-blue-700" />
+            )}
           </div>
         </div>
       );
@@ -39,33 +55,52 @@ const StatsTable = ({
   players,
   bgColor,
 }: {
-  players: RLStats[];
+  players: StatsType[];
   bgColor: string;
-}) => (
-  <Table className="max-w-sm">
-    <TableCaption></TableCaption>
-    <TableHeader>
-      <TableRow>
-        <TableHead>Player</TableHead>
-        <TableHead>Score</TableHead>
-        <TableHead>Goals</TableHead>
-        <TableHead>Assists</TableHead>
-        <TableHead>Saves</TableHead>
-        <TableHead>Shots</TableHead>
-      </TableRow>
-    </TableHeader>
-    <TableBody className={bgColor}>
-      {players.map((ps) => (
-        <TableRow key={ps.player}>
-          <TableCell>{ps.player}</TableCell>
-          <TableCell>{ps.score}</TableCell>
-          <TableCell>{ps.goals}</TableCell>
-          <TableCell>{ps.assists}</TableCell>
-          <TableCell>{ps.saves}</TableCell>
-          <TableCell>{ps.shots}</TableCell>
+}) => {
+  if (!players.length) return null;
+  // Detect type by checking for 'score' property
+  const isRocketLeague = (p: StatsType): p is RLStats =>
+    typeof (p as RLStats).score === "number";
+
+  return (
+    <Table className="max-w-sm">
+      <TableCaption></TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Player</TableHead>
+          {isRocketLeague(players[0]) ? (
+            <>
+              <TableHead>Score</TableHead>
+              <TableHead>Goals</TableHead>
+              <TableHead>Assists</TableHead>
+              <TableHead>Saves</TableHead>
+              <TableHead>Shots</TableHead>
+            </>
+          ) : (
+            <TableHead>Position</TableHead>
+          )}
         </TableRow>
-      ))}
-    </TableBody>
-    <TableFooter></TableFooter>
-  </Table>
-);
+      </TableHeader>
+      <TableBody className={bgColor}>
+        {players.map((ps) => (
+          <TableRow key={ps.player}>
+            <TableCell>{ps.player}</TableCell>
+            {isRocketLeague(ps) ? (
+              <>
+                <TableCell>{ps.score}</TableCell>
+                <TableCell>{ps.goals}</TableCell>
+                <TableCell>{ps.assists}</TableCell>
+                <TableCell>{ps.saves}</TableCell>
+                <TableCell>{ps.shots}</TableCell>
+              </>
+            ) : (
+              <TableCell>{(ps as MarioKartStats).position}</TableCell>
+            )}
+          </TableRow>
+        ))}
+      </TableBody>
+      <TableFooter></TableFooter>
+    </Table>
+  );
+};
