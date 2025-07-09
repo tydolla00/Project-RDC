@@ -13,17 +13,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Image from "next/image";
+import { redirect } from "next/navigation";
+
 import { Session } from "next-auth";
 import { DeleteAccountForm } from "./_components/DeleteAccountForm";
+import prisma from "@/../prisma/db";
 
 export default async function Page() {
   const session = (await auth()) as Session;
-  console.log(session);
+  if (!session) redirect("/");
 
   // Mask email for privacy
   const maskedEmail = session?.user?.email
     ? session.user.email.replace(/(.{2}).+(@.+)/, "$1***$2")
     : "";
+
+  // Query all sessions submitted by the current user (by email)
+  const userSessions = await prisma.session.findMany({
+    where: { createdBy: session.user?.email || "" },
+    select: {
+      sessionId: true,
+      sessionName: true,
+      videoId: true,
+      thumbnail: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
     <div className="mx-auto mt-16 max-w-3xl rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-200 p-8 shadow-xl dark:border-[#23232a] dark:from-[#18181b] dark:to-[#23232a]">
@@ -47,15 +63,26 @@ export default async function Page() {
         </div>
       </div>
       <div className="mt-10">
-        <TabsDemo email={session.user?.email} />
+        <ProfileTabs email={session.user?.email} userSessions={userSessions} />
       </div>
     </div>
   );
 }
 
-function TabsDemo({ email }: { email: string | null | undefined }) {
+function ProfileTabs({
+  email,
+  userSessions,
+}: {
+  email: string | null | undefined;
+  userSessions: {
+    sessionId: number;
+    sessionName: string;
+    videoId: string;
+    thumbnail: string;
+  }[];
+}) {
   return (
-    <Tabs defaultValue="account" className="bg-transparent">
+    <Tabs defaultValue="submissions" className="bg-transparent">
       <TabsList className="bg-inherit">
         <TabsTrigger
           className="data-[state=active]:bg-chart-4 cursor-pointer"
@@ -77,7 +104,24 @@ function TabsDemo({ email }: { email: string | null | undefined }) {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="submissions">
-        <div>Submissions content</div>
+        {userSessions.length === 0 ? (
+          <div className="text-slate-500">No submissions yet.</div>
+        ) : (
+          <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+            {userSessions.map((session) => (
+              <div key={session.sessionId}>
+                <Image
+                  className=""
+                  src={session.thumbnail}
+                  alt={session.sessionName}
+                  width={400}
+                  height={225}
+                />
+                <div>{session.sessionName}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </TabsContent>
       <TabsContent value="settings">
         <div>Settings content</div>
