@@ -4,10 +4,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
-import {
-  insertNewSessionFromAdmin,
-  insertNewSessionV2,
-} from "@/app/actions/adminAction";
+import { insertNewSessionFromAdmin } from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { SessionInfo } from "./SessionInfo";
@@ -47,9 +44,6 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     mode: "onChange",
   });
 
-  console.log("FORM ERRORS", form.formState.errors);
-  console.log("FORM", { form });
-
   const { handleSubmit } = form;
 
   /**
@@ -73,8 +67,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     });
     console.time("Form Submission Time Start: ");
     const { error: err } = await insertNewSessionFromAdmin(data);
-    // const { error: err } = await insertNewSessionV2(data);
-    // console.timeEnd("Form Submission Time End: ");
+    console.timeEnd("Form Submission Time End: ");
 
     if (err)
       err === errorCodes.NotAuthenticated

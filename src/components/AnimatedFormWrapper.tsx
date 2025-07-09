@@ -48,6 +48,7 @@ export const NavigationButtons = ({
   const handleNextClicked = async () => {
     let isValid: boolean = false;
     switch (step) {
+      // TODO Validate video and game combo not already existing.
       case 0:
         isValid = await form.trigger([
           "game",

@@ -33,6 +33,7 @@ import { useState, useEffect } from "react";
 import { getAllGames } from "../../../../../../prisma/lib/games";
 import { FormValues } from "../../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
+import { toast } from "sonner";
 
 // TODO Cache results
 
@@ -50,7 +51,9 @@ const GameDropDownForm = ({
   useEffect(() => {
     const fetchGames = async () => {
       const games = await getAllGames();
-      setTestGames(games);
+      if (!games.success || !games.data)
+        toast.error("Failed to fetch games. Please try again.");
+      else setTestGames(games.data);
     };
     fetchGames();
     getGameStatsFromDb("Mario Kart 8"); // ! TODO TEMP FIX to load games due to needing to pass game as default value in form
@@ -96,9 +99,16 @@ const GameDropDownForm = ({
                         value={game.gameName}
                         key={game.gameId}
                         onSelect={async () => {
-                          field.onChange(game.gameName);
-                          reset("sets");
-                          await getGameStatsFromDb(game.gameName);
+                          try {
+                            field.onChange(game.gameName);
+                            reset("sets");
+                            await getGameStatsFromDb(game.gameName);
+                          } catch (error) {
+                            console.error("Failed to fetch game stats:", error);
+                            toast.error(
+                              "Failed to fetch game stats. Please try again.",
+                            );
+                          }
                         }}
                       >
                         {game.gameName}

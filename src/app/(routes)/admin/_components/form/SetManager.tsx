@@ -77,7 +77,7 @@ const SetManager = () => {
           return (
             <Collapsible open={openSets[setIndex]} key={set.setId}>
               <Card className="flex flex-col space-y-3 rounded-lg p-6 shadow-lg">
-                <CardHeader className="flex flex-row justify-between space-y-0 pr-0 pb-0 pl-0">
+                <CardHeader className="flex flex-row justify-between space-y-0 pb-0 pl-0 pr-0">
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
                   </div>

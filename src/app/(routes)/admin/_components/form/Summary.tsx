@@ -1,34 +1,38 @@
-import { useFieldArray, useFormContext } from "react-hook-form";
-import { z } from "zod";
+import { useFormContext } from "react-hook-form";
 import { H2 } from "@/components/headings";
-import { formSchema, FormValues } from "../../_utils/form-helpers";
+import { FormValues } from "../../_utils/form-helpers";
+import PlayerAvatar from "./PlayerAvatar";
 
 export const FormSummary = () => {
-  const { watch, control, getValues } = useFormContext<FormValues>();
+  const { getValues } = useFormContext<FormValues>();
 
   const sets = getValues("sets");
 
   return (
     <>
       <H2>Form Summary</H2>
-      {sets.map((set, index) => (
-        <div key={set.setId}>
-          <div className="flex">
-            <div>Set {index + 1} winners &nbsp;</div>
-            {set.setWinners.map((winner) => (
-              <div key={winner.playerId}>{winner.playerName} &nbsp;</div>
-            ))}
-          </div>
-          {set.matches.map((match, matchIndex) => (
-            <div key={matchIndex} className="flex">
-              <div>Match {matchIndex + 1} winners &nbsp;</div>
-              {match.matchWinners.map((winner) => (
-                <div key={winner.playerId}>{winner.playerName} &nbsp;</div>
+      <div className="grid grid-cols-2 gap-2 divide-x divide-gray-400">
+        {sets.map((set, index) => (
+          <div className="border-b" key={set.setId}>
+            <div>Set {index + 1} Winners</div>
+            <div className="my-2 flex">
+              {set.setWinners.map((winner) => (
+                <PlayerAvatar key={winner.playerId} player={winner} />
               ))}
             </div>
-          ))}
-        </div>
-      ))}
+            {set.matches.map((match, matchIndex) => (
+              <div key={matchIndex}>
+                <div>Match {matchIndex + 1} Winners</div>
+                <div className="my-2 flex">
+                  {match.matchWinners.map((winner) => (
+                    <PlayerAvatar key={winner.playerId} player={winner} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
     </>
   );
 };
