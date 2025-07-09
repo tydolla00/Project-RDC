@@ -1,16 +1,18 @@
 import { H1 } from "@/components/headings";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import EntryCreatorForm from "./_components/EntryCreatorForm";
 import { getAllMembers } from "../../../../prisma/lib/members";
+import EntryCreatorForm from "./_components/form/EntryCreatorForm";
+import { MotionConfig } from "motion/react";
 
 export default async function Page() {
   return (
-    <div className="m-16">
+    <div>
       <H1>Admin</H1>
-
       <Suspense fallback={<Skelly />}>
-        <EntryCreatorForm rdcMembers={await getAllMembers()} />
+        <MotionConfig transition={{ duration: 0.6, type: "spring", bounce: 0 }}>
+          <EntryCreatorForm rdcMembers={await getAllMembers()} />
+        </MotionConfig>
       </Suspense>
     </div>
   );

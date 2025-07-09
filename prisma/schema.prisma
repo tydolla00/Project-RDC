@@ -2,13 +2,13 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["typedSql", "driverAdapters"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL") // Used during development to connect to dev db
 }
 
@@ -39,13 +39,14 @@ model Player {
 
 // { game_id: 1, game_name: 'Mario Kart', game_stats: [], player_game_stats: [] }
 model Game {
-  gameId      Int           @id @default(autoincrement()) @map("game_id")
-  gameName    String        @map("game_name")
+  gameId      Int          @id @default(autoincrement()) @map("game_id")
+  gameName    String       @unique @map("game_name")
   gameStats   GameStat[]
   playerStats PlayerStat[]
   sessions    Session[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
   @@map("games")
 }
 
@@ -64,6 +65,7 @@ enum StatName {
   COD_DEATHS
   COD_SCORE
   COD_POS
+  COD_MELEES
   LC_DEATHS
   SR_WINS
   SR_SETS
@@ -72,15 +74,18 @@ enum StatName {
 
 // { stat_id: 1, game_id: 1, stat_name: 'MK_POS', playerStats: [], type: 'int' }
 model GameStat {
-  statId      Int           @id @default(autoincrement()) @map("stat_id")
-  statName    StatName      @map("stat_name")
-  gameId      Int           @map("game_id")
-  game        Game          @relation(fields: [gameId], references: [gameId])
+  statId      Int          @id @default(autoincrement()) @map("stat_id")
+  statName    StatName     @map("stat_name")
+  gameId      Int          @map("game_id")
+  game        Game         @relation(fields: [gameId], references: [gameId])
   playerStats PlayerStat[]
-  type        String?       @map("type") // Don't think there is any stat there is not an int can probably remove
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  type        String?      @map("type") // Don't think there is any stat there is not an int can probably remove
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdBy String @default("SYSTEM") @map("created_by")
+
   @@map("game_stats")
 }
 
@@ -94,35 +99,42 @@ model Session {
   thumbnail   String
   date        DateTime  @default(now()) // Date video posted
   videoId     String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isApproved Boolean @default(false) @map("is_approved")
+  createdBy  String  @default("SYSTEM") @map("created_by")
+
   @@map("sessions")
 }
 
 // Set Table Concept 
 model GameSet {
-  setId          Int            @id @default(autoincrement()) @map("set_id")
+  setId          Int             @id @default(autoincrement()) @map("set_id")
   playerSessions PlayerSession[]
   matches        Match[]
-  sessionId      Int            @map("session_id")
-  session        Session        @relation(fields: [sessionId], references: [sessionId])
+  sessionId      Int             @map("session_id")
+  session        Session         @relation(fields: [sessionId], references: [sessionId])
   setWinners     Player[]
-  
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("sets")
 }
 
 model Match {
-  matchId        Int            @id @default(autoincrement()) @map("match_id")
+  matchId        Int             @id @default(autoincrement()) @map("match_id")
   matchWinners   Player[]
   playerSessions PlayerSession[]
-  setId          Int            @map("set_id")
-  set            GameSet        @relation(fields: [setId], references: [setId])
-  date           DateTime       @default(now()) // Date video posted
-  
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  setId          Int             @map("set_id")
+  set            GameSet         @relation(fields: [setId], references: [setId])
+  date           DateTime        @default(now()) // Date video posted
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("matches")
 }
 
@@ -137,9 +149,10 @@ model PlayerSession {
   match           Match        @relation(fields: [matchId], references: [matchId])
   setId           Int          @map("set_id")
   set             GameSet      @relation(fields: [setId], references: [setId])
-  
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("player_sessions")
 }
 
@@ -161,11 +174,11 @@ model PlayerStat {
 }
 
 model User {
-  id            String          @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String          @unique
+  email         String    @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }

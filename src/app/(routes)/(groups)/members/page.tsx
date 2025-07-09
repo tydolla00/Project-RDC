@@ -12,8 +12,7 @@ import {
 } from "@/components/ui/hover-card";
 import { getMembersNav } from "@/lib/constants";
 
-// TODO Revalidate Stats Once Per Week
-// TODO Show all button that displays all Members. Default is centered 3D circular card that pops up from the 'ground'
+export const revalidate = 604_800; // 1 week
 
 export default async function Page() {
   const members = await getMembersNav();
