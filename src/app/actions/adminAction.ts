@@ -1,13 +1,13 @@
 "use server";
 
 import { $Enums, Game, GameStat, Player } from "@prisma/client";
-import { v4 } from "uuid";
 import prisma from "../../../prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { getAllGames } from "../../../prisma/lib/games";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { randomInt } from "crypto";
+import { revalidateTag } from "next/cache";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -35,6 +35,20 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
     },
   });
   return gameStats;
+}
+
+export async function getGameIdFromName(gameName: string) {
+  const game = await prisma.game.findFirst({
+    where: {
+      gameName: gameName,
+    },
+  });
+
+  if (!game) {
+    throw new Error(`Game with name ${gameName} not found`);
+  }
+
+  return game.gameId;
 }
 
 /**
@@ -70,7 +84,6 @@ export async function getGameStats(gameName: string): Promise<GameStat[]> {
  * const result = await insertNewSessionFromAdmin(session);
  * console.log(result); // { error: null }
  *
- * @throws {Error} Throws an error if an unknown error occurs.
  */
 export const insertNewSessionFromAdmin = async (
   session: FormValues,
@@ -86,10 +99,8 @@ export const insertNewSessionFromAdmin = async (
       },
     });
 
-    if (!sessionGame) {
-      // TODO This should never happen game should be required.
-      return { error: "Game not found." };
-    } else {
+    if (!sessionGame) return { error: "Game not found." };
+    else {
       const videoAlreadyExists = await prisma.session.findFirst({
         where: {
           gameId: sessionGame.gameId,
@@ -114,7 +125,7 @@ export const insertNewSessionFromAdmin = async (
     console.log("\n--- New Session Created: ---", newSession);
 
     // For each set in the session assign to parent session
-    // TODO We might want to change these to be transactions. Need to explain the promise.all to me. Also may want to wrap in try catch
+    // TODO We might want to change these to be transactions. Need to explain the promise.all to me.
     await Promise.all(
       session.sets.map(async (set) => {
         console.log(
@@ -264,6 +275,7 @@ export const insertNewSessionFromAdmin = async (
         );
       }),
     );
+    revalidateTag("getAllSessions");
     return { error: null };
   } catch (error) {
     return { error: "Unknown error occurred. Please try again." };
@@ -301,8 +313,6 @@ export const insertNewSessionV2 = async ({
   const isAuthenticated = await auth();
   if (!isAuthenticated) return { error: errorCodes.NotAuthenticated };
 
-  //? Check if the game and video exists in the db.
-  // TODO This should never happen game should be required.
   if (!gameId) return { error: "Game not found." };
   else {
     const videoAlreadyExists = await prisma.session.findFirst({
