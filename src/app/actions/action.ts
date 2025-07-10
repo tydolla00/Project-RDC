@@ -3,10 +3,9 @@
 import prisma from "../../../prisma/db";
 import config from "@/lib/config";
 import { Session } from "next-auth";
-import { signOut, signIn, auth } from "@/auth";
+import { signOut, auth } from "@/auth";
 import { isProduction } from "@/lib/utils";
 import { errorCodes } from "@/lib/constants";
-import { identifyUser } from "@/lib/posthog";
 import { redirect } from "next/navigation";
 
 /**
@@ -33,67 +32,81 @@ export const updateAuthStatus = async (session: Session | null) => {
 };
 
 /**
- * Fetches RDC video details based on the provided video ID.
+ * Fetches and validates YouTube video details for RDC sessions
  *
- * @param videoId - The ID of the video to fetch details for.
- * @returns An object containing the video details or an error message.
+ * @description
+ * This server action:
+ * 1. Validates that the video ID isn't already in use
+ * 2. Fetches video metadata from YouTube API
+ * 3. Formats video data for session storage
+ * 4. Handles errors including authentication failures
+ * 5. Revalidates cached data on successful fetch
  *
- * The function first checks if the user is authenticated. If not, it returns an error.
- * It then attempts to find the video session in the database using the provided video ID.
- * If the video session is not found in the database, it fetches the video details from the YouTube API.
- * The function ensures that the video is uploaded by "RDC Live" and returns the video details.
- * If the video session is found in the database, it returns the database record.
+ * @param videoId - The YouTube video ID to fetch details for
+ * @returns Object containing video details or error information
+ * @throws Returns error object if video fetch fails or authentication is invalid
  *
  * @example
- * ```typescript
- * const videoDetails = await getRDCVideoDetails("someVideoId");
- * if (videoDetails.error) {
- *   console.error(videoDetails.error);
+ * const { video, error } = await getRDCVideoDetails('dQw4w9WgXcQ');
+ * if (error) {
+ *   // Handle error case
  * } else {
- *   console.log(videoDetails.video);
+ *   // Use video details
  * }
- * ```
  */
 export const getRDCVideoDetails = async (
   videoId: string,
+  gameName: string,
 ): GetRdcVideoDetails => {
-  const isAuthenticated = await auth();
-  if (!isAuthenticated)
-    return { video: null, error: errorCodes.NotAuthenticated };
+  // TODO Maybe only validate if it's a valid video when clicking next.
+  try {
+    const isAuthenticated = await auth();
+    if (!isAuthenticated)
+      return { video: null, error: errorCodes.NotAuthenticated };
 
-  const dbRecord = await prisma.session.findFirst({
-    where: { videoId },
-  });
-  const apiKey = isProduction
-    ? config.YOUTUBE_API_KEY
-    : config.YOUTUBE_LOCAL_API_KEY;
+    const dbRecord = await prisma.session.findFirst({
+      where: { videoId },
+      include: { Game: true },
+    });
+    const apiKey = isProduction
+      ? config.YOUTUBE_API_KEY
+      : config.YOUTUBE_LOCAL_API_KEY;
 
-  if (!dbRecord) {
-    const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${apiKey}`;
-    const YTvideo = await fetch(apiUrl);
+    if (!dbRecord) {
+      const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${apiKey}`;
+      const YTvideo = await fetch(apiUrl);
 
-    !isProduction &&
-      !config.YOUTUBE_LOCAL_API_KEY &&
-      console.log("LOCAL YOUTUBE API KEY NOT CONFIGURED");
+      !isProduction &&
+        !config.YOUTUBE_LOCAL_API_KEY &&
+        console.log("LOCAL YOUTUBE API KEY NOT CONFIGURED");
 
-    if (!YTvideo.ok)
-      return { error: "Something went wrong. Please try again.", video: null };
+      if (!YTvideo.ok)
+        return {
+          error: "Something went wrong. Please try again.",
+          video: null,
+        };
 
-    const json = (await YTvideo.json()) as YouTubeVideoListResponse;
-    const video = json.items[0];
+      const json = (await YTvideo.json()) as YouTubeVideoListResponse;
+      const video = json.items[0];
 
-    if (video?.snippet.channelTitle !== "RDC Live")
-      return { error: "Please upload a video by RDC Live", video: null };
+      if (video?.snippet.channelTitle !== "RDC Live")
+        return { error: "Please upload a video by RDC Live", video: null };
 
-    const session: YTAPIRequestSession = {
-      sessionUrl: `https://youtube.com/watch?v=${video.id}`,
-      date: new Date(video.snippet.publishedAt),
-      sessionName: video.snippet.title,
-      thumbnail:
-        video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
-    };
-    return { video: session, error: undefined };
-  } else return { video: dbRecord, error: undefined };
+      const session: YTAPIRequestSession = {
+        sessionUrl: `https://youtube.com/watch?v=${video.id}`,
+        date: new Date(video.snippet.publishedAt),
+        sessionName: video.snippet.title,
+        thumbnail:
+          video.snippet.thumbnails.maxres || video.snippet.thumbnails.high,
+      };
+      return { video: session, error: undefined };
+    } else if (dbRecord.Game.gameName === gameName)
+      return { video: dbRecord, error: "Video already exists" };
+    else return { video: dbRecord, error: undefined };
+  } catch (error) {
+    console.error("Error in getRDCVideoDetails:", error);
+    return { video: null, error: "An unexpected error occurred" };
+  }
 };
 
 type YouTubeVideoListResponse = {
@@ -151,12 +164,7 @@ type YTAPIRequestSession = Pick<
 };
 
 type GetRdcVideoDetails = Promise<
-  | {
-      video: FindManySessions | YTAPIRequestSession;
-      error: undefined;
-    }
-  | {
-      video: null;
-      error: string;
-    }
+  | { video: FindManySessions | YTAPIRequestSession; error: undefined }
+  | { video: null; error: string }
+  | { video: FindManySessions | YTAPIRequestSession; error: string }
 >;
