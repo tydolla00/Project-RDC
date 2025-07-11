@@ -1,13 +1,12 @@
 "use client";
 
-import { Pie, CartesianGrid, XAxis, Bar, BarChart, PieChart } from "recharts";
+import { Pie, PieChart } from "recharts";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "./ui/card";
 import {
   ChartConfig,
@@ -28,7 +27,7 @@ export const PieChartRDC = ({
   // This Chart will rank the average of placements in each category.
   // TODO Responsive not working. May need to mess with config or use grid resizing via css.
   return (
-    <Card className="-ml-16 h-fit w-screen min-w-fit max-w-3xl transition-colors duration-500 hover:border-white md:m-auto md:w-72 lg:ml-0 lg:w-max">
+    <Card className="-ml-16 h-fit w-screen max-w-3xl min-w-fit transition-colors duration-500 hover:border-white md:m-auto md:w-72 lg:ml-0 lg:w-max">
       <CardHeader>
         <CardTitle>Sorry scale</CardTitle>
         <CardDescription>
@@ -45,36 +44,6 @@ export const PieChartRDC = ({
           </PieChart>
         </ChartContainer>
       </CardContent>
-    </Card>
-  );
-};
-
-const Chart = ({ config, data }: { config: ChartConfig; data: any[] }) => {
-  return (
-    <Card className="w-fit">
-      <CardHeader>
-        <CardTitle>3v3 Rocket League</CardTitle>
-        <CardDescription>July - Now</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={config} className="min-h-60 w-full">
-          <BarChart accessibilityLayer data={data}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="player"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-            />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent nameKey="player" />} />
-            <Bar dataKey="sorryCounter" fill="hsl(var(--chart-1))" radius={4} />
-          </BarChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter>
-        <p>Trending up by 5%</p>
-      </CardFooter>
     </Card>
   );
 };

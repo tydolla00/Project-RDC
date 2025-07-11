@@ -36,7 +36,7 @@ export default function Page() {
           <div className="flex flex-col space-y-4">
             <Button
               type="submit"
-              className="cursor-pointer focus-visible:bg-primary/90"
+              className="focus-visible:bg-primary/90 cursor-pointer"
               asChild
             >
               <Input
@@ -48,7 +48,7 @@ export default function Page() {
             </Button>
             <Button
               type="submit"
-              className="cursor-pointer focus-visible:bg-primary/90"
+              className="focus-visible:bg-primary/90 cursor-pointer"
               asChild
             >
               <Input

@@ -12,8 +12,7 @@ import {
 } from "@/components/ui/hover-card";
 import { getMembersNav } from "@/lib/constants";
 
-// TODO Revalidate Stats Once Per Week
-// TODO Show all button that displays all Members. Default is centered 3D circular card that pops up from the 'ground'
+export const revalidate = 604_800; // 1 week
 
 export default async function Page() {
   const members = await getMembersNav();
@@ -49,11 +48,11 @@ export default async function Page() {
             </HoverCardTrigger>
             <HoverCardContent align="center" side="right">
               <H3>{rdc.name}</H3>
-              <i className="leading-7 text-muted-foreground">{rdc.desc}</i>
+              <i className="text-muted-foreground leading-7">{rdc.desc}</i>
               {rdc.stats.map((stat, index) => (
                 <div key={index}>
                   <p className="mt-2 font-bold">{stat.prop}</p>
-                  <p className="mb-6 text-muted-foreground">{stat.val}</p>
+                  <p className="text-muted-foreground mb-6">{stat.val}</p>
                 </div>
               ))}
             </HoverCardContent>

@@ -8,11 +8,12 @@ import { getGamesNav } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
 import Image from "next/image";
+import prisma from "../../prisma/db";
 
 export default async function Home() {
   const games = await getGamesNav();
   const session = await auth();
-  console.log(games);
+
   return (
     <>
       <div className="m-16">
@@ -22,7 +23,7 @@ export default async function Home() {
         >
           <div className="col-span-2 md:col-span-1">
             <H1>RDC Stat Tracker</H1>
-            <p className="leading-7 text-muted-foreground md:w-3/4">
+            <p className="text-muted-foreground leading-7 md:w-3/4">
               This site is dedicated to tracking and celebrating the gaming
               stats and achievements of RDC (Real Dreams Change the World). As a
               fan of their incredible teamwork and drive, I created this space
@@ -45,7 +46,7 @@ export default async function Home() {
           </div>
           <PieChartRDC config={config} data={data} />
         </div>
-        <H2 className="mx-auto mb-6 mt-40 w-fit text-chart-4 md:my-10">
+        <H2 className="text-chart-4 mx-auto mt-40 mb-6 w-fit md:my-10">
           Games
         </H2>
         <div className="flex flex-wrap justify-center gap-10">
@@ -62,7 +63,7 @@ export default async function Home() {
                       alt=""
                       src={game.src || ""}
                     />
-                    <CardHeader className="relative h-1/4 bg-black bg-opacity-50">
+                    <CardHeader className="relative h-1/4 bg-black/50">
                       <CardTitle className="absolute font-extrabold text-white opacity-100">
                         {game.name}
                       </CardTitle>
@@ -79,7 +80,7 @@ export default async function Home() {
           user={session}
           shouldRedirect={false}
         >
-          <H2 className="mx-auto my-10 w-fit text-chart-4">Want to Help</H2>
+          <H2 className="text-chart-4 mx-auto my-10 w-fit">Want to Help</H2>
           <Card className="mx-auto md:w-1/2">
             <CardHeader>
               <p>
@@ -109,46 +110,46 @@ const data = [
     player: "mark",
     sorryCounter: 100,
     sorryScale: 0.15,
-    fill: "hsl(var(--chart-1))",
+    fill: "blue",
   },
   {
     player: "leland",
     sorryCounter: 50,
     sorryScale: 0.15,
-    fill: "hsl(var(--chart-2))",
+    fill: "purple",
   },
   {
     player: "ben",
     sorryCounter: 50,
     sorryScale: 0.3,
-    fill: "hsl(var(--chart-3))",
+    fill: "green",
   },
   {
     player: "john",
     sorryCounter: 20,
     sorryScale: 0.05,
-    fill: "hsl(var(--chart-4))",
+    fill: "skyblue",
   },
   {
     player: "aff",
     sorryCounter: 10,
     sorryScale: 0.3,
-    fill: "hsl(var(--chart-5))",
+    fill: "orange",
   },
   {
     player: "dylan",
     sorryCounter: 30,
     sorryScale: 0.05,
-    fill: "green",
+    fill: "red",
   },
 ];
 
 const config = {
   player: { label: "Player" },
-  mark: { label: "Mark", color: "hsl(var(--chart-1))" },
-  ben: { label: "Ben", color: "hsl(var(--chart-2))" },
-  leland: { label: "Leland", color: "hsl(var(--chart-3))" },
-  john: { label: "John", color: "hsl(var(--chart-4))" },
-  aff: { label: "Aff", color: "hsl(var(--chart-5))" },
-  dylan: { label: "Dylan", color: "green" },
+  mark: { label: "Mark", color: "blue" },
+  ben: { label: "Ben", color: "yellow" },
+  leland: { label: "Leland", color: "red" },
+  john: { label: "John", color: "purple" },
+  aff: { label: "Aff", color: "orange" },
+  dylan: { label: "Dylan", color: "blue" },
 } satisfies ChartConfig;
