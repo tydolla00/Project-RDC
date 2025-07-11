@@ -233,16 +233,47 @@ const speedrunnersSchema = baseSessionSchema.extend({
   game: z.literal("Speedrunners"),
 });
 // Other game schemas...
-const defaultGameSchema = baseSessionSchema.extend({
+const codSchema = baseSessionSchema.extend({
   game: z.literal("Call of Duty"),
-  sets: setsSchema,
+  sets: z.array(
+    setSchema.extend({
+      matches: z.array(matchSchema).refine(
+        (data) => {
+          return data.every((match, i) => {
+            const playerScores = new Map<string, number>();
+            // Ensure there's exactly one match winner
+            if (match.matchWinners.length !== 1) return false;
+
+            // Ensure the match winner has the highest score
+            let highestScore = 0;
+            match.playerSessions.forEach((ps) => {
+              ps.playerStats.forEach((stat) => {
+                if (stat.stat === $Enums.StatName.COD_SCORE) {
+                  const score = parseInt(stat.statValue) || 0;
+                  if (score > highestScore) highestScore = score;
+
+                  playerScores.set(ps.playerId.toString(), score);
+                }
+              });
+            });
+
+            return (
+              playerScores.get(match.matchWinners[0].playerId.toString()) ===
+              highestScore
+            );
+          });
+        },
+        { error: "The match winner must have the highest score." },
+      ),
+    }),
+  ),
 });
 
 // ! End of Game specific schemas
 
 // Combined schema with discriminated union
 export const formSchema = z.discriminatedUnion("game", [
-  defaultGameSchema,
+  codSchema,
   rocketLeagueSchema,
   marioKart8MatchSchema,
   lethalCompanySchema,
