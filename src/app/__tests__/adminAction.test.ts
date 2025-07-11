@@ -28,25 +28,25 @@ describe("adminAction tests", () => {
       (prisma.playerStat.create as jest.Mock).mockResolvedValue({});
 
       const session: Parameters<typeof insertNewSessionFromAdmin>["0"] = {
-        game: "Game Name",
+        game: "Call of Duty",
         sessionName: "Session Name",
         sessionUrl: "http://example.com",
         thumbnail: "http://example.com/thumbnail.jpg",
         date: new Date("2023-10-01"),
         videoId: "video123",
-        players: [{ playerId: 1, playerName: "Player 1" }],
+        players: [{ playerId: 1, playerName: "Ben" }],
         sets: [
           {
             setId: 1,
-            setWinners: [{ playerId: 1, playerName: "Player 1" }],
+            setWinners: [{ playerId: 1, playerName: "Ben" }],
             matches: [
               {
-                matchWinners: [{ playerId: 1, playerName: "Player 1" }],
+                matchWinners: [{ playerId: 1, playerName: "Ben" }],
                 playerSessions: [
                   {
                     playerId: 1,
                     playerStats: [
-                      { statId: "1", stat: "Score", statValue: "100" },
+                      { statId: "1", stat: "COD_SCORE", statValue: "100" },
                     ],
                     playerSessionName: "",
                   },
@@ -65,14 +65,14 @@ describe("adminAction tests", () => {
       (auth as jest.Mock).mockResolvedValue(false);
 
       const session: Parameters<typeof insertNewSessionFromAdmin>["0"] = {
-        game: "Game Name",
+        game: "Call of Duty",
         sessionName: "Session Name",
         sessionUrl: "http://example.com",
         thumbnail: "http://example.com/thumbnail.jpg",
         date: new Date("2023-10-01"),
         videoId: "video123",
         sets: [],
-        players: [{ playerId: 1, playerName: "Player 1" }],
+        players: [{ playerId: 1, playerName: "Ben" }],
       };
 
       const result = await insertNewSessionFromAdmin(session);
@@ -84,14 +84,14 @@ describe("adminAction tests", () => {
       (prisma.game.findFirst as jest.Mock).mockResolvedValue(null);
 
       const session: Parameters<typeof insertNewSessionFromAdmin>["0"] = {
-        game: "Game Name",
+        game: "Call of Duty",
         sessionName: "Session Name",
         sessionUrl: "http://example.com",
         thumbnail: "http://example.com/thumbnail.jpg",
         date: new Date("2023-10-01"),
         videoId: "video123",
         sets: [],
-        players: [{ playerId: 1, playerName: "Player 1" }],
+        players: [{ playerId: 1, playerName: "Ben" }],
       };
 
       const result = await insertNewSessionFromAdmin(session);
@@ -104,14 +104,14 @@ describe("adminAction tests", () => {
       (prisma.session.findFirst as jest.Mock).mockResolvedValue({});
 
       const session: Parameters<typeof insertNewSessionFromAdmin>["0"] = {
-        game: "Game Name",
+        game: "Call of Duty",
         sessionName: "Session Name",
         sessionUrl: "http://example.com",
         thumbnail: "http://example.com/thumbnail.jpg",
         date: new Date("2023-10-01"),
         videoId: "video123",
         sets: [],
-        players: [{ playerId: 1, playerName: "Player 1" }],
+        players: [{ playerId: 1, playerName: "Ben" }],
       };
 
       const result = await insertNewSessionFromAdmin(session);
