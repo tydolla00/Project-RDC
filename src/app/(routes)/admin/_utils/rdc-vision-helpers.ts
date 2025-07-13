@@ -16,100 +16,71 @@ export const handleAnalyzeBtnClick = async (
   gameName: string,
   onSuccessClose?: () => void,
 ): Promise<void> => {
+  if (!state.selectedFile) return;
+
+  dispatch({
+    type: "UPDATE_VISION",
+    visionStatus: null,
+    visionMsg: "Analyzing...",
+    loading: true,
+  });
+
   try {
-    if (!state.selectedFile) return;
-
-    dispatch({
-      type: "UPDATE_VISION",
-      visionStatus: null,
-      visionMsg: "Analyzing...",
-      loading: true,
-    });
-
-    const base64FileContent = await getFileAsBase64(state.selectedFile);
-
-    // Get game ID with error handling
-    let gameId: number;
-    try {
-      gameId = await getGameIdFromName(gameName);
-      if (!gameId) {
-        throw new Error(`Game "${gameName}" not found`);
-      }
-    } catch (error) {
-      console.error("Failed to get game ID:", error);
-      dispatch({
-        type: "UPDATE_VISION",
-        visionStatus: VisionResultCodes.Failed,
-        visionMsg: `Unable to find game "${gameName}". Please verify the game name is correct.`,
-        loading: false,
-      });
-      toast.error(`Game "${gameName}" not found`, { richColors: true });
-      return;
-    }
-
-    if (!base64FileContent) {
-      toast.error("Unknown error has occurred, please try again.", {
-        richColors: true,
-      });
-      return;
-    }
+    // Run independent async operations in parallel
+    const [base64FileContent, gameId] = await Promise.all([
+      getFileAsBase64(state.selectedFile),
+      getGameIdFromName(gameName),
+    ]);
 
     const analysisResults = await analyzeScreenShot(
       base64FileContent,
       sessionPlayers,
-      gameId, // TODO: This should be from the selected game
+      gameId,
     );
 
     console.log("analysis Results: ", analysisResults);
 
+    // Handle success and check-request cases first
+    if (
+      analysisResults.status === VisionResultCodes.Success ||
+      analysisResults.status === VisionResultCodes.CheckRequest
+    ) {
+      handleCreateMatchFromVision(
+        analysisResults.data.players,
+        analysisResults.data.winner || [],
+      );
+    }
+
+    // Update UI based on status
+    dispatch({
+      type: "UPDATE_VISION",
+      visionStatus: analysisResults.status,
+      visionMsg: analysisResults.message,
+    });
+
+    // Show toast notifications
     switch (analysisResults.status) {
       case VisionResultCodes.Success:
-        handleCreateMatchFromVision(
-          analysisResults.data.players,
-          analysisResults.data.winner || [],
-        );
-        dispatch({
-          type: "UPDATE_VISION",
-          visionStatus: VisionResultCodes.Success,
-          visionMsg: analysisResults.message,
-        });
         toast.success("Success", { richColors: true });
-        // Only close modal on success
-        if (onSuccessClose) onSuccessClose();
+        if (onSuccessClose) onSuccessClose(); // Close modal only on success
         break;
       case VisionResultCodes.CheckRequest:
-        handleCreateMatchFromVision(
-          analysisResults.data.players,
-          analysisResults.data.winner || [],
-        );
-        dispatch({
-          type: "UPDATE_VISION",
-          visionStatus: VisionResultCodes.CheckRequest,
-          visionMsg: analysisResults.message,
-        });
         toast.warning(analysisResults.message, { richColors: true });
         break;
       case VisionResultCodes.Failed:
-        dispatch({
-          type: "UPDATE_VISION",
-          visionStatus: VisionResultCodes.Failed,
-          visionMsg: analysisResults.message,
-        });
         toast.error(analysisResults.message, { richColors: true });
         break;
-      default:
-        break;
     }
-
-    handleClose(state.previewUrl, dispatch);
   } catch (error) {
     console.error("Error in handleAnalyzeBtnClick: ", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred.";
     dispatch({
       type: "UPDATE_VISION",
       visionStatus: VisionResultCodes.Failed,
-      visionMsg: "An error occurred",
-      loading: false,
+      visionMsg: errorMessage,
     });
+    toast.error(errorMessage, { richColors: true });
   } finally {
     dispatch({ type: "UPDATE_LOADING", loading: false });
   }
@@ -125,25 +96,20 @@ export const handleClose = (
   dispatch({ type: "RESET" });
 };
 
-const getFileAsBase64 = async (selectedFile: File) => {
-  const reader = new FileReader();
-
-  const readFile = () =>
-    new Promise((resolve, reject) => {
-      reader.onload = async (e) => resolve(e.target?.result);
-      reader.onerror = (error) => reject(error);
-      reader.readAsArrayBuffer(selectedFile!);
-    });
-  const fileContent = await readFile();
-
-  if (!fileContent) {
-    console.error("Error reading file content");
-    return;
-  }
-
-  const base64FileContent = Buffer.from(fileContent as ArrayBuffer).toString(
-    "base64",
-  );
-
-  return base64FileContent;
+const getFileAsBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      // result is "data:image/png;base64,iVBORw0KGgo..."
+      // We need to extract just the base64 part
+      const base64 = (reader.result as string)?.split(",")[1];
+      if (base64) {
+        resolve(base64);
+      } else {
+        reject(new Error("Could not extract base64 string from file."));
+      }
+    };
+    reader.onerror = (error) => reject(error);
+  });
 };
