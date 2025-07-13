@@ -117,6 +117,29 @@ describe("adminAction tests", () => {
       const result = await insertNewSessionFromAdmin(session);
       expect(result).toEqual({ error: "Video already exists." });
     });
+
+    it("should return a generic error if an exception is thrown", async () => {
+      (auth as jest.Mock).mockResolvedValue(true);
+      (prisma.game.findFirst as jest.Mock).mockImplementation(() => {
+        throw new Error("Unexpected error");
+      });
+
+      const session: Parameters<typeof insertNewSessionFromAdmin>["0"] = {
+        game: "Call of Duty",
+        sessionName: "Session Name",
+        sessionUrl: "http://example.com",
+        thumbnail: "http://example.com/thumbnail.jpg",
+        date: new Date("2023-10-01"),
+        videoId: "video123",
+        sets: [],
+        players: [{ playerId: 1, playerName: "Ben" }],
+      };
+
+      const result = await insertNewSessionFromAdmin(session);
+      expect(result).toEqual({
+        error: "Unknown error occurred. Please try again.",
+      });
+    });
   });
 
   // describe("insertNewSessionV2", () => {

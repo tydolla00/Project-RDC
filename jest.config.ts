@@ -10,13 +10,12 @@ const createJestConfig = nextJest({
 const config: Config = {
   coverageProvider: "v8",
   testEnvironment: "jest-fixed-jsdom",
-  // moduleNameMapper: {
-  //   components: "./src/components",
-  //   utils: "./src/lib/utils.ts",
-  //   ui: "./src/components/ui",
-  //   lib: "./src/lib",
-  //   hooks: "./src/hooks",
-  // },
+  moduleNameMapper: {
+    "^@/components/(.*)$": "<rootDir>/src/components/$1",
+    "^@/lib/(.*)$": "<rootDir>/src/lib/$1",
+    "^@/hooks/(.*)$": "<rootDir>/src/hooks/$1",
+    "^@/(.*)$": "<rootDir>/src/$1",
+  },
   // Add more setup options before each test is run
   // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 };
