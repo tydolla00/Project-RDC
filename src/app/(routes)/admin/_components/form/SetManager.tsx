@@ -73,11 +73,10 @@ const SetManager = () => {
         fields.map((set, setIndex) => {
           // Get errors for this set
           const setError = errors.sets?.[setIndex];
-          console.log(setError);
           return (
             <Collapsible open={openSets[setIndex]} key={set.setId}>
               <Card className="flex flex-col space-y-3 rounded-lg p-6 shadow-lg">
-                <CardHeader className="flex flex-row justify-between space-y-0 pb-0 pl-0 pr-0">
+                <CardHeader className="flex flex-row justify-between space-y-0 pr-0 pb-0 pl-0">
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
                   </div>
@@ -114,7 +113,7 @@ const SetManager = () => {
                 </CollapsibleContent>
                 {/* TODO Surface Set Level Error Messages Here */}
                 {setError && setError.matches && (
-                  <div className="text-sm text-red-500">
+                  <div className="text-destructive text-sm">
                     {setError.matches.root?.message}
                   </div>
                 )}
