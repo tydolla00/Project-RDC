@@ -18,7 +18,11 @@ interface Props {
 }
 
 const MatchManager = (props: Props) => {
-  const { control, getValues } = useFormContext<FormValues>();
+  const {
+    control,
+    getValues,
+    formState: { errors },
+  } = useFormContext<FormValues>();
   const { setIndex } = props;
   const { append, remove, fields } = useFieldArray({
     name: `sets.${setIndex}.matches`,
@@ -98,6 +102,8 @@ const MatchManager = (props: Props) => {
         </div>
       )) ||
         fields.map((match, matchIndex) => {
+          const matchError =
+            errors.sets?.[setIndex]?.matches?.[matchIndex]?.message;
           return (
             <div key={match.id} className="my-5 flex flex-col justify-between">
               <div id="match-manager-header" className="flex justify-between">
@@ -135,6 +141,9 @@ const MatchManager = (props: Props) => {
                 matchIndex={matchIndex}
                 players={players}
               />
+              {matchError && (
+                <div className="text-destructive text-sm">{matchError}</div>
+              )}
             </div>
           );
         })}

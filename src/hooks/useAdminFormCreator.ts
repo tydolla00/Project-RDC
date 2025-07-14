@@ -6,6 +6,26 @@ import { EnrichedMatch } from "../../prisma/types/match";
 import { Player } from "@prisma/client";
 import { EnrichedPlayerSession } from "../../prisma/types/playerSession";
 
+/**
+ * Custom hook for managing admin form state and operations
+ *
+ * @description
+ * This hook provides:
+ * 1. Session state management and counter generation
+ * 2. Methods for adding/updating sets, matches, and player sessions
+ * 3. Player session creation with automatic ID generation
+ * 4. Match winner handling and validation
+ * 5. Set state management with proper session association
+ *
+ * The hook maintains internal counters for generating temporary IDs until
+ * the data is persisted to the database. These IDs are used to maintain
+ * relationships between entities during form editing.
+ *
+ * @returns An object containing:
+ * - session state and modifiers
+ * - methods for managing sets, matches and player sessions
+ * - counter states for ID generation
+ */
 const useAdminFormCreator = () => {
   const [session, setSession] = useState<
     Omit<

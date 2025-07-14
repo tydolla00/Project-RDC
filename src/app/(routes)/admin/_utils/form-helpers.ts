@@ -64,9 +64,8 @@ const rocketLeagueStats = z.object({
   statValue: z
     .string()
     .trim()
-    .min(1, "Stat value is required")
+    .min(1, "Required")
     .regex(/^\d+$/, "Stat value must be a number")
-    .nonempty("Required")
     .transform((val) => String(parseInt(val) || 0)),
 });
 
@@ -78,7 +77,7 @@ const marioKart8Stats = z.object({
   statValue: z
     .string()
     .trim()
-    .min(1, "Stat value is required")
+    .min(1, "Required")
     .regex(/^\d+$/, "Stat value must be a number")
     .transform((val) => String(parseInt(val) || 0)),
 });
@@ -96,7 +95,7 @@ const codStats = z.object({
   statValue: z
     .string()
     .trim()
-    .min(1, "Stat value is required")
+    .min(1, "Required")
     .regex(/^\d+$/, "Stat value must be a number")
     .transform((val) => String(parseInt(val) || 0)),
 });
@@ -162,34 +161,32 @@ const rocketLeagueSchema = baseSessionSchema.extend({
   sets: z
     .array(
       setSchema.extend({
-        matches: z.array(matchSchema).refine(
-          (data) => {
-            return data.every((match, i) => {
-              let winningTeam = 0;
-              let losingTeam = 0;
+        matches: z.array(
+          matchSchema.check((ctx) => {
+            const match = ctx.value;
+            let winningTeam = 0;
+            let losingTeam = 0;
 
-              match.playerSessions.forEach((ps) => {
-                const onWinningTeam = match.matchWinners.some(
-                  (mw) => mw.playerId === ps.playerId,
-                );
-                ps.playerStats.forEach((stat) => {
-                  if (stat.stat === $Enums.StatName.RL_GOALS) {
-                    if (onWinningTeam)
-                      winningTeam += Number(stat.statValue) || 0;
-                    else losingTeam += Number(stat.statValue) || 0;
-                  }
-                });
+            match.playerSessions.forEach((ps) => {
+              const onWinningTeam = match.matchWinners.some(
+                (mw) => mw.playerId === ps.playerId,
+              );
+              ps.playerStats.forEach((stat) => {
+                if (stat.stat === $Enums.StatName.RL_GOALS) {
+                  if (onWinningTeam) winningTeam += Number(stat.statValue) || 0;
+                  else losingTeam += Number(stat.statValue) || 0;
+                }
               });
-              if (winningTeam <= losingTeam)
-                console.warn(
-                  `Error in match ${i + 1}. Winning team should have more goals. Winners: ${winningTeam} Losers: ${losingTeam}`,
-                );
-              return winningTeam > losingTeam;
             });
-          },
-          {
-            message: "Winning team should have more goals in each match",
-          },
+
+            // Rule: Winning team must have more goals than losing team
+            if (winningTeam <= losingTeam)
+              ctx.issues.push({
+                code: "custom",
+                input: ctx.value,
+                message: "Winning team must have more goals than losing team.",
+              });
+          }),
         ),
       }),
     )
@@ -200,26 +197,49 @@ const marioKart8MatchSchema = baseSessionSchema.extend({
   game: z.literal("Mario Kart 8"),
   sets: z.array(
     setSchema.extend({
-      matches: z.array(matchSchema).refine(
-        (data) => {
-          return data.every((match, i) => {
-            let passed = true;
-            match.playerSessions.forEach((ps) => {
-              ps.playerStats.forEach((stat) => {
-                if (
-                  stat.stat === $Enums.StatName.MK8_POS &&
-                  parseInt(stat.statValue) === 1
-                ) {
-                  passed =
-                    match.matchWinners.length === 1 &&
-                    match.matchWinners.some((p) => p.playerId === ps.playerId);
-                }
-              });
+      matches: z.array(
+        matchSchema.check((ctx) => {
+          const match = ctx.value;
+          // Rule 1: Check if exactly one winner is selected
+          if (match.matchWinners.length !== 1)
+            ctx.issues.push({
+              code: "custom",
+              message: "A match must have exactly one winner.",
+              input: ctx.value,
             });
-            return passed;
+
+          const firstPlace: number[] = [];
+
+          const winnerId = match.matchWinners.at(0)?.playerId;
+          let highestPosition = [0, Infinity] as [number, number]; // playerId, position
+          match.playerSessions.forEach((ps) => {
+            ps.playerStats.forEach((stat) => {
+              if (stat.stat === $Enums.StatName.MK8_POS) {
+                const position = parseInt(stat.statValue);
+                if (position === 1) firstPlace.push(ps.playerId);
+                if (position < highestPosition[1])
+                  highestPosition = [ps.playerId, position];
+              }
+            });
           });
-        },
-        { error: "The first placed player must be the only match winner." },
+
+          // Rule 2: Check if there is more than one first place player
+          if (firstPlace.length > 1) {
+            ctx.issues.push({
+              code: "custom",
+              message: "There can be only one 1st place player.",
+              input: ctx.value,
+            });
+          }
+          // Rule 3: Check if the winner has the highest position
+          if (highestPosition[0] !== winnerId)
+            ctx.issues.push({
+              code: "custom",
+              message:
+                "The 1st place player and match winner must have the highest position.",
+              input: ctx.value,
+            });
+        }),
       ),
     }),
   ),
@@ -233,16 +253,83 @@ const speedrunnersSchema = baseSessionSchema.extend({
   game: z.literal("Speedrunners"),
 });
 // Other game schemas...
-const defaultGameSchema = baseSessionSchema.extend({
+const codSchema = baseSessionSchema.extend({
   game: z.literal("Call of Duty"),
-  sets: setsSchema,
+  sets: z.array(
+    setSchema.extend({
+      matches: z.array(
+        matchSchema.check((ctx) => {
+          const match = ctx.value;
+          // Rule 1: Check if exactly one winner is selected
+          if (match.matchWinners.length !== 1)
+            ctx.issues.push({
+              code: "custom",
+              message: "A match must have exactly one winner.",
+              path: ["matchWinners"],
+              input: ctx.value,
+            });
+
+          const firstPlace: number[] = [];
+
+          const winnerId = match.matchWinners.at(0)?.playerId;
+          const winner = { winnerId, score: 0, position: 0 };
+          let highestScoreOverall = 0;
+
+          match.playerSessions.forEach((ps) => {
+            ps.playerStats.forEach((stat) => {
+              if (stat.stat === $Enums.StatName.COD_SCORE) {
+                const score = parseInt(stat.statValue) || 0;
+                highestScoreOverall = Math.max(highestScoreOverall, score);
+                if (ps.playerId === winnerId) {
+                  winner.score = score;
+                }
+              }
+              if (
+                stat.stat === $Enums.StatName.COD_POS &&
+                parseInt(stat.statValue) === 1
+              ) {
+                winner.position = parseInt(stat.statValue) || 0;
+                firstPlace.push(ps.playerId);
+              }
+            });
+          });
+
+          // Rule 2: Ensure there's only one first place player
+          if (firstPlace.length > 1)
+            ctx.issues.push({
+              code: "custom",
+              message: "There can be only one 1st place player.",
+              input: ctx.value,
+            });
+
+          // Rule 3: Ensure the match winner has the highest score
+          if (winner.score < highestScoreOverall)
+            ctx.issues.push({
+              code: "custom",
+              message: "The match winner must have the highest score.",
+              path: ["matchWinners"],
+              input: ctx.value,
+            });
+
+          // Rule 4: Ensure the match winner is in first place
+          if (!firstPlace.includes(winnerId || Infinity))
+            ctx.issues.push({
+              code: "custom",
+              message: "The match winner must be in first place.",
+              path: ["matchWinners"],
+              input: ctx.value,
+            });
+        }),
+      ),
+    }),
+  ),
 });
 
 // ! End of Game specific schemas
 
 // Combined schema with discriminated union
 export const formSchema = z.discriminatedUnion("game", [
-  defaultGameSchema,
+  codSchema,
   rocketLeagueSchema,
   marioKart8MatchSchema,
   lethalCompanySchema,
