@@ -137,62 +137,64 @@ const SetNavigation = ({
 const getSetsData = (session: Sessions[0]) => {
   switch (session.Game.gameName) {
     case "Rocket League":
-      const innerSets: RLStats[][][] = [];
-      session?.sets.forEach((set) => {
-        const setWinners = set.setWinners.map((p) => p.playerName);
-        const innerSet: RLStats[][] = [];
-        set.matches.forEach((match) => {
-          const matchWinners = new Set(
-            match.matchWinners.map((m) => m.playerName),
-          );
-          const innerMatch = new Map<string, RLStats>();
-          match.playerSessions.forEach((ps) => {
-            ps.playerStats.forEach(({ player, value, gameStat }) => {
-              if (!innerMatch.has(player.playerName))
-                innerMatch.set(player.playerName, {
-                  score: 0,
-                  goals: 0,
-                  assists: 0,
-                  saves: 0,
-                  shots: 0,
-                  player: player.playerName,
-                  winners: setWinners,
-                });
+      {
+        const innerSets: RLStats[][][] = [];
+        session?.sets.forEach((set) => {
+          const setWinners = set.setWinners.map((p) => p.playerName);
+          const innerSet: RLStats[][] = [];
+          set.matches.forEach((match) => {
+            const matchWinners = new Set(
+              match.matchWinners.map((m) => m.playerName),
+            );
+            const innerMatch = new Map<string, RLStats>();
+            match.playerSessions.forEach((ps) => {
+              ps.playerStats.forEach(({ player, value, gameStat }) => {
+                if (!innerMatch.has(player.playerName))
+                  innerMatch.set(player.playerName, {
+                    score: 0,
+                    goals: 0,
+                    assists: 0,
+                    saves: 0,
+                    shots: 0,
+                    player: player.playerName,
+                    winners: setWinners,
+                  });
 
-              let innerPlayer = innerMatch.get(player.playerName)!;
-              switch (gameStat.statName) {
-                case "RL_SCORE":
-                  innerPlayer.score = Number(value);
-                  break;
-                case "RL_GOALS":
-                  innerPlayer.goals = Number(value);
-                  break;
-                case "RL_ASSISTS":
-                  innerPlayer.assists = Number(value);
-                  break;
-                case "RL_SAVES":
-                  innerPlayer.saves = Number(value);
-                  break;
-                case "RL_SHOTS":
-                  innerPlayer.shots = Number(value);
-                  break;
-              }
+                let innerPlayer = innerMatch.get(player.playerName)!;
+                switch (gameStat.statName) {
+                  case "RL_SCORE":
+                    innerPlayer.score = Number(value);
+                    break;
+                  case "RL_GOALS":
+                    innerPlayer.goals = Number(value);
+                    break;
+                  case "RL_ASSISTS":
+                    innerPlayer.assists = Number(value);
+                    break;
+                  case "RL_SAVES":
+                    innerPlayer.saves = Number(value);
+                    break;
+                  case "RL_SHOTS":
+                    innerPlayer.shots = Number(value);
+                    break;
+                }
+              });
             });
+            const matchData = Array.from(innerMatch, ([_, stats]) => ({
+              ...stats,
+            })).sort((a, b) => {
+              if (matchWinners.has(a.player) && matchWinners.has(b.player))
+                return b.score - a.score;
+              else if (matchWinners.has(a.player)) return -1;
+              else if (matchWinners.has(b.player)) return 1;
+              else return b.score - a.score;
+            });
+            innerSet.push(matchData);
           });
-          const matchData = Array.from(innerMatch, ([s, stats]) => ({
-            ...stats,
-          })).sort((a, b) => {
-            if (matchWinners.has(a.player) && matchWinners.has(b.player))
-              return b.score - a.score;
-            else if (matchWinners.has(a.player)) return -1;
-            else if (matchWinners.has(b.player)) return 1;
-            else return b.score - a.score;
-          });
-          innerSet.push(matchData);
+          innerSets.push(innerSet);
         });
-        innerSets.push(innerSet);
-      });
-      return innerSets;
+        return innerSets;
+      }
     case "Mario Kart 8":
       type MarioKartStats = {
         player: string;
