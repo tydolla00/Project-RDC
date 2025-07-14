@@ -195,7 +195,7 @@ const getSetsData = (session: Sessions[0]) => {
         });
         return innerSets;
       }
-    case "Mario Kart 8":
+    case "Mario Kart 8": {
       type MarioKartStats = {
         player: string;
         position: number;
@@ -235,6 +235,7 @@ const getSetsData = (session: Sessions[0]) => {
         mkSets.push(innerSet);
       });
       return mkSets;
+    }
     default:
       return [];
   }
