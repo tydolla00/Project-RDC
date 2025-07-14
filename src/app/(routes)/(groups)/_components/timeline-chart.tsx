@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { getAllSessionsByGame } from "../../../../../prisma/lib/admin";
+import { getAllSessionsByGame } from "prisma/lib/admin";
 import Image from "next/image";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -135,7 +135,7 @@ export function TimelineChart({
             <CardDescription>{desc}</CardDescription>
           </div>
           <div className="flex items-center justify-center gap-3 p-6">
-            <Label htmlFor="showMatchData">Disable hover effects</Label>
+            <Label htmlFor="showMatchData">Toggle hover effects</Label>
             <Switch
               id="showMatchData"
               onCheckedChange={(val) => {
@@ -218,15 +218,15 @@ const CustomTooltip = ({
   setSession: (session: Sessions[0]) => void;
   showMatchData: boolean;
 }) => {
-  const session = payload?.at(0)?.payload as Sessions[0];
+  const session = payload?.at(0)?.payload as Sessions[0] | undefined;
   useEffect(() => {
-    if (active && showMatchData) {
+    if (active && showMatchData && session) {
       console.log(showMatchData);
       setSession(session);
     }
   }, [active, session, setSession]);
 
-  if (active) {
+  if (active && session) {
     return (
       <div className="max-w-48 flex-wrap rounded-md p-2 shadow-md">
         <Card>

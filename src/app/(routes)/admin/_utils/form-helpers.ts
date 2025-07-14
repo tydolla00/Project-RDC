@@ -282,14 +282,15 @@ const codSchema = baseSessionSchema.extend({
                 highestScoreOverall = Math.max(highestScoreOverall, score);
                 if (ps.playerId === winnerId) {
                   winner.score = score;
-                  winner.position = parseInt(stat.statValue) || 0;
                 }
               }
               if (
                 stat.stat === $Enums.StatName.COD_POS &&
                 parseInt(stat.statValue) === 1
-              )
+              ) {
+                winner.position = parseInt(stat.statValue) || 0;
                 firstPlace.push(ps.playerId);
+              }
             });
           });
 
