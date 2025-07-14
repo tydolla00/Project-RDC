@@ -246,11 +246,11 @@ export const insertNewSessionFromAdmin = async (
                       }
 
                       // If gameStat is still not found, throw an error
-                      if (true)
-                        throw new Error(
-                          `GameStat not found: ${playerStat.stat}`,
-                        );
-
+      // If gameStat is still not found, throw an error
+      if (!gameStat)
+        throw new Error(
+          `GameStat not found: ${playerStat.stat}`,
+        );
                       console.log(
                         "PlayerSessionId: ",
                         newPlayerSession.playerSessionId,
