@@ -1,9 +1,17 @@
 import { useMemo, useState } from "react";
 import { RLStats } from "./timeline-chart";
 import { getAllSessionsByGame } from "../../../../../prisma/lib/admin";
-import { Button } from "@/components/ui/button";
 import SetData from "./set-data";
 import { QueryResponseData } from "../../../../../prisma/db";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 type Sessions = QueryResponseData<
   Awaited<ReturnType<typeof getAllSessionsByGame>>
@@ -15,12 +23,12 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
     return getSetsData(session);
   }, [session]);
   const [currentSet, setCurrentSet] = useState(0);
-  console.log({ sets });
+
   return (
     <div className="my-6">
       {sets.length > 0 && (
         <>
-          <NavigationButtons
+          <SetNavigation
             currentSet={currentSet}
             setCurrentSet={setCurrentSet}
             maxSets={sets.length}
@@ -30,7 +38,7 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
             setIndex={currentSet}
             game={session?.Game.gameName}
           />
-          <NavigationButtons
+          <SetNavigation
             currentSet={currentSet}
             setCurrentSet={setCurrentSet}
             maxSets={sets.length}
@@ -42,7 +50,7 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
 };
 export default MatchData;
 
-const NavigationButtons = ({
+const SetNavigation = ({
   currentSet,
   setCurrentSet,
   maxSets,
@@ -50,26 +58,81 @@ const NavigationButtons = ({
   currentSet: number;
   setCurrentSet: React.Dispatch<React.SetStateAction<number>>;
   maxSets: number;
-}) => (
-  <div>
-    <Button
-      className="cursor-pointer"
-      variant="ghost"
-      disabled={currentSet === 0}
-      onClick={() => setCurrentSet((curr) => curr - 1)}
-    >
-      Previous Set
-    </Button>
-    <Button
-      className="cursor-pointer"
-      variant="ghost"
-      disabled={currentSet === maxSets - 1}
-      onClick={() => setCurrentSet((curr) => curr + 1)}
-    >
-      Next Set
-    </Button>
-  </div>
-);
+}) => {
+  const getSetNumbers = () => {
+    const numbers: (number | "...")[] = [];
+    const currentPage = currentSet + 1;
+    const totalPages = maxSets;
+
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    numbers.push(1);
+
+    if (currentPage <= 3) {
+      numbers.push(2, 3, "...", totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      numbers.push("...", totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      numbers.push(
+        "...",
+        currentPage - 1,
+        currentPage,
+        currentPage + 1,
+        "...",
+        totalPages,
+      );
+    }
+
+    return numbers;
+  };
+
+  return (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            onClick={() => currentSet > 0 && setCurrentSet((curr) => curr - 1)}
+            className={currentSet === 0 ? "pointer-events-none opacity-50" : ""}
+          />
+        </PaginationItem>
+
+        {getSetNumbers().map((setNumber, index) => {
+          if (setNumber === "...") {
+            return (
+              <PaginationItem key={`ellipsis-${index}`}>
+                <PaginationEllipsis />
+              </PaginationItem>
+            );
+          }
+
+          return (
+            <PaginationItem key={setNumber}>
+              <PaginationLink
+                onClick={() => setCurrentSet(setNumber - 1)}
+                isActive={currentSet === setNumber - 1}
+              >
+                {setNumber}
+              </PaginationLink>
+            </PaginationItem>
+          );
+        })}
+
+        <PaginationItem>
+          <PaginationNext
+            onClick={() =>
+              currentSet < maxSets - 1 && setCurrentSet((curr) => curr + 1)
+            }
+            className={
+              currentSet === maxSets - 1 ? "pointer-events-none opacity-50" : ""
+            }
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  );
+};
 
 const getSetsData = (session: Sessions[0]) => {
   switch (session.Game.gameName) {
