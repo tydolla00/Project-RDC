@@ -273,7 +273,6 @@ const codSchema = baseSessionSchema.extend({
 
           const winnerId = match.matchWinners.at(0)?.playerId;
           const winner = { winnerId, score: 0, position: 0 };
-          let winnerScore = 0;
           let highestScoreOverall = 0;
 
           match.playerSessions.forEach((ps) => {
@@ -303,7 +302,7 @@ const codSchema = baseSessionSchema.extend({
             });
 
           // Rule 3: Ensure the match winner has the highest score
-          if (winnerScore < highestScoreOverall)
+          if (winner.score < highestScoreOverall)
             ctx.issues.push({
               code: "custom",
               message: "The match winner must have the highest score.",
@@ -312,7 +311,7 @@ const codSchema = baseSessionSchema.extend({
             });
 
           // Rule 4: Ensure the match winner is in first place
-          if (firstPlace.at(0) !== winnerId)
+          if (!firstPlace.includes(winnerId || Infinity))
             ctx.issues.push({
               code: "custom",
               message: "The match winner must be in first place.",
