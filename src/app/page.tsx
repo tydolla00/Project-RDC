@@ -8,19 +8,14 @@ import { getGamesNav } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
 import Image from "next/image";
-import prisma from "../../prisma/db";
 
 export default async function Home() {
   const games = await getGamesNav();
   const session = await auth();
-
   return (
     <>
       <div className="m-16">
-        <div
-          style={{ transitionDuration: "2000ms" }}
-          className="grid grid-cols-2"
-        >
+        <div className="grid grid-cols-2 duration-[2000ms]">
           <div className="col-span-2 md:col-span-1">
             <H1>RDC Stat Tracker</H1>
             <p className="text-muted-foreground leading-7 md:w-3/4">
@@ -110,31 +105,31 @@ const data = [
     player: "mark",
     sorryCounter: 100,
     sorryScale: 0.15,
-    fill: "blue",
+    fill: "var(--chart-1)",
   },
   {
     player: "leland",
     sorryCounter: 50,
     sorryScale: 0.15,
-    fill: "purple",
+    fill: "var(--chart-2)",
   },
   {
     player: "ben",
     sorryCounter: 50,
     sorryScale: 0.3,
-    fill: "green",
+    fill: "var(--chart-3)",
   },
   {
     player: "john",
     sorryCounter: 20,
     sorryScale: 0.05,
-    fill: "skyblue",
+    fill: "var(--chart-4)",
   },
   {
     player: "aff",
     sorryCounter: 10,
     sorryScale: 0.3,
-    fill: "orange",
+    fill: "var(--chart-5)",
   },
   {
     player: "dylan",

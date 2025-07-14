@@ -7,6 +7,7 @@ import SetManager from "./SetManager";
 import {
   insertNewSessionFromAdmin,
   insertNewSessionV2,
+  revalidateAction,
 } from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
@@ -60,9 +61,6 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     },
     mode: "onChange",
   });
-
-  console.log(form.formState.errors);
-  console.log({ form });
 
   const { handleSubmit } = form;
 
