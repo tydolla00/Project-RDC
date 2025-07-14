@@ -322,7 +322,7 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
   John: {
     playerId: 6,
     playerName: "John",
-    gamerTags: ["I will never forget that day in Lockdown..."],
+    gamerTags: ["Playthatjohn#9767687"],
   },
   Aff: {
     playerId: 7,
