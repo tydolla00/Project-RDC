@@ -7,20 +7,20 @@ import { EnrichedSession } from "./types/session";
 
 async function main() {
   console.log("Seeding database...");
-  // console.group("Begin seeding database");
-  // console.time("Seeding Time");
-  // try {
-  //   await seedRDCMembers();
-  //   await seedGames();
-  //   await importSessions();
-  //   console.log("Database seeded successfully");
-  // } catch (error) {
-  //   console.error("Error seeding database:", error);
-  //   throw error;
-  // } finally {
-  //   console.timeEnd("Seeding Time");
-  //   console.groupEnd();
-  // }
+  console.group("Begin seeding database");
+  console.time("Seeding Time");
+  try {
+    await seedRDCMembers();
+    await seedGames();
+    await importSessions();
+    console.log("Database seeded successfully");
+  } catch (error) {
+    console.error("Error seeding database:", error);
+    throw error;
+  } finally {
+    console.timeEnd("Seeding Time");
+    console.groupEnd();
+  }
 }
 
 // Seed RDC Members
