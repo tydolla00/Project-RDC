@@ -144,107 +144,138 @@ const SetNavigation = ({
   );
 };
 
+type MarioKartStats = {
+  player: string;
+  position: number;
+  winners: string[];
+};
+
+type GameSet = {
+  setWinners: { playerName: string }[];
+  matches: {
+    matchWinners: { playerName: string }[];
+    playerSessions: {
+      playerStats: {
+        player: { playerName: string };
+        value: string;
+        gameStat: { statName: string };
+      }[];
+    }[];
+  }[];
+};
+
+const processRocketLeagueData = (sets: GameSet[]): RLStats[][][] => {
+  const innerSets: RLStats[][][] = [];
+
+  sets.forEach((set) => {
+    const setWinners = set.setWinners.map((p) => p.playerName);
+    const innerSet: RLStats[][] = [];
+
+    set.matches.forEach((match) => {
+      const matchWinners = new Set(match.matchWinners.map((m) => m.playerName));
+      const innerMatch = new Map<string, RLStats>();
+
+      match.playerSessions.forEach((ps) => {
+        ps.playerStats.forEach(({ player, value, gameStat }) => {
+          if (!innerMatch.has(player.playerName)) {
+            innerMatch.set(player.playerName, {
+              score: 0,
+              goals: 0,
+              assists: 0,
+              saves: 0,
+              shots: 0,
+              player: player.playerName,
+              winners: setWinners,
+            });
+          }
+
+          const innerPlayer = innerMatch.get(player.playerName)!;
+          switch (gameStat.statName) {
+            case "RL_SCORE":
+              innerPlayer.score = Number(value);
+              break;
+            case "RL_GOALS":
+              innerPlayer.goals = Number(value);
+              break;
+            case "RL_ASSISTS":
+              innerPlayer.assists = Number(value);
+              break;
+            case "RL_SAVES":
+              innerPlayer.saves = Number(value);
+              break;
+            case "RL_SHOTS":
+              innerPlayer.shots = Number(value);
+              break;
+          }
+        });
+      });
+
+      const matchData = Array.from(innerMatch, ([, stats]) => ({
+        ...stats,
+      })).sort((a, b) => {
+        if (matchWinners.has(a.player) && matchWinners.has(b.player)) {
+          return b.score - a.score;
+        }
+        if (matchWinners.has(a.player)) return -1;
+        if (matchWinners.has(b.player)) return 1;
+        return b.score - a.score;
+      });
+
+      innerSet.push(matchData);
+    });
+    innerSets.push(innerSet);
+  });
+
+  return innerSets;
+};
+
+const processMarioKartData = (sets: GameSet[]): MarioKartStats[][][] => {
+  const mkSets: MarioKartStats[][][] = [];
+
+  sets.forEach((set) => {
+    const setWinners = set.setWinners.map((p) => p.playerName);
+    const innerSet: MarioKartStats[][] = [];
+
+    set.matches.forEach((match) => {
+      const innerMatch = new Map<string, MarioKartStats>();
+
+      match.playerSessions.forEach((ps) => {
+        ps.playerStats.forEach(({ player, value, gameStat }) => {
+          if (!innerMatch.has(player.playerName)) {
+            innerMatch.set(player.playerName, {
+              position: 0,
+              player: player.playerName,
+              winners: setWinners,
+            });
+          }
+
+          const innerPlayer = innerMatch.get(player.playerName)!;
+          if (gameStat.statName === "MK8_POS") {
+            innerPlayer.position = Number(value);
+          }
+        });
+      });
+
+      const matchData = Array.from(innerMatch, ([, stats]) => ({
+        ...stats,
+      })).sort((a, b) => a.position - b.position);
+
+      innerSet.push(matchData);
+    });
+    mkSets.push(innerSet);
+  });
+
+  return mkSets;
+};
+
 const getSetsData = (session: Sessions[0]) => {
+  if (!session?.sets) return [];
+
   switch (session.Game.gameName) {
-    case "Rocket League": {
-      const innerSets: RLStats[][][] = [];
-      session?.sets.forEach((set) => {
-        const setWinners = set.setWinners.map((p) => p.playerName);
-        const innerSet: RLStats[][] = [];
-        set.matches.forEach((match) => {
-          const matchWinners = new Set(
-            match.matchWinners.map((m) => m.playerName),
-          );
-          const innerMatch = new Map<string, RLStats>();
-          match.playerSessions.forEach((ps) => {
-            ps.playerStats.forEach(({ player, value, gameStat }) => {
-              if (!innerMatch.has(player.playerName))
-                innerMatch.set(player.playerName, {
-                  score: 0,
-                  goals: 0,
-                  assists: 0,
-                  saves: 0,
-                  shots: 0,
-                  player: player.playerName,
-                  winners: setWinners,
-                });
-
-              let innerPlayer = innerMatch.get(player.playerName)!;
-              switch (gameStat.statName) {
-                case "RL_SCORE":
-                  innerPlayer.score = Number(value);
-                  break;
-                case "RL_GOALS":
-                  innerPlayer.goals = Number(value);
-                  break;
-                case "RL_ASSISTS":
-                  innerPlayer.assists = Number(value);
-                  break;
-                case "RL_SAVES":
-                  innerPlayer.saves = Number(value);
-                  break;
-                case "RL_SHOTS":
-                  innerPlayer.shots = Number(value);
-                  break;
-              }
-            });
-          });
-          const matchData = Array.from(innerMatch, ([_, stats]) => ({
-            ...stats,
-          })).sort((a, b) => {
-            if (matchWinners.has(a.player) && matchWinners.has(b.player))
-              return b.score - a.score;
-            else if (matchWinners.has(a.player)) return -1;
-            else if (matchWinners.has(b.player)) return 1;
-            else return b.score - a.score;
-          });
-          innerSet.push(matchData);
-        });
-        innerSets.push(innerSet);
-      });
-      return innerSets;
-    }
-    case "Mario Kart 8": {
-      type MarioKartStats = {
-        player: string;
-        position: number;
-        winners: string[];
-      };
-      const mkSets: MarioKartStats[][][] = [];
-      session?.sets.forEach((set) => {
-        const setWinners = set.setWinners.map((p) => p.playerName);
-        const innerSet: MarioKartStats[][] = [];
-        set.matches.forEach((match) => {
-          const matchWinners = new Set(
-            match.matchWinners.map((m) => m.playerName),
-          );
-          const innerMatch = new Map<string, MarioKartStats>();
-          match.playerSessions.forEach((ps) => {
-            ps.playerStats.forEach(({ player, value, gameStat }) => {
-              if (!innerMatch.has(player.playerName))
-                innerMatch.set(player.playerName, {
-                  position: 0,
-                  player: player.playerName,
-                  winners: setWinners,
-                });
-
-              let innerPlayer = innerMatch.get(player.playerName)!;
-              switch (gameStat.statName) {
-                case "MK8_POS":
-                  innerPlayer.position = Number(value);
-                  break;
-              }
-            });
-          });
-          const matchData = Array.from(innerMatch, ([, stats]) => ({
-            ...stats,
-          })).sort((a, b) => a.position - b.position);
-          innerSet.push(matchData);
-        });
-        mkSets.push(innerSet);
-      });
-      return mkSets;
-    }
+    case "Rocket League":
+      return processRocketLeagueData(session.sets);
+    case "Mario Kart 8":
+      return processMarioKartData(session.sets);
     default:
       return [];
   }
