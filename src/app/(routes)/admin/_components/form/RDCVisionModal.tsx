@@ -6,7 +6,13 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -50,6 +56,26 @@ const initialState = {
   previewUrl: null as string | null,
 };
 
+/**
+ * State reducer for RDC Vision modal
+ *
+ * @description
+ * This reducer handles:
+ * 1. File selection and preview state updates
+ * 2. Vision processing status management
+ * 3. Loading state control
+ * 4. State reset functionality
+ *
+ * Actions:
+ * - UPDATE_FILE: Updates selected file and preview URL
+ * - UPDATE_VISION: Updates vision processing status and message
+ * - UPDATE_LOADING: Controls loading state
+ * - RESET: Resets state to initial values
+ *
+ * @param state - Current state object
+ * @param action - Action to process
+ * @returns Updated state object
+ */
 const zodFile = z
   .file({ error: "File is required." })
   .mime(["image/jpeg", "image/png", "image/jpg"], {
@@ -86,36 +112,51 @@ const RDCVisionModal = (props: Props) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [open, setOpen] = useState(false);
 
+  // Add a ref to always have the latest value of open
+  const openRef = useRef(open);
+
+  useEffect(() => {
+    openRef.current = open;
+  }, [open]);
+
   const { selectedFile, isLoading, visionStatus, visionMsg, previewUrl } =
     state;
 
   const visionButton = useRef<HTMLButtonElement>(null);
 
-  const handlePaste = async (e: ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    let file: File | null = null;
-    if (!items) return;
-    for (const item of Array.from(items)) {
-      file = item.getAsFile();
+  const handlePaste = useCallback(
+    async (e: ClipboardEvent) => {
+      // Use openRef.current instead of open
+      if (!openRef.current) return; // Only handle paste if modal is open
 
-      try {
-        zodFile.parse(file);
-      } catch (error) {
-        console.warn("Invalid file pasted", error);
-        continue;
+      const items = e.clipboardData?.items;
+      let file: File | null = null;
+      if (!items) return;
+      for (const item of Array.from(items)) {
+        file = item.getAsFile();
+
+        try {
+          zodFile.parse(file);
+        } catch (error) {
+          console.warn("Invalid file pasted", error);
+          continue;
+        }
+
+        const url = URL.createObjectURL(file!);
+        dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
+        // Focus after state update
+        setTimeout(() => {
+          visionButton.current?.focus();
+        }, 0);
+        return;
       }
-
-      const url = URL.createObjectURL(file!);
-      dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
-      // Focus after state update
-      setTimeout(() => {
-        visionButton.current?.focus();
-      }, 0);
-      return;
-    }
-    toast.error("No valid image file found in clipboard", { richColors: true });
-    dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
-  };
+      toast.error("No valid image file found in clipboard", {
+        richColors: true,
+      });
+      dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
+    },
+    [], // Remove open from dependencies
+  );
 
   useEffect(() => {
     document.addEventListener("paste", handlePaste);
