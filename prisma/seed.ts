@@ -5,12 +5,13 @@ import { capitalizeFirst } from "@/lib/utils";
 import { MembersEnum } from "@/lib/constants";
 import { EnrichedSession } from "./types/session";
 
+/**
+ * Seeds the database with RDC members, games, and sessions.
+ *
+ * Runs all seeding steps and logs progress and errors.
+ */
 async function main() {
-  /**
-   * Seeds the database with RDC members, games, and sessions.
-   *
-   * Runs all seeding steps and logs progress and errors.
-   */
+  console.log("Seeding database...");
   console.group("Begin seeding database");
   console.time("Seeding Time");
   try {
