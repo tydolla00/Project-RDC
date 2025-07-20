@@ -29,7 +29,7 @@ type SetDataProps = {
   game: string | undefined;
 };
 
-const SetData = ({ set, setIndex, game }: SetDataProps) => {
+export const SetData = ({ set, setIndex, game }: SetDataProps) => {
   console.log(game);
   const renderGameStats = (match: StatsType[]) => {
     switch (game) {

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { RLStats } from "../../../_components/timeline-chart";
 import { getAllSessionsByGame } from "../../../../../../../prisma/lib/admin";
-import SetData from "./set-data";
+import { SetData } from "./set-data";
 import { QueryResponseData } from "../../../../../../../prisma/db";
 import {
   Pagination,
