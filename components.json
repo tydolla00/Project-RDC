@@ -15,8 +15,7 @@
     "utils": "@/lib/utils",
     "ui": "@/components/ui",
     "lib": "@/lib",
-    "hooks": "@/hooks",
-    "prisma": "@/../prisma"
+    "hooks": "@/hooks"
   },
   "iconLibrary": "lucide"
 }

@@ -9,9 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { RLStats } from "./timeline-chart";
 
 // Accepts either RLStats[][] or MarioKartStats[][]
-type RLStats = import("../../../_components/timeline-chart").RLStats;
 type MarioKartStats = { player: string; position: number; winners: string[] };
 type CoDStats = {
   player: string;

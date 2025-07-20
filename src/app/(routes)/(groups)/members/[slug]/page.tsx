@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
-import { getAllMembers } from "prisma/lib/members";
+import { getAllMembers } from "../../../../../../prisma/lib/members";
 
 export const dynamicParams = false; // true | false,
 
