@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 
 // Accepts either RLStats[][] or MarioKartStats[][]
-type RLStats = import("./timeline-chart").RLStats;
+type RLStats = import("../../../_components/timeline-chart").RLStats;
 type MarioKartStats = { player: string; position: number; winners: string[] };
 type CoDStats = {
   player: string;

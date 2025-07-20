@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { RLStats } from "./timeline-chart";
-import { getAllSessionsByGame } from "../../../../../prisma/lib/admin";
+import { RLStats } from "../../../_components/timeline-chart";
+import { getAllSessionsByGame } from "../../../../../../../prisma/lib/admin";
 import SetData from "./set-data";
-import { QueryResponseData } from "../../../../../prisma/db";
+import { QueryResponseData } from "../../../../../../../prisma/db";
 import {
   Pagination,
   PaginationContent,
@@ -94,14 +94,21 @@ const SetNavigation = ({
         <PaginationItem>
           <PaginationPrevious
             onClick={() => currentSet > 0 && setCurrentSet((curr) => curr - 1)}
-            className={currentSet === 0 ? "pointer-events-none opacity-50" : ""}
+            className={
+              currentSet === 0
+                ? "pointer-events-none opacity-50"
+                : "cursor-pointer"
+            }
           />
         </PaginationItem>
 
         {getSetNumbers().map((setNumber, index) => {
           if (setNumber === "...") {
             return (
-              <PaginationItem key={`ellipsis-${index}`}>
+              <PaginationItem
+                className="cursor-pointer"
+                key={`ellipsis-${index}`}
+              >
                 <PaginationEllipsis />
               </PaginationItem>
             );
@@ -110,6 +117,7 @@ const SetNavigation = ({
           return (
             <PaginationItem key={setNumber}>
               <PaginationLink
+                className="cursor-pointer"
                 onClick={() => setCurrentSet(setNumber - 1)}
                 isActive={currentSet === setNumber - 1}
               >
@@ -125,7 +133,9 @@ const SetNavigation = ({
               currentSet < maxSets - 1 && setCurrentSet((curr) => curr + 1)
             }
             className={
-              currentSet === maxSets - 1 ? "pointer-events-none opacity-50" : ""
+              currentSet === maxSets - 1
+                ? "pointer-events-none opacity-50"
+                : "cursor-pointer"
             }
           />
         </PaginationItem>
@@ -136,65 +146,64 @@ const SetNavigation = ({
 
 const getSetsData = (session: Sessions[0]) => {
   switch (session.Game.gameName) {
-    case "Rocket League":
-      {
-        const innerSets: RLStats[][][] = [];
-        session?.sets.forEach((set) => {
-          const setWinners = set.setWinners.map((p) => p.playerName);
-          const innerSet: RLStats[][] = [];
-          set.matches.forEach((match) => {
-            const matchWinners = new Set(
-              match.matchWinners.map((m) => m.playerName),
-            );
-            const innerMatch = new Map<string, RLStats>();
-            match.playerSessions.forEach((ps) => {
-              ps.playerStats.forEach(({ player, value, gameStat }) => {
-                if (!innerMatch.has(player.playerName))
-                  innerMatch.set(player.playerName, {
-                    score: 0,
-                    goals: 0,
-                    assists: 0,
-                    saves: 0,
-                    shots: 0,
-                    player: player.playerName,
-                    winners: setWinners,
-                  });
+    case "Rocket League": {
+      const innerSets: RLStats[][][] = [];
+      session?.sets.forEach((set) => {
+        const setWinners = set.setWinners.map((p) => p.playerName);
+        const innerSet: RLStats[][] = [];
+        set.matches.forEach((match) => {
+          const matchWinners = new Set(
+            match.matchWinners.map((m) => m.playerName),
+          );
+          const innerMatch = new Map<string, RLStats>();
+          match.playerSessions.forEach((ps) => {
+            ps.playerStats.forEach(({ player, value, gameStat }) => {
+              if (!innerMatch.has(player.playerName))
+                innerMatch.set(player.playerName, {
+                  score: 0,
+                  goals: 0,
+                  assists: 0,
+                  saves: 0,
+                  shots: 0,
+                  player: player.playerName,
+                  winners: setWinners,
+                });
 
-                let innerPlayer = innerMatch.get(player.playerName)!;
-                switch (gameStat.statName) {
-                  case "RL_SCORE":
-                    innerPlayer.score = Number(value);
-                    break;
-                  case "RL_GOALS":
-                    innerPlayer.goals = Number(value);
-                    break;
-                  case "RL_ASSISTS":
-                    innerPlayer.assists = Number(value);
-                    break;
-                  case "RL_SAVES":
-                    innerPlayer.saves = Number(value);
-                    break;
-                  case "RL_SHOTS":
-                    innerPlayer.shots = Number(value);
-                    break;
-                }
-              });
+              let innerPlayer = innerMatch.get(player.playerName)!;
+              switch (gameStat.statName) {
+                case "RL_SCORE":
+                  innerPlayer.score = Number(value);
+                  break;
+                case "RL_GOALS":
+                  innerPlayer.goals = Number(value);
+                  break;
+                case "RL_ASSISTS":
+                  innerPlayer.assists = Number(value);
+                  break;
+                case "RL_SAVES":
+                  innerPlayer.saves = Number(value);
+                  break;
+                case "RL_SHOTS":
+                  innerPlayer.shots = Number(value);
+                  break;
+              }
             });
-            const matchData = Array.from(innerMatch, ([_, stats]) => ({
-              ...stats,
-            })).sort((a, b) => {
-              if (matchWinners.has(a.player) && matchWinners.has(b.player))
-                return b.score - a.score;
-              else if (matchWinners.has(a.player)) return -1;
-              else if (matchWinners.has(b.player)) return 1;
-              else return b.score - a.score;
-            });
-            innerSet.push(matchData);
           });
-          innerSets.push(innerSet);
+          const matchData = Array.from(innerMatch, ([_, stats]) => ({
+            ...stats,
+          })).sort((a, b) => {
+            if (matchWinners.has(a.player) && matchWinners.has(b.player))
+              return b.score - a.score;
+            else if (matchWinners.has(a.player)) return -1;
+            else if (matchWinners.has(b.player)) return 1;
+            else return b.score - a.score;
+          });
+          innerSet.push(matchData);
         });
-        return innerSets;
-      }
+        innerSets.push(innerSet);
+      });
+      return innerSets;
+    }
     case "Mario Kart 8": {
       type MarioKartStats = {
         player: string;

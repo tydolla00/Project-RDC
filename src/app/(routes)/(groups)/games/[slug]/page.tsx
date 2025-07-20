@@ -8,7 +8,7 @@ import Speedrunners from "./_components/speedrunners";
 import LethalCompany from "./_components/lethalcompany";
 import GolfWithFriends from "./_components/golfwithfriends";
 import { gameImages, GamesEnum } from "@/lib/constants";
-import { TimelineChart } from "../../_components/timeline-chart";
+import { TimelineChart } from "./_components/timeline-chart";
 import { Separator } from "@/components/ui/separator";
 
 // ? Force non specified routes to return 404
