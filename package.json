@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
-    "@azure-rest/ai-document-intelligence": "^1.1.0",
+    "@azure-rest/ai-document-intelligence": "^1.0.0-beta.3",
     "@azure-rest/ai-vision-image-analysis": "^1.0.0-beta.3",
     "@azure/cognitiveservices-computervision": "^8.2.0",
     "@azure/core-auth": "^1.9.0",
