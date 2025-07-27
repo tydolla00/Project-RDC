@@ -57,7 +57,7 @@
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.57.0",
-    "react-scan": "^0.2.14",
+    "react-scan": "^0.4.3",
     "react-use-measure": "^2.1.7",
     "recharts": "^2.15.3",
     "sharp": "^0.34.2",
