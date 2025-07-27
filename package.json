@@ -8,11 +8,10 @@
     "build": "next build",
     "build-memory": "next build --experimental-debug-memory-usage",
     "start": "next start",
-    "lint": "next lint",
-    "dbcrashout": "npx prisma db push --force-reset && npx prisma db push && npx tsx prisma/seed.ts"
+    "lint": "next lint"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
@@ -22,7 +21,7 @@
     "@azure/core-auth": "^1.9.0",
     "@azure/ms-rest-azure-js": "^2.1.0",
     "@hookform/resolvers": "^5.1.0",
-    "@neondatabase/serverless": "^1.0.0",
+    "@neondatabase/serverless": "^1.0.1",
     "@prisma/adapter-neon": "^6.9.0",
     "@prisma/client": "^6.9.0",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -52,7 +51,7 @@
     "next": "^15.3.3",
     "next-auth": "^5.0.0-beta.25",
     "next-themes": "^0.4.6",
-    "posthog-js": "^1.252.0",
+    "posthog-js": "^1.257.0",
     "posthog-node": "^4.18.0",
     "react": "^19.1.0",
     "react-day-picker": "^9.7.0",
@@ -69,7 +68,7 @@
     "ts-node": "^10.9.2",
     "uuid": "^11.1.0",
     "ws": "^8.18.2",
-    "zod": "^3.25.63"
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
