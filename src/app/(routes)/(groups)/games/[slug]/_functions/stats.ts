@@ -7,13 +7,20 @@ import {
   getSumPerStat,
 } from "../../../../../../../prisma/lib/games";
 import PostHogClient from "@/lib/posthog";
+import { QueryResponseData } from "../../../../../../../prisma/db";
+import { Decimal } from "@prisma/client/runtime/library";
 
-type Result = Awaited<ReturnType<typeof getSumPerStat>>[number];
+type Result = NonNullable<
+  NonNullable<Awaited<ReturnType<typeof getSumPerStat>>["data"]>[number]
+> & {
+  avg: number;
+  sum: number;
+};
 
 type SumAndAvg<T extends string[], Y extends "RL"> = {
   [K in T[number] as K extends `${Y}_${infer U}` ? Lowercase<`${U}`> : never]:
     | Result
-    | { avg: -1; sum: -1 };
+    | { readonly avg: Decimal | number; readonly sum: bigint | number };
 };
 
 export const getAvgAndSum = async (
@@ -29,7 +36,13 @@ export const getAvgAndSum = async (
         const statName = stats[index]
           .slice(i + 1)
           .toLowerCase() as keyof SumAndAvg<typeof stats, "RL">;
-        acc[statName] = result.at(0) || { avg: -1, sum: -1 };
+
+        const res = {
+          avg: result.data?.at(0)?.avg ?? 0,
+          sum: result.data?.at(0)?.sum ?? 0,
+        };
+
+        acc[statName] = res;
         return acc;
       },
       {} as SumAndAvg<typeof stats, "RL">,
@@ -43,7 +56,7 @@ export const getAvgAndSum = async (
  * @returns Array of object containing info about the amount of match and set wins a player has.
  */
 export const calcWinsPerPlayer = (
-  game: NonNullable<Awaited<ReturnType<typeof getWinsPerPlayer>>>,
+  game: QueryResponseData<Awaited<ReturnType<typeof getWinsPerPlayer>>>,
 ) => {
   const members = new Map<string, { matchWins: number; setWins: number }>();
 
@@ -96,10 +109,16 @@ export const calcMostPerPlacing = async (
   statName: StatEndsWith<"POS">,
 ) => {
   const sessions = await getMatchesPerGame(gameId, statName);
+
+  if (!sessions.success || !sessions.data) {
+    console.log("Failed to get sessions");
+    return [];
+  }
+
   const members = new Map<string, MembersPerPosition>();
   const posthog = PostHogClient();
 
-  for (const session of sessions) {
+  for (const session of sessions.data) {
     for (const set of session.sets) {
       for (const match of set.matches) {
         const race = [];
@@ -172,11 +191,15 @@ export const calcMostPerPlacing = async (
  */
 export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
   const stats = await getStatPerPlayer(gameId, statName);
-  console.log(stats);
+
+  if (!stats.success || !stats.data) {
+    console.log("Failed to get stats");
+    return [];
+  }
   const members = new Map<string, number>();
   const posthog = PostHogClient();
 
-  for (const { player, value } of stats) {
+  for (const { player, value } of stats.data) {
     const val = Number(value);
 
     if (isNaN(val)) {

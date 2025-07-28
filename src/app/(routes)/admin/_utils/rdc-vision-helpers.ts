@@ -5,6 +5,23 @@ import { analyzeScreenShot, VisionPlayer } from "@/app/actions/visionAction";
 import { Action, State } from "../_components/form/RDCVisionModal";
 import { getGameIdFromName } from "@/app/actions/adminAction";
 
+/**
+ * Handles the analysis of a screenshot using vision recognition
+ *
+ * @description
+ * This function orchestrates the vision analysis process:
+ * 1. Updates UI state to show analysis is in progress
+ * 2. Converts selected file to base64 format
+ * 3. Sends image for vision analysis
+ * 4. Processes results and updates UI based on analysis outcome
+ * 5. Handles success, warning, and error cases with appropriate user feedback
+ *
+ * @param state - Current state of the vision analysis UI
+ * @param dispatch - Function to update the UI state
+ * @param handleCreateMatchFromVision - Callback to create match data from vision results
+ * @param sessionPlayers - Array of players in the current session for validation
+ * @returns Promise that resolves when analysis is complete
+ */
 export const handleAnalyzeBtnClick = async (
   state: State,
   dispatch: (action: Action) => void,
@@ -115,6 +132,17 @@ export const handleAnalyzeBtnClick = async (
   }
 };
 
+/**
+ * Cleans up resources and resets UI state after vision analysis
+ *
+ * @description
+ * This function:
+ * 1. Revokes the object URL for the preview image to prevent memory leaks
+ * 2. Resets all UI state to initial values
+ *
+ * @param previewUrl - URL of the preview image to cleanup
+ * @param dispatch - Function to update UI state
+ */
 export const handleClose = (
   previewUrl: string | null,
   dispatch: (action: Action) => void,
@@ -125,6 +153,20 @@ export const handleClose = (
   dispatch({ type: "RESET" });
 };
 
+/**
+ * Converts a File object to a base64 encoded string
+ *
+ * @description
+ * This function:
+ * 1. Creates a FileReader to read the file as an ArrayBuffer
+ * 2. Returns a Promise that resolves with the base64 encoded content
+ * 3. Handles errors during file reading
+ * 4. Converts ArrayBuffer to base64 string using Buffer
+ *
+ * @param selectedFile - The File object to convert
+ * @returns Promise that resolves with the base64 encoded string, or undefined if reading fails
+ * @throws Logs error if file reading fails
+ */
 const getFileAsBase64 = async (selectedFile: File) => {
   const reader = new FileReader();
 
