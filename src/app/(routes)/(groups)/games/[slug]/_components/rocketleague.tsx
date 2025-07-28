@@ -1,6 +1,9 @@
 import { ChartConfig } from "@/components/ui/chart";
 import { getWinsPerPlayer } from "../../../../../../../prisma/lib/games";
 import { getAllMembers } from "../../../../../../../prisma/lib/members";
+import { CustomChart } from "./charts";
+import { TabbedChart } from "../../../_components/tabbed-chart";
+import { NoMembers } from "../../../members/_components/members";
 import { calcWinsPerPlayer, getAvgAndSum } from "../_functions/stats";
 import { CustomChart } from "./charts";
 
@@ -10,8 +13,13 @@ const RocketLeague = async ({
   game: { gameId: number; gameName: string };
 }) => {
   const members = await getAllMembers();
+
+  if (!members.success || !members.data) {
+    return <NoMembers />;
+  }
+
   let membersMap = await Promise.all(
-    members.map(async (member) => {
+    members.data.map(async (member) => {
       try {
         const { goals, assists, saves, score, day } = await getAvgAndSum(
           member.playerId,
@@ -34,20 +42,22 @@ const RocketLeague = async ({
           assists: { sum: -1, avg: -1 },
           saves: { sum: -1, avg: -1 },
           score: { sum: -1, avg: -1 },
-          days: { sum: -1, avg: -1 },
+          day: { sum: -1, avg: -1 },
         };
       }
     }),
   );
-  membersMap = membersMap.filter((d) => d?.score.sum !== 0);
-  console.log({ membersMap });
+  membersMap = membersMap.filter((d) => d?.score.sum > 0);
   const wins = await getWinsPerPlayer(game.gameId);
-  const winsPerPlayer = calcWinsPerPlayer(wins!); // Sets / Wins
-  console.log(winsPerPlayer);
+  if (!wins.success || !wins.data) wins.data = { sessions: [] };
+
+  const winsPerPlayer = calcWinsPerPlayer(wins.data); // Sets / Wins
 
   const config = {
     player: { label: "Player" },
-    matchWins: { label: "Games won" },
+    matchWins: { label: "Matches won" },
+    setWins: { label: "Sets won" },
+    days: { label: "Days won" },
   } satisfies ChartConfig;
 
   const sumConfig = {
@@ -57,20 +67,11 @@ const RocketLeague = async ({
     ["assists.sum"]: { label: "Total Assists" },
     ["days.sum"]: { label: "Total Days" },
     ["saves.sum"]: { label: "Total Saves" },
-  };
+  } satisfies ChartConfig;
 
   return (
-    <div className="flex flex-wrap gap-10">
+    <div className="flex flex-wrap justify-center gap-10">
       <CustomChart
-        data={winsPerPlayer}
-        nameKey="player"
-        dataKey="matchWins"
-        title="Wins Per Player"
-        description="All time rocket league stats"
-        config={config}
-      />
-      <CustomChart
-        // @ts-ignore
         data={membersMap}
         nameKey="playerName"
         dataKey="goals.sum"
@@ -80,7 +81,6 @@ const RocketLeague = async ({
         ignoreWarnings
       />
       <CustomChart
-        // @ts-ignore
         data={membersMap}
         nameKey="playerName"
         dataKey="saves.sum"
@@ -90,7 +90,6 @@ const RocketLeague = async ({
         ignoreWarnings
       />
       <CustomChart
-        // @ts-ignore
         data={membersMap}
         nameKey="playerName"
         dataKey="assists.sum"
@@ -100,7 +99,6 @@ const RocketLeague = async ({
         ignoreWarnings
       />
       <CustomChart
-        // @ts-ignore
         data={membersMap}
         nameKey="playerName"
         dataKey="score.avg"
@@ -109,7 +107,7 @@ const RocketLeague = async ({
         config={sumConfig}
         ignoreWarnings
       />
-      <CustomChart
+      {/* <CustomChart
         // @ts-ignore
         data={membersMap}
         nameKey="playerName"
@@ -118,7 +116,8 @@ const RocketLeague = async ({
         description="The amount of days each member has won."
         config={sumConfig}
         ignoreWarnings // No days in db currently
-      />
+      /> */}
+      <TabbedChart chartConfig={config} chartData={winsPerPlayer} />
     </div>
   );
 };

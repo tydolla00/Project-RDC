@@ -1,8 +1,17 @@
+import { $Enums } from "@prisma/client";
 import { getAllGames } from "../../prisma/lib/games";
 import { getAllMembers } from "../../prisma/lib/members";
+import { capitalizeFirst } from "./utils";
 
+/**
+ * Returns navigation data for all RDC members.
+ *
+ * @returns Promise resolving to an array of member navigation objects.
+ */
 export const getMembersNav = async () => {
   const members = await getAllMembers();
+
+  if (!members.success || !members.data) return [];
 
   const navMembers: {
     alt: string;
@@ -12,7 +21,7 @@ export const getMembersNav = async () => {
     src: string;
     desc: string;
     stats: { prop: string; val: string }[];
-  }[] = members.map((member) => {
+  }[] = members.data.map((member) => {
     const memberKey = member.playerName.toLowerCase();
     const rdcMember = RDCMembers.get(memberKey as MembersEnum)!;
     return {
@@ -28,7 +37,9 @@ export const getMembersNav = async () => {
   return navMembers;
 };
 
-// TODO Replace src with player avatars
+/**
+ * Enum of RDC member names.
+ */
 export enum MembersEnum {
   Mark = "mark",
   Ipi = "ipi",
@@ -169,8 +180,15 @@ const RDCMembers = new Map<MembersEnum, MembersProps>([
   ],
 ]);
 
+/**
+ * Returns navigation data for all games.
+ *
+ * @returns Promise resolving to an array of game navigation objects.
+ */
 export const getGamesNav = async () => {
   const games = await getAllGames();
+
+  if (!games.success || !games.data) return [];
 
   const navGames: {
     alt?: string;
@@ -178,7 +196,7 @@ export const getGamesNav = async () => {
     url: string;
     src?: string;
     desc?: string;
-  }[] = games.map((game) => {
+  }[] = games.data.map((game) => {
     const gameKey = game.gameName.replace(/\s/g, "").toLowerCase() as GamesEnum;
     return {
       alt: game.gameName,
@@ -216,8 +234,40 @@ export const gameImages = {
   [GamesEnum.CallOfDuty]: "callofduty.jpeg",
 };
 
+export const memberImages = new Map<MembersEnum, string>([
+  [capitalizeFirst(MembersEnum.Mark), "mark_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Dylan), "dylan_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Ben), "ben_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Lee), "leland_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Des), "desmond_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.John), "john_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Aff), "aff_rdc.jpg"],
+  [capitalizeFirst(MembersEnum.Ipi), "ipi_rdc.jpg"],
+]);
+
+export const statDescriptions: { [key in $Enums.StatName]: string } = {
+  [$Enums.StatName.MK8_DAY]: "Mario Kart 8 Days",
+  [$Enums.StatName.MK8_POS]: "Mario Kart 8 Position",
+  [$Enums.StatName.COD_SCORE]: "Call of Duty Score",
+  [$Enums.StatName.COD_KILLS]: "Call of Duty Kills",
+  [$Enums.StatName.COD_DEATHS]: "Call of Duty Deaths",
+  [$Enums.StatName.COD_MELEES]: "Call of Duty Melees",
+  [$Enums.StatName.COD_POS]: "Call of Duty Position",
+  [$Enums.StatName.LC_DEATHS]: "Lethal Company Deaths",
+  [$Enums.StatName.SR_SETS]: "Speedrunners Sets",
+  [$Enums.StatName.SR_WINS]: "Speedrunners Wins",
+  [$Enums.StatName.SR_POS]: "Speedrunners Position",
+  [$Enums.StatName.RL_GOALS]: "Rocket League Goals",
+  [$Enums.StatName.RL_ASSISTS]: "Rocket League Assists",
+  [$Enums.StatName.RL_SAVES]: "Rocket League Saves",
+  [$Enums.StatName.RL_SHOTS]: "Rocket League Shots",
+  [$Enums.StatName.RL_SCORE]: "Rocket League Score",
+  [$Enums.StatName.RL_DAY]: "Rocket League Position",
+};
+
 export enum errorCodes {
   NotAuthenticated = "Not Authenticated",
+  NotAuthorized = "Not Authorized",
 }
 
 export enum VisionResultCodes {

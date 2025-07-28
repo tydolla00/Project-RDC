@@ -64,7 +64,7 @@ export const CustomChart = <T extends any[]>({
             <ChartLegend
               content={<ChartLegendContent nameKey={nameKey.toString()} />}
             />
-            <Bar dataKey={dataKey} fill="hsl(var(--chart-1))" radius={4} />
+            <Bar dataKey={dataKey} fill="var(--chart-1)" radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>
