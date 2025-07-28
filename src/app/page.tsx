@@ -48,6 +48,9 @@ export default async function Home() {
         <H2 className="text-chart-4 mx-auto mt-40 mb-6 w-fit md:my-10">
           Games
         </H2>
+        <p className="text-muted-foreground my-2 text-center leading-7">
+          Explore stats for each of the games below.
+        </p>
         <div className="flex flex-wrap justify-center gap-10">
           {games.map((game) => (
             <div key={game.url}>
@@ -83,10 +86,9 @@ export default async function Home() {
           <Card className="mx-auto md:w-1/2">
             <CardHeader>
               <p>
-                We could use some help keeping up scores. We have a place where
-                you can submit scores and we&apos;ll review them and compare
-                with other scores. In order to submit scores you must be signed
-                in.
+                Keeping track of stats, takes a lot of time. If you would like
+                to help us keep a record of the games they play, please login
+                and complete the form.
               </p>
             </CardHeader>
             <CardFooter>

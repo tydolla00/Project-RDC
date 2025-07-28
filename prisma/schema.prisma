@@ -41,7 +41,7 @@ model Player {
 // { game_id: 1, game_name: 'Mario Kart', game_stats: [], player_game_stats: [] }
 model Game {
   gameId      Int          @id @default(autoincrement()) @map("game_id")
-  gameName    String       @map("game_name") @unique
+  gameName    String       @unique @map("game_name")
   gameStats   GameStat[]
   playerStats PlayerStat[]
   sessions    Session[]
