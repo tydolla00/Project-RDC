@@ -89,23 +89,19 @@ export function zodResolver<Input extends FieldValues, Context, Output>(
 ): Resolver<Input, Context, Input>;
 
 /**
- * Creates a resolver function for react-hook-form that validates form data using a Zod schema
- * @param {z.$ZodType<Input>} schema - The Zod schema used to validate the form data
- * @param {Partial<z.ParseContext<z.$ZodIssue>>} [schemaOptions] - Optional configuration options for Zod parsing
- * @param {Object} [resolverOptions] - Optional resolver-specific configuration
- * @param {('async'|'sync')} [resolverOptions.mode='async'] - Validation mode. Use 'sync' for synchronous validation
- * @param {boolean} [resolverOptions.raw=false] - If true, returns the raw form values instead of the parsed data
- * @returns {Resolver<z.output<typeof schema>>} A resolver function compatible with react-hook-form
- * @throws {Error} Throws if validation fails with a non-Zod error
- * @example
- * const schema = z.object({
- *   name: z.string().min(2),
- *   age: z.number().min(18)
- * });
+ * Creates a resolver function for react-hook-form that validates form data using a Zod schema.
  *
- * useForm({
- *   resolver: zodResolver(schema)
- * });
+ * @param schema - The Zod schema used to validate the form data
+ * @param schemaOptions - Optional Zod parsing options
+ * @param resolverOptions - Optional resolver-specific configuration
+ * @param resolverOptions.mode - Validation mode: 'async' (default) or 'sync'
+ * @param resolverOptions.raw - If true, returns raw form values instead of parsed data
+ * @returns A resolver function compatible with react-hook-form
+ * @throws Error if validation fails with a non-Zod error
+ *
+ * @example
+ * const schema = z.object({ name: z.string().min(2), age: z.number().min(18) });
+ * useForm({ resolver: zodResolver(schema) });
  */
 export function zodResolver<Input extends FieldValues, Context, Output>(
   schema: z.$ZodType<Output, Input>,
