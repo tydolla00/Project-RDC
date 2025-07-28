@@ -11,7 +11,6 @@ import { EnrichedSession } from "./types/session";
  * Runs all seeding steps and logs progress and errors.
  */
 async function main() {
-  console.log("Seeding database...");
   console.group("Begin seeding database");
   console.time("Seeding Time");
   try {

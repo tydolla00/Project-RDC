@@ -8,7 +8,7 @@ import Speedrunners from "./_components/speedrunners";
 import LethalCompany from "./_components/lethalcompany";
 import GolfWithFriends from "./_components/golfwithfriends";
 import { gameImages, GamesEnum } from "@/lib/constants";
-import { TimelineChart } from "./_components/timeline-chart";
+import { TimelineChart } from "../../_components/timeline-chart";
 import { Separator } from "@/components/ui/separator";
 
 // ? Force non specified routes to return 404
@@ -72,8 +72,12 @@ export default async function Page({
     <div className="m-16">
       <H1 className="my-0">{game.gameName}</H1>
       <TimelineChart
-        gameName={normalGameName}
-        sessions={sessions.data.slice(1)}
+        gameName={
+          game.gameName
+            .replace(/\s/g, "")
+            .toLowerCase() as keyof typeof gameImages
+        }
+        sessions={sessions.data}
         title={`${game.gameName} Videos`}
         desc="Use the keyboard to view specific data for a video"
       />

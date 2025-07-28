@@ -8,7 +8,10 @@
     "build": "next build",
     "build-memory": "next build --experimental-debug-memory-usage",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dbcrashout": "npx prisma db push --force-reset && npx prisma db push && npx tsx prisma/seed.ts",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -60,7 +63,7 @@
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.57.0",
-    "react-scan": "^0.3.3",
+    "react-scan": "^0.4.3",
     "react-use-measure": "^2.1.7",
     "recharts": "^2.15.3",
     "sharp": "^0.34.2",
@@ -68,22 +71,29 @@
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.11",
     "tailwindcss-animate": "^1.0.7",
-    "ts-node": "^10.9.2",
     "uuid": "^11.1.0",
     "ws": "^8.18.2",
     "zod": "^4.0.5"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.15.29",
     "@types/react": "19.1.6",
     "@types/react-dom": "19.1.6",
     "@types/ws": "^8.18.1",
-    "eslint": "^9",
+    "eslint": "^9.28.0",
     "eslint-config-next": "^15.3.3",
+    "jest": "^30.0.4",
+    "jest-environment-jsdom": "^30.0.4",
+    "jest-fixed-jsdom": "^0.0.9",
     "postcss": "^8.5.4",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.12",
     "prisma": "^6.9.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
