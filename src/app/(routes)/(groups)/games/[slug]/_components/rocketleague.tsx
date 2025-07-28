@@ -41,7 +41,7 @@ const RocketLeague = async ({
           assists: { sum: -1, avg: -1 },
           saves: { sum: -1, avg: -1 },
           score: { sum: -1, avg: -1 },
-          days: { sum: -1, avg: -1 },
+          day: { sum: -1, avg: -1 },
         };
       }
     }),
