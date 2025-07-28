@@ -5,7 +5,6 @@ import { CustomChart } from "./charts";
 import { TabbedChart } from "../../../_components/tabbed-chart";
 import { NoMembers } from "../../../members/_components/members";
 import { calcWinsPerPlayer, getAvgAndSum } from "../_functions/stats";
-import { CustomChart } from "./charts";
 
 const RocketLeague = async ({
   game,

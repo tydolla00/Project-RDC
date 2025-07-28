@@ -17,7 +17,6 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { Session } from "next-auth";
-import { DeleteAccountForm } from "./_components/DeleteAccountForm";
 import prisma from "@/../prisma/db";
 
 export default async function Page() {
@@ -139,18 +138,17 @@ function DialogDemo({ email }: { email: string | null | undefined }) {
     <Dialog>
       <DialogTrigger asChild>
         <Button className="cursor-pointer" variant="destructive">
-          Delete account
+          Settings
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+          <DialogTitle>Settings</DialogTitle>
           <DialogDescription className="select-none">
-            We hate to see you go. Are you sure you want to delete your account?
-            To confirm please type <b>{email}</b>
+            You can change your profile settings here. Make sure to save all
+            changes before leaving this page.
           </DialogDescription>
         </DialogHeader>
-        <DeleteAccountForm email={email} />
         <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>
