@@ -13,7 +13,6 @@ import prisma from "../../prisma/db";
 export default async function Home() {
   const games = await getGamesNav();
   const session = await auth();
-
   return (
     <>
       <div className="m-16">
@@ -49,6 +48,9 @@ export default async function Home() {
         <H2 className="text-chart-4 mx-auto mt-40 mb-6 w-fit md:my-10">
           Games
         </H2>
+        <p className="text-muted-foreground my-2 text-center leading-7">
+          Explore stats for each of the games below.
+        </p>
         <div className="flex flex-wrap justify-center gap-10">
           {games.map((game) => (
             <div key={game.url}>
@@ -84,10 +86,9 @@ export default async function Home() {
           <Card className="mx-auto md:w-1/2">
             <CardHeader>
               <p>
-                We could use some help keeping up scores. We have a place where
-                you can submit scores and we&apos;ll review them and compare
-                with other scores. In order to submit scores you must be signed
-                in.
+                Keeping track of stats, takes a lot of time. If you would like
+                to help us keep a record of the games they play, please login
+                and complete the form.
               </p>
             </CardHeader>
             <CardFooter>
@@ -110,31 +111,31 @@ const data = [
     player: "mark",
     sorryCounter: 100,
     sorryScale: 0.15,
-    fill: "blue",
+    fill: "var(--chart-1)",
   },
   {
     player: "leland",
     sorryCounter: 50,
     sorryScale: 0.15,
-    fill: "purple",
+    fill: "var(--chart-2)",
   },
   {
     player: "ben",
     sorryCounter: 50,
     sorryScale: 0.3,
-    fill: "green",
+    fill: "var(--chart-3)",
   },
   {
     player: "john",
     sorryCounter: 20,
     sorryScale: 0.05,
-    fill: "skyblue",
+    fill: "var(--chart-4)",
   },
   {
     player: "aff",
     sorryCounter: 10,
     sorryScale: 0.3,
-    fill: "orange",
+    fill: "var(--chart-5)",
   },
   {
     player: "dylan",

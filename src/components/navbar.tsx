@@ -33,7 +33,7 @@ export const Navbar = async () => {
   const members = await getMembersNav();
 
   return (
-    <NavigationMenu className="sticky top-0 z-20 mx-auto w-screen bg-inherit">
+    <NavigationMenu className="sticky top-0 z-20 mx-auto w-screen rounded-lg bg-inherit px-2">
       <NavigationMenuList>
         <NavigationMenuItem className={navigationMenuTriggerStyle()}>
           <Link href="/">
@@ -132,9 +132,11 @@ export const Navbar = async () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Avatar>
-                      <AvatarImage src={session.user?.image || Icon.src} />
-                      <AvatarFallback>Icon</AvatarFallback>
+                    <Avatar asChild>
+                      <Link href="/profile">
+                        <AvatarImage src={session.user?.image || Icon.src} />
+                        <AvatarFallback>Icon</AvatarFallback>
+                      </Link>
                     </Avatar>
                   </TooltipTrigger>
                   <TooltipContent>{session.user?.name}</TooltipContent>
