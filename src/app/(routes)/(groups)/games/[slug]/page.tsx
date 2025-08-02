@@ -8,7 +8,7 @@ import Speedrunners from "./_components/speedrunners";
 import LethalCompany from "./_components/lethalcompany";
 import GolfWithFriends from "./_components/golfwithfriends";
 import { gameImages, GamesEnum } from "@/lib/constants";
-import { TimelineChart } from "../../_components/timeline-chart";
+import { TimelineChart } from "./_components/timeline-chart";
 import { Separator } from "@/components/ui/separator";
 
 // ? Force non specified routes to return 404
@@ -63,6 +63,10 @@ export default async function Page({
     //   component = <GolfWithFriends game={game} />;
     //   break;
   }
+
+  const normalGameName = game.gameName
+    .replace(/\s/g, "")
+    .toLowerCase() as keyof typeof gameImages;
 
   return (
     <div className="m-16">

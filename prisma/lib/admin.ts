@@ -43,6 +43,7 @@ export const getAllSessionsByGame = unstable_cache(
           sessionName: true,
           sessionUrl: true,
           thumbnail: true,
+          dayWinners: true,
           Game: { select: { gameName: true } },
           sets: {
             select: {
