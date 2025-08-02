@@ -6,6 +6,7 @@ import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { revalidateTag } from "next/cache";
+import posthog from "@/lib/posthog";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -92,9 +93,12 @@ export const insertNewSessionFromAdmin = async (
 ): Promise<{ error: null | string }> => {
   console.group("insertNewSessionFromAdmin");
   console.log("Inserting New Session: ", session);
+  
+  const user = await auth();
+  let error: null | string = null;
+
   try {
-    const isAuthenticated = await auth();
-    if (!isAuthenticated) return { error: errorCodes.NotAuthenticated };
+    if (!user) return { error: errorCodes.NotAuthenticated };
 
     const sessionGame = await prisma.game.findFirst({
       where: { gameName: session.game },
@@ -129,7 +133,7 @@ export const insertNewSessionFromAdmin = async (
           thumbnail: session.thumbnail,
           date: session.date,
           videoId: session.videoId,
-          createdBy: isAuthenticated.user?.email || "SYSTEM",
+          createdBy: user.user?.email || "SYSTEM",
         },
       });
       const newSessionId = newSession.sessionId;
@@ -288,10 +292,19 @@ export const insertNewSessionFromAdmin = async (
     });
     revalidateTag("getAllSessions");
     return { error: null };
-  } catch (error) {
-    console.log(error);
-    return { error: "Unknown error occurred. Please try again." };
+  } catch (err) {
+    console.log(err);
+    error = "Unknown error occurred. Please try again.";
+    return { error };
   } finally {
+    posthog.capture({
+      event: error ? "Admin Form Submission Failed" : "Admin Form Submitted",
+      distinctId: user?.user?.email ?? "Unidentified User",
+      properties: {
+        error,
+      },
+    });
+    
     console.groupEnd();
   }
 };

@@ -6,9 +6,10 @@ import {
   getStatPerPlayer,
   getSumPerStat,
 } from "../../../../../../../prisma/lib/games";
-import PostHogClient from "@/lib/posthog";
+import posthog from "@/lib/posthog";
 import { QueryResponseData } from "../../../../../../../prisma/db";
 import { Decimal } from "@prisma/client/runtime/library";
+import { auth } from "@/auth";
 
 type Result = NonNullable<
   NonNullable<Awaited<ReturnType<typeof getSumPerStat>>["data"]>[number]
@@ -109,6 +110,7 @@ export const calcMostPerPlacing = async (
   statName: StatEndsWith<"POS">,
 ) => {
   const sessions = await getMatchesPerGame(gameId, statName);
+  const user = await auth();
 
   if (!sessions.success || !sessions.data) {
     console.log("Failed to get sessions");
@@ -116,7 +118,7 @@ export const calcMostPerPlacing = async (
   }
 
   const members = new Map<string, MembersPerPosition>();
-  const posthog = PostHogClient();
+  
 
   for (const session of sessions.data) {
     for (const set of session.sets) {
@@ -127,7 +129,7 @@ export const calcMostPerPlacing = async (
           if (isNaN(pos)) {
             posthog.capture({
               event: `NaN called in calcMostPerPlacing val: ${pos}`,
-              distinctId: new Date().toUTCString(),
+              distinctId: user?.user?.email ?? "Unidentified Email",
             });
             console.log("Not a number", pos);
             continue;
@@ -179,7 +181,7 @@ export const calcMostPerPlacing = async (
     7: val[7] || 0,
     8: val[8] || 0,
   }));
-  posthog.shutdown();
+  
   return data;
 };
 
@@ -191,13 +193,14 @@ export const calcMostPerPlacing = async (
  */
 export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
   const stats = await getStatPerPlayer(gameId, statName);
+  const user = await auth();
 
   if (!stats.success || !stats.data) {
     console.log("Failed to get stats");
     return [];
   }
   const members = new Map<string, number>();
-  const posthog = PostHogClient();
+  
 
   for (const { player, value } of stats.data) {
     const val = Number(value);
@@ -205,7 +208,7 @@ export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
     if (isNaN(val)) {
       posthog.capture({
         event: `NaN called in calculateStatPerPlayer val: ${val}`,
-        distinctId: new Date().toUTCString(),
+        distinctId: user?.user?.email ?? "Unidentified Email",
       });
       console.log("Not a number", val);
       continue;
@@ -215,6 +218,6 @@ export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
     members.set(player.playerName, member + val);
   }
   const data = Array.from(members, ([key, val]) => ({ player: key, val }));
-  posthog.shutdown();
+  
   return data;
 };
