@@ -7,6 +7,7 @@ import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { revalidateTag } from "next/cache";
 import posthog from "@/lib/posthog";
+import { v4 } from "uuid";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -93,7 +94,7 @@ export const insertNewSessionFromAdmin = async (
 ): Promise<{ error: null | string }> => {
   console.group("insertNewSessionFromAdmin");
   console.log("Inserting New Session: ", session);
-  
+
   const user = await auth();
   let error: null | string = null;
 
@@ -294,6 +295,16 @@ export const insertNewSessionFromAdmin = async (
     return { error: null };
   } catch (err) {
     console.log(err);
+    const user = await auth();
+    let e = err instanceof Error ? err.message : "Unknown error";
+    posthog.capture({
+      distinctId: user?.user?.email || v4(),
+      event: "admin_error",
+      properties: {
+        error: e,
+        session: JSON.stringify(session),
+      },
+    });
     error = "Unknown error occurred. Please try again.";
     return { error };
   } finally {
@@ -304,7 +315,7 @@ export const insertNewSessionFromAdmin = async (
         error,
       },
     });
-    
+
     console.groupEnd();
   }
 };
