@@ -232,7 +232,7 @@ const CustomTooltip = ({
       console.log(showMatchData);
       setSession(session);
     }
-  }, [active, session, setSession]);
+  }, [active, session, setSession, showMatchData]);
 
   if (active) {
     return (

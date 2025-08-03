@@ -8,11 +8,19 @@ import { ErrorModelOutput } from "@azure-rest/ai-document-intelligence";
  * @param error - The error to log
  */
 export const logAuthError = async (error: Error) => {
-  const session = await auth();
-  posthog.capture({
-    event: `Authentication Error - ${error}`,
-    distinctId: session?.user?.email ?? "Unidentified Email",
-  });
+  try {
+    const session = await auth();
+    posthog.captureException({
+      event: `Authentication Error - ${error}`,
+      distinctId: session?.user?.email ?? "Unidentified Email",
+    });
+  } catch (error) {
+    posthog.captureException({
+      event: `Authentication Error - ${error}`,
+      distinctId: undefined,
+    });
+    console.error("Error logging authentication error:", error);
+  }
 };
 
 /**
@@ -39,7 +47,7 @@ export const logFormError = (
   email: string,
   session: FormValues,
 ) => {
-  posthog.capture({
+  posthog.captureException({
     distinctId: email,
     event: "ADMIN_FORM_ERROR",
     properties: {
@@ -63,7 +71,7 @@ export const logVisionError = (
   email: string,
   error: ErrorModelOutput | unknown,
 ) => {
-  posthog.capture({
+  posthog.captureException({
     event: "VISION_ERROR",
     distinctId: email,
     properties: {

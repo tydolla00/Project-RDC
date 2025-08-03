@@ -32,12 +32,10 @@ import { Player } from "@prisma/client";
 import Image from "next/image";
 import { VisionResultCodes } from "@/lib/constants";
 import { toast } from "sonner";
-import {
-  handleClose,
-  handleAnalyzeBtnClick,
-} from "../../_utils/rdc-vision-helpers";
+import { handleAnalyzeBtnClick } from "../../_utils/rdc-vision-helpers";
 import { VisionPlayer } from "@/app/actions/visionAction";
 import { z } from "zod/v4";
+import { handleClose } from "../../vision/helpers";
 
 interface Props {
   handleCreateMatchFromVision: (
@@ -106,6 +104,43 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
+/**
+ * Converts a File object to a base64 encoded string
+ *
+ * @description
+ * This function:
+ * 1. Creates a FileReader to read the file as an ArrayBuffer
+ * 2. Returns a Promise that resolves with the base64 encoded content
+ * 3. Handles errors during file reading
+ * 4. Converts ArrayBuffer to base64 string using Buffer
+ *
+ * @param selectedFile - The File object to convert
+ * @returns Promise that resolves with the base64 encoded string, or undefined if reading fails
+ * @throws Logs error if file reading fails
+ */
+const getFileAsBase64 = async (selectedFile: File) => {
+  const reader = new FileReader();
+
+  const readFile = () =>
+    new Promise((resolve, reject) => {
+      reader.onload = async (e) => resolve(e.target?.result);
+      reader.onerror = (error) => reject(error);
+      reader.readAsArrayBuffer(selectedFile!);
+    });
+  const fileContent = await readFile();
+
+  if (!fileContent) {
+    console.error("Error reading file content");
+    return;
+  }
+
+  const base64FileContent = Buffer.from(fileContent as ArrayBuffer).toString(
+    "base64",
+  );
+
+  return base64FileContent;
+};
+
 const RDCVisionModal = (props: Props) => {
   const { handleCreateMatchFromVision, sessionPlayers, gameName } = props;
 
@@ -163,7 +198,7 @@ const RDCVisionModal = (props: Props) => {
     return () => {
       document.removeEventListener("paste", handlePaste);
     };
-  }, []);
+  }, [handlePaste]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || event.target.files.length === 0) return;
@@ -191,15 +226,75 @@ const RDCVisionModal = (props: Props) => {
 
   // Wrap analyze click to close modal on success
   const handleAnalyzeAndMaybeClose = async () => {
-    await handleAnalyzeBtnClick(
-      state,
-      dispatch,
-      handleCreateMatchFromVision,
+    if (!state.selectedFile) {
+      toast.warning("Please select a file to analyze.", {
+        richColors: true,
+      });
+      return;
+    }
+
+    const base64FileContent = await getFileAsBase64(state.selectedFile);
+
+    if (!base64FileContent) {
+      toast.warning("Could not read the selected file. Please try again.", {
+        richColors: true,
+      });
+      return;
+    }
+
+    dispatch({ type: "UPDATE_LOADING", loading: true });
+
+    const result = await handleAnalyzeBtnClick(
+      base64FileContent,
       sessionPlayers,
       gameName,
-      // Pass a callback to close modal on success
-      () => setOpen(false),
     );
+
+    if (result) {
+      switch (result.status) {
+        case VisionResultCodes.Success:
+          if (result.data) {
+            handleCreateMatchFromVision(
+              result.data.players,
+              result.data.winner || [],
+            );
+          }
+          dispatch({
+            type: "UPDATE_VISION",
+            visionStatus: VisionResultCodes.Success,
+            visionMsg: result.message,
+          });
+          toast.success("Success", { richColors: true });
+          setOpen(false); // Close modal on success
+          break;
+        case VisionResultCodes.CheckRequest:
+          if (result.data) {
+            handleCreateMatchFromVision(
+              result.data.players,
+              result.data.winner || [],
+            );
+          }
+          dispatch({
+            type: "UPDATE_VISION",
+            visionStatus: VisionResultCodes.CheckRequest,
+            visionMsg: result.message,
+          });
+          toast.warning(result.message, { richColors: true });
+          break;
+        case VisionResultCodes.Failed:
+          dispatch({
+            type: "UPDATE_VISION",
+            visionStatus: VisionResultCodes.Failed,
+            visionMsg: result.message,
+          });
+          toast.error(result.message, { richColors: true });
+          break;
+        default:
+          break;
+      }
+    }
+
+    dispatch({ type: "UPDATE_LOADING", loading: false });
   };
 
   return (

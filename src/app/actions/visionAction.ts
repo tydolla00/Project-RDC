@@ -94,7 +94,7 @@ export const analyzeScreenShot = async (
       throw new Error(`Game config not found for gameId: ${gameId}`);
     }
 
-    console.log("Analzying Screenshot with config: ", gameConfig);
+    console.log("Analyzing Screenshot with config: ", gameConfig);
 
     const response = await client
       .path("/documentModels/{modelId}:analyze", gameConfig.modelId)

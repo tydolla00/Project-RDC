@@ -47,7 +47,7 @@ export const updateAuthStatus = async (session: Session | null) => {
  * @throws Returns error object if video fetch fails or authentication is invalid
  *
  * @example
- * const { video, error } = await getRDCVideoDetails('dQw4w9WgXcQ');
+ * const { video, error } = await getRDCVideoDetails('dQw4w9WgXcQ', 'Rocket League', 'distinct-id-123');
  * if (error) {
  *   // Handle error case
  * } else {

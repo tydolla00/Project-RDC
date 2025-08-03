@@ -43,7 +43,7 @@ const PlayerStatManager = (props: Props) => {
     return () => {
       ignore = true;
     };
-  }, [gameStats, append]);
+  }, [gameStats, append, curPlayerSession, getValues]);
 
   return (
     <>
