@@ -108,6 +108,51 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
   };
 
   useEffect(() => {
+    const key = "entryCreatorForm";
+    const savedForm = localStorage.getItem(key);
+    if (savedForm) {
+      toast("Would you like to restore your previous form data?", {
+        action: {
+          label: "Restore",
+          onClick: () => {
+            try {
+              const session: FormValues = JSON.parse(savedForm);
+              session.date = new Date(session.date);
+              form.reset(session);
+            } catch (error) {
+              console.error("Error restoring form data:", error);
+            }
+            localStorage.removeItem(key);
+          },
+        },
+      });
+    } else {
+      localStorage.removeItem(key);
+    }
+  }, [form]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      console.log("beforeunload event triggered", form.formState.isDirty);
+      if (form.formState.isDirty) {
+        console.log("Got here");
+        e.preventDefault();
+        localStorage.setItem(
+          "entryCreatorForm",
+          JSON.stringify(form.getValues()),
+        );
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [form.formState.isDirty, form.getValues, form]);
+
+  useEffect(() => {
     document.documentElement.scrollTop = 0; // Scroll to top when a new set is added
   }, []);
   return (
