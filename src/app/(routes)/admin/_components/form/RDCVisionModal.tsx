@@ -125,7 +125,7 @@ const getFileAsBase64 = async (selectedFile: File) => {
     new Promise((resolve, reject) => {
       reader.onload = async (e) => resolve(e.target?.result);
       reader.onerror = (error) => reject(error);
-      reader.readAsArrayBuffer(selectedFile!);
+      reader.readAsArrayBuffer(selectedFile);
     });
   const fileContent = await readFile();
 

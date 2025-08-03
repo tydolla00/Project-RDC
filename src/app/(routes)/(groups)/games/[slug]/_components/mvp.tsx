@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { QueryResponseData } from "prisma/db";
 import { getAllSessionsByGame } from "prisma/lib/admin";
 import { useMemo } from "react";
