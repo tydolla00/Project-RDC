@@ -6,8 +6,8 @@ import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { revalidateTag } from "next/cache";
-import posthog from "@/lib/posthog";
 import { v4 } from "uuid";
+import { logFormError, logFormSuccess } from "@/posthog/server-analytics";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -291,31 +291,15 @@ export const insertNewSessionFromAdmin = async (
         }),
       );
     });
+    logFormSuccess(user?.user?.email ?? v4());
     revalidateTag("getAllSessions");
     return { error: null };
   } catch (err) {
-    console.log(err);
     const user = await auth();
-    let e = err instanceof Error ? err.message : "Unknown error";
-    posthog.capture({
-      distinctId: user?.user?.email || v4(),
-      event: "admin_error",
-      properties: {
-        error: e,
-        session: JSON.stringify(session),
-      },
-    });
+    logFormError(err, user?.user?.email ?? v4(), session);
     error = "Unknown error occurred. Please try again.";
     return { error };
   } finally {
-    posthog.capture({
-      event: error ? "Admin Form Submission Failed" : "Admin Form Submitted",
-      distinctId: user?.user?.email ?? "Unidentified User",
-      properties: {
-        error,
-      },
-    });
-
     console.groupEnd();
   }
 };

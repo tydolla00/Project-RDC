@@ -1,3 +1,7 @@
+// import { cookies } from "next/headers";
+// import posthog from "./posthog/server-init";
+// import { v4 } from "uuid";
+
 /**
  * Handles errors that occur during Next.js requests.
  *
@@ -13,7 +17,7 @@
  * @param request - Request context including path, method and headers
  * @param context - Next.js runtime context including router and rendering information
  */
-export function onRequestError(
+export async function onRequestError(
   error: { digest: string } & Error,
   request: {
     path: string; // resource path, e.g. /blog?name=foo
@@ -31,12 +35,20 @@ export function onRequestError(
     revalidateReason: "on-demand" | "stale" | undefined; // undefined is a normal request without revalidation
     renderType: "dynamic" | "dynamic-resume"; // 'dynamic-resume' for PPR
   },
-): void | Promise<void> {
-  console.log(
-    "ERROR OCCURRED",
-    error.message,
-    request.method,
-    context.routePath,
-    context.routeType,
-  );
+): Promise<void> {
+  let distinctId: string;
+  // const cookiesStore = await cookies();
+  // const cookieName =
+  //   "ph_phc_ymI76IccT0jIjAjaJVFse643ZsilQYyvwG2qnZ2w10H_posthog";
+
+  // if (cookiesStore.has(cookieName)) {
+  //   distinctId = cookiesStore.get(cookieName)?.value || v4();
+  // } else distinctId = v4();
+
+  // posthog.captureException(error, distinctId, {
+  //   errorMsg: error.message,
+  //   requestMethod: request.method,
+  //   contextRoutePath: context.routePath,
+  //   contextRouteType: context.routeType,
+  // });
 }

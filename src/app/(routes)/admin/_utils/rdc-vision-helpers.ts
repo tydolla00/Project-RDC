@@ -1,3 +1,5 @@
+"use server";
+
 import { VisionResultCodes } from "@/lib/constants";
 import { toast } from "sonner";
 import { Player } from "@prisma/client";
@@ -143,7 +145,7 @@ export const handleAnalyzeBtnClick = async (
  * @param previewUrl - URL of the preview image to cleanup
  * @param dispatch - Function to update UI state
  */
-export const handleClose = (
+export const handleClose = async (
   previewUrl: string | null,
   dispatch: (action: Action) => void,
 ) => {

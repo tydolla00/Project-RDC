@@ -4,7 +4,6 @@ import DocumentIntelligence, {
   AnalyzeResultOperationOutput,
   isUnexpected,
 } from "@azure-rest/ai-document-intelligence";
-import posthog from "@/lib/posthog";
 import { Player } from "@prisma/client";
 import { GameProcessor } from "@/lib/game-processors/game-processor-utils";
 import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
@@ -13,6 +12,7 @@ import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";
 import { PLAYER_MAPPINGS } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";
 import { v4 } from "uuid";
+import { logVisionError } from "@/posthog/server-analytics";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -109,6 +109,8 @@ export const analyzeScreenShot = async (
       });
 
     if (isUnexpected(response)) {
+      const user = await auth();
+      logVisionError(user?.user?.email || v4(), response.body.error);
       throw response.body.error;
     }
 
@@ -202,18 +204,8 @@ export const analyzeScreenShot = async (
     console.error(error);
     const user = await auth();
     let e = error instanceof Error ? error.message : "Unknown error";
-    posthog.capture({
-      distinctId: user?.user?.email || v4(),
-      event: "vision_error",
-      properties: {
-        error: e,
-        image: base64Source,
-      },
-    });
-    return {
-      status: VisionResultCodes.Failed,
-      message: e,
-    };
+    logVisionError(user?.user?.email ?? v4(), error);
+    return { status: VisionResultCodes.Failed, message: e };
   }
 };
 
