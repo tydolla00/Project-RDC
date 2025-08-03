@@ -14,11 +14,12 @@ import { useState, useTransition } from "react";
 import { getRDCVideoDetails } from "@/app/actions/action";
 import { toast } from "sonner";
 import { errorCodes } from "@/lib/constants";
-import { signOut } from "@/auth";
 import { Player } from "@prisma/client";
 import { FormValues } from "../../_utils/form-helpers";
 import { getVideoId } from "../../_utils/helper-functions";
 import { userSignOut } from "@/app/actions/signOut";
+import { usePostHog } from "posthog-js/react";
+import { useSession } from "next-auth/react";
 
 export const SessionInfo = ({
   form,
@@ -35,6 +36,8 @@ export const SessionInfo = ({
     control,
     formState: { errors, defaultValues },
   } = form;
+  const posthog = usePostHog();
+  const { data: user } = useSession();
 
   /**
    * Handles the URL update process for a session.
@@ -72,9 +75,12 @@ export const SessionInfo = ({
         return;
       }
 
+      const distinctId = posthog.get_distinct_id();
+
       const { error, video } = await getRDCVideoDetails(
         videoId,
         form.getValues("game"),
+        user?.user?.email ?? distinctId,
       );
 
       if (error !== undefined) {
