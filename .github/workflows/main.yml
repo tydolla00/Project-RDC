@@ -33,8 +33,16 @@ jobs:
       - name: Set Direct URL
         run: echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> $GITHUB_ENV
 
+      - name: Set Posthog Host
+        run: echo "NEXT_PUBLIC_POSTHOG_HOST=${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}" >> $GITHUB_ENV
+
+      - name: Set Posthog Key
+        run: echo "NEXT_PUBLIC_POSTHOG_KEY=${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}" >> $GITHUB_ENV
+
       - name: Build with Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
         run: vercel build --token ${{ secrets.VERCEL_TOKEN }} --prod
