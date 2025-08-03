@@ -205,9 +205,9 @@ const RDCVisionModal = (props: Props) => {
   return (
     <Dialog
       open={open}
-      onOpenChange={(v) => {
+      onOpenChange={async (v) => {
         setOpen(v);
-        if (!v) handleClose(previewUrl, dispatch);
+        if (!v) await handleClose(previewUrl, dispatch);
       }}
     >
       <DialogTrigger asChild>

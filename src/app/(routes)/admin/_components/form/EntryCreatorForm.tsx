@@ -9,7 +9,6 @@ import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
-import { signOut } from "@/auth";
 import { formSchema, FormValues } from "../../_utils/form-helpers";
 import {
   AnimatedFormWrapper,
@@ -20,7 +19,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoInfo } from "./VideoInfo";
 import { cn } from "@/lib/utils";
 import { FormSummary } from "./Summary";
-// import { zodResolver } from "../../_utils/temp-zodv4-resolver";
+import { userSignOut } from "@/app/actions/signOut";
 
 interface AdminFormProps {
   rdcMembers: Player[];
@@ -85,7 +84,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
 
     if (err)
       err === errorCodes.NotAuthenticated
-        ? await signOut({ redirectTo: "/" })
+        ? await userSignOut()
         : toast.error(err, { richColors: true });
     else {
       toast.success("Session successfully created.", { richColors: true });

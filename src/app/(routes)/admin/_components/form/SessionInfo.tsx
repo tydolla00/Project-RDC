@@ -18,6 +18,7 @@ import { signOut } from "@/auth";
 import { Player } from "@prisma/client";
 import { FormValues } from "../../_utils/form-helpers";
 import { getVideoId } from "../../_utils/helper-functions";
+import { userSignOut } from "@/app/actions/signOut";
 
 export const SessionInfo = ({
   form,
@@ -77,8 +78,7 @@ export const SessionInfo = ({
       );
 
       if (error !== undefined) {
-        if (error === errorCodes.NotAuthenticated)
-          await signOut({ redirectTo: "/" });
+        if (error === errorCodes.NotAuthenticated) await userSignOut();
         else {
           form.reset(undefined, { keepIsValid: true });
           toast.error(error, { richColors: true });

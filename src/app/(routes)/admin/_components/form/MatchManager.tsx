@@ -8,9 +8,8 @@ import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import RDCVisionModal from "./RDCVisionModal";
-import { VisionPlayer, VisionResult } from "@/app/actions/visionAction";
+import { VisionPlayer } from "@/app/actions/visionAction";
 import { FormValues } from "../../_utils/form-helpers";
-import { getGameIdFromName } from "@/app/actions/adminAction";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 interface Props {

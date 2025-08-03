@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { RLStats } from "./timeline-chart";
+import { RLStats } from "../games/[slug]/_components/timeline-chart";
 import { getAllSessionsByGame } from "../../../../../prisma/lib/admin";
 import { Button } from "@/components/ui/button";
 import SetData from "./set-data";

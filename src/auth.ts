@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import { logAuthError, logAuthEvent } from "./lib/analytics";
+import { logAuthError, logAuthEvent } from "./posthog/server-analytics";
 
 export const config: NextAuthConfig = {
   providers: [GitHub, Google],

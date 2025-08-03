@@ -6,10 +6,11 @@ import {
   getStatPerPlayer,
   getSumPerStat,
 } from "../../../../../../../prisma/lib/games";
-import posthog from "@/lib/posthog";
 import { QueryResponseData } from "../../../../../../../prisma/db";
 import { Decimal } from "@prisma/client/runtime/library";
 import { auth } from "@/auth";
+import { logNAN } from "@/posthog/server-analytics";
+import { v4 } from "uuid";
 
 type Result = NonNullable<
   NonNullable<Awaited<ReturnType<typeof getSumPerStat>>["data"]>[number]
@@ -118,7 +119,6 @@ export const calcMostPerPlacing = async (
   }
 
   const members = new Map<string, MembersPerPosition>();
-  
 
   for (const session of sessions.data) {
     for (const set of session.sets) {
@@ -127,11 +127,11 @@ export const calcMostPerPlacing = async (
         for (const ps of match.playerSessions) {
           const pos = Number(ps.playerStats[0].value);
           if (isNaN(pos)) {
-            posthog.capture({
-              event: `NaN called in calcMostPerPlacing val: ${pos}`,
-              distinctId: user?.user?.email ?? "Unidentified Email",
-            });
-            console.log("Not a number", pos);
+            logNAN(
+              "calcMostPerPlacing",
+              user?.user?.email ?? v4(),
+              ps.playerStats[0].playerStatId,
+            );
             continue;
           }
           if (!members.has(ps.player.playerName))
@@ -181,7 +181,7 @@ export const calcMostPerPlacing = async (
     7: val[7] || 0,
     8: val[8] || 0,
   }));
-  
+
   return data;
 };
 
@@ -200,17 +200,16 @@ export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
     return [];
   }
   const members = new Map<string, number>();
-  
 
-  for (const { player, value } of stats.data) {
+  for (const { player, value, statId } of stats.data) {
     const val = Number(value);
 
     if (isNaN(val)) {
-      posthog.capture({
-        event: `NaN called in calculateStatPerPlayer val: ${val}`,
-        distinctId: user?.user?.email ?? "Unidentified Email",
-      });
-      console.log("Not a number", val);
+      logNAN(
+        "calcStatPerPlayer",
+        user?.user?.email ?? "Unidentified Email",
+        statId,
+      );
       continue;
     }
 
@@ -218,6 +217,6 @@ export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
     members.set(player.playerName, member + val);
   }
   const data = Array.from(members, ([key, val]) => ({ player: key, val }));
-  
+
   return data;
 };

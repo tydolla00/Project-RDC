@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { z } from "zod";
 import MatchManager from "./MatchManager";
 import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { formSchema, FormValues, SetWinners } from "../../_utils/form-helpers";
+import { FormValues } from "../../_utils/form-helpers";
 import WinnerDisplay from "./WinnerDisplay";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
@@ -76,7 +75,7 @@ const SetManager = () => {
           return (
             <Collapsible open={openSets[setIndex]} key={set.setId}>
               <Card className="flex flex-col space-y-3 rounded-lg p-6 shadow-lg">
-                <CardHeader className="flex flex-row justify-between space-y-0 pb-0 pl-0 pr-0">
+                <CardHeader className="flex flex-row justify-between space-y-0 pr-0 pb-0 pl-0">
                   <div className="mb-2 text-lg font-semibold">
                     Set {setIndex + 1}
                   </div>

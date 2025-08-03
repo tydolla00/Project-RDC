@@ -121,7 +121,7 @@ export const getMatchesPerGame = async <T extends StatName = StatName>(
                     player: true,
                     playerStats: {
                       where: { gameStat: { statName } },
-                      select: { value: true },
+                      select: { playerStatId: true, value: true },
                       take: 1,
                     },
                   },
@@ -145,7 +145,7 @@ export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
   await handlePrismaOperation(() =>
     prisma.playerStat.findMany({
       where: { gameId, AND: { gameStat: { statName } } },
-      select: { player: true, value: true },
+      select: { player: true, value: true, statId: true },
     }),
   );
 
