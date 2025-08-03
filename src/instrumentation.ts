@@ -1,6 +1,6 @@
-// import { cookies } from "next/headers";
-// import posthog from "./posthog/server-init";
-// import { v4 } from "uuid";
+import { cookies } from "next/headers";
+import posthog from "./posthog/server-init";
+import { v4 } from "uuid";
 
 /**
  * Handles errors that occur during Next.js requests.
@@ -37,18 +37,18 @@ export async function onRequestError(
   },
 ): Promise<void> {
   let distinctId: string;
-  // const cookiesStore = await cookies();
-  // const cookieName =
-  //   "ph_phc_ymI76IccT0jIjAjaJVFse643ZsilQYyvwG2qnZ2w10H_posthog";
+  const cookiesStore = await cookies();
+  const cookieName =
+    "ph_phc_ymI76IccT0jIjAjaJVFse643ZsilQYyvwG2qnZ2w10H_posthog";
 
-  // if (cookiesStore.has(cookieName)) {
-  //   distinctId = cookiesStore.get(cookieName)?.value || v4();
-  // } else distinctId = v4();
+  if (cookiesStore.has(cookieName)) {
+    distinctId = cookiesStore.get(cookieName)?.value || v4();
+  } else distinctId = v4();
 
-  // posthog.captureException(error, distinctId, {
-  //   errorMsg: error.message,
-  //   requestMethod: request.method,
-  //   contextRoutePath: context.routePath,
-  //   contextRouteType: context.routeType,
-  // });
+  posthog.captureException(error, distinctId, {
+    errorMsg: error.message,
+    requestMethod: request.method,
+    contextRoutePath: context.routePath,
+    contextRouteType: context.routeType,
+  });
 }
