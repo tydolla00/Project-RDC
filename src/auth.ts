@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import { logAuthError, logAuthEvent } from "./posthog/server-analytics";
+// import { logAuthError, logAuthEvent } from "./posthog/server-analytics";
 
 export const config: NextAuthConfig = {
   providers: [GitHub, Google],
@@ -13,7 +13,7 @@ export const config: NextAuthConfig = {
     async error(error) {
       console.log(error.cause);
       console.log(error.stack);
-      logAuthError(error);
+      // logAuthError(error);
     },
   },
   callbacks: {
@@ -30,7 +30,7 @@ export const config: NextAuthConfig = {
       }
       console.log(user);
       if (user === "tydolla00" || user === "shargrove09") {
-        logAuthEvent("signin", params.user.email!);
+        // logAuthEvent("signin", params.user.email!);
         return true;
       }
       return false; // Flip when ready to go live
