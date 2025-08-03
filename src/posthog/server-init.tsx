@@ -18,3 +18,5 @@ const posthog = new PostHog(config.NEXT_PUBLIC_POSTHOG_KEY, {
 });
 
 export default posthog;
+
+// ? May want to disable posthog in development.
