@@ -83,7 +83,7 @@ const marioKart8Stats = z.object({
     .transform((val) => String(parseInt(val) || 0)),
 });
 
-// ? COD
+// ? COD Gun Game Stats
 
 const codStats = z.object({
   statId: z.string().trim().min(1, "StatId is required"),
@@ -94,6 +94,8 @@ const codStats = z.object({
     $Enums.StatName.COD_SCORE,
     $Enums.StatName.COD_MELEES,
   ]),
+
+  // CoD
   statValue: z
     .string()
     .trim()
