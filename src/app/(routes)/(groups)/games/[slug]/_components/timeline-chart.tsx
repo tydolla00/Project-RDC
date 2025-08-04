@@ -19,7 +19,7 @@ import {
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { getAllSessionsByGame } from "../../../../../../../prisma/lib/admin";
 import Image from "next/image";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import MatchData from "./match-data";
@@ -219,10 +219,9 @@ export type RLStats = {
 const CustomTooltip = ({
   active,
   payload,
-  label,
   setSession,
   showMatchData,
-}: TooltipProps<any, any> & {
+}: TooltipProps<string, string> & {
   setSession: (session: Sessions[0]) => void;
   showMatchData: boolean;
 }) => {

@@ -7,10 +7,8 @@ import { toast } from "sonner";
 
 export const VideoInfo = ({
   form,
-  step,
 }: {
   form: ReturnType<typeof useForm<FormValues>>;
-  step: number;
 }) => {
   const thumbnail = form.watch("thumbnail");
   const sessionName = form.watch("sessionName");

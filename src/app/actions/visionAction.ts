@@ -203,7 +203,7 @@ export const analyzeScreenShot = async (
   } catch (error) {
     console.error(error);
     const user = await auth();
-    let e = error instanceof Error ? error.message : "Unknown error";
+    const e = error instanceof Error ? error.message : "Unknown error";
     logVisionError(user?.user?.email ?? v4(), error);
     return { status: VisionResultCodes.Failed, message: e };
   }

@@ -9,14 +9,6 @@ import { redirect } from "next/navigation";
 import posthog from "@/posthog/server-init";
 
 /**
- * @deprecated
- * @param props
- */
-export const submitUpdates = async (props: any) => {
-  console.log(props);
-};
-
-/**
  * Updates the authentication status based on the provided session.
  *
  * If a session is provided, it signs out the user and redirects to the home page.

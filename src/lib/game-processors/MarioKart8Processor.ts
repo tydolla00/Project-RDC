@@ -31,7 +31,7 @@ const validateMKStatValue = (
     return { statValue: "0", reqCheck: true };
   }
 
-  if (numericValue === 7 && numPlayers!! < 7) {
+  if (numericValue === 7 && numPlayers! < 7) {
     console.log(`Converting position 7 to 1 (numPlayers=${numPlayers})`);
     return { statValue: "1", reqCheck: true };
   }
@@ -47,7 +47,7 @@ export const MarioKart8Processor: GameProcessor = {
   ) {
     console.log("Processing MK8 Players: ", mk8Players);
 
-    let mk8VisionResult: VisionResult = {
+    const mk8VisionResult: VisionResult = {
       players: [],
     };
     let requiresCheck = false;

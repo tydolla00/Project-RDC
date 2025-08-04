@@ -19,12 +19,6 @@ export const H3 = ({ id, children, className }: HeaderProps) => (
   </h3>
 );
 
-const Heading1 = React.forwardRef<
-  HTMLHeadingElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ ...props }, ref) => <h1></h1>);
-Heading1.displayName = "Heading1";
-
 type HeaderProps = {
   id?: string;
   children?: React.ReactNode;

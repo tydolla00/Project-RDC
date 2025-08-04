@@ -3,6 +3,6 @@ const LethalCompany = ({
 }: {
   game: { gameId: number; gameName: string };
 }) => {
-  return <div>lethalcompany</div>;
+  return <div>{game.gameName}</div>;
 };
 export default LethalCompany;

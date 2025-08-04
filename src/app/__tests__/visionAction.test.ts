@@ -1,5 +1,5 @@
 import { analyzeScreenShot, getGameProcessor } from "../actions/visionAction";
-import { GAME_CONFIGS, VisionResultCodes } from "@/lib/constants";
+import { VisionResultCodes } from "@/lib/constants";
 import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
 import { RocketLeagueProcessor } from "@/lib/game-processors/RocketLeagueProcessor";
 import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";

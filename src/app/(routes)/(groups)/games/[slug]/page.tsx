@@ -6,7 +6,7 @@ import CallOfDuty from "./_components/callofduty";
 import RocketLeague from "./_components/rocketleague";
 import Speedrunners from "./_components/speedrunners";
 import LethalCompany from "./_components/lethalcompany";
-import GolfWithFriends from "./_components/golfwithfriends";
+// import GolfWithFriends from "./_components/golfwithfriends";
 import { gameImages, GamesEnum } from "@/lib/constants";
 import { TimelineChart } from "./_components/timeline-chart";
 import { Separator } from "@/components/ui/separator";
@@ -63,10 +63,6 @@ export default async function Page({
     //   component = <GolfWithFriends game={game} />;
     //   break;
   }
-
-  const normalGameName = game.gameName
-    .replace(/\s/g, "")
-    .toLowerCase() as keyof typeof gameImages;
 
   return (
     <div className="m-16">

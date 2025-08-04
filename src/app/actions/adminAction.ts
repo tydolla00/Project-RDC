@@ -148,11 +148,9 @@ export const insertNewSessionFromAdmin = async (
             set,
           );
 
-          const setWinnerConnect = (set?.setWinners ?? []).map(
-            (winner: any) => ({
-              playerId: winner.playerId,
-            }),
-          );
+          const setWinnerConnect = (set?.setWinners ?? []).map((winner) => ({
+            playerId: winner.playerId,
+          }));
 
           console.log(`Set Winners for set ${i + 1}: `, setWinnerConnect);
 

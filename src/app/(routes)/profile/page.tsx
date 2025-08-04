@@ -62,17 +62,15 @@ export default async function Page() {
         </div>
       </div>
       <div className="mt-10">
-        <ProfileTabs email={session.user?.email} userSessions={userSessions} />
+        <ProfileTabs userSessions={userSessions} />
       </div>
     </div>
   );
 }
 
 function ProfileTabs({
-  email,
   userSessions,
 }: {
-  email: string | null | undefined;
   userSessions: {
     sessionId: number;
     sessionName: string;
@@ -124,7 +122,7 @@ function ProfileTabs({
       </TabsContent>
       <TabsContent value="settings">
         <div>Settings content</div>
-        <DialogDemo email={email} />
+        <DialogDemo />
       </TabsContent>
       <TabsContent value="favorites">
         <div>Favorites content</div>
@@ -133,7 +131,7 @@ function ProfileTabs({
   );
 }
 
-function DialogDemo({ email }: { email: string | null | undefined }) {
+function DialogDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>

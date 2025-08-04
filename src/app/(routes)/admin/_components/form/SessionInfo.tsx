@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Controller, UseFormReturn } from "react-hook-form";
 import GameDropDownForm from "./GameDropDownForm";
 import PlayerSelector from "./PlayerSelector";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { getRDCVideoDetails } from "@/app/actions/action";
 import { toast } from "sonner";
 import { errorCodes } from "@/lib/constants";
@@ -28,13 +28,10 @@ export const SessionInfo = ({
   form: UseFormReturn<FormValues>;
   rdcMembers: Player[];
 }) => {
-  const [session, setSession] = useState<
-    Awaited<ReturnType<typeof getRDCVideoDetails>>["video"] | null
-  >(null);
   const [isPending, startTransition] = useTransition();
   const {
     control,
-    formState: { errors, defaultValues },
+    formState: { defaultValues },
   } = form;
   const posthog = usePostHog();
   const { data: user } = useSession();
@@ -88,7 +85,6 @@ export const SessionInfo = ({
         else {
           form.reset(undefined, { keepIsValid: true });
           toast.error(error, { richColors: true });
-          setSession(null);
         }
       } else {
         const thumbnail =
@@ -99,7 +95,6 @@ export const SessionInfo = ({
         form.setValue("thumbnail", thumbnail);
         form.setValue("date", new Date(video.date));
         form.setValue("videoId", videoId);
-        setSession(video);
         toast.success("Youtube video successfully linked.", {
           richColors: true,
         });

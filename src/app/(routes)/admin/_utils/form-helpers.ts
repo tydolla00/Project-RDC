@@ -109,10 +109,6 @@ const statSchema = z.discriminatedUnion("stat", [
 
 // ! End of Stat Schema Definitions
 
-type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};
-
 const playerSessionSchema = z.object({
   playerId: z.int(),
   playerSessionName: z.string().trim().min(1),
@@ -153,7 +149,7 @@ const baseSessionSchema = z.object({
   date: dateSchema,
   thumbnail: thumbnailSchema,
   players: playersSchema,
-  sets: z.array(setSchema).nonempty("At least one set is required"),
+  sets: setsSchema,
 });
 
 const rocketLeagueSchema = baseSessionSchema.extend({

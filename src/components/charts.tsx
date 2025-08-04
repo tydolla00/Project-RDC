@@ -22,7 +22,7 @@ export const PieChartRDC = ({
   data,
 }: {
   config: ChartConfig;
-  data: any[];
+  data: unknown[];
 }) => {
   // This Chart will rank the average of placements in each category.
   // TODO Responsive not working. May need to mess with config or use grid resizing via css.

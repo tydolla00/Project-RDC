@@ -19,15 +19,14 @@ import {
 import { BarChart, YAxis } from "recharts";
 import { CartesianGrid, XAxis, Bar } from "recharts";
 
-export const CustomChart = <T extends any[]>({
+export const CustomChart = <T extends unknown[]>({
   data,
   nameKey,
   config,
   dataKey,
   title,
   description,
-  type = "bar",
-  ignoreWarnings = false,
+  // ignoreWarnings = false,
 }: {
   data: T;
   nameKey: string;
@@ -35,13 +34,12 @@ export const CustomChart = <T extends any[]>({
   dataKey: string;
   title: string;
   description: string;
-  type?: "pie" | "bar";
   ignoreWarnings?: boolean;
 }) => {
-  if (!ignoreWarnings && data.some((d) => d[nameKey] === undefined))
-    console.error("NameKey not present in data passed to chart.");
-  if (!ignoreWarnings && data.some((d) => d[dataKey] === undefined))
-    console.error("DataKey not present in data passed to chart");
+  // if (!ignoreWarnings && data.some((d) => typeof d=== "object" && d !== null && d[nameKey] === undefined))
+  //   console.error("NameKey not present in data passed to chart.");
+  // if (!ignoreWarnings && data.some((d) => typeof d=== "object" && d !== null && d[dataKey] === undefined))
+  //   console.error("DataKey not present in data passed to chart");
 
   return (
     <Card className="w-fit">

@@ -67,7 +67,7 @@ export const calcWinsPerPlayer = (
       // Calculate Match Wins
       for (const match of set.matches) {
         for (const winner of match.matchWinners) {
-          let member = members.get(winner.playerName);
+          const member = members.get(winner.playerName);
           if (!member)
             members.set(winner.playerName, { matchWins: 1, setWins: 0 });
           else member.matchWins += 1;
@@ -75,7 +75,7 @@ export const calcWinsPerPlayer = (
       }
       // Calculate Set Wins
       for (const winner of set.setWinners) {
-        let member = members.get(winner.playerName);
+        const member = members.get(winner.playerName);
         if (!member)
           members.set(winner.playerName, { matchWins: 0, setWins: 1 });
         else member.setWins += 1;
@@ -141,7 +141,7 @@ export const calcMostPerPlacing = async (
               third: 0,
               last: 0,
             });
-          let member = members.get(ps.player.playerName)!;
+          const member = members.get(ps.player.playerName)!;
           member[pos as keyof MembersPerPosition] ??= 0;
           member[pos as keyof MembersPerPosition] += 1;
           race.push({ player: ps.player.playerName, pos });
@@ -213,7 +213,7 @@ export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
       continue;
     }
 
-    let member = members.get(player.playerName) || 0;
+    const member = members.get(player.playerName) || 0;
     members.set(player.playerName, member + val);
   }
   const data = Array.from(members, ([key, val]) => ({ player: key, val }));

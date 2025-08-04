@@ -22,7 +22,7 @@ const SetManager = () => {
     formState: { errors },
   } = useFormContext<FormValues>();
 
-  const { append, remove, fields, update } = useFieldArray({
+  const { append, remove, fields } = useFieldArray({
     name: "sets",
     control,
   });

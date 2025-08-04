@@ -15,12 +15,11 @@ interface Props {
 }
 
 const PlayerStatManager = (props: Props) => {
-  const { player, matchIndex, setIndex, playerSessionIndex } = props;
+  const { matchIndex, setIndex, playerSessionIndex } = props;
   const curPlayerSession =
     `sets.${setIndex}.matches.${matchIndex}.playerSessions.${playerSessionIndex}` as const;
-  const { register, control, getValues, getFieldState } =
-    useFormContext<FormValues>();
-  const { append, remove, fields } = useFieldArray({
+  const { register, control, getValues } = useFormContext<FormValues>();
+  const { append, fields } = useFieldArray({
     name: `${curPlayerSession}.playerStats`,
     control,
   });
@@ -56,10 +55,10 @@ const PlayerStatManager = (props: Props) => {
               <FormField
                 control={control}
                 name={curr}
-                render={({ field: f }) => (
+                render={() => (
                   <FormItem>
                     <Input
-                      className="peer block w-[100px] appearance-none rounded-t-lg border-2 px-2.5 pb-2.5 pt-6 text-sm focus:border-b-gray-200 focus:outline-none focus:ring-0 dark:focus:border-purple-700"
+                      className="peer block w-[100px] appearance-none rounded-t-lg border-2 px-2.5 pt-6 pb-2.5 text-sm focus:border-b-gray-200 focus:ring-0 focus:outline-none dark:focus:border-purple-700"
                       id={curr}
                       type="text"
                       {...register(curr)}

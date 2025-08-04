@@ -30,8 +30,9 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
   const [step, setStep] = useState(0);
   const [modifier, setModifier] = useState(0);
 
-  const form = useForm<FormValues, any>({
+  const form = useForm<FormValues, unknown>({
     resolver: zodResolver(formSchema),
+
     // async (data, context, options) => {
     //   try {
     //     // Validate the form data against the Zod schema
@@ -82,11 +83,13 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     const { error: err } = await insertNewSessionFromAdmin(data);
     console.timeEnd("Form Submission Time End: ");
 
-    if (err)
-      err === errorCodes.NotAuthenticated
-        ? await userSignOut()
-        : toast.error(err, { richColors: true });
-    else {
+    if (err) {
+      if (err === errorCodes.NotAuthenticated) {
+        await userSignOut();
+      } else {
+        toast.error(err, { richColors: true });
+      }
+    } else {
       toast.success("Session successfully created.", { richColors: true });
       form.reset();
       setStep(0);
@@ -100,7 +103,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
    * @param {any} errors - The errors object containing details about the form submission errors.
    * Each key in the object corresponds to a form field, and the value is the error message for that field.
    */
-  const onError = (errors: any) => {
+  const onError = (errors: unknown) => {
     console.log("Admin Form Submission Errors:", errors);
     toast.error(`Error creating session please check all fields.`, {
       richColors: true,
@@ -189,7 +192,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
             </Form>
           </AnimatedFormWrapper>
         </Card>
-        {step === 0 && <VideoInfo form={form} step={step} />}
+        {step === 0 && <VideoInfo form={form} />}
       </div>
     </FormProvider>
   );

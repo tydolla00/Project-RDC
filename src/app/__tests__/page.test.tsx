@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import Page from "../page";
+// import Page from "../page";
 import About from "@/app/(routes)/about/page";
 
 // describe("Page", () => {
