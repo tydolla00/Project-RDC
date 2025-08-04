@@ -9,7 +9,6 @@ import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { SessionInfo } from "./SessionInfo";
 import { errorCodes } from "@/lib/constants";
-import { signOut } from "@/auth";
 import { formSchema, FormValues } from "../../_utils/form-helpers";
 import {
   AnimatedFormWrapper,
@@ -20,7 +19,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoInfo } from "./VideoInfo";
 import { cn } from "@/lib/utils";
 import { FormSummary } from "./Summary";
-// import { zodResolver } from "../../_utils/temp-zodv4-resolver";
+import { userSignOut } from "@/app/actions/signOut";
 
 interface AdminFormProps {
   rdcMembers: Player[];
@@ -31,8 +30,9 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
   const [step, setStep] = useState(0);
   const [modifier, setModifier] = useState(0);
 
-  const form = useForm<FormValues, any>({
+  const form = useForm<FormValues, unknown>({
     resolver: zodResolver(formSchema),
+
     // async (data, context, options) => {
     //   try {
     //     // Validate the form data against the Zod schema
@@ -83,11 +83,13 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     const { error: err } = await insertNewSessionFromAdmin(data);
     console.timeEnd("Form Submission Time End: ");
 
-    if (err)
-      err === errorCodes.NotAuthenticated
-        ? await signOut({ redirectTo: "/" })
-        : toast.error(err, { richColors: true });
-    else {
+    if (err) {
+      if (err === errorCodes.NotAuthenticated) {
+        await userSignOut();
+      } else {
+        toast.error(err, { richColors: true });
+      }
+    } else {
       toast.success("Session successfully created.", { richColors: true });
       form.reset();
       setStep(0);
@@ -101,12 +103,57 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
    * @param {any} errors - The errors object containing details about the form submission errors.
    * Each key in the object corresponds to a form field, and the value is the error message for that field.
    */
-  const onError = (errors: any) => {
+  const onError = (errors: unknown) => {
     console.log("Admin Form Submission Errors:", errors);
     toast.error(`Error creating session please check all fields.`, {
       richColors: true,
     });
   };
+
+  useEffect(() => {
+    const key = "entryCreatorForm";
+    const savedForm = localStorage.getItem(key);
+    if (savedForm) {
+      toast("Would you like to restore your previous form data?", {
+        action: {
+          label: "Restore",
+          onClick: () => {
+            try {
+              const session: FormValues = JSON.parse(savedForm);
+              session.date = new Date(session.date);
+              form.reset(session);
+            } catch (error) {
+              console.error("Error restoring form data:", error);
+            }
+            localStorage.removeItem(key);
+          },
+        },
+      });
+    } else {
+      localStorage.removeItem(key);
+    }
+  }, [form]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      console.log("beforeunload event triggered", form.formState.isDirty);
+      if (form.formState.isDirty) {
+        console.log("Got here");
+        e.preventDefault();
+        localStorage.setItem(
+          "entryCreatorForm",
+          JSON.stringify(form.getValues()),
+        );
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [form.formState.isDirty, form.getValues, form]);
 
   useEffect(() => {
     document.documentElement.scrollTop = 0; // Scroll to top when a new set is added
@@ -145,7 +192,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
             </Form>
           </AnimatedFormWrapper>
         </Card>
-        {step === 0 && <VideoInfo form={form} step={step} />}
+        {step === 0 && <VideoInfo form={form} />}
       </div>
     </FormProvider>
   );

@@ -3,6 +3,6 @@ const Speedrunners = ({
 }: {
   game: { gameId: number; gameName: string };
 }) => {
-  return <div>speedrunners</div>;
+  return <div>{game.gameName}</div>;
 };
 export default Speedrunners;

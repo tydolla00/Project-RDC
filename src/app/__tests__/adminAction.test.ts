@@ -1,7 +1,4 @@
-import {
-  insertNewSessionFromAdmin,
-  insertNewSessionV2,
-} from "../actions/adminAction";
+import { insertNewSessionFromAdmin } from "../actions/adminAction";
 import prisma from "../../../prisma/db";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";

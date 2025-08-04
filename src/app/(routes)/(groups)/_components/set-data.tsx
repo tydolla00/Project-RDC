@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { RLStats } from "./timeline-chart";
+import { RLStats } from "../games/[slug]/_components/timeline-chart";
 
 // TODO Show Set Results - Who Won and what was the score.
 const SetData = ({ set, setIndex }: { set: RLStats[][]; setIndex: number }) => (

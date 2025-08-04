@@ -67,6 +67,7 @@ export type GameProcessor = {
     requiresCheck: boolean,
   ) => {
     status: VisionResultCodes;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any;
     message: string;
   };
@@ -153,6 +154,7 @@ type ProcessedPlayer = {
 export const processPlayer = (
   player: AnalyzedPlayer,
   teamName?: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   gameId?: number,
 ): ProcessedPlayer => {
   console.log("Processing Player: ", player);
@@ -304,40 +306,44 @@ export const calculateIndividualWinner = (
     (s) => s.name === config.winCondition.statName,
   );
 
-  if (config.winCondition.comparison === "highest") {
-    return [
-      players.reduce((winner, current) => {
-        const winnerScore = winner.stats.find(
-          (s) => s.stat === config.winCondition.statName,
-        )?.statValue;
-        const currentScore = current.stats.find(
-          (s) => s.stat === config.winCondition.statName,
-        )?.statValue;
+  if (players.length) {
+    if (config.winCondition.comparison === "highest") {
+      return [
+        players.reduce((winner, current) => {
+          const winnerScore = winner.stats.find(
+            (s) => s.stat === config.winCondition.statName,
+          )?.statValue;
+          const currentScore = current.stats.find(
+            (s) => s.stat === config.winCondition.statName,
+          )?.statValue;
 
-        // For position stats, lower number is better
-        if (statConfig?.dataType === "position") {
+          // For position stats, lower number is better
+          if (statConfig?.dataType === "position") {
+            return Number(currentScore) < Number(winnerScore)
+              ? current
+              : winner;
+          }
+
+          return Number(currentScore) > Number(winnerScore) ? current : winner;
+        }),
+      ];
+    }
+
+    if (config.winCondition.comparison === "lowest") {
+      console.log("Calculating lowest winner");
+      return [
+        players.reduce((winner, current) => {
+          const winnerScore = winner.stats.find(
+            (s) => s.stat === config.winCondition.statName,
+          )?.statValue;
+          const currentScore = current.stats.find(
+            (s) => s.stat === config.winCondition.statName,
+          )?.statValue;
+
           return Number(currentScore) < Number(winnerScore) ? current : winner;
-        }
-
-        return Number(currentScore) > Number(winnerScore) ? current : winner;
-      }),
-    ];
-  }
-
-  if (config.winCondition.comparison === "lowest") {
-    console.log("Calculating lowest winner");
-    return [
-      players.reduce((winner, current) => {
-        const winnerScore = winner.stats.find(
-          (s) => s.stat === config.winCondition.statName,
-        )?.statValue;
-        const currentScore = current.stats.find(
-          (s) => s.stat === config.winCondition.statName,
-        )?.statValue;
-
-        return Number(currentScore) < Number(winnerScore) ? current : winner;
-      }),
-    ];
+        }),
+      ];
+    }
   }
 
   return [];

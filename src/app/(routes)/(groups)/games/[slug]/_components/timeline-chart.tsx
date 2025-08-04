@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { getAllSessionsByGame } from "prisma/lib/admin";
+import { getAllSessionsByGame } from "../../../../../../../prisma/lib/admin";
 import Image from "next/image";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,7 +36,9 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { gameImages } from "@/lib/constants";
-import { QueryResponseData } from "../../../../../prisma/db";
+import { QueryResponseData } from "../../../../../../../prisma/db";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MVP } from "./mvp";
 
 const chartConfig = {
   id: {
@@ -44,7 +46,7 @@ const chartConfig = {
   },
   desktop: {
     label: "Desktop",
-    color: "",
+    color: "var(--chart-1)",
   },
   mobile: {
     label: "Mobile",
@@ -74,68 +76,74 @@ export function TimelineChart({
   const [showMatchData, setShowMatchData] = useState(true);
 
   return (
-    <>
-      <div className="flex items-start">
-        <Image
-          height={200}
-          width={200}
-          src={`/images/${gameImages[gameName]}`}
-          alt={gameName}
-        />
-        <Suspense fallback={<Skeleton className="h-10 w-full" />}>
-          <div className="my-4">
-            {session ? (
-              <div className="flex space-x-4">
-                <div className="w-[300px]">
-                  <Link className="block" href={session?.sessionUrl}>
-                    <Image
-                      height={300}
-                      width={300}
-                      alt={session.sessionName}
-                      src={session.thumbnail}
-                    />
-                    <div className="my-4 hover:underline">
-                      {session.sessionName}
-                    </div>
-                  </Link>
-                </div>
-                <MVP session={session} />
-              </div>
-            ) : null}
+    <div className="space-y-8">
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-6">
+          <Avatar className="h-24 w-24">
+            <AvatarImage
+              src={`/images/${gameImages[gameName]}`}
+              alt={gameName}
+            />
+            <AvatarFallback>{gameName[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-2xl font-bold">{title}</h1>
+            <p className="text-muted-foreground">{desc}</p>
           </div>
+        </div>
+
+        <Suspense fallback={<Skeleton className="h-[400px]" />}>
           {session && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  className="cursor-pointer"
-                  // onClick={() => setSession(undefined)}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <div className="space-y-4">
+                <Link
+                  href={session?.sessionUrl}
+                  className="group block overflow-hidden rounded-lg"
                 >
-                  Show Session Data
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="h-screen max-w-3xl">
-                <DialogHeader className="space-y-0">
-                  <DialogTitle>Session Info</DialogTitle>
-                  <DialogDescription>
-                    Explore the info about this video
-                  </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="h-[80vh]">
-                  <MatchData session={session} />
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
+                  <Image
+                    className="aspect-video w-full object-cover transition-transform group-hover:scale-105"
+                    height={400}
+                    width={600}
+                    alt={session.sessionName}
+                    src={session.thumbnail}
+                  />
+                  <div className="mt-4 font-medium group-hover:underline">
+                    {session.sessionName}
+                  </div>
+                </Link>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      Show Session Data
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="h-screen max-w-3xl">
+                    <DialogHeader className="space-y-0">
+                      <DialogTitle>Session Info</DialogTitle>
+                      <DialogDescription>
+                        Explore the info about this video
+                      </DialogDescription>
+                    </DialogHeader>
+                    <ScrollArea className="h-[80vh]">
+                      <MatchData session={session} />
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <MVP session={session} />
+            </div>
           )}
         </Suspense>
       </div>
-      <Card className="my-6">
+
+      <Card>
         <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
           <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
             <CardTitle>{title}</CardTitle>
             <CardDescription>{desc}</CardDescription>
           </div>
           <div className="flex items-center justify-center gap-3 p-6">
-            <Label htmlFor="showMatchData">Toggle hover effects</Label>
+            <Label htmlFor="showMatchData">Disable hover effects</Label>
             <Switch
               id="showMatchData"
               onCheckedChange={(val) => {
@@ -193,7 +201,7 @@ export function TimelineChart({
           </ChartContainer>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }
 
@@ -211,22 +219,21 @@ export type RLStats = {
 const CustomTooltip = ({
   active,
   payload,
-  label,
   setSession,
   showMatchData,
-}: TooltipProps<any, any> & {
+}: TooltipProps<string, string> & {
   setSession: (session: Sessions[0]) => void;
   showMatchData: boolean;
 }) => {
-  const session = payload?.at(0)?.payload as Sessions[0] | undefined;
+  const session = payload?.at(0)?.payload as Sessions[0];
   useEffect(() => {
-    if (active && showMatchData && session) {
+    if (active && showMatchData) {
       console.log(showMatchData);
       setSession(session);
     }
-  }, [active, session, setSession]);
+  }, [active, session, setSession, showMatchData]);
 
-  if (active && session) {
+  if (active) {
     return (
       <div className="max-w-48 flex-wrap rounded-md p-2 shadow-md">
         <Card>
@@ -235,6 +242,7 @@ const CustomTooltip = ({
           </CardHeader>
           <CardContent>
             <Image
+              className="h-auto w-auto"
               height={200}
               width={200}
               alt={session.sessionName}
@@ -247,7 +255,3 @@ const CustomTooltip = ({
   }
   return null;
 };
-
-// TODO Create a MVP Card Displaying Stats for the Day
-// Goals Per Game, Assists Per Game, Saves Per Game, Shots Per Game, Player Nickname under name
-const MVP = ({ session }: { session: Sessions[0] }) => <div>MVP</div>;

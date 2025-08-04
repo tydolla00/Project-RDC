@@ -117,7 +117,9 @@ export function zodResolver<Input extends FieldValues, Context, Output>(
         resolverOptions.mode === "sync" ? "parse" : "parseAsync"
       ](schema, values, schemaOptions);
 
-      options.shouldUseNativeValidation && validateFieldsNatively({}, options);
+      if (options.shouldUseNativeValidation) {
+        validateFieldsNatively({}, options);
+      }
 
       return {
         errors: {} as FieldErrors,

@@ -2,7 +2,6 @@
 interface Config {
   DATABASE_URL: string | undefined;
   DIRECT_URL: string | undefined;
-  YOUTUBE_LOCAL_API_KEY: string | undefined;
   YOUTUBE_API_KEY: string | undefined;
   NEXT_PUBLIC_POSTHOG_KEY: string | undefined;
   NEXT_PUBLIC_POSTHOG_HOST: string | undefined;
@@ -20,7 +19,6 @@ const getConfig = (): Config => {
   return {
     DATABASE_URL: process.env.DATABASE_URL,
     DIRECT_URL: process.env.DIRECT_URL,
-    YOUTUBE_LOCAL_API_KEY: process.env.YOUTUBE_LOCAL_API_KEY,
     YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
@@ -40,7 +38,7 @@ const getConfig = (): Config => {
 const getSanitizedConfig = (
   config: Config,
 ): { [key in keyof typeof config]: string } => {
-  for (const [key, val] of Object.entries(config)) {
+  for (const [] of Object.entries(config)) {
     // if (val === undefined && window === undefined) {
     //   throw new Error(`Missing key ${key} in .env`);
     // }

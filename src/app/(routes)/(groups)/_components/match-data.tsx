@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { RLStats } from "./timeline-chart";
+import { RLStats } from "../games/[slug]/_components/timeline-chart";
 import { getAllSessionsByGame } from "../../../../../prisma/lib/admin";
 import { Button } from "@/components/ui/button";
 import SetData from "./set-data";
@@ -33,7 +33,7 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
                 winners: setWinners,
               });
 
-            let innerPlayer = innerMatch.get(player.playerName)!;
+            const innerPlayer = innerMatch.get(player.playerName)!;
             switch (gameStat.statName) {
               case "RL_SCORE":
                 innerPlayer.score = Number(value);
@@ -53,7 +53,7 @@ const MatchData = ({ session }: { session: Sessions[0] | undefined }) => {
             }
           });
         });
-        const matchData = Array.from(innerMatch, ([s, stats]) => ({
+        const matchData = Array.from(innerMatch, ([, stats]) => ({
           ...stats,
         })).sort((a, b) => {
           if (matchWinners.has(a.player) && matchWinners.has(b.player))

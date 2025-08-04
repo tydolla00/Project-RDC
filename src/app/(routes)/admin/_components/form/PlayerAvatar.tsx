@@ -8,7 +8,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { memberImages, MembersEnum } from "@/lib/constants";
-import { capitalizeFirst } from "@/lib/utils";
 
 interface PlayerAvatarProps {
   player: Player;

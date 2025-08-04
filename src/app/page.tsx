@@ -8,7 +8,6 @@ import { getGamesNav } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
 import Image from "next/image";
-import prisma from "../../prisma/db";
 
 export default async function Home() {
   const games = await getGamesNav();
@@ -16,10 +15,7 @@ export default async function Home() {
   return (
     <>
       <div className="m-16">
-        <div
-          style={{ transitionDuration: "2000ms" }}
-          className="grid grid-cols-2"
-        >
+        <div className="grid grid-cols-2 duration-[2000ms]">
           <div className="col-span-2 md:col-span-1">
             <H1>RDC Stat Tracker</H1>
             <p className="text-muted-foreground leading-7 md:w-3/4">

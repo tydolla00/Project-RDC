@@ -3,6 +3,6 @@ const Mariokart = async ({
 }: {
   game: { gameId: number; gameName: string };
 }) => {
-  return <div>mariokart</div>;
+  return <div>{game.gameName}</div>;
 };
 export default Mariokart;

@@ -6,6 +6,8 @@ import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { revalidateTag } from "next/cache";
+import { v4 } from "uuid";
+import { logFormError, logFormSuccess } from "@/posthog/server-analytics";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -92,9 +94,12 @@ export const insertNewSessionFromAdmin = async (
 ): Promise<{ error: null | string }> => {
   console.group("insertNewSessionFromAdmin");
   console.log("Inserting New Session: ", session);
+
+  const user = await auth();
+  let error: null | string = null;
+
   try {
-    const isAuthenticated = await auth();
-    if (!isAuthenticated) return { error: errorCodes.NotAuthenticated };
+    if (!user) return { error: errorCodes.NotAuthenticated };
 
     const sessionGame = await prisma.game.findFirst({
       where: { gameName: session.game },
@@ -129,7 +134,7 @@ export const insertNewSessionFromAdmin = async (
           thumbnail: session.thumbnail,
           date: session.date,
           videoId: session.videoId,
-          createdBy: isAuthenticated.user?.email || "SYSTEM",
+          createdBy: user.user?.email || "SYSTEM",
         },
       });
       const newSessionId = newSession.sessionId;
@@ -143,11 +148,9 @@ export const insertNewSessionFromAdmin = async (
             set,
           );
 
-          const setWinnerConnect = (set?.setWinners ?? []).map(
-            (winner: any) => ({
-              playerId: winner.playerId,
-            }),
-          );
+          const setWinnerConnect = (set?.setWinners ?? []).map((winner) => ({
+            playerId: winner.playerId,
+          }));
 
           console.log(`Set Winners for set ${i + 1}: `, setWinnerConnect);
 
@@ -246,11 +249,11 @@ export const insertNewSessionFromAdmin = async (
                       }
 
                       // If gameStat is still not found, throw an error
-      // If gameStat is still not found, throw an error
-      if (!gameStat)
-        throw new Error(
-          `GameStat not found: ${playerStat.stat}`,
-        );
+                      // If gameStat is still not found, throw an error
+                      if (!gameStat)
+                        throw new Error(
+                          `GameStat not found: ${playerStat.stat}`,
+                        );
                       console.log(
                         "PlayerSessionId: ",
                         newPlayerSession.playerSessionId,
@@ -286,12 +289,17 @@ export const insertNewSessionFromAdmin = async (
         }),
       );
     });
+    logFormSuccess(user?.user?.email ?? v4());
     revalidateTag("getAllSessions");
     return { error: null };
-  } catch (error) {
-    console.log(error);
-    return { error: "Unknown error occurred. Please try again." };
+  } catch (err) {
+    const user = await auth();
+    logFormError(err, user?.user?.email ?? v4(), session);
+    error = "Unknown error occurred. Please try again.";
+    return { error };
   } finally {
     console.groupEnd();
   }
 };
+
+export const revalidateAction = async (path: string) => revalidateTag(path);

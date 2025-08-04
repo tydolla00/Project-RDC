@@ -12,7 +12,7 @@ interface Props {
 
 const PlayerSessionManager = (props: Props) => {
   const { setIndex, matchIndex, players } = props;
-  const { control, getValues } = useFormContext();
+  const { control, getValues } = useFormContext<FieldValues>();
   const { append, remove, fields } = useFieldArray<FieldValues>({
     name: `sets.${setIndex}.matches.${matchIndex}.playerSessions`,
     control,
@@ -26,6 +26,7 @@ const PlayerSessionManager = (props: Props) => {
     // Add new PlayerSession for each Player
     players.forEach((player) => {
       const playerExists = finalPlayerSessionValues.some(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (playerSession: any) => player.playerId === playerSession.playerId,
       );
       if (!playerExists) {
@@ -38,6 +39,7 @@ const PlayerSessionManager = (props: Props) => {
     });
 
     // Remove player sessions for players that are no longer in the players array
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     finalPlayerSessionValues.forEach((playerSession: any, index: number) => {
       const playerExists = players.some(
         (player) => player.playerId === playerSession.playerId,
@@ -48,6 +50,7 @@ const PlayerSessionManager = (props: Props) => {
     });
   }, [props.players, append, getValues, setIndex, matchIndex, players, remove]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getPlayerNameFromField = (field: any): boolean => {
     return field?.playerSessionName ?? 0; // Discrepancy in what is being assigned to playerSessionName
   };
@@ -59,7 +62,7 @@ const PlayerSessionManager = (props: Props) => {
     <div className="@container grid grid-cols-2">
       {fields.map((field, sessionIndex) => {
         return (
-          <div className="@xs:col-span-1 col-span-2" key={field.id}>
+          <div className="col-span-2 @xs:col-span-1" key={field.id}>
             <Label className="font-bold">{getPlayerNameFromField(field)}</Label>
             <div className="flex flex-wrap gap-3">
               <PlayerStatManager

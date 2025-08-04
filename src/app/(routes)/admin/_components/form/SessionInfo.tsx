@@ -10,14 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Controller, UseFormReturn } from "react-hook-form";
 import GameDropDownForm from "./GameDropDownForm";
 import PlayerSelector from "./PlayerSelector";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { getRDCVideoDetails } from "@/app/actions/action";
 import { toast } from "sonner";
 import { errorCodes } from "@/lib/constants";
-import { signOut } from "@/auth";
 import { Player } from "@prisma/client";
 import { FormValues } from "../../_utils/form-helpers";
 import { getVideoId } from "../../_utils/helper-functions";
+import { userSignOut } from "@/app/actions/signOut";
+import { usePostHog } from "posthog-js/react";
+import { useSession } from "next-auth/react";
 
 export const SessionInfo = ({
   form,
@@ -26,14 +28,13 @@ export const SessionInfo = ({
   form: UseFormReturn<FormValues>;
   rdcMembers: Player[];
 }) => {
-  const [session, setSession] = useState<
-    Awaited<ReturnType<typeof getRDCVideoDetails>>["video"] | null
-  >(null);
   const [isPending, startTransition] = useTransition();
   const {
     control,
-    formState: { errors, defaultValues },
+    formState: { defaultValues },
   } = form;
+  const posthog = usePostHog();
+  const { data: user } = useSession();
 
   /**
    * Handles the URL update process for a session.
@@ -71,18 +72,19 @@ export const SessionInfo = ({
         return;
       }
 
+      const distinctId = posthog.get_distinct_id();
+
       const { error, video } = await getRDCVideoDetails(
         videoId,
         form.getValues("game"),
+        user?.user?.email ?? distinctId,
       );
 
       if (error !== undefined) {
-        if (error === errorCodes.NotAuthenticated)
-          await signOut({ redirectTo: "/" });
+        if (error === errorCodes.NotAuthenticated) await userSignOut();
         else {
           form.reset(undefined, { keepIsValid: true });
           toast.error(error, { richColors: true });
-          setSession(null);
         }
       } else {
         const thumbnail =
@@ -93,7 +95,6 @@ export const SessionInfo = ({
         form.setValue("thumbnail", thumbnail);
         form.setValue("date", new Date(video.date));
         form.setValue("videoId", videoId);
-        setSession(video);
         toast.success("Youtube video successfully linked.", {
           richColors: true,
         });

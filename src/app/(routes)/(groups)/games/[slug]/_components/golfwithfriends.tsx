@@ -3,6 +3,6 @@ const GolfWithFriends = ({
 }: {
   game: { gameId: number; gameName: string };
 }) => {
-  return <div>golfwithfriends</div>;
+  return <div>{game.gameName}</div>;
 };
 export default GolfWithFriends;
