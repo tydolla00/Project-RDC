@@ -14,10 +14,14 @@ export default async function Page() {
           <div key={game.url}>
             {game.src && (
               <Card className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52">
-                <Link href={game.url}>
+                <Link
+                  href={game.url}
+                  className="relative block h-full w-full"
+                >
                   <Image
-                    className="absolute h-100 w-full object-cover transition-transform duration-500 group-hover:scale-125"
+                    className="object-cover transition-transform duration-500 group-hover:scale-125"
                     fill
+                    sizes="(max-width: 639px) 100vw, 208px"
                     alt=""
                     src={game.src || ""}
                   />
