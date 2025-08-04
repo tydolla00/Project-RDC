@@ -161,30 +161,26 @@ const RDCVisionModal = (props: Props) => {
 
   const handlePaste = useCallback(
     async (e: ClipboardEvent) => {
-      // Use openRef.current instead of open
-      if (!openRef.current) return; // Only handle paste if modal is open
-
       const items = e.clipboardData?.items;
-      let file: File | null = null;
       if (!items) return;
+
       for (const item of Array.from(items)) {
-        file = item.getAsFile();
+        const file = item.getAsFile();
+        if (!file) continue;
+        const validationResult = zodFile.safeParse(file);
 
-        try {
-          zodFile.parse(file);
-        } catch (error) {
-          console.warn("Invalid file pasted", error);
-          continue;
+        if (validationResult.success) {
+          const url = URL.createObjectURL(file);
+          dispatch({ type: "UPDATE_FILE", file, previewUrl: url });
+          setTimeout(() => visionButton.current?.focus(), 0);
+          return; // Exit after finding the first valid image
+        } else {
+          // Log error for developers but don't toast for a better UX
+          console.warn("Invalid file pasted:", validationResult.error);
         }
-
-        const url = URL.createObjectURL(file!);
-        dispatch({ type: "UPDATE_FILE", file: file, previewUrl: url });
-        // Focus after state update
-        setTimeout(() => {
-          visionButton.current?.focus();
-        }, 0);
-        return;
       }
+
+      // Toast only if no valid image was found after checking all items
       toast.error("No valid image file found in clipboard", {
         richColors: true,
       });
@@ -194,25 +190,33 @@ const RDCVisionModal = (props: Props) => {
   );
 
   useEffect(() => {
-    document.addEventListener("paste", handlePaste);
+    if (open) {
+      document.addEventListener("paste", handlePaste);
+      return () => {
+        document.removeEventListener("paste", handlePaste);
+      };
+    }
+  }, [open, handlePaste]);
+
+  useEffect(() => {
     return () => {
-      document.removeEventListener("paste", handlePaste);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
-  }, [handlePaste]);
+  }, [previewUrl]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || event.target.files.length === 0) return;
 
     const uploadedFile = event.target.files[0];
-    try {
-      zodFile.parse(uploadedFile);
-    } catch (err) {
-      console.error(err);
-      if (err instanceof z.ZodError) {
-        toast.error(err.message, { richColors: true });
-        dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
-        event.target.value = "";
-      }
+    const validationResult = zodFile.safeParse(uploadedFile);
+
+    if (!validationResult.success) {
+      console.error(validationResult.error);
+      toast.error(validationResult.error.message, {
+        richColors: true,
+      });
+      dispatch({ type: "UPDATE_FILE", file: null, previewUrl: null });
+      event.target.value = "";
       return;
     }
 
@@ -250,48 +254,43 @@ const RDCVisionModal = (props: Props) => {
       gameName,
     );
 
-    if (result) {
-      switch (result.status) {
-        case VisionResultCodes.Success:
-          if (result.data) {
-            handleCreateMatchFromVision(
-              result.data.players,
-              result.data.winner || [],
-            );
-          }
-          dispatch({
-            type: "UPDATE_VISION",
-            visionStatus: VisionResultCodes.Success,
-            visionMsg: result.message,
-          });
-          toast.success("Success", { richColors: true });
-          setOpen(false); // Close modal on success
-          break;
-        case VisionResultCodes.CheckRequest:
-          if (result.data) {
-            handleCreateMatchFromVision(
-              result.data.players,
-              result.data.winner || [],
-            );
-          }
-          dispatch({
-            type: "UPDATE_VISION",
-            visionStatus: VisionResultCodes.CheckRequest,
-            visionMsg: result.message,
-          });
-          toast.warning(result.message, { richColors: true });
-          break;
-        case VisionResultCodes.Failed:
-          dispatch({
-            type: "UPDATE_VISION",
-            visionStatus: VisionResultCodes.Failed,
-            visionMsg: result.message,
-          });
-          toast.error(result.message, { richColors: true });
-          break;
-        default:
-          break;
-      }
+    if (
+      result.status === VisionResultCodes.CheckRequest ||
+      result.status === VisionResultCodes.Success
+    )
+      handleCreateMatchFromVision(
+        result.data.players,
+        result.data.winner || [],
+      );
+
+    switch (result.status) {
+      case VisionResultCodes.Success:
+        dispatch({
+          type: "UPDATE_VISION",
+          visionStatus: VisionResultCodes.Success,
+          visionMsg: result.message,
+        });
+        toast.success("Success", { richColors: true });
+        setOpen(false); // Close modal on success
+        break;
+      case VisionResultCodes.CheckRequest:
+        dispatch({
+          type: "UPDATE_VISION",
+          visionStatus: VisionResultCodes.CheckRequest,
+          visionMsg: result.message,
+        });
+        toast.warning(result.message, { richColors: true });
+        break;
+      case VisionResultCodes.Failed:
+        dispatch({
+          type: "UPDATE_VISION",
+          visionStatus: VisionResultCodes.Failed,
+          visionMsg: result.message,
+        });
+        toast.error(result.message, { richColors: true });
+        break;
+      default:
+        break;
     }
 
     dispatch({ type: "UPDATE_LOADING", loading: false });

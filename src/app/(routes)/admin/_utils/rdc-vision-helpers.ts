@@ -2,7 +2,7 @@
 
 import { VisionResultCodes } from "@/lib/constants";
 import { Player } from "@prisma/client";
-import { analyzeScreenShot } from "@/app/actions/visionAction";
+import { analyzeScreenShot, VisionResult } from "@/app/actions/visionAction";
 import { getGameIdFromName } from "@/app/actions/adminAction";
 
 /**
@@ -22,7 +22,7 @@ export const handleAnalyzeBtnClick = async (
   base64FileContent: string,
   sessionPlayers: Player[],
   gameName: string,
-) => {
+): Promise<FnReturnType> => {
   try {
     // Get game ID with error handling
     let gameId: number;
@@ -79,3 +79,19 @@ export const handleAnalyzeBtnClick = async (
     };
   }
 };
+
+type FnReturnType =
+  | {
+      status: VisionResultCodes.CheckRequest;
+      data: VisionResult;
+      message: string;
+    }
+  | {
+      status: VisionResultCodes.Success;
+      data: VisionResult;
+      message: string;
+    }
+  | {
+      status: VisionResultCodes.Failed;
+      message: string;
+    };
