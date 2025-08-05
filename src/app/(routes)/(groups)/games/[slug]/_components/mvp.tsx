@@ -11,7 +11,7 @@ import { getAllSessionsByGame } from "prisma/lib/admin";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { analyzeMvp, MvpOutput } from "@/app/ai/actions";
-import { getSetsData, ProcessedRLSet } from "./match-data";
+import { getSetsData, ProcessedSet } from "./match-data";
 import { capitalizeFirst } from "@/lib/utils";
 // import { readStreamableValue } from "@ai-sdk/rsc";
 
@@ -29,7 +29,7 @@ export const MVP = ({ session }: { session: Sessions[0] }) => {
 
   return (
     <Card className="relative overflow-hidden">
-      <div className="from-primary/10 absolute top-0 right-0 h-full w-1/2 bg-gradient-to-l to-transparent" />
+      <div className="from-primary/10 pointer-events-none absolute top-0 right-0 h-full w-1/2 bg-gradient-to-l to-transparent" />
       <CardHeader>
         <CardTitle className="flex items-center gap-2">MVP</CardTitle>
         <CardDescription>Match Statistics</CardDescription>
@@ -50,7 +50,7 @@ export const MVP = ({ session }: { session: Sessions[0] }) => {
               //     );
               //   }
               // }
-              const mvp = await analyzeMvp(stats as ProcessedRLSet[]);
+              const mvp = await analyzeMvp(stats as ProcessedSet[]);
               setMvp(mvp);
             } catch (error) {
               console.log("Unexpected error", error);
@@ -101,9 +101,11 @@ export const MVP = ({ session }: { session: Sessions[0] }) => {
                   <p className="text-2xl font-bold tracking-tight">
                     {stat.sum}
                   </p>
-                  <p className="text-muted-foreground text-xs">
-                    {stat.average} per game
-                  </p>
+                  {stat.average && (
+                    <p className="text-muted-foreground text-xs">
+                      {stat.average} per game
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
