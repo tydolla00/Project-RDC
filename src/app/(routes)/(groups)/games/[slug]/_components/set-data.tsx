@@ -8,9 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { RLStats } from "./timeline-chart";
+import { ProcessedSet } from "./match-data";
 
-// New types for Rocket League
 type RLPlayerStats = {
   player: string;
   score: number;
@@ -20,36 +19,28 @@ type RLPlayerStats = {
   shots: number;
 };
 
-type ProcessedRLMatch = {
-  matchWinners: string[];
-  players: RLPlayerStats[];
+type MarioKartPlayerStats = {
+  player: string;
+  position: number;
 };
 
-type ProcessedRLSet = {
-  setWinners: string[];
-  matches: ProcessedRLMatch[];
-};
-
-// Accepts either RLStats[][] or MarioKartStats[][]
-type MarioKartStats = { player: string; position: number; winners: string[] };
-type CoDStats = {
+type CoDPlayerStats = {
   player: string;
   kills: number;
   deaths: number;
   assists: number;
-  winners: string[];
 };
 
-type StatsType = RLStats | MarioKartStats | CoDStats;
+type PlayerStats = RLPlayerStats | MarioKartPlayerStats | CoDPlayerStats;
 
 type SetDataProps = {
-  set: StatsType[][] | ProcessedRLSet;
+  set: ProcessedSet;
   setIndex: number;
   game: string | undefined;
 };
 
 export const SetData = ({ set, setIndex, game }: SetDataProps) => {
-  const renderGameStats = (match: StatsType[], gameForStats?: string) => {
+  const renderGameStats = (match: PlayerStats[], gameForStats?: string) => {
     const currentGame = gameForStats || game;
     switch (currentGame) {
       case "Rocket League":
@@ -100,37 +91,7 @@ export const SetData = ({ set, setIndex, game }: SetDataProps) => {
     }
   };
 
-  if (game === "Rocket League") {
-    const rlSet = set as ProcessedRLSet;
-    const winners = rlSet.setWinners;
-    const winnerText = winners.length > 1 ? "Winners" : "Winner";
-
-    return (
-      <div className="mb-6">
-        <div className="text-chart-4 text-2xl font-bold">Set {setIndex + 1}</div>
-        <div className="text-muted-foreground my-2 text-sm">
-          {winnerText}: {winners.join(", ") || "No winners recorded"}
-        </div>
-        {rlSet.matches.map((match, matchIndex) => {
-          const statsForTable: RLStats[] = match.players.map((p) => ({
-            ...p,
-            winners: rlSet.setWinners,
-          }));
-          return (
-            <div className="mb-4" key={matchIndex}>
-              <div>Match {matchIndex + 1}</div>
-              <Separator className="my-2" />
-              <span className="text-muted-foreground text-sm">Teams</span>
-              {renderGameStats(statsForTable, "Rocket League")}
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-
-  const otherGameSet = set as StatsType[][];
-  const winners = otherGameSet.at(0)?.at(0)?.winners || [];
+  const winners = set.setWinners;
   const winnerText = winners.length > 1 ? "Winners" : "Winner";
 
   return (
@@ -139,14 +100,14 @@ export const SetData = ({ set, setIndex, game }: SetDataProps) => {
       <div className="text-muted-foreground my-2 text-sm">
         {winnerText}: {winners.join(", ") || "No winners recorded"}
       </div>
-      {otherGameSet.map((match, matchIndex) => (
+      {set.matches.map((match, matchIndex) => (
         <div className="mb-4" key={matchIndex}>
           <div>Match {matchIndex + 1}</div>
           <Separator className="my-2" />
           <span className="text-muted-foreground text-sm">
             {game === "Rocket League" ? "Teams" : "Results"}
           </span>
-          {renderGameStats(match)}
+          {renderGameStats(match.players, game)}
         </div>
       ))}
     </div>
@@ -160,18 +121,17 @@ const StatsTable = ({
   teamName,
   game,
 }: {
-  players: StatsType[];
+  players: PlayerStats[];
   bgColor: string;
   teamName?: string;
   game?: string;
 }) => {
   if (!players.length) return null;
-  const isRocketLeague = (p: StatsType): p is RLStats =>
-    typeof (p as RLStats).score === "number";
-  const isMarioKart = (p: StatsType): p is MarioKartStats =>
-    typeof (p as MarioKartStats).position === "number";
-  const isCoDStats = (p: StatsType): p is CoDStats =>
-    typeof (p as CoDStats).kills === "number";
+  const isRocketLeague = (p: PlayerStats): p is RLPlayerStats =>
+    "score" in p;
+  const isMarioKart = (p: PlayerStats): p is MarioKartPlayerStats =>
+    "position" in p;
+  const isCoDStats = (p: PlayerStats): p is CoDPlayerStats => "kills" in p;
 
   const firstPlayer = players[0];
   const shouldHighlightFirst = game !== "Rocket League";

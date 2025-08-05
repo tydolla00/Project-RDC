@@ -22,7 +22,7 @@ import Image from "next/image";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import MatchData from "./match-data";
+
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
@@ -38,6 +38,7 @@ import Link from "next/link";
 import { gameImages } from "@/lib/constants";
 import { QueryResponseData } from "../../../../../../../prisma/db";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import MatchData from "./match-data";
 import { MVP } from "./mvp";
 
 const chartConfig = {
@@ -133,7 +134,7 @@ export function TimelineChart({
                     </DialogContent>
                   </Dialog>
                 </div>
-                <MVP session={session} />
+                <MVP key={session.sessionId} session={session} />
               </>
             ) : (
               <>
@@ -231,15 +232,7 @@ export function TimelineChart({
   );
 }
 
-export type RLStats = {
-  score: number;
-  goals: number;
-  assists: number;
-  saves: number;
-  shots: number;
-  player: string;
-  winners: string[];
-};
+
 
 // TODO Show session info about sets/matches.
 const CustomTooltip = ({
