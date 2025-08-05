@@ -15,7 +15,7 @@ type Sessions = QueryResponseData<
 >;
 
 export const MVP = ({ session }: { session: Sessions[0] }) => {
-  const playerId = 1; // For example purposes
+  const playerId = 3; // For example purposes
 
   const processStats = useMemo((): ProcessedStats => {
     const stats = getInitialStats(session.Game.gameName);
@@ -266,8 +266,8 @@ const getAverageStats = (
   const avgStats: Record<string, string> = {};
 
   Object.entries(stats).forEach(([key, value]) => {
-    if (typeof value === "number") {
-      avgStats[key] = (value / matches).toFixed(1);
+    if (!isNaN(parseFloat(String(value)))) {
+      avgStats[key] = (parseFloat(String(value)) / matches).toFixed(1);
     } else {
       avgStats[key] = "N/A";
     }

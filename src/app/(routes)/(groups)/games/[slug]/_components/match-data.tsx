@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { RLStats } from "./timeline-chart";
 import { getAllSessionsByGame } from "../../../../../../../prisma/lib/admin";
 import { SetData } from "./set-data";
 import { QueryResponseData } from "../../../../../../../prisma/db";
@@ -164,69 +163,96 @@ type GameSet = {
   }[];
 };
 
-const processRocketLeagueData = (sets: GameSet[]): RLStats[][][] => {
-  const innerSets: RLStats[][][] = [];
+type RLPlayerStats = {
+  player: string;
+  score: number;
+  goals: number;
+  assists: number;
+  saves: number;
+  shots: number;
+};
 
-  sets.forEach((set) => {
+type ProcessedRLMatch = {
+  matchWinners: string[];
+  players: RLPlayerStats[];
+};
+
+export type ProcessedRLSet = {
+  setWinners: string[];
+  matches: ProcessedRLMatch[];
+};
+
+const processRocketLeagueData = (sets: GameSet[]): ProcessedRLSet[] => {
+  const processedSets: ProcessedRLSet[] = sets.map((set) => {
     const setWinners = set.setWinners.map((p) => p.playerName);
-    const innerSet: RLStats[][] = [];
 
-    set.matches.forEach((match) => {
-      const matchWinners = new Set(match.matchWinners.map((m) => m.playerName));
-      const innerMatch = new Map<string, RLStats>();
+    const matches: ProcessedRLMatch[] = set.matches.map((match) => {
+      const matchWinners = match.matchWinners.map((m) => m.playerName);
+      const matchWinnersSet = new Set(matchWinners);
+
+      const playerStatsMap = new Map<string, Omit<RLPlayerStats, "player">>();
 
       match.playerSessions.forEach((ps) => {
         ps.playerStats.forEach(({ player, value, gameStat }) => {
-          if (!innerMatch.has(player.playerName)) {
-            innerMatch.set(player.playerName, {
+          if (!playerStatsMap.has(player.playerName)) {
+            playerStatsMap.set(player.playerName, {
               score: 0,
               goals: 0,
               assists: 0,
               saves: 0,
               shots: 0,
-              player: player.playerName,
-              winners: setWinners,
             });
           }
 
-          const innerPlayer = innerMatch.get(player.playerName)!;
+          const stats = playerStatsMap.get(player.playerName)!;
           switch (gameStat.statName) {
             case "RL_SCORE":
-              innerPlayer.score = Number(value);
+              stats.score = Number(value);
               break;
             case "RL_GOALS":
-              innerPlayer.goals = Number(value);
+              stats.goals = Number(value);
               break;
             case "RL_ASSISTS":
-              innerPlayer.assists = Number(value);
+              stats.assists = Number(value);
               break;
             case "RL_SAVES":
-              innerPlayer.saves = Number(value);
+              stats.saves = Number(value);
               break;
             case "RL_SHOTS":
-              innerPlayer.shots = Number(value);
+              stats.shots = Number(value);
               break;
           }
         });
       });
 
-      const matchData = Array.from(innerMatch, ([, stats]) => ({
-        ...stats,
-      })).sort((a, b) => {
-        if (matchWinners.has(a.player) && matchWinners.has(b.player)) {
-          return b.score - a.score;
-        }
-        if (matchWinners.has(a.player)) return -1;
-        if (matchWinners.has(b.player)) return 1;
-        return b.score - a.score;
-      });
+      const players: RLPlayerStats[] = Array.from(playerStatsMap.entries())
+        .map(([playerName, stats]) => ({
+          player: playerName,
+          ...stats,
+        }))
+        .sort((a, b) => {
+          const aIsWinner = matchWinnersSet.has(a.player);
+          const bIsWinner = matchWinnersSet.has(b.player);
 
-      innerSet.push(matchData);
+          if (aIsWinner && !bIsWinner) return -1;
+          if (!aIsWinner && bIsWinner) return 1;
+
+          return b.score - a.score;
+        });
+
+      return {
+        matchWinners,
+        players,
+      };
     });
-    innerSets.push(innerSet);
+
+    return {
+      setWinners,
+      matches,
+    };
   });
 
-  return innerSets;
+  return processedSets;
 };
 
 const processMarioKartData = (sets: GameSet[]): MarioKartStats[][][] => {

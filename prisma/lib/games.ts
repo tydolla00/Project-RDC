@@ -1,13 +1,14 @@
 "use server";
 
 import { unstable_cache } from "next/cache";
-import prisma, { handlePrismaOperation, QueryResponse } from "../db";
+import prisma, { handlePrismaOperation } from "../db";
 import { StatName } from "@prisma/client";
 import { getSumOfStat } from "@prisma/client/sql";
 
 export type StatEndsWith<
   T extends string,
   Y extends StatName = StatName,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 > = Y extends StatName ? (Y extends `${infer u}_${T}` ? Y : never) : never;
 
 // Cache is used for deduping

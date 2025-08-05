@@ -19,7 +19,10 @@ type Result = NonNullable<
   sum: number;
 };
 
-type SumAndAvg<T extends string[], Y extends "RL"> = {
+type SumAndAvg<
+  T extends string[],
+  Y extends "RL" | "COD" | "MK8" | "LC" | "SR",
+> = {
   [K in T[number] as K extends `${Y}_${infer U}` ? Lowercase<`${U}`> : never]:
     | Result
     | { readonly avg: Decimal | number; readonly sum: bigint | number };
@@ -28,7 +31,7 @@ type SumAndAvg<T extends string[], Y extends "RL"> = {
 export const getAvgAndSum = async (
   playerId: number,
   stats: $Enums.StatName[],
-): Promise<SumAndAvg<typeof stats, "RL">> => {
+): Promise<SumAndAvg<typeof stats, "RL" | "COD" | "MK8" | "LC" | "SR">> => {
   return await Promise.all(
     stats.map((stat) => getSumPerStat(Number(playerId), stat)),
   ).then((results) =>
@@ -47,7 +50,7 @@ export const getAvgAndSum = async (
         acc[statName] = res;
         return acc;
       },
-      {} as SumAndAvg<typeof stats, "RL">,
+      {} as SumAndAvg<typeof stats, "RL" | "COD" | "MK8" | "LC" | "SR">,
     ),
   );
 };
