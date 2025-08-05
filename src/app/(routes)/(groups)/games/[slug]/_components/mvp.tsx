@@ -15,7 +15,7 @@ type Sessions = QueryResponseData<
 >;
 
 export const MVP = ({ session }: { session: Sessions[0] }) => {
-  const playerId = 1; // For example purposes
+  const playerId = 3; // For example purposes
 
   const processStats = useMemo((): ProcessedStats => {
     const stats = getInitialStats(session.Game.gameName);
