@@ -294,7 +294,7 @@ const processMarioKartData = (sets: GameSet[]): MarioKartStats[][][] => {
   return mkSets;
 };
 
-const getSetsData = (session: Sessions[0]) => {
+export const getSetsData = (session: Sessions[0]) => {
   if (!session?.sets) return [];
 
   switch (session.Game.gameName) {
