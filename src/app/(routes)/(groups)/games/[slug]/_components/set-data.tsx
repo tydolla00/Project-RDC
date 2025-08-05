@@ -8,30 +8,41 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { RLStats } from "./timeline-chart";
+import { ProcessedSet } from "./match-data";
 
-// Accepts either RLStats[][] or MarioKartStats[][]
-type MarioKartStats = { player: string; position: number; winners: string[] };
-type CoDStats = {
+type RLPlayerStats = {
+  player: string;
+  score: number;
+  goals: number;
+  assists: number;
+  saves: number;
+  shots: number;
+};
+
+type MarioKartPlayerStats = {
+  player: string;
+  position: number;
+};
+
+type CoDPlayerStats = {
   player: string;
   kills: number;
   deaths: number;
   assists: number;
-  winners: string[];
 };
 
-type StatsType = RLStats | MarioKartStats | CoDStats;
+type PlayerStats = RLPlayerStats | MarioKartPlayerStats | CoDPlayerStats;
 
 type SetDataProps = {
-  set: StatsType[][];
+  set: ProcessedSet;
   setIndex: number;
   game: string | undefined;
 };
 
 export const SetData = ({ set, setIndex, game }: SetDataProps) => {
-  console.log(game);
-  const renderGameStats = (match: StatsType[]) => {
-    switch (game) {
+  const renderGameStats = (match: PlayerStats[], gameForStats?: string) => {
+    const currentGame = gameForStats || game;
+    switch (currentGame) {
       case "Rocket League":
         return (
           <div className="flex gap-10 text-white">
@@ -80,7 +91,7 @@ export const SetData = ({ set, setIndex, game }: SetDataProps) => {
     }
   };
 
-  const winners = set.at(0)?.at(0)?.winners || [];
+  const winners = set.setWinners;
   const winnerText = winners.length > 1 ? "Winners" : "Winner";
 
   return (
@@ -89,14 +100,14 @@ export const SetData = ({ set, setIndex, game }: SetDataProps) => {
       <div className="text-muted-foreground my-2 text-sm">
         {winnerText}: {winners.join(", ") || "No winners recorded"}
       </div>
-      {set.map((match, matchIndex) => (
+      {set.matches.map((match, matchIndex) => (
         <div className="mb-4" key={matchIndex}>
           <div>Match {matchIndex + 1}</div>
           <Separator className="my-2" />
           <span className="text-muted-foreground text-sm">
             {game === "Rocket League" ? "Teams" : "Results"}
           </span>
-          {renderGameStats(match)}
+          {renderGameStats(match.players, game)}
         </div>
       ))}
     </div>
@@ -110,18 +121,17 @@ const StatsTable = ({
   teamName,
   game,
 }: {
-  players: StatsType[];
+  players: PlayerStats[];
   bgColor: string;
   teamName?: string;
   game?: string;
 }) => {
   if (!players.length) return null;
-  const isRocketLeague = (p: StatsType): p is RLStats =>
-    typeof (p as RLStats).score === "number";
-  const isMarioKart = (p: StatsType): p is MarioKartStats =>
-    typeof (p as MarioKartStats).position === "number";
-  const isCoDStats = (p: StatsType): p is CoDStats =>
-    typeof (p as CoDStats).kills === "number";
+  const isRocketLeague = (p: PlayerStats): p is RLPlayerStats =>
+    "score" in p;
+  const isMarioKart = (p: PlayerStats): p is MarioKartPlayerStats =>
+    "position" in p;
+  const isCoDStats = (p: PlayerStats): p is CoDPlayerStats => "kills" in p;
 
   const firstPlayer = players[0];
   const shouldHighlightFirst = game !== "Rocket League";
