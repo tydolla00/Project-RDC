@@ -266,8 +266,8 @@ const getAverageStats = (
   const avgStats: Record<string, string> = {};
 
   Object.entries(stats).forEach(([key, value]) => {
-    if (typeof value === "number") {
-      avgStats[key] = (value / matches).toFixed(1);
+    if (!isNaN(parseFloat(String(value)))) {
+      avgStats[key] = (parseFloat(String(value)) / matches).toFixed(1);
     } else {
       avgStats[key] = "N/A";
     }

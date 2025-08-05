@@ -93,46 +93,72 @@ export function TimelineChart({
         </div>
 
         <Suspense fallback={<Skeleton className="h-[400px]" />}>
-          {session && (
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <div className="space-y-4">
-                <Link
-                  href={session?.sessionUrl}
-                  className="group block overflow-hidden rounded-lg"
-                >
-                  <Image
-                    className="aspect-video w-full object-cover transition-transform group-hover:scale-105"
-                    height={400}
-                    width={600}
-                    alt={session.sessionName}
-                    src={session.thumbnail}
-                  />
-                  <div className="mt-4 font-medium group-hover:underline">
-                    {session.sessionName}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {session ? (
+              <>
+                <div className="space-y-4">
+                  <Link
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    href={session.sessionUrl}
+                    className="group block overflow-hidden rounded-lg"
+                  >
+                    <Image
+                      className="aspect-video w-full object-cover transition-transform group-hover:scale-105"
+                      height={400}
+                      width={600}
+                      alt={session.sessionName}
+                      src={session.thumbnail}
+                    />
+                    <div className="mt-4 font-medium group-hover:underline">
+                      {session.sessionName}
+                    </div>
+                  </Link>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        Show Session Data
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="h-screen max-w-3xl">
+                      <DialogHeader className="space-y-0">
+                        <DialogTitle>Session Info</DialogTitle>
+                        <DialogDescription>
+                          Explore the info about this video
+                        </DialogDescription>
+                      </DialogHeader>
+                      <ScrollArea className="h-[80vh]">
+                        <MatchData session={session} />
+                      </ScrollArea>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                <MVP session={session} />
+              </>
+            ) : (
+              <>
+                <Card className="bg-muted/40 flex h-[400px] items-center justify-center rounded-lg border-2 border-dashed">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold">
+                      No session selected
+                    </h3>
+                    <p className="text-muted-foreground mt-2 text-sm">
+                      Hover over a point on the chart to see session details.
+                    </p>
                   </div>
-                </Link>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full">
-                      Show Session Data
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="h-screen max-w-3xl">
-                    <DialogHeader className="space-y-0">
-                      <DialogTitle>Session Info</DialogTitle>
-                      <DialogDescription>
-                        Explore the info about this video
-                      </DialogDescription>
-                    </DialogHeader>
-                    <ScrollArea className="h-[80vh]">
-                      <MatchData session={session} />
-                    </ScrollArea>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              <MVP session={session} />
-            </div>
-          )}
+                </Card>
+
+                <Card className="bg-muted/40 flex h-[400px] items-center justify-center rounded-lg border-2 border-dashed">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold">No MVP data</h3>
+                    <p className="text-muted-foreground mt-2 text-sm">
+                      MVP data will appear here when a session is selected.
+                    </p>
+                  </div>
+                </Card>
+              </>
+            )}
+          </div>
         </Suspense>
       </div>
 
@@ -225,15 +251,16 @@ const CustomTooltip = ({
   setSession: (session: Sessions[0]) => void;
   showMatchData: boolean;
 }) => {
-  const session = payload?.at(0)?.payload as Sessions[0];
+  const session = payload?.at(0)?.payload as Sessions[0] | undefined;
+
   useEffect(() => {
-    if (active && showMatchData) {
+    if (active && showMatchData && session) {
       console.log(showMatchData);
       setSession(session);
     }
   }, [active, session, setSession, showMatchData]);
 
-  if (active) {
+  if (active && session) {
     return (
       <div className="max-w-48 flex-wrap rounded-md p-2 shadow-md">
         <Card>
