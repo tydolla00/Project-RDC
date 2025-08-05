@@ -1,5 +1,7 @@
 import { H1 } from "@/components/headings";
 import Link from "next/link";
+import { generateText } from "ai";
+import { google } from "@ai-sdk/google";
 
 export default function AboutPage() {
   return (
