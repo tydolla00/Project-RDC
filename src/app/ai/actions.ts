@@ -6,7 +6,6 @@ import { generateObject } from "ai";
 import type { ProcessedSet } from "../(routes)/(groups)/games/[slug]/_components/match-data";
 // import { createStreamableValue } from "@ai-sdk/rsc";
 
-import { z } from "zod";
 import { mvpSystemPrompt } from "./prompts";
 import prisma, { handlePrismaOperation } from "../../../prisma/db";
 import {
@@ -15,27 +14,7 @@ import {
 } from "@/posthog/server-analytics";
 import { after } from "next/server";
 import { revalidateTag } from "next/cache";
-
-const output = z.object({
-  player: z.string(),
-  description: z.string(),
-  stats: z.array(
-    z.object({
-      statName: z.string().meta({ description: "The name of the statistic" }),
-      sum: z
-        .number()
-        .nonnegative()
-        .meta({ description: "Total of the stat for the whole session" }),
-      average: z
-        .number()
-        .nonnegative()
-        .optional()
-        .meta({ description: "Average of the stat for the whole session" }),
-    }),
-  ),
-});
-
-export type MvpOutput = z.infer<typeof output>;
+import { mvpSchema } from "./types";
 
 export const analyzeMvp = async (sets: ProcessedSet[], sessionId: number) => {
   try {
@@ -44,7 +23,7 @@ export const analyzeMvp = async (sets: ProcessedSet[], sessionId: number) => {
     if (!session) throw new Error("Unauthorized");
 
     const { object, usage } = await generateObject({
-      schema: output,
+      schema: mvpSchema,
       model: google("gemini-2.5-pro"),
       system: mvpSystemPrompt,
       prompt: `Analyze the following game sets and determine the MVP based on the provided statistics: ${JSON.stringify(sets)}`,

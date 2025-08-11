@@ -10,9 +10,10 @@ import type { QueryResponseData } from "prisma/db";
 import type { getAllSessionsByGame } from "prisma/lib/admin";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { analyzeMvp, MvpOutput } from "@/app/ai/actions";
+import { analyzeMvp } from "@/app/ai/actions";
 import { getSetsData, ProcessedSet } from "./match-data";
 import { capitalizeFirst } from "@/lib/utils";
+import type { MvpOutput } from "@/app/ai/types";
 // import { readStreamableValue } from "@ai-sdk/rsc";
 
 type Sessions = QueryResponseData<

@@ -40,7 +40,7 @@ import { QueryResponseData } from "../../../../../../../prisma/db";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import MatchData from "./match-data";
 import { MVP } from "./mvp";
-import { MvpOutput } from "@/app/ai/actions";
+import { type MvpOutput, mvpStatsSchema } from "@/app/ai/types";
 
 const chartConfig = {
   id: {
@@ -78,18 +78,14 @@ export function TimelineChart({
   const [showMatchData, setShowMatchData] = useState(true);
   const mvp = useMemo<MvpOutput | null>(() => {
     if (session?.mvp) {
-      let stats: MvpOutput["stats"];
-      try {
-        stats = session.mvpStats as MvpOutput["stats"];
-      } catch (error) {
-        console.log(error);
-        return null;
-      }
-      return {
-        description: session.mvpDescription,
-        player: session.mvp.playerName,
-        stats,
-      } as MvpOutput;
+      const res = mvpStatsSchema.safeParse(session.mvpStats);
+      return res.success
+        ? ({
+            description: session.mvpDescription,
+            player: session.mvp.playerName,
+            stats: session.mvpStats,
+          } as MvpOutput)
+        : null;
     } else return null;
   }, [session]);
 
