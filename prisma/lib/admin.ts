@@ -44,6 +44,9 @@ export const getAllSessionsByGame = unstable_cache(
           sessionUrl: true,
           thumbnail: true,
           dayWinners: true,
+          mvp: true,
+          mvpDescription: true,
+          mvpStats: true,
           Game: { select: { gameName: true } },
           sets: {
             select: {
@@ -73,6 +76,7 @@ export const getAllSessionsByGame = unstable_cache(
             },
           },
         },
+        orderBy: { date: "asc" },
       }),
     ),
   undefined,

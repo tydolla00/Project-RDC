@@ -6,8 +6,8 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { QueryResponseData } from "prisma/db";
-import { getAllSessionsByGame } from "prisma/lib/admin";
+import type { QueryResponseData } from "prisma/db";
+import type { getAllSessionsByGame } from "prisma/lib/admin";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { analyzeMvp, MvpOutput } from "@/app/ai/actions";
@@ -20,11 +20,16 @@ type Sessions = QueryResponseData<
 >;
 
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
 
-export const MVP = ({ session }: { session: Sessions[0] }) => {
+export const MVP = ({
+  session,
+  defaultMvp = null,
+}: {
+  session: Sessions[0];
+  defaultMvp: MvpOutput | null;
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [mvp, setMvp] = useState<MvpOutput | null>(null);
+  const [mvp, setMvp] = useState<MvpOutput | null>(defaultMvp);
   // const [generation, setGeneration] = useState<string | null>(null);
 
   return (
@@ -33,37 +38,6 @@ export const MVP = ({ session }: { session: Sessions[0] }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">MVP</CardTitle>
         <CardDescription>Match Statistics</CardDescription>
-        <Button
-          className="cursor-pointer"
-          disabled={isSubmitting}
-          onClick={async () => {
-            setIsSubmitting(true);
-            try {
-              const stats = getSetsData(session);
-              console.log({ stats });
-              // const { object } = await analyzeMvp(stats as ProcessedRLSet[]);
-              // for await (const partialObject of readStreamableValue(object)) {
-              //   if (partialObject) {
-              //     console.log(partialObject);
-              //     setGeneration(
-              //       JSON.stringify(partialObject.notifications, null, 2),
-              //     );
-              //   }
-              // }
-              const mvp = await analyzeMvp(stats as ProcessedSet[]);
-              setMvp(mvp);
-            } catch (error) {
-              console.log("Unexpected error", error);
-            } finally {
-              setIsSubmitting(false);
-            }
-          }}
-        >
-          Generate Description
-        </Button>
-        {isSubmitting && (
-          <p className="text-muted-foreground text-sm">Generating...</p>
-        )}
         {/* {generation && (
           <pre className="bg-muted mt-2 rounded-md p-4 text-sm">
             {generation}
@@ -101,7 +75,7 @@ export const MVP = ({ session }: { session: Sessions[0] }) => {
                   <p className="text-2xl font-bold tracking-tight">
                     {stat.sum}
                   </p>
-                  {stat.average && (
+                  {stat.average !== undefined && (
                     <p className="text-muted-foreground text-xs">
                       {stat.average} per game
                     </p>
@@ -111,7 +85,48 @@ export const MVP = ({ session }: { session: Sessions[0] }) => {
             </div>
           </div>
         ) : (
-          <p>No data available for this player in this session.</p>
+          <>
+            <p>No MVP has been decided yet, would you like to do the honors?</p>
+            <Button
+              className="cursor-pointer disabled:cursor-auto"
+              disabled={isSubmitting}
+              onClick={async () => {
+                setIsSubmitting(true);
+                try {
+                  const stats = getSetsData(session);
+                  console.log({ stats });
+                  // const { object } = await analyzeMvp(stats as ProcessedRLSet[]);
+                  // for await (const partialObject of readStreamableValue(object)) {
+                  //   if (partialObject) {
+                  //     console.log(partialObject);
+                  //     setGeneration(
+                  //       JSON.stringify(partialObject.notifications, null, 2),
+                  //     );
+                  //   }
+                  // }
+                  const mvp = await analyzeMvp(
+                    stats as ProcessedSet[],
+                    session.sessionId,
+                  );
+                  // TODO use proper id, fix player lookup throughout app.
+                  // Update the in memory record of a session to keep mvp in state.
+                  session.mvp = { playerName: mvp.player, playerId: 1 };
+                  session.mvpDescription = mvp.description;
+                  session.mvpStats = mvp.stats;
+                  setMvp(mvp);
+                } catch (error) {
+                  console.log("Unexpected error", error);
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }}
+            >
+              Who is the real MVP?
+            </Button>
+            {isSubmitting && (
+              <p className="text-muted-foreground text-sm">Generating...</p>
+            )}
+          </>
         )}
       </CardContent>
     </Card>

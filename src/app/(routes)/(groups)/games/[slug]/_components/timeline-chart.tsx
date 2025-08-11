@@ -19,7 +19,7 @@ import {
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { getAllSessionsByGame } from "../../../../../../../prisma/lib/admin";
 import Image from "next/image";
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -40,6 +40,7 @@ import { QueryResponseData } from "../../../../../../../prisma/db";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import MatchData from "./match-data";
 import { MVP } from "./mvp";
+import { MvpOutput } from "@/app/ai/actions";
 
 const chartConfig = {
   id: {
@@ -75,6 +76,22 @@ export function TimelineChart({
     setSession(session);
   }, []);
   const [showMatchData, setShowMatchData] = useState(true);
+  const mvp = useMemo<MvpOutput | null>(() => {
+    if (session?.mvp) {
+      let stats: MvpOutput["stats"];
+      try {
+        stats = session.mvpStats as MvpOutput["stats"];
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+      return {
+        description: session.mvpDescription,
+        player: session.mvp.playerName,
+        stats,
+      } as MvpOutput;
+    } else return null;
+  }, [session]);
 
   return (
     <div className="space-y-8">
@@ -134,7 +151,11 @@ export function TimelineChart({
                     </DialogContent>
                   </Dialog>
                 </div>
-                <MVP key={session.sessionId} session={session} />
+                <MVP
+                  key={session.sessionId}
+                  session={session}
+                  defaultMvp={mvp}
+                />
               </>
             ) : (
               <>
@@ -231,8 +252,6 @@ export function TimelineChart({
     </div>
   );
 }
-
-
 
 // TODO Show session info about sets/matches.
 const CustomTooltip = ({

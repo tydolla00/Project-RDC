@@ -3,11 +3,15 @@
 import { auth } from "@/auth";
 import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
-import { ProcessedSet } from "../(routes)/(groups)/games/[slug]/_components/match-data";
+import type { ProcessedSet } from "../(routes)/(groups)/games/[slug]/_components/match-data";
 // import { createStreamableValue } from "@ai-sdk/rsc";
 
 import { z } from "zod";
 import { mvpSystemPrompt } from "./prompts";
+import prisma, { handlePrismaOperation } from "../../../prisma/db";
+import { logMvpUpdateFailure } from "@/posthog/server-analytics";
+import { after } from "next/server";
+import { revalidateTag } from "next/cache";
 
 const output = z.object({
   player: z.string(),
@@ -17,11 +21,11 @@ const output = z.object({
       statName: z.string().meta({ description: "The name of the statistic" }),
       sum: z
         .number()
-        .positive()
+        .nonnegative()
         .meta({ description: "Total of the stat for the whole session" }),
       average: z
         .number()
-        .positive()
+        .nonnegative()
         .optional()
         .meta({ description: "Average of the stat for the whole session" }),
     }),
@@ -30,9 +34,9 @@ const output = z.object({
 
 export type MvpOutput = z.infer<typeof output>;
 
-export const analyzeMvp = async (sets: ProcessedSet[]) => {
+export const analyzeMvp = async (sets: ProcessedSet[], sessionId: number) => {
   try {
-    const session = auth();
+    const session = await auth();
 
     if (!session) throw new Error("Unauthorized");
 
@@ -42,6 +46,27 @@ export const analyzeMvp = async (sets: ProcessedSet[]) => {
       system: mvpSystemPrompt,
       prompt: `Analyze the following game sets and determine the MVP based on the provided statistics: ${JSON.stringify(sets)}`,
     });
+
+    // Update the Mvp record after request finishes.
+    after(async () => {
+      const player = await prisma.player.findFirst({
+        where: { playerName: { startsWith: object.player } },
+      });
+
+      const res = await handlePrismaOperation(() =>
+        prisma.session.update({
+          where: { sessionId },
+          data: {
+            mvpDescription: object.description,
+            mvpStats: object.stats,
+            mvpId: player?.playerId,
+          },
+        }),
+      );
+      if (!res.success) logMvpUpdateFailure(sessionId, res.error, session);
+      else revalidateTag("getAllSessions");
+    });
+
     console.log("Total usage:", usage);
     return object;
   } catch (error) {
