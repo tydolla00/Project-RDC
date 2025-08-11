@@ -4,6 +4,7 @@ import { FormValues } from "@/app/(routes)/admin/_utils/form-helpers";
 import { ErrorModelOutput } from "@azure-rest/ai-document-intelligence";
 import { Session } from "next-auth";
 import { v4 } from "uuid";
+import { MvpOutput } from "@/app/ai/actions";
 
 /**
  * Logs an authentication error to PostHog
@@ -109,6 +110,25 @@ export const logMvpUpdateFailure = async (
     properties: {
       sessionId,
       error,
+    },
+  });
+};
+
+export const logMvpUpdateSuccess = async (
+  sessionId: number,
+  mvp: MvpOutput,
+  timeStamp: Date,
+  userSession?: Session | null,
+) => {
+  const session = userSession ?? (await auth());
+
+  posthog.capture({
+    event: "MVP_UPDATE_SUCCESS",
+    distinctId: session?.user?.email || v4(),
+    properties: {
+      sessionId,
+      mvp,
+      timeStamp,
     },
   });
 };

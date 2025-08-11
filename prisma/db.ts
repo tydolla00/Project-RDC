@@ -18,7 +18,7 @@ declare global {
 }
 
 export type ErrorResponse<T> = {
-  success: boolean;
+  success: false;
   error: string;
   code?: string;
   data: T | null;
