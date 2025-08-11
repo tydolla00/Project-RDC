@@ -9,7 +9,10 @@ import type { ProcessedSet } from "../(routes)/(groups)/games/[slug]/_components
 import { z } from "zod";
 import { mvpSystemPrompt } from "./prompts";
 import prisma, { handlePrismaOperation } from "../../../prisma/db";
-import { logMvpUpdateFailure } from "@/posthog/server-analytics";
+import {
+  logMvpUpdateFailure,
+  logMvpUpdateSuccess,
+} from "@/posthog/server-analytics";
 import { after } from "next/server";
 import { revalidateTag } from "next/cache";
 
@@ -63,8 +66,17 @@ export const analyzeMvp = async (sets: ProcessedSet[], sessionId: number) => {
           },
         }),
       );
-      if (!res.success) logMvpUpdateFailure(sessionId, res.error, session);
-      else revalidateTag("getAllSessions");
+      if (!res.success)
+        await logMvpUpdateFailure(sessionId, res.error, session);
+      else {
+        revalidateTag("getAllSessions");
+        await logMvpUpdateSuccess(
+          sessionId,
+          object,
+          res.data.updatedAt,
+          session,
+        );
+      }
     });
 
     console.log("Total usage:", usage);
