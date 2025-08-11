@@ -14,7 +14,7 @@ import {
   AnimatedFormWrapper,
   NavigationButtons,
 } from "@/components/AnimatedFormWrapper";
-import { motion } from "motion/react";
+import { motion, MotionConfig } from "motion/react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoInfo } from "./VideoInfo";
 import { cn } from "@/lib/utils";
@@ -159,42 +159,44 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     document.documentElement.scrollTop = 0; // Scroll to top when a new set is added
   }, []);
   return (
-    <FormProvider {...form}>
-      <div className="flex w-full gap-3">
-        <Card className={cn("relative col-auto flex-1 p-4")}>
-          <CardHeader className="dark:text-purple-500">
-            <CardTitle>Entry Creator Form</CardTitle>
-          </CardHeader>
-          <AnimatedFormWrapper>
-            <Form {...form}>
-              <form method="post" onSubmit={handleSubmit(onSubmit, onError)}>
-                <motion.div
-                  key={step} // Necessary in order for animate presence to know when to rerender
-                  className="space-y-4"
-                  initial={{ x: `${-110 * modifier}%`, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: `${110 * modifier}%`, opacity: 0 }}
-                >
-                  {step === 0 && (
-                    <SessionInfo form={form} rdcMembers={rdcMembers} />
-                  )}
-                  {step === 1 && <SetManager />}
-                  {step === 2 && <FormSummary />}
-                </motion.div>
-                <NavigationButtons
-                  form={form}
-                  isPending={isLoading}
-                  step={step}
-                  setStep={setStep}
-                  setModifier={setModifier}
-                />
-              </form>
-            </Form>
-          </AnimatedFormWrapper>
-        </Card>
-        {step === 0 && <VideoInfo form={form} />}
-      </div>
-    </FormProvider>
+    <MotionConfig transition={{ duration: 0.6, type: "spring", bounce: 0 }}>
+      <FormProvider {...form}>
+        <div className="flex w-full gap-3">
+          <Card className={cn("relative col-auto flex-1 p-4")}>
+            <CardHeader className="dark:text-purple-500">
+              <CardTitle>Entry Creator Form</CardTitle>
+            </CardHeader>
+            <AnimatedFormWrapper>
+              <Form {...form}>
+                <form method="post" onSubmit={handleSubmit(onSubmit, onError)}>
+                  <motion.div
+                    key={step} // Necessary in order for animate presence to know when to rerender
+                    className="space-y-4"
+                    initial={{ x: `${-110 * modifier}%`, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: `${110 * modifier}%`, opacity: 0 }}
+                  >
+                    {step === 0 && (
+                      <SessionInfo form={form} rdcMembers={rdcMembers} />
+                    )}
+                    {step === 1 && <SetManager />}
+                    {step === 2 && <FormSummary />}
+                  </motion.div>
+                  <NavigationButtons
+                    form={form}
+                    isPending={isLoading}
+                    step={step}
+                    setStep={setStep}
+                    setModifier={setModifier}
+                  />
+                </form>
+              </Form>
+            </AnimatedFormWrapper>
+          </Card>
+          {step === 0 && <VideoInfo form={form} />}
+        </div>
+      </FormProvider>
+    </MotionConfig>
   );
 };
 

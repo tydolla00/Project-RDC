@@ -10,9 +10,8 @@ import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
 import { RocketLeagueProcessor } from "@/lib/game-processors/RocketLeagueProcessor";
 import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";
 import { PLAYER_MAPPINGS } from "../(routes)/admin/_utils/form-helpers";
-import { auth } from "@/auth";
-import { v4 } from "uuid";
 import { logVisionError } from "@/posthog/server-analytics";
+import { after } from "next/server";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -109,8 +108,7 @@ export const analyzeScreenShot = async (
       });
 
     if (isUnexpected(response)) {
-      const user = await auth();
-      logVisionError(user?.user?.email || v4(), response.body.error);
+      after(() => logVisionError(response.body.error));
       throw response.body.error;
     }
 
@@ -202,9 +200,8 @@ export const analyzeScreenShot = async (
     return validatedResult;
   } catch (error) {
     console.error(error);
-    const user = await auth();
     const e = error instanceof Error ? error.message : "Unknown error";
-    logVisionError(user?.user?.email ?? v4(), error);
+    logVisionError(error);
     return { status: VisionResultCodes.Failed, message: e };
   }
 };

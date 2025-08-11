@@ -2,14 +2,19 @@ import posthog from "@/posthog/server-init";
 import { auth } from "@/auth";
 import { FormValues } from "@/app/(routes)/admin/_utils/form-helpers";
 import { ErrorModelOutput } from "@azure-rest/ai-document-intelligence";
+import { Session } from "next-auth";
+import { v4 } from "uuid";
 
 /**
  * Logs an authentication error to PostHog
  * @param error - The error to log
  */
-export const logAuthError = async (error: Error) => {
+export const logAuthError = async (
+  error: Error,
+  userSession?: Session | null,
+) => {
   try {
-    const session = await auth();
+    const session = userSession ?? (await auth());
     posthog.captureException({
       event: `Authentication Error - ${error}`,
       distinctId: session?.user?.email ?? "Unidentified Email",
@@ -28,27 +33,37 @@ export const logAuthError = async (error: Error) => {
  * @param event - The name of the event to log
  * @param email - The user's email address
  */
-export const logAuthEvent = (event: "signin" | "signout", email: string) => {
+export const logAuthEvent = async (
+  event: "signin" | "signout",
+  userSession?: Session | null,
+) => {
+  const session = userSession ?? (await auth());
   posthog.capture({
     event,
-    distinctId: email,
+    distinctId: session?.user?.email || v4(),
   });
 };
 
-export const logNAN = (fnName: string, email: string, statId: number) => {
+export const logNAN = async (
+  fnName: string,
+  statId: number,
+  userSession?: Session | null,
+) => {
+  const session = userSession ?? (await auth());
   posthog.capture({
     event: `NaN called in ${fnName} for statId: ${statId}`,
-    distinctId: email,
+    distinctId: session?.user?.email || v4(),
   });
 };
 
-export const logFormError = (
+export const logFormError = async (
   err: unknown,
-  email: string,
   session: FormValues,
+  userSession?: Session | null,
 ) => {
+  const authSession = userSession ?? (await auth());
   posthog.captureException({
-    distinctId: email,
+    distinctId: authSession?.user?.email || v4(),
     event: "ADMIN_FORM_ERROR",
     properties: {
       error: err,
@@ -57,24 +72,42 @@ export const logFormError = (
   });
 };
 
-export const logFormSuccess = (email: string) => {
+export const logFormSuccess = async (userSession?: Session | null) => {
+  const session = userSession ?? (await auth());
   posthog.capture({
     event: "ADMIN_FORM_SUCCESS",
-    distinctId: email,
+    distinctId: session?.user?.email || v4(),
     properties: {
       submittedAt: new Date().toISOString(),
     },
   });
 };
 
-export const logVisionError = (
-  email: string,
+export const logVisionError = async (
   error: ErrorModelOutput | unknown,
+  userSession?: Session | null,
 ) => {
+  const session = userSession ?? (await auth());
   posthog.captureException({
     event: "VISION_ERROR",
-    distinctId: email,
+    distinctId: session?.user?.email || v4(),
     properties: {
+      error,
+    },
+  });
+};
+
+export const logMvpUpdateFailure = async (
+  sessionId: number,
+  error: unknown,
+  userSession?: Session | null,
+) => {
+  const session = userSession ?? (await auth());
+  posthog.capture({
+    event: "MVP_UPDATE_FAILURE",
+    distinctId: session?.user?.email || v4(),
+    properties: {
+      sessionId,
       error,
     },
   });
