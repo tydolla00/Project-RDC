@@ -7,7 +7,7 @@ export const mvpSystemPrompt = `
     OUTPUT (return ONLY valid JSON, no prose, no markdown):  
     {  
       "mvp": "<player name>",  
-      "description": "<why this player was chosen, concise>",  
+      "description": "<why this player was chosen>",  
       "stats": [  
         { "statName": "<string>", "sum": <number>, "average": <number optional> }  
       ]  

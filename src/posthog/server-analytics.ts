@@ -93,7 +93,10 @@ export const logVisionError = async (
     event: "VISION_ERROR",
     distinctId: session?.user?.email || v4(),
     properties: {
-      error,
+      error:
+        error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack }
+          : String(error),
     },
   });
 };
@@ -104,12 +107,15 @@ export const logMvpUpdateFailure = async (
   userSession?: Session | null,
 ) => {
   const session = userSession ?? (await auth());
-  posthog.capture({
+  posthog.captureException({
     event: "MVP_UPDATE_FAILURE",
     distinctId: session?.user?.email || v4(),
     properties: {
       sessionId,
-      error,
+      error:
+        error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack }
+          : String(error),
     },
   });
 };
@@ -118,6 +124,7 @@ export const logMvpUpdateSuccess = async (
   sessionId: number,
   mvp: MvpOutput,
   timeStamp: Date,
+  duration: number,
   userSession?: Session | null,
 ) => {
   const session = userSession ?? (await auth());
@@ -129,6 +136,7 @@ export const logMvpUpdateSuccess = async (
       sessionId,
       mvp,
       timeStamp,
+      fnDuration: duration,
     },
   });
 };
