@@ -71,6 +71,7 @@ export const getRDCVideoDetails = async (
 
       if (!apiKey) {
         console.log("YOUTUBE API KEY NOT CONFIGURED");
+        // TODO Move Posthog calls to analytics file.
         posthog.captureException("YOUTUBE API KEY NOT CONFIGURED", distinctId);
       }
 

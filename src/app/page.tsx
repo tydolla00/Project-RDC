@@ -56,7 +56,6 @@ export default async function Home() {
                     href={game.url}
                     className="relative block h-full w-full"
                   >
-                    {/* TODO Fix warning in browser related to sizing of the image. */}
                     <Image
                       className="object-cover transition-transform duration-500 group-hover:scale-125"
                       fill

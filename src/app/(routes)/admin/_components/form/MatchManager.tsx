@@ -76,7 +76,6 @@ const MatchManager = (props: Props) => {
       };
     });
 
-    // TODO FIX Typings
     if (formattedWinners && formattedWinners.length > 0) {
       console.log("Setting Vision Winners!", formattedWinners);
       append({

@@ -6,10 +6,9 @@ import { StatName } from "@prisma/client";
 import { getSumOfStat } from "@prisma/client/sql";
 
 export type StatEndsWith<
-  T extends string,
-  Y extends StatName = StatName,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-> = Y extends StatName ? (Y extends `${infer u}_${T}` ? Y : never) : never;
+  Suffix extends string,
+  Name extends StatName = StatName,
+> = Extract<Name, `${string}_${Suffix}`>;
 
 // Cache is used for deduping
 // unstable is used for time based caching
