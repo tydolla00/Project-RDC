@@ -6,8 +6,8 @@ import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { revalidateTag } from "next/cache";
-import { v4 } from "uuid";
 import { logFormError, logFormSuccess } from "@/posthog/server-analytics";
+import { after } from "next/server";
 
 /**
  * Retrieves the statistics for a specified game.
@@ -289,12 +289,11 @@ export const insertNewSessionFromAdmin = async (
         }),
       );
     });
-    logFormSuccess(user?.user?.email ?? v4());
+    after(() => logFormSuccess(user));
     revalidateTag("getAllSessions");
     return { error: null };
   } catch (err) {
-    const user = await auth();
-    logFormError(err, user?.user?.email ?? v4(), session);
+    after(() => logFormError(err, session));
     error = "Unknown error occurred. Please try again.";
     return { error };
   } finally {

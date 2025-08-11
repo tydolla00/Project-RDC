@@ -8,9 +8,7 @@ import {
 } from "../../../../../../../prisma/lib/games";
 import { QueryResponseData } from "../../../../../../../prisma/db";
 import { Decimal } from "@prisma/client/runtime/library";
-import { auth } from "@/auth";
 import { logNAN } from "@/posthog/server-analytics";
-import { v4 } from "uuid";
 
 type Result = NonNullable<
   NonNullable<Awaited<ReturnType<typeof getSumPerStat>>["data"]>[number]
@@ -114,7 +112,6 @@ export const calcMostPerPlacing = async (
   statName: StatEndsWith<"POS">,
 ) => {
   const sessions = await getMatchesPerGame(gameId, statName);
-  const user = await auth();
 
   if (!sessions.success || !sessions.data) {
     console.log("Failed to get sessions");
@@ -130,11 +127,7 @@ export const calcMostPerPlacing = async (
         for (const ps of match.playerSessions) {
           const pos = Number(ps.playerStats[0].value);
           if (isNaN(pos)) {
-            logNAN(
-              "calcMostPerPlacing",
-              user?.user?.email ?? v4(),
-              ps.playerStats[0].playerStatId,
-            );
+            logNAN("calcMostPerPlacing", ps.playerStats[0].playerStatId);
             continue;
           }
           if (!members.has(ps.player.playerName))
@@ -196,7 +189,6 @@ export const calcMostPerPlacing = async (
  */
 export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
   const stats = await getStatPerPlayer(gameId, statName);
-  const user = await auth();
 
   if (!stats.success || !stats.data) {
     console.log("Failed to get stats");
@@ -208,11 +200,7 @@ export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
     const val = Number(value);
 
     if (isNaN(val)) {
-      logNAN(
-        "calcStatPerPlayer",
-        user?.user?.email ?? "Unidentified Email",
-        statId,
-      );
+      logNAN("calcStatPerPlayer", statId);
       continue;
     }
 
