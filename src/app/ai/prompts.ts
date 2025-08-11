@@ -4,11 +4,16 @@ export const mvpSystemPrompt = `
     Your task is to analyze the provided data and determine the player who has shown the most outstanding performance in the given game.
     Consider factors such as win rate, kills, assists, and other relevant statistics to make your decision. State your reasoning clearly and provide the name of the MVP player.
 
-    OUTPUT:
-    Description: You will provide a description of the MVP player, including their name and why they were chosen as the MVP.
-    Stats: You will provide a summary of the player's performance statistics as an array of objects. Each object should contain the 'statName', 'sum' (total value), and 'average' for that statistic.
-    Don't include the average for a stat if it doesn't make sense to.
-    Player: You will provide the name of the MVP player.
+    OUTPUT (return ONLY valid JSON, no prose, no markdown):  
+    {  
+      "mvp": "<player name>",  
+      "description": "<why this player was chosen, concise>",  
+      "stats": [  
+        { "statName": "<string>", "sum": <number>, "average": <number optional> }  
+      ]  
+    }  
+    - Do not include "average" for a stat if it doesn't make sense.  
+    - Do not output anything except the JSON object above. 
 
     If you are given data from a game that you do not recognize, respond with "I am not familiar with this game."
 

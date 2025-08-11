@@ -4,7 +4,7 @@ import { FormValues } from "@/app/(routes)/admin/_utils/form-helpers";
 import { ErrorModelOutput } from "@azure-rest/ai-document-intelligence";
 import { Session } from "next-auth";
 import { v4 } from "uuid";
-import { MvpOutput } from "@/app/ai/actions";
+import type { MvpOutput } from "@/app/ai/types";
 
 /**
  * Logs an authentication error to PostHog
