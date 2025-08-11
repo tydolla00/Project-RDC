@@ -249,7 +249,6 @@ export function TimelineChart({
   );
 }
 
-// TODO Show session info about sets/matches.
 const CustomTooltip = ({
   active,
   payload,

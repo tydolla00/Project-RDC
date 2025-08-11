@@ -16,15 +16,12 @@ export const logAuthError = async (
 ) => {
   try {
     const session = userSession ?? (await auth());
-    posthog.captureException({
-      event: `Authentication Error - ${error}`,
-      distinctId: session?.user?.email ?? "Unidentified Email",
-    });
+    posthog.captureException(
+      `Authentication Error - ${error}`,
+      session?.user?.email ?? "Unidentified Email",
+    );
   } catch (error) {
-    posthog.captureException({
-      event: `Authentication Error - ${error}`,
-      distinctId: undefined,
-    });
+    posthog.captureException(`Authentication Error - ${error}`, undefined);
     console.error("Error logging authentication error:", error);
   }
 };
@@ -63,13 +60,8 @@ export const logFormError = async (
   userSession?: Session | null,
 ) => {
   const authSession = userSession ?? (await auth());
-  posthog.captureException({
-    distinctId: authSession?.user?.email || v4(),
-    event: "ADMIN_FORM_ERROR",
-    properties: {
-      error: err,
-      session: JSON.stringify(session),
-    },
+  posthog.captureException(err, authSession?.user?.email || v4(), {
+    session: JSON.stringify(session),
   });
 };
 
@@ -89,16 +81,7 @@ export const logVisionError = async (
   userSession?: Session | null,
 ) => {
   const session = userSession ?? (await auth());
-  posthog.captureException({
-    event: "VISION_ERROR",
-    distinctId: session?.user?.email || v4(),
-    properties: {
-      error:
-        error instanceof Error
-          ? { name: error.name, message: error.message, stack: error.stack }
-          : String(error),
-    },
-  });
+  posthog.captureException(error, session?.user?.email || v4());
 };
 
 export const logMvpUpdateFailure = async (
@@ -107,16 +90,8 @@ export const logMvpUpdateFailure = async (
   userSession?: Session | null,
 ) => {
   const session = userSession ?? (await auth());
-  posthog.captureException({
-    event: "MVP_UPDATE_FAILURE",
-    distinctId: session?.user?.email || v4(),
-    properties: {
-      sessionId,
-      error:
-        error instanceof Error
-          ? { name: error.name, message: error.message, stack: error.stack }
-          : String(error),
-    },
+  posthog.captureException(error, session?.user?.email || v4(), {
+    sessionId,
   });
 };
 
