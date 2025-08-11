@@ -100,6 +100,7 @@
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.12",
     "prisma": "^6.13.0",
+    "prisma-json-types-generator": "^3.5.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"

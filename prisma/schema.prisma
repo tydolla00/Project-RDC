@@ -6,6 +6,10 @@ generator client {
   previewFeatures = ["typedSql", "driverAdapters"]
 }
 
+generator json {
+  provider = "prisma-json-types-generator"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
@@ -107,10 +111,11 @@ model Session {
   thumbnail      String
   date           DateTime  @default(now()) // Date video posted
   videoId        String
-  mvp            Player?   @relation("Mvp", fields: [mvpId], references: [playerId])
-  mvpId          Int?
-  mvpDescription String?
-  mvpStats       String?
+  mvp            Player?   @relation("Mvp", fields: [mvpId], references: [playerId], onDelete: SetNull) // on delete not in schema
+  mvpId          Int? 
+  mvpDescription String?  
+  /// [MvpOutput]
+  mvpStats       Json? // json not in schema
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -118,7 +123,7 @@ model Session {
   isApproved Boolean @default(false) @map("is_approved")
   createdBy  String  @default("SYSTEM") @map("created_by")
 
-  @@unique([gameId, videoId]) // not in migrations
+  @@unique([gameId, videoId]) 
   @@map("sessions")
 }
 
