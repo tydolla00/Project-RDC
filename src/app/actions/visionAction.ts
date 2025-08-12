@@ -9,7 +9,7 @@ import { GameProcessor } from "@/lib/game-processors/game-processor-utils";
 import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
 import { RocketLeagueProcessor } from "@/lib/game-processors/RocketLeagueProcessor";
 import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";
-import { PLAYER_MAPPINGS } from "../(routes)/admin/_utils/form-helpers";
+import { PLAYER_MAPPINGS } from "../(routes)/admin/_utils/player-mappings";
 import { logVisionError } from "@/posthog/server-analytics";
 import { after } from "next/server";
 

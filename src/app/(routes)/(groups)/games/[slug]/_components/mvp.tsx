@@ -14,6 +14,7 @@ import { analyzeMvp } from "@/app/ai/actions";
 import { getSetsData, ProcessedSet } from "./match-data";
 import { capitalizeFirst } from "@/lib/utils";
 import type { MvpOutput } from "@/app/ai/types";
+import { PLAYER_MAPPINGS } from "@/app/(routes)/admin/_utils/player-mappings";
 // import { readStreamableValue } from "@ai-sdk/rsc";
 
 type Sessions = QueryResponseData<
@@ -51,7 +52,10 @@ export const MVP = ({
             <div className="flex items-center gap-4">
               <Avatar className="border-primary/20 h-16 w-16 border-2">
                 <AvatarImage
-                  src={`/images/${mvp.player.toLowerCase()}_rdc.jpg`}
+                  src={
+                    PLAYER_MAPPINGS[mvp.player as keyof typeof PLAYER_MAPPINGS]
+                      .image
+                  }
                   alt={mvp.player}
                 />
                 <AvatarFallback>{mvp.player[0]}</AvatarFallback>

@@ -8,10 +8,10 @@ import {
 import { Player } from "@prisma/client";
 import { VisionResultCodes } from "../constants";
 import {
-  findPlayerByGamerTag,
-  FormValues,
+  findPlayer,
+  PLAYER_MAPPINGS,
   PlayerNotFoundError,
-} from "@/app/(routes)/admin/_utils/form-helpers";
+} from "@/app/(routes)/admin/_utils/player-mappings";
 import { STAT_CONFIGS, getStatConfigByFieldKey } from "../stat-configs";
 
 type WinnerType = "TEAM" | "INDIVIDUAL";
@@ -114,7 +114,7 @@ export const validateProcessedPlayer = (
   sessionPlayers: Player[],
 ): VisionPlayer | undefined => {
   try {
-    const foundPlayer: Player = findPlayerByGamerTag(
+    const foundPlayer: Player | undefined = findPlayer(
       processedPlayer.playerData.name,
     );
     const foundSessionPlayer = sessionPlayers.find(
@@ -128,7 +128,7 @@ export const validateProcessedPlayer = (
     } else {
       return {
         playerId: foundSessionPlayer?.playerId,
-        name: foundSessionPlayer.playerName as FormValues["players"][number]["playerName"],
+        name: foundSessionPlayer.playerName as keyof typeof PLAYER_MAPPINGS,
         stats: [...processedPlayer.playerData.stats],
         teamKey: processedPlayer.teamKey,
       };

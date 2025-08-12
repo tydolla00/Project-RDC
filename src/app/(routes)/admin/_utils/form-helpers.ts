@@ -1,4 +1,4 @@
-import { $Enums, Player } from "@prisma/client";
+import { $Enums } from "@prisma/client";
 import { z } from "zod/v4";
 
 // Session Schema Definitions
@@ -32,7 +32,7 @@ const thumbnailSchema = z.string().trim().min(1).readonly();
 
 // ! End of Session Schema Definitions
 
-const playerSchema = z.object({
+export const playerSchema = z.object({
   playerId: z.int(),
   playerName: z.literal([
     "Mark",
@@ -340,100 +340,3 @@ export type Match = FormValues["sets"][number]["matches"][number];
 export type MatchWinners = Match["matchWinners"];
 export type PlayerSessions = Match["playerSessions"];
 export type SetWinners = FormValues["sets"][number]["setWinners"];
-
-type PlayerMapping = {
-  [key in z.infer<typeof playerSchema>["playerName"]]: {
-    playerId: number;
-    playerName: string;
-    gamerTags: string[];
-  };
-};
-
-// TODO: Fuzzy Matching
-export const PLAYER_MAPPINGS: PlayerMapping & {} = {
-  Mark: {
-    playerId: 1,
-    playerName: "Mark",
-    gamerTags: [
-      "SupremeMvp0020",
-      "SupremeMvp 0020",
-      "Mark",
-      "SupremeMvp0020#4772468",
-    ],
-  },
-  Dylan: {
-    playerId: 2,
-    playerName: "Dylan",
-    gamerTags: [
-      "Dpatel254",
-      "Opatel254",
-      "L. Opatel254",
-      "Dylan",
-      "RdcDylan#2869564",
-    ],
-  },
-  Ben: {
-    playerId: 3,
-    playerName: "Ben",
-    gamerTags: ["Jabenixem", "Ben"],
-  },
-  Lee: {
-    playerId: 4,
-    playerName: "Lee",
-    gamerTags: [
-      "Leland12123",
-      "Leland23",
-      "Leland",
-      "Lee",
-      "MysticLeland#1739668",
-    ],
-  },
-  Des: {
-    playerId: 5,
-    playerName: "Des",
-    gamerTags: [
-      "13RUTALxPANIiC",
-      "13RUTALxPANIC",
-      "IBRUTALxPANIiC",
-      "IBRUTALXPANIIC",
-      "Desmond",
-      "Des",
-      "Des#5052521",
-    ],
-  },
-  John: {
-    playerId: 6,
-    playerName: "John",
-    gamerTags: ["I will never forget that day in Lockdown..."],
-  },
-  Aff: {
-    playerId: 7,
-    playerName: "Aff",
-    gamerTags: ["Aff"],
-  },
-  Ipi: {
-    playerId: 8,
-    playerName: "Ipi",
-    gamerTags: ["iceman_ip"],
-  },
-};
-
-// TODO: Fix this
-export const findPlayerByGamerTag = (gamerTag: string) => {
-  const player = Object.values(PLAYER_MAPPINGS).find((player) =>
-    player.gamerTags.some(
-      (tag) => tag.toLowerCase() === gamerTag.toLowerCase(),
-    ),
-  );
-  return {
-    playerId: player?.playerId,
-    playerName: player?.playerName,
-  } as Player;
-};
-
-export class PlayerNotFoundError extends Error {
-  constructor(playerName: string) {
-    super(`Player not found: ${playerName}`);
-    this.name = "PlayerNotFoundError";
-  }
-}
