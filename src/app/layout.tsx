@@ -1,4 +1,5 @@
-import { ReactScan } from "@/components/ReactScan";
+/* eslint-disable @next/next/no-sync-scripts */
+// import { ReactScan } from "@/components/ReactScan";
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -26,7 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html className="h-screen" lang="en" suppressHydrationWarning>
-      <ReactScan />
+      <head>
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+      </head>
+      {/* <ReactScan /> */}
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
