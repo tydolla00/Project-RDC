@@ -1,10 +1,10 @@
+import { NoMembers } from "@/app/(routes)/(groups)/members/_components/members";
 import { ChartConfig } from "@/components/ui/chart";
-import { getWinsPerPlayer } from "../../../../../../../prisma/lib/games";
-import { getAllMembers } from "../../../../../../../prisma/lib/members";
-import { CustomChart } from "./charts";
-import { TabbedChart } from "./tabbed-chart";
-import { NoMembers } from "../../../members/_components/members";
-import { calcWinsPerPlayer, getAvgAndSum } from "../_functions/stats";
+import { getWinsPerPlayer } from "prisma/lib/games";
+import { getAllMembers } from "prisma/lib/members";
+import { getAvgAndSum, calcWinsPerPlayer } from "../../_helpers/stats";
+import { CustomChart } from "../charts";
+import { TabbedChart } from "../tabbed-chart";
 
 const CallOfDuty = async ({
   game,
