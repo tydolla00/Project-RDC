@@ -49,35 +49,24 @@ const GameDropDownForm = ({
   const [testGames, setTestGames] = useState<Game[]>([]);
   const { getGameStatsFromDb } = useAdmin();
 
+  // 1) Fetch games once on mount
   useEffect(() => {
     const fetchGames = async () => {
       const games = await getAllGames();
-      if (!games.success || !games.data)
+      if (!games.success || !games.data) {
         toast.error("Failed to fetch games. Please try again.");
-      else setTestGames(games.data);
+      } else {
+        setTestGames(games.data);
+      }
     };
     fetchGames();
-    // 1) Fetch games once on mount
-    useEffect(() => {
-      const fetchGames = async () => {
-        const games = await getAllGames();
-        if (!games.success || !games.data) {
-          toast.error("Failed to fetch games. Please try again.");
-        } else {
-          setTestGames(games.data);
-        }
-      };
-      fetchGames();
-    }, []);
+  }, []);
 
-    // 2) Fetch stats when the selected game changes
-    useEffect(() => {
-      const selected =
-        typeof field.value === "string" && field.value.trim().length > 0
-          ? field.value
-          : "Mario Kart 8";
-      void getGameStatsFromDb(selected);
-    }, [field.value, getGameStatsFromDb]);
+  // 2) Fetch stats when the selected game changes
+  useEffect(() => {
+    const selected = String(field.value) || "Mario Kart 8";
+    void getGameStatsFromDb(selected);
+  }, [field.value, getGameStatsFromDb]);
   return (
     <FormField
       control={control}

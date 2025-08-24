@@ -23,7 +23,7 @@ export const SubmissionTable = async ({
 }: {
   page: string | undefined;
 }) => {
-  const currentPage = parseInt(page);
+  const currentPage = parseInt(page) || 1;
   const pageSize = 25;
   const [sessions, count] = await Promise.all([
     prisma.session.findMany({
