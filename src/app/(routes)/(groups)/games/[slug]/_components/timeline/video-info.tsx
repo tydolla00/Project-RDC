@@ -40,7 +40,7 @@ export const VideoInfo = ({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {session ? (
           <>
-            <div className="space-y-4">
+            <div className="h-[400px] space-y-4">
               <Link
                 target="_blank"
                 rel="noreferrer noopener"
