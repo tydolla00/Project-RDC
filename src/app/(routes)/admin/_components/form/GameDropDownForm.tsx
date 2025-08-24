@@ -57,9 +57,27 @@ const GameDropDownForm = ({
       else setTestGames(games.data);
     };
     fetchGames();
-    getGameStatsFromDb(String(field.value) || "Mario Kart 8"); // ! TODO TEMP FIX to load games due to needing to pass game as default value in form
-  }, [field.value, getGameStatsFromDb]);
+    // 1) Fetch games once on mount
+    useEffect(() => {
+      const fetchGames = async () => {
+        const games = await getAllGames();
+        if (!games.success || !games.data) {
+          toast.error("Failed to fetch games. Please try again.");
+        } else {
+          setTestGames(games.data);
+        }
+      };
+      fetchGames();
+    }, []);
 
+    // 2) Fetch stats when the selected game changes
+    useEffect(() => {
+      const selected =
+        typeof field.value === "string" && field.value.trim().length > 0
+          ? field.value
+          : "Mario Kart 8";
+      void getGameStatsFromDb(selected);
+    }, [field.value, getGameStatsFromDb]);
   return (
     <FormField
       control={control}
