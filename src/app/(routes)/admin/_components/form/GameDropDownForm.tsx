@@ -40,6 +40,7 @@ import { toast } from "sonner";
 const GameDropDownForm = ({
   control,
   reset,
+  field,
 }: {
   control: Control<FormValues>;
   field: ControllerRenderProps<FormValues>;
@@ -56,8 +57,8 @@ const GameDropDownForm = ({
       else setTestGames(games.data);
     };
     fetchGames();
-    getGameStatsFromDb("Mario Kart 8"); // ! TODO TEMP FIX to load games due to needing to pass game as default value in form
-  }, [getGameStatsFromDb]);
+    getGameStatsFromDb(String(field.value) || "Mario Kart 8"); // ! TODO TEMP FIX to load games due to needing to pass game as default value in form
+  }, [field.value, getGameStatsFromDb]);
 
   return (
     <FormField

@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -27,6 +28,7 @@ import { Separator } from "@radix-ui/react-separator";
 import { Gamepad, Home, Notebook } from "lucide-react";
 import { cookies, headers } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const items = [
   { label: "Dashboard", icon: Home, href: "/admin" },
@@ -39,6 +41,9 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+  if (!session) redirect("/");
+
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
   const headersList = await headers();

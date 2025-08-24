@@ -3,18 +3,50 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllSessions } from "../../../../../prisma/lib/admin";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
+import { PaginationButtons } from "../(routes)/submissions/_components/PaginationButtons";
+import prisma from "../../../../../prisma/db";
 
-export const SubmissionTable = async () => {
-  const sessions = await getAllSessions();
+export const SubmissionTable = async ({
+  page = "1",
+}: {
+  page: string | undefined;
+}) => {
+  const currentPage = parseInt(page);
+  const pageSize = 25;
+  const [sessions, count] = await Promise.all([
+    prisma.session.findMany({
+      take: pageSize,
+      skip: (currentPage - 1) * pageSize,
+      select: {
+        sessionId: true,
+        sessionName: true,
+        sessionUrl: true,
+        createdAt: true,
+        isApproved: true,
+        Game: {
+          select: { gameName: true },
+        },
+      },
+    }),
+    prisma.session.count(),
+  ]);
 
-  if (!sessions.success || !sessions.data) sessions.data = [];
+  if (!sessions.length) {
+    return <div>No sessions found</div>;
+  }
+
   return (
     <>
       <Table>
@@ -27,10 +59,11 @@ export const SubmissionTable = async () => {
             <TableHead>Session URL</TableHead>
             <TableHead>Created At (EST)</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sessions.data.map((session) => (
+          {sessions.map((session) => (
             <TableRow key={session.sessionId}>
               <TableCell>{session.sessionId}</TableCell>
               <TableCell>{session.sessionName}</TableCell>
@@ -42,11 +75,31 @@ export const SubmissionTable = async () => {
               <TableCell>
                 {session.isApproved ? "Approved" : "Pending"}
               </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="cursor-pointer focus:outline-none">
+                    <DotsVerticalIcon className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        className="cursor-pointer"
+                        href={`/admin/submissions/edit/${session.sessionId}`}
+                      >
+                        Edit
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive">
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
-        <TableFooter></TableFooter>
       </Table>
+      <PaginationButtons page={currentPage} count={count} pageSize={pageSize} />
     </>
   );
 };

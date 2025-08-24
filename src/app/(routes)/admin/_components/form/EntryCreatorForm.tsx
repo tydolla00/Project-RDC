@@ -23,31 +23,17 @@ import { userSignOut } from "@/app/actions/signOut";
 
 interface AdminFormProps {
   rdcMembers: Player[];
+  defaultValues?: FormValues;
 }
 
-const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
+const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [modifier, setModifier] = useState(0);
 
   const form = useForm<FormValues, unknown>({
     resolver: zodResolver(formSchema),
-
-    // async (data, context, options) => {
-    //   try {
-    //     // Validate the form data against the Zod schema
-    //     console.log(await formSchema.parseAsync(data));
-    //   } catch (error) {
-    //     // If validation fails, return the error to the resolver
-    //     console.log(error);
-    //     return {
-    //       values: {},
-    //       errors: error.flatten().fieldErrors,
-    //     };
-    //   }
-    //   return zodResolver(formSchema)(data, context, options);
-    // },
-    defaultValues: {
+    defaultValues: defaultValues || {
       game: "Mario Kart 8",
       sessionName: "",
       sessionUrl: "https://www.youtube.com/watch?v=",
