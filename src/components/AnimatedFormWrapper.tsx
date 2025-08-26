@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import useMeasure from "react-use-measure";
 import { CardContent, CardFooter } from "./ui/card";
 import { useForm, useFormContext } from "react-hook-form";
-import { Dispatch, JSX, SetStateAction, useState } from "react";
+import { Dispatch, JSX, MouseEvent, SetStateAction, useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
@@ -39,9 +39,12 @@ export const NavigationButtons = ({
   setModifier,
 }: NavigationButtonsProps) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const { getValues } = useFormContext<FormValues>();
+  const { getValues, formState } = useFormContext<FormValues>();
 
-  const handleNextClicked = async () => {
+  const handleNextClicked = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     let isValid: boolean = false;
     switch (step) {
       // TODO Validate video and game combo not already existing.
@@ -96,7 +99,7 @@ export const NavigationButtons = ({
         </Button>
         {step === 2 ? (
           <Button
-            disabled={isSubmitDisabled || isPending}
+            disabled={isSubmitDisabled || isPending || !formState.isDirty}
             className="cursor-pointer"
             type="submit"
           >
