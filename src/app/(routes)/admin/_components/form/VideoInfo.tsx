@@ -7,10 +7,8 @@ import { toast } from "sonner";
 
 export const VideoInfo = ({
   form,
-  step,
 }: {
   form: ReturnType<typeof useForm<FormValues>>;
-  step: number;
 }) => {
   const thumbnail = form.watch("thumbnail");
   const sessionName = form.watch("sessionName");
@@ -38,7 +36,7 @@ export const VideoInfo = ({
         width={384}
         alt="RDC Youtube Video Thumbnail"
         onError={(e) => {
-          e.currentTarget.src = "/images/leland_rdc.png"; // TODO get default image
+          e.currentTarget.src = "/images/leland_rdc.jpg"; // TODO get default image
           e.currentTarget.alt = "Leland from RDC";
           toast.warning("Image failed to load, here's a picture of leland.", {
             richColors: true,

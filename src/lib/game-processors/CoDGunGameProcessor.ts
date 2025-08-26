@@ -60,10 +60,10 @@ export const CoDGunGameProcessor: GameProcessor = {
   ) {
     console.log("Processing CoD Gun Game Players: ", codPlayers);
 
-    let codVisionResult: VisionResult = {
+    const codVisionResult: VisionResult = {
       players: [],
     };
-    let requiresCheck = false;
+    const requiresCheck = false;
 
     // TODO: Handle team versus individual typing better
     if (isAnalyzedTeamDataArray(codPlayers)) {
@@ -81,7 +81,7 @@ export const CoDGunGameProcessor: GameProcessor = {
         console.error("Player validation failed: ", processedPlayer);
         return;
       }
-      console.log("Successfuly validated player: ", validatedPlayer);
+      console.log("Successfully validated player: ", validatedPlayer);
       codVisionResult.players.push(validatedPlayer);
     });
 
@@ -114,6 +114,7 @@ export const CoDGunGameProcessor: GameProcessor = {
   },
   validateStats: (
     statValue: string | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     numPlayers: number | undefined,
   ) => {
     if (statValue === undefined) {

@@ -7,8 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { memberImages, MembersEnum } from "@/lib/constants";
-import { capitalizeFirst } from "@/lib/utils";
+import { PLAYER_MAPPINGS } from "@/app/(routes)/admin/_utils/player-mappings";
 
 interface PlayerAvatarProps {
   player: Player;
@@ -21,11 +20,8 @@ const PlayerAvatar = ({
   handleOnClick,
   optionalClassName,
 }: PlayerAvatarProps) => {
-  const avatarHelperFunction = (playerName: string) => {
-    return memberImages.get(playerName as MembersEnum) || "default_avatar.jpg";
-  };
-
-  const avatarSrc = `/images/${avatarHelperFunction(player.playerName)}`;
+  const avatarSrc =
+    PLAYER_MAPPINGS[player.playerName as keyof typeof PLAYER_MAPPINGS].image;
 
   return (
     <TooltipProvider>

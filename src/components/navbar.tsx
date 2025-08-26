@@ -40,9 +40,7 @@ export const Navbar = async () => {
             <FillText text="Home" className="text-chart-4" />
           </Link>
         </NavigationMenuItem>
-        <NavigationMenuItem
-          className={cn(navigationMenuTriggerStyle(), "hidden md:block")}
-        >
+        <NavigationMenuItem className={navigationMenuTriggerStyle()}>
           <Link href="/about">
             <FillText text="About" className="text-chart-4" />
           </Link>
@@ -132,9 +130,11 @@ export const Navbar = async () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Avatar>
-                      <AvatarImage src={session.user?.image || Icon.src} />
-                      <AvatarFallback>Icon</AvatarFallback>
+                    <Avatar asChild>
+                      <Link href="/profile">
+                        <AvatarImage src={session.user?.image || Icon.src} />
+                        <AvatarFallback>Icon</AvatarFallback>
+                      </Link>
                     </Avatar>
                   </TooltipTrigger>
                   <TooltipContent>{session.user?.name}</TooltipContent>

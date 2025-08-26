@@ -4,17 +4,9 @@ import prisma from "../../../prisma/db";
 import config from "@/lib/config";
 import { Session } from "next-auth";
 import { signOut, auth } from "@/auth";
-import { isProduction } from "@/lib/utils";
 import { errorCodes } from "@/lib/constants";
 import { redirect } from "next/navigation";
-
-/**
- * @deprecated
- * @param props
- */
-export const submitUpdates = async (props: any) => {
-  console.log(props);
-};
+import posthog from "@/posthog/server-init";
 
 /**
  * Updates the authentication status based on the provided session.
@@ -47,7 +39,7 @@ export const updateAuthStatus = async (session: Session | null) => {
  * @throws Returns error object if video fetch fails or authentication is invalid
  *
  * @example
- * const { video, error } = await getRDCVideoDetails('dQw4w9WgXcQ');
+ * const { video, error } = await getRDCVideoDetails('dQw4w9WgXcQ', 'Rocket League', 'distinct-id-123');
  * if (error) {
  *   // Handle error case
  * } else {
@@ -57,34 +49,39 @@ export const updateAuthStatus = async (session: Session | null) => {
 export const getRDCVideoDetails = async (
   videoId: string,
   gameName: string,
+  distinctId: string,
 ): GetRdcVideoDetails => {
   // TODO Maybe only validate if it's a valid video when clicking next.
   try {
     const isAuthenticated = await auth();
-    if (!isAuthenticated)
+    if (!isAuthenticated) {
+      posthog.captureException("User not authenticated", distinctId);
       return { video: null, error: errorCodes.NotAuthenticated };
+    }
 
     const dbRecord = await prisma.session.findFirst({
       where: { videoId },
       include: { Game: true },
     });
-    const apiKey = isProduction
-      ? config.YOUTUBE_API_KEY
-      : config.YOUTUBE_LOCAL_API_KEY;
+    const apiKey = config.YOUTUBE_API_KEY;
 
     if (!dbRecord) {
       const apiUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet&part=player&id=${videoId}&key=${apiKey}`;
       const YTvideo = await fetch(apiUrl);
 
-      !isProduction &&
-        !config.YOUTUBE_LOCAL_API_KEY &&
-        console.log("LOCAL YOUTUBE API KEY NOT CONFIGURED");
+      if (!apiKey) {
+        console.log("YOUTUBE API KEY NOT CONFIGURED");
+        // TODO Move Posthog calls to analytics file.
+        posthog.captureException("YOUTUBE API KEY NOT CONFIGURED", distinctId);
+      }
 
-      if (!YTvideo.ok)
+      if (!YTvideo.ok) {
+        posthog.captureException(await YTvideo.json(), distinctId);
         return {
           error: "Something went wrong. Please try again.",
           video: null,
         };
+      }
 
       const json = (await YTvideo.json()) as YouTubeVideoListResponse;
       const video = json.items[0];

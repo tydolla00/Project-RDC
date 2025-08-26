@@ -1,9 +1,11 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { Pool, neonConfig } from "@neondatabase/serverless";
+import { neonConfig } from "@neondatabase/serverless";
 // import config from "../lib/config";
 
 import ws from "ws";
+// import posthog from "@/posthog/server-init";
+// import { v4 } from "uuid";
 
 neonConfig.webSocketConstructor = ws;
 
@@ -12,11 +14,11 @@ neonConfig.poolQueryViaFetch = true;
 
 // Type definitions
 declare global {
-  var prisma: PrismaClient | undefined;
+  const prisma: PrismaClient | undefined;
 }
 
 export type ErrorResponse<T> = {
-  success: boolean;
+  success: false;
   error: string;
   code?: string;
   data: T | null;
@@ -29,8 +31,8 @@ export type SuccessResponse<T> = {
 
 export type QueryResponse<T> = ErrorResponse<T> | SuccessResponse<T>;
 
-export type QueryResponseData<T> = NonNullable<
-  Extract<T, { success: true; data: any }>["data"]
+export type QueryResponseData<T, Y = unknown> = NonNullable<
+  Extract<T, { success: true; data: Y }>["data"]
 >;
 
 export async function handlePrismaOperation<T>(
@@ -40,6 +42,8 @@ export async function handlePrismaOperation<T>(
     const data = await operation();
     return { success: true, data };
   } catch (error) {
+    // posthog.captureException(error, v4());
+    console.log(error);
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return {
         success: false,
@@ -57,7 +61,7 @@ export async function handlePrismaOperation<T>(
     }
     return {
       success: false,
-      error: "An unexpected error occurred",
+      error: `An unexpected error occurred: ${error}`,
       data: null,
     };
   }
@@ -66,8 +70,13 @@ export async function handlePrismaOperation<T>(
 const connectionString = process.env.DATABASE_URL;
 
 const adapter = new PrismaNeon({ connectionString });
-const prisma = new PrismaClient({ adapter });
 
-if (process.env.NODE_ENV === "development") global.prisma = prisma;
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export default prisma;

@@ -6,9 +6,9 @@ import {
   getStatPerPlayer,
   getSumPerStat,
 } from "../../../../../../../prisma/lib/games";
-import PostHogClient from "@/lib/posthog";
 import { QueryResponseData } from "../../../../../../../prisma/db";
 import { Decimal } from "@prisma/client/runtime/library";
+import { logNAN } from "@/posthog/server-analytics";
 
 type Result = NonNullable<
   NonNullable<Awaited<ReturnType<typeof getSumPerStat>>["data"]>[number]
@@ -17,7 +17,10 @@ type Result = NonNullable<
   sum: number;
 };
 
-type SumAndAvg<T extends string[], Y extends "RL"> = {
+type SumAndAvg<
+  T extends string[],
+  Y extends "RL" | "COD" | "MK8" | "LC" | "SR",
+> = {
   [K in T[number] as K extends `${Y}_${infer U}` ? Lowercase<`${U}`> : never]:
     | Result
     | { readonly avg: Decimal | number; readonly sum: bigint | number };
@@ -26,7 +29,7 @@ type SumAndAvg<T extends string[], Y extends "RL"> = {
 export const getAvgAndSum = async (
   playerId: number,
   stats: $Enums.StatName[],
-): Promise<SumAndAvg<typeof stats, "RL">> => {
+): Promise<SumAndAvg<typeof stats, "RL" | "COD" | "MK8" | "LC" | "SR">> => {
   return await Promise.all(
     stats.map((stat) => getSumPerStat(Number(playerId), stat)),
   ).then((results) =>
@@ -45,7 +48,7 @@ export const getAvgAndSum = async (
         acc[statName] = res;
         return acc;
       },
-      {} as SumAndAvg<typeof stats, "RL">,
+      {} as SumAndAvg<typeof stats, "RL" | "COD" | "MK8" | "LC" | "SR">,
     ),
   );
 };
@@ -65,7 +68,7 @@ export const calcWinsPerPlayer = (
       // Calculate Match Wins
       for (const match of set.matches) {
         for (const winner of match.matchWinners) {
-          let member = members.get(winner.playerName);
+          const member = members.get(winner.playerName);
           if (!member)
             members.set(winner.playerName, { matchWins: 1, setWins: 0 });
           else member.matchWins += 1;
@@ -73,7 +76,7 @@ export const calcWinsPerPlayer = (
       }
       // Calculate Set Wins
       for (const winner of set.setWinners) {
-        let member = members.get(winner.playerName);
+        const member = members.get(winner.playerName);
         if (!member)
           members.set(winner.playerName, { matchWins: 0, setWins: 1 });
         else member.setWins += 1;
@@ -116,7 +119,6 @@ export const calcMostPerPlacing = async (
   }
 
   const members = new Map<string, MembersPerPosition>();
-  const posthog = PostHogClient();
 
   for (const session of sessions.data) {
     for (const set of session.sets) {
@@ -125,11 +127,7 @@ export const calcMostPerPlacing = async (
         for (const ps of match.playerSessions) {
           const pos = Number(ps.playerStats[0].value);
           if (isNaN(pos)) {
-            posthog.capture({
-              event: `NaN called in calcMostPerPlacing val: ${pos}`,
-              distinctId: new Date().toUTCString(),
-            });
-            console.log("Not a number", pos);
+            logNAN("calcMostPerPlacing", ps.playerStats[0].playerStatId);
             continue;
           }
           if (!members.has(ps.player.playerName))
@@ -139,7 +137,7 @@ export const calcMostPerPlacing = async (
               third: 0,
               last: 0,
             });
-          let member = members.get(ps.player.playerName)!;
+          const member = members.get(ps.player.playerName)!;
           member[pos as keyof MembersPerPosition] ??= 0;
           member[pos as keyof MembersPerPosition] += 1;
           race.push({ player: ps.player.playerName, pos });
@@ -179,7 +177,7 @@ export const calcMostPerPlacing = async (
     7: val[7] || 0,
     8: val[8] || 0,
   }));
-  posthog.shutdown();
+
   return data;
 };
 
@@ -197,24 +195,19 @@ export const calcStatPerPlayer = async (gameId: number, statName: StatName) => {
     return [];
   }
   const members = new Map<string, number>();
-  const posthog = PostHogClient();
 
-  for (const { player, value } of stats.data) {
+  for (const { player, value, statId } of stats.data) {
     const val = Number(value);
 
     if (isNaN(val)) {
-      posthog.capture({
-        event: `NaN called in calculateStatPerPlayer val: ${val}`,
-        distinctId: new Date().toUTCString(),
-      });
-      console.log("Not a number", val);
+      logNAN("calcStatPerPlayer", statId);
       continue;
     }
 
-    let member = members.get(player.playerName) || 0;
+    const member = members.get(player.playerName) || 0;
     members.set(player.playerName, member + val);
   }
   const data = Array.from(members, ([key, val]) => ({ player: key, val }));
-  posthog.shutdown();
+
   return data;
 };

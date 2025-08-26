@@ -1,7 +1,6 @@
 import React from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import { z } from "zod";
-import { formSchema, FormValues } from "../../_utils/form-helpers";
+import { FormValues } from "../../_utils/form-helpers";
 
 interface Props {
   setIndex: number;

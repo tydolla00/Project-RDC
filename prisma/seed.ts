@@ -1,16 +1,16 @@
-import { Session, StatName } from "@prisma/client";
+import { StatName } from "@prisma/client";
 import * as fs from "fs";
 import prisma from "./db";
 import { capitalizeFirst } from "@/lib/utils";
 import { MembersEnum } from "@/lib/constants";
 import { EnrichedSession } from "./types/session";
 
+/**
+ * Seeds the database with RDC members, games, and sessions.
+ *
+ * Runs all seeding steps and logs progress and errors.
+ */
 async function main() {
-  /**
-   * Seeds the database with RDC members, games, and sessions.
-   *
-   * Runs all seeding steps and logs progress and errors.
-   */
   console.group("Begin seeding database");
   console.time("Seeding Time");
   try {
@@ -220,7 +220,7 @@ async function importSessions() {
   for (const sessionData of sessionsData) {
     try {
       // First find the game outside of transaction
-      let game = await prisma.game.findFirst({
+      const game = await prisma.game.findFirst({
         where: { gameName: sessionData.Game.gameName },
       });
 
@@ -243,6 +243,15 @@ async function importSessions() {
           thumbnail: sessionData.thumbnail,
           videoId: sessionData.videoId,
           gameId: game.gameId,
+          date: sessionData.date || new Date(),
+          dayWinners: {
+            connect: sessionData.dayWinners.map((sd) => ({
+              playerId: sd.playerId,
+            })),
+          },
+          mvpId: sessionData.mvpId,
+          mvpDescription: sessionData.mvpDescription,
+          mvpStats: sessionData.mvpStats ?? undefined,
         },
       });
 

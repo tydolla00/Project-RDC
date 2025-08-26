@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { z } from "zod";
 import MatchManager from "./MatchManager";
 import PlayerSelector from "./PlayerSelector";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { formSchema, FormValues, SetWinners } from "../../_utils/form-helpers";
+import { FormValues } from "../../_utils/form-helpers";
 import WinnerDisplay from "./WinnerDisplay";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
@@ -23,7 +22,7 @@ const SetManager = () => {
     formState: { errors },
   } = useFormContext<FormValues>();
 
-  const { append, remove, fields, update } = useFieldArray({
+  const { append, remove, fields } = useFieldArray({
     name: "sets",
     control,
   });
@@ -73,7 +72,6 @@ const SetManager = () => {
         fields.map((set, setIndex) => {
           // Get errors for this set
           const setError = errors.sets?.[setIndex];
-          console.log(setError);
           return (
             <Collapsible open={openSets[setIndex]} key={set.setId}>
               <Card className="flex flex-col space-y-3 rounded-lg p-6 shadow-lg">
@@ -114,7 +112,7 @@ const SetManager = () => {
                 </CollapsibleContent>
                 {/* TODO Surface Set Level Error Messages Here */}
                 {setError && setError.matches && (
-                  <div className="text-sm text-red-500">
+                  <div className="text-destructive text-sm">
                     {setError.matches.root?.message}
                   </div>
                 )}

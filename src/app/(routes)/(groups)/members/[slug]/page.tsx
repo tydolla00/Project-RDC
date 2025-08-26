@@ -1,11 +1,15 @@
-import { H1 } from "@/components/headings";
+import { notFound } from "next/navigation";
+import { getMember } from "./data";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 import { getAllMembers } from "../../../../../../prisma/lib/members";
+import { PLAYER_MAPPINGS } from "@/app/(routes)/admin/_utils/player-mappings";
 
 export const dynamicParams = false; // true | false,
 
@@ -26,36 +30,49 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const memberName = slug.slice(0, 1).toUpperCase() + slug.slice(1);
+  const member = await getMember(slug);
+
+  if (!member.success || !member.data) notFound();
 
   return (
-    <div className="m-16">
-      <H1>{memberName}</H1>
-      <Card className="h-64 flex-1">
+    <div className="container mx-auto p-4">
+      <Card>
         <CardHeader>
-          <CardTitle>Chart</CardTitle>
+          <div className="flex items-center gap-4">
+            <Image
+              src={
+                PLAYER_MAPPINGS[
+                  member.data.playerName as keyof typeof PLAYER_MAPPINGS
+                ].image
+              }
+              alt={member.data.playerName}
+              width={100}
+              height={100}
+              className="rounded-full"
+            />
+            <div>
+              <CardTitle className="text-4xl">
+                {member.data.playerName}
+              </CardTitle>
+              <CardDescription>Member of RDC</CardDescription>
+            </div>
+          </div>
         </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle>Win Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>Matches Won: {member.data.matchWins.length}</p>
+                <p>Sets Won: {member.data.setWins.length}</p>
+                <p>Days Won: {member.data.dayWins.length}</p>
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
       </Card>
-      <div className="mt-10 flex flex-wrap gap-10">
-        <Card className="h-64 flex-1">
-          <CardHeader>
-            <CardTitle>Chart</CardTitle>
-            <CardDescription>Ranking</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card className="h-64 flex-1">
-          <CardHeader>
-            <CardTitle>Chart</CardTitle>
-            <CardDescription>Ranking</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card className="h-64 flex-1">
-          <CardHeader>
-            <CardTitle>Chart</CardTitle>
-            <CardDescription>Ranking</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
     </div>
   );
 }

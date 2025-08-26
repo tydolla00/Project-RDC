@@ -1,14 +1,14 @@
 "use server";
 
 import { unstable_cache } from "next/cache";
-import prisma, { handlePrismaOperation, QueryResponse } from "../db";
+import prisma, { handlePrismaOperation } from "../db";
 import { StatName } from "@prisma/client";
 import { getSumOfStat } from "@prisma/client/sql";
 
 export type StatEndsWith<
-  T extends string,
-  Y extends StatName = StatName,
-> = Y extends StatName ? (Y extends `${infer u}_${T}` ? Y : never) : never;
+  Suffix extends string,
+  Name extends StatName = StatName,
+> = Extract<Name, `${string}_${Suffix}`>;
 
 // Cache is used for deduping
 // unstable is used for time based caching
@@ -121,7 +121,7 @@ export const getMatchesPerGame = async <T extends StatName = StatName>(
                     player: true,
                     playerStats: {
                       where: { gameStat: { statName } },
-                      select: { value: true },
+                      select: { playerStatId: true, value: true },
                       take: 1,
                     },
                   },
@@ -145,7 +145,7 @@ export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
   await handlePrismaOperation(() =>
     prisma.playerStat.findMany({
       where: { gameId, AND: { gameStat: { statName } } },
-      select: { player: true, value: true },
+      select: { player: true, value: true, statId: true },
     }),
   );
 

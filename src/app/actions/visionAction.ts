@@ -9,7 +9,9 @@ import { GameProcessor } from "@/lib/game-processors/game-processor-utils";
 import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
 import { RocketLeagueProcessor } from "@/lib/game-processors/RocketLeagueProcessor";
 import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";
-import { AnalysisResults, Stat, VisionPlayer } from "../../lib/visionTypes";
+import { PLAYER_MAPPINGS } from "../(routes)/admin/_utils/player-mappings";
+import { logVisionError } from "@/posthog/server-analytics";
+import { after } from "next/server";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -60,7 +62,7 @@ export const analyzeScreenShot = async (
       throw new Error(`Game config not found for gameId: ${gameId}`);
     }
 
-    console.log("Analzying Screenshot with config: ", gameConfig);
+    console.log("Analyzing Screenshot with config: ", gameConfig);
 
     const response = await client
       .path("/documentModels/{modelId}:analyze", gameConfig.modelId)
@@ -75,6 +77,7 @@ export const analyzeScreenShot = async (
       });
 
     if (isUnexpected(response)) {
+      after(() => logVisionError(response.body.error));
       throw response.body.error;
     }
 
@@ -166,10 +169,9 @@ export const analyzeScreenShot = async (
     return validatedResult;
   } catch (error) {
     console.error(error);
-    return {
-      status: VisionResultCodes.Failed,
-      message: error instanceof Error ? error.message : "Unknown error",
-    };
+    const e = error instanceof Error ? error.message : "Unknown error";
+    logVisionError(error);
+    return { status: VisionResultCodes.Failed, message: e };
   }
 };
 

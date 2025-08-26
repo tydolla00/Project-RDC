@@ -8,10 +8,8 @@ import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import RDCVisionModal from "./RDCVisionModal";
-import { VisionPlayer, VisionResult } from "@/lib/visionTypes";
-
+import { VisionPlayer } from "@/app/actions/visionAction";
 import { FormValues } from "../../_utils/form-helpers";
-import { getGameIdFromName } from "@/app/actions/adminAction";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 interface Props {
@@ -19,7 +17,11 @@ interface Props {
 }
 
 const MatchManager = (props: Props) => {
-  const { control, getValues } = useFormContext<FormValues>();
+  const {
+    control,
+    getValues,
+    formState: { errors },
+  } = useFormContext<FormValues>();
   const { setIndex } = props;
   const { append, remove, fields } = useFieldArray({
     name: `sets.${setIndex}.matches`,
@@ -74,18 +76,15 @@ const MatchManager = (props: Props) => {
       };
     });
 
-    // TODO FIX Typings
     if (formattedWinners && formattedWinners.length > 0) {
       console.log("Setting Vision Winners!", formattedWinners);
       append({
         matchWinners: formattedWinners,
-        // @ts-expect-error - Type mismatch, but we know this is correct
         playerSessions: visionMatchPlayerSessions,
       });
     } else {
       append({
         matchWinners: [],
-        // @ts-expect-error - Type mismatch, but we know this is correct
         playerSessions: visionMatchPlayerSessions,
       });
     }
@@ -99,6 +98,8 @@ const MatchManager = (props: Props) => {
         </div>
       )) ||
         fields.map((match, matchIndex) => {
+          const matchError =
+            errors.sets?.[setIndex]?.matches?.[matchIndex]?.message;
           return (
             <div key={match.id} className="my-5 flex flex-col justify-between">
               <div id="match-manager-header" className="flex justify-between">
@@ -136,6 +137,9 @@ const MatchManager = (props: Props) => {
                 matchIndex={matchIndex}
                 players={players}
               />
+              {matchError && (
+                <div className="text-destructive text-sm">{matchError}</div>
+              )}
             </div>
           );
         })}

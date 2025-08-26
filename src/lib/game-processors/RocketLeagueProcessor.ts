@@ -18,7 +18,7 @@ export const RocketLeagueProcessor: GameProcessor = {
     rlTeams: AnalyzedTeamData[] | AnalyzedPlayersObj[],
     sessionPlayers: Player[],
   ) {
-    let rocketLeagueVisionResult: VisionResult = {
+    const rocketLeagueVisionResult: VisionResult = {
       players: [],
     };
     let requiresCheck = false;

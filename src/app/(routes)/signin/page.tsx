@@ -3,7 +3,7 @@ import { H1 } from "@/components/headings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { domain } from "@/lib/utils";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
+// import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { redirect } from "next/navigation";
 
 export default function Page() {

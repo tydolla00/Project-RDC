@@ -172,6 +172,8 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
     validationRules: { min: 0, allowZero: true },
   },
 
+  // TODO RUN MIGRATION TO ADD THIS STAT ^
+
   // Lethal Company Stats
   lc_deaths: {
     id: "14",

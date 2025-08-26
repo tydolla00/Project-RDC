@@ -1,10 +1,10 @@
+import { NoMembers } from "@/app/(routes)/(groups)/members/_components/members";
 import { ChartConfig } from "@/components/ui/chart";
-import { getWinsPerPlayer } from "../../../../../../../prisma/lib/games";
-import { getAllMembers } from "../../../../../../../prisma/lib/members";
-import { CustomChart } from "./charts";
-import { TabbedChart } from "../../../_components/tabbed-chart";
-import { NoMembers } from "../../../members/_components/members";
-import { calcWinsPerPlayer, getAvgAndSum } from "../_functions/stats";
+import { getWinsPerPlayer } from "../../../../../../../../prisma/lib/games";
+import { getAllMembers } from "../../../../../../../../prisma/lib/members";
+import { getAvgAndSum, calcWinsPerPlayer } from "../../_helpers/stats";
+import { CustomChart } from "../charts";
+import { TabbedChart } from "../tabbed-chart";
 
 const RocketLeague = async ({
   game,
@@ -41,7 +41,7 @@ const RocketLeague = async ({
           assists: { sum: -1, avg: -1 },
           saves: { sum: -1, avg: -1 },
           score: { sum: -1, avg: -1 },
-          days: { sum: -1, avg: -1 },
+          day: { sum: -1, avg: -1 },
         };
       }
     }),

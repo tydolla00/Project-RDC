@@ -8,7 +8,6 @@ import { getGamesNav } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
 import Image from "next/image";
-import prisma from "../../prisma/db";
 
 export default async function Home() {
   const games = await getGamesNav();
@@ -16,10 +15,7 @@ export default async function Home() {
   return (
     <>
       <div className="m-16">
-        <div
-          style={{ transitionDuration: "2000ms" }}
-          className="grid grid-cols-2"
-        >
+        <div className="grid grid-cols-2 duration-[2000ms]">
           <div className="col-span-2 md:col-span-1">
             <H1>RDC Stat Tracker</H1>
             <p className="text-muted-foreground leading-7 md:w-3/4">
@@ -48,17 +44,22 @@ export default async function Home() {
         <H2 className="text-chart-4 mx-auto mt-40 mb-6 w-fit md:my-10">
           Games
         </H2>
+        <p className="text-muted-foreground my-2 text-center leading-7">
+          Explore stats for each of the games below.
+        </p>
         <div className="flex flex-wrap justify-center gap-10">
           {games.map((game) => (
             <div key={game.url}>
               {game.src && (
                 <Card className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52">
-                  <Link href={game.url}>
-                    {/* TODO Fix warning in browser related to sizing of the image. */}
+                  <Link
+                    href={game.url}
+                    className="relative block h-full w-full"
+                  >
                     <Image
-                      className="absolute h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
+                      className="object-cover transition-transform duration-500 group-hover:scale-125"
                       fill
-                      sizes="(max-width: 639px) 100vw, 100vw"
+                      sizes="(max-width: 639px) 100vw, 208px"
                       alt=""
                       src={game.src || ""}
                     />
@@ -83,10 +84,9 @@ export default async function Home() {
           <Card className="mx-auto md:w-1/2">
             <CardHeader>
               <p>
-                We could use some help keeping up scores. We have a place where
-                you can submit scores and we&apos;ll review them and compare
-                with other scores. In order to submit scores you must be signed
-                in.
+                Keeping track of stats, takes a lot of time. If you would like
+                to help us keep a record of the games they play, please login
+                and complete the form.
               </p>
             </CardHeader>
             <CardFooter>
