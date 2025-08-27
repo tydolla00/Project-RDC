@@ -14,14 +14,15 @@ datasource db {
 }
 
 model Player {
-  playerId       Int             @id @default(autoincrement()) @map("player_id")
-  playerName     String          @map("player_name")
-  playerSessions PlayerSession[]
-  playerStats    PlayerStat[]
-  matchWins      Match[]
-  setWins        GameSet[]
-  dayWins        Session[]       @relation("DayWinners")
-  mvpOf          Session[]       @relation("Mvp")
+  playerId        Int               @id @default(autoincrement()) @map("player_id")
+  playerName      String            @map("player_name")
+  playerSessions  PlayerSession[]
+  playerStats     PlayerStat[]
+  matchWins       Match[]
+  setWins         GameSet[]
+  dayWins         Session[]         @relation("DayWinners")
+  mvpOf           Session[]         @relation("Mvp")
+  GameSetToPlayer GameSetToPlayer[]
 
   @@map("players")
 }
@@ -34,98 +35,6 @@ model Game {
   sessions    Session[]
 
   @@map("games")
-}
-
-model GameStat {
-  statId      Int          @id @default(autoincrement()) @map("stat_id")
-  statName    StatName     @map("stat_name")
-  gameId      Int          @map("game_id")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  createdBy   String       @default("SYSTEM") @map("created_by")
-  type        StatType     @default(INT) @map("type")
-  game        Game         @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
-  playerStats PlayerStat[]
-
-  @@map("game_stats")
-}
-
-model Session {
-  sessionId   Int       @id @default(autoincrement()) @map("session_id")
-  sessionName String    @map("session_name")
-  sessionUrl  String    @map("session_url")
-  gameId      Int       @map("game_id")
-  thumbnail   String
-  date        DateTime  @default(now())
-  videoId     String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  isApproved  Boolean   @default(false) @map("is_approved")
-  createdBy   String    @default("SYSTEM") @map("created_by")
-  Game        Game      @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
-  sets        GameSet[]
-  dayWinners  Player[]  @relation("PlayerToSession")
-
-  @@unique([gameId, videoId])
-  @@map("sessions")
-}
-
-model GameSet {
-  setId           Int               @id @default(autoincrement()) @map("set_id")
-  sessionId       Int               @map("session_id")
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  GameSetToPlayer GameSetToPlayer[]
-  matches         Match[]
-  playerSessions  PlayerSession[]
-  session         Session           @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
-
-  @@map("sets")
-}
-
-model Match {
-  matchId        Int             @id @default(autoincrement()) @map("match_id")
-  setId          Int             @map("set_id")
-  date           DateTime        @default(now())
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  set            GameSet         @relation(fields: [setId], references: [setId], onDelete: Cascade)
-  playerSessions PlayerSession[]
-  matchWinners   Player[]        @relation("MatchToPlayer")
-
-  @@map("matches")
-}
-
-model PlayerSession {
-  playerSessionId Int          @id @default(autoincrement()) @map("player_session_id")
-  playerId        Int          @map("player_id")
-  sessionId       Int          @map("session_id")
-  matchId         Int          @map("match_id")
-  setId           Int          @map("set_id")
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  match           Match        @relation(fields: [matchId], references: [matchId], onDelete: Cascade)
-  player          Player       @relation(fields: [playerId], references: [playerId], onDelete: Cascade)
-  set             GameSet      @relation(fields: [setId], references: [setId], onDelete: Cascade)
-  playerStats     PlayerStat[]
-
-  @@map("player_sessions")
-}
-
-model PlayerStat {
-  playerStatId    Int           @id @default(autoincrement()) @map("player_stat_id")
-  playerId        Int           @map("player_id")
-  gameId          Int           @map("game_id")
-  playerSessionId Int           @map("player_session_id")
-  statId          Int           @map("stat_id")
-  value           String
-  date            DateTime      @default(now())
-  game            Game          @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
-  player          Player        @relation(fields: [playerId], references: [playerId], onDelete: Cascade)
-  playerSession   PlayerSession @relation(fields: [playerSessionId], references: [playerSessionId], onDelete: Cascade)
-  gameStat        GameStat      @relation(fields: [statId], references: [statId], onDelete: Cascade)
-
-  @@map("player_stats")
 }
 
 model User {
@@ -227,8 +136,9 @@ model GameSet {
   session        Session         @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
   setWinners     Player[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  GameSetToPlayer GameSetToPlayer[]
 
   @@map("sets")
 }
@@ -280,14 +190,4 @@ model PlayerStat {
   date            DateTime      @default(now()) // Date video posted
 
   @@map("player_stats")
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 }

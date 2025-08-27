@@ -2,9 +2,9 @@
 
 import { VisionResultCodes } from "@/lib/constants";
 import { Player } from "@prisma/client";
-import { analyzeScreenShot, VisionResult } from "@/app/actions/visionAction";
+import { analyzeScreenShot } from "@/app/actions/visionAction";
 import { getGameIdFromName } from "@/app/actions/adminAction";
-import { VisionPlayer } from "../../../../lib/visionTypes";
+import { VisionResult } from "@/lib/visionTypes";
 
 /**
  * Handles the analysis of a screenshot using vision recognition

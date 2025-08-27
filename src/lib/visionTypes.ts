@@ -1,5 +1,6 @@
-import { PLAYER_MAPPINGS } from "@/app/(routes)/admin/_utils/form-helpers";
+import { PLAYER_MAPPINGS } from "@/app/(routes)/admin/_utils/player-mappings";
 import { VisionResultCodes } from "./constants";
+import { PlayerStat } from "@prisma/client";
 
 export interface VisionResult {
   players: VisionPlayer[];
@@ -14,7 +15,7 @@ export interface VisionPlayer {
   playerId?: number;
   teamKey?: string;
   name: keyof typeof PLAYER_MAPPINGS;
-  stats: Stat[];
+  stats: PlayerStat[];
 }
 
 export interface Stat {

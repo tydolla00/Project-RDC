@@ -33,7 +33,7 @@ import Image from "next/image";
 import { VisionResultCodes } from "@/lib/constants";
 import { toast } from "sonner";
 import { handleAnalyzeBtnClick } from "../../_utils/rdc-vision-helpers";
-import { VisionPlayer } from "@/app/actions/visionAction";
+import { VisionPlayer } from "@/lib/visionTypes";
 import { z } from "zod/v4";
 import { handleClose } from "../../vision/helpers";
 
@@ -349,7 +349,7 @@ const RDCVisionModal = (props: Props) => {
           ref={visionButton}
           className="focus:ring-primary focus:bg-primary/90 w-full max-w-[200px] transition-all duration-150 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:w-auto"
           disabled={!selectedFile || sessionPlayers.length === 0 || isLoading}
-          onClick={handleAnalyzeWithModalClose}
+          onClick={handleAnalyzeAndMaybeClose}
           type="button"
         >
           Extract Stats from Image

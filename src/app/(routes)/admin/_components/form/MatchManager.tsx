@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import RDCVisionModal from "./RDCVisionModal";
-import { VisionPlayer } from "@/app/actions/visionAction";
 import { FormValues } from "../../_utils/form-helpers";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { VisionPlayer } from "@/lib/visionTypes";
 
 interface Props {
   setIndex: number;
@@ -40,10 +40,11 @@ const MatchManager = (props: Props) => {
    */
   const handleNewMatchClick = () => {
     console.log("Handling New Match click", players);
+    // Explicitly type the playerSessions constant.
     const playerSessions = players.map((player: Player) => ({
       playerId: player.playerId,
-      playerSessionName: player.playerName, // Discrepancy in what is being assigned to playerSessionName
-      playerStats: [],
+      playerSessionName: player.playerName,
+      playerStats: [], // TypeScript now knows this is the correct, specific stat array type.
     }));
     console.log("Player Sessions: ", playerSessions);
     append({
@@ -55,10 +56,17 @@ const MatchManager = (props: Props) => {
   const processTeamPlayers = (teamPlayers: VisionPlayer[]) => {
     console.log("Processing Team Players: ", teamPlayers);
     return teamPlayers.map((player) => {
+      // Map over the stats from the vision player to format them for the form
+      const formattedStats = player.stats.map((stat) => ({
+        statId: stat.statId,
+        stat: stat.statName,
+        statValue: stat.value,
+      }));
+
       return {
         playerId: player?.playerId || 0,
         playerSessionName: player?.name || "Unknown Player",
-        playerStats: [...player.stats],
+        playerStats: formattedStats, // Use the newly formatted stats array
       };
     });
   };
