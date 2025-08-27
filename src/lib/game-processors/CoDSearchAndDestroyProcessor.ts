@@ -21,7 +21,7 @@ export const CoDSearchAndDestroyProcessor: GameProcessor = {
   ) {
     console.log("Processing CoD Search and Destroy Players: ", codPlayers);
 
-    let codVisionResult: VisionResult = {
+    const codVisionResult: VisionResult = {
       players: [],
     };
     let requiresCheck = false;
@@ -111,10 +111,7 @@ export const CoDSearchAndDestroyProcessor: GameProcessor = {
     // The actual winner determination might be based on external factors (round wins, etc.)
     return calculateTeamWinners(players, "TEAM", config);
   },
-  validateStats: (
-    statValue: string | undefined,
-    numPlayers: number | undefined,
-  ) => {
+  validateStats: (statValue: string | undefined) => {
     if (statValue === undefined) {
       console.error("Stat value is undefined");
       return { statValue: "0", reqCheck: true };

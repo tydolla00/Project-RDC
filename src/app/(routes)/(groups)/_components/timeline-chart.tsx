@@ -211,10 +211,9 @@ export type RLStats = {
 const CustomTooltip = ({
   active,
   payload,
-  label,
   setSession,
   showMatchData,
-}: TooltipProps<any, any> & {
+}: TooltipProps<number, string> & {
   setSession: (session: Sessions[0]) => void;
   showMatchData: boolean;
 }) => {
@@ -224,7 +223,7 @@ const CustomTooltip = ({
       console.log(showMatchData);
       setSession(session);
     }
-  }, [active, session, setSession]);
+  }, [active, session, setSession, showMatchData]);
 
   if (active) {
     return (
@@ -250,4 +249,4 @@ const CustomTooltip = ({
 
 // TODO Create a MVP Card Displaying Stats for the Day
 // Goals Per Game, Assists Per Game, Saves Per Game, Shots Per Game, Player Nickname under name
-const MVP = ({ session }: { session: Sessions[0] }) => <div>MVP</div>;
+const MVP = ({}: { session: Sessions[0] }) => <div>MVP</div>;

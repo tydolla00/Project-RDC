@@ -43,7 +43,7 @@ const rankPlayersByScore = (players: VisionPlayer[]): VisionPlayer[] => {
     } else {
       // Add new COD_POS stat
       player.stats.push({
-        statId: getStatConfigByFieldKey("cod_pos")?.id || "12", // COD_POS stat ID
+        statId: getStatConfigByFieldKey("cod_pos")?.id || 12, // COD_POS stat ID
         stat: "COD_POS",
         statValue: position.toString(),
       });

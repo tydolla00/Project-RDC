@@ -189,7 +189,7 @@ export const processPlayer = (
       stats: Object.entries(statValidations).map(([statKey, validation]) => {
         const statConfig = getStatConfigByFieldKey(statKey);
         return {
-          statId: statConfig?.id || "0",
+          statId: statConfig?.id || 0,
           stat: statConfig?.name || "UNKNOWN_STAT",
           statValue: validation.statValue,
         };

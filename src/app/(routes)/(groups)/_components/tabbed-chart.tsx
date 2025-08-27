@@ -23,7 +23,7 @@ export const TabbedChart = ({
   chartData,
 }: {
   chartConfig: ChartConfig;
-  chartData: any[];
+  chartData: unknown[];
 }) => {
   const [activeChart, setActiveChart] = useState("matchWins");
   // TODO Set up days won

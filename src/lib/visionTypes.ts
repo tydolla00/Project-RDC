@@ -1,6 +1,5 @@
 import { PLAYER_MAPPINGS } from "@/app/(routes)/admin/_utils/player-mappings";
 import { VisionResultCodes } from "./constants";
-import { PlayerStat } from "@prisma/client";
 
 export interface VisionResult {
   players: VisionPlayer[];
@@ -15,11 +14,12 @@ export interface VisionPlayer {
   playerId?: number;
   teamKey?: string;
   name: keyof typeof PLAYER_MAPPINGS;
-  stats: PlayerStat[];
+  // Stats captured and validated by vision processors, not DB shape
+  stats: Stat[];
 }
 
 export interface Stat {
-  statId: string;
+  statId: number;
   stat: string;
   statValue: string; // TODO: This should be allowed to be undefined but throw an error maybe?
 }
