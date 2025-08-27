@@ -91,6 +91,7 @@ const codStats = z.object({
     $Enums.StatName.COD_DEATHS,
     $Enums.StatName.COD_POS,
     $Enums.StatName.COD_SCORE,
+    $Enums.StatName.COD_MELEES,
   ]),
   statValue: z
     .string()
