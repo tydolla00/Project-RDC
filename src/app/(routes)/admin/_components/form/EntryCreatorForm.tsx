@@ -27,7 +27,6 @@ interface AdminFormProps {
 }
 
 const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [modifier, setModifier] = useState(0);
 
@@ -43,6 +42,7 @@ const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
     },
     mode: "onChange",
   });
+  console.log(form.formState.isDirty); // make sure formState is read before render to enable the Proxy
 
   const { handleSubmit } = form;
 
@@ -59,8 +59,6 @@ const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
    * If the insertion is successful, displays a success toast message and revalidates the session data.
    */
   const onSubmit = async (data: FormValues): Promise<void> => {
-    setIsLoading(true);
-
     console.log("Form Data Being Submitted:", {
       data,
       stringified: JSON.stringify(data, null, 2),
@@ -80,7 +78,6 @@ const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
       form.reset();
       setStep(0);
     }
-    setIsLoading(false);
   };
 
   /**
@@ -170,7 +167,6 @@ const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
                   </motion.div>
                   <NavigationButtons
                     form={form}
-                    isPending={isLoading}
                     step={step}
                     setStep={setStep}
                     setModifier={setModifier}

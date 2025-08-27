@@ -28,6 +28,7 @@ export const SubmissionTable = async ({
   const [sessions, count] = await Promise.all([
     prisma.session.findMany({
       take: pageSize,
+      where: { isApproved: false },
       skip: (currentPage - 1) * pageSize,
       select: {
         sessionId: true,
@@ -66,10 +67,20 @@ export const SubmissionTable = async ({
           {sessions.map((session) => (
             <TableRow key={session.sessionId}>
               <TableCell>{session.sessionId}</TableCell>
-              <TableCell>{session.sessionName}</TableCell>
+              <TableCell className="hover:underline">
+                <Link href={`/admin/submissions/approve/${session.sessionId}`}>
+                  {session.sessionName}
+                </Link>
+              </TableCell>
               <TableCell>{session.Game.gameName}</TableCell>
               <TableCell className="hover:underline">
-                <Link href={session.sessionUrl}>{session.sessionUrl}</Link>
+                <Link
+                  href={session.sessionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {session.sessionUrl}
+                </Link>
               </TableCell>
               <TableCell>{`${new Date(session.createdAt).toLocaleString()}`}</TableCell>
               <TableCell>

@@ -9,6 +9,28 @@ import { revalidateTag } from "next/cache";
 import { logFormError, logFormSuccess } from "@/posthog/server-analytics";
 import { after } from "next/server";
 
+export async function approveSession(sessionId: number) {
+  try {
+    const query = await handlePrismaOperation(() =>
+      prisma.session.update({
+        where: { sessionId },
+        data: { isApproved: true },
+        select: { sessionId: true },
+      }),
+    );
+
+    if (!query.success) {
+      return { error: query.error || "Failed to approve session" };
+    }
+
+    revalidateTag("getAllSessions");
+    return { success: true };
+  } catch (error) {
+    console.error("Error approving session:", error);
+    return { error: "Failed to approve session" };
+  }
+}
+
 /**
  * Retrieves the statistics for a specified game.
  *
