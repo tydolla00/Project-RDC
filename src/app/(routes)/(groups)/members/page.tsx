@@ -13,6 +13,8 @@ import {
 import { getMembersNav } from "prisma/lib/members";
 import { Battle } from "./_components/Battle";
 
+import { Battle } from "./_components/Battle";
+
 export default async function Page() {
   const members = await getMembersNav();
   return (
