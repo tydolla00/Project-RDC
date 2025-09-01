@@ -11,6 +11,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { getMembersNav } from "@/lib/constants";
+import { Battle } from "./_components/Battle";
 
 export const revalidate = 604_800; // 1 week
 
@@ -71,6 +72,7 @@ export default async function Page() {
           </CardHeader>
         </Card>
       </div>
+      <Battle />
     </div>
   );
 }
