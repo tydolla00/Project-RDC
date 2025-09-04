@@ -1,4 +1,4 @@
-// Keep in sync with .env
+import "server-only"; // Keep in sync with .env
 interface Config {
   DATABASE_URL: string | undefined;
   DIRECT_URL: string | undefined;
@@ -14,6 +14,9 @@ interface Config {
   AUTH_GOOGLE_ID: string | undefined;
   AUTH_GOOGLE_SECRET: string | undefined;
   GOOGLE_GENERATIVE_AI_API_KEY: string | undefined;
+  SHEET_ID: string | undefined;
+  GCP_SA_KEY: string | undefined;
+  CRON_SECRET: string | undefined;
 }
 
 const getConfig = (): Config => {
@@ -34,6 +37,9 @@ const getConfig = (): Config => {
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+    SHEET_ID: process.env.SHEET_ID,
+    GCP_SA_KEY: process.env.GCP_SA_KEY,
+    CRON_SECRET: process.env.CRON_SECRET,
   };
 };
 
