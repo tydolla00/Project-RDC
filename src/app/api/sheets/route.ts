@@ -33,11 +33,12 @@ function getServiceAccount(): {
 
 export async function GET(req: NextRequest) {
   const cronSecret = config.CRON_SECRET;
-  const authHeader = req.headers.get("authorization");
+  const authHeader = req.headers.get("authorization") ?? "";
 
-  if (!authHeader || authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret) return new Response("Missing cron secret", { status: 500 });
+
+  if (authHeader !== `Bearer ${cronSecret}`)
     return new Response("Unauthorized", { status: 401 });
-  }
 
   const sa = getServiceAccount();
   const spreadsheetId = config.SHEET_ID;
@@ -129,10 +130,7 @@ export async function GET(req: NextRequest) {
 
     logDriveCronJobSuccess("Successfully retrieved rows");
 
-    return NextResponse.json(
-      { ok: true, error: "No new rows found" },
-      { status: 204 },
-    );
+    return NextResponse.json({ ok: true }, { status: 204 });
   } catch (err) {
     logDriveCronJobError("Error reading google sheet", { err });
     return NextResponse.json(
