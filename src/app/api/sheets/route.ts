@@ -6,8 +6,15 @@ import prisma from "../../../../prisma/db";
 import { generateObject } from "ai";
 import { google as aiGoogle } from "@ai-sdk/google";
 import z from "zod";
+import {
+  logAiGenFailure,
+  logAiGenSuccess,
+  logDriveCronJobError,
+  logDriveCronJobSuccess,
+} from "@/posthog/server-analytics";
 
 // Serverless-compatible helper to parse base64-encoded service account JSON from env
+// TODO Add logging
 function getServiceAccount(): {
   client_email: string;
   private_key: string;
@@ -18,8 +25,8 @@ function getServiceAccount(): {
   try {
     const decoded = Buffer.from(raw.trim(), "base64").toString("utf8");
     return JSON.parse(decoded);
-  } catch (e) {
-    console.error("Failed to parse GCP_SA_KEY (base64)", e);
+  } catch {
+    logDriveCronJobError("Failed to parse GCP_SA_KEY (base64)");
     return null;
   }
 }
@@ -36,14 +43,14 @@ export async function GET(req: NextRequest) {
   const spreadsheetId = config.SHEET_ID;
 
   if (!sa) {
-    console.error("Service account key not found in env GCP_SA_KEY");
+    logDriveCronJobError("Service account key not found in env GCP_SA_KEY");
     return NextResponse.json(
       { ok: false, error: "missing_service_account" },
       { status: 500 },
     );
   }
   if (!spreadsheetId) {
-    console.error("SHEET_ID not set");
+    logDriveCronJobError("SHEET_ID not set");
     return NextResponse.json(
       { ok: false, error: "missing_sheet_id" },
       { status: 500 },
@@ -71,7 +78,7 @@ export async function GET(req: NextRequest) {
       sheets.spreadsheets.values.get({ spreadsheetId, range: "Dashboard!A:B" }),
     ]);
 
-    // update cursor if we got rows
+    // A lot of this is dependent on rows not being deleted.
     if (truth.data.values && truth.data.values.length > 0) {
       // maybe filter out rows that were added to db
       const { items } = parseTruthRows(truth.data.values || []);
@@ -79,7 +86,6 @@ export async function GET(req: NextRequest) {
       const newLastRow = startRow + items.length - 1;
       // optionally compute lastVideoId from the final row
       const lastVideoId = getVideoId(items.at(-1)?.videoId || "");
-      // Generate a short summary of the new rows using AI. If it fails, continue without the summary.
       let summary: string | null = null;
       try {
         const summarySchema = z.object({ summary: z.string() });
@@ -96,10 +102,14 @@ export async function GET(req: NextRequest) {
           )}`,
         });
 
-        // object will match z schema; safely read the summary
         summary = generatedSummary;
+        logAiGenSuccess("Google Drive Summary Generation Success", "cron-job", {
+          summary,
+          newLastRow,
+          lastVideoId,
+        });
       } catch (aiErr) {
-        console.error("AI summarization failed:", aiErr);
+        logAiGenFailure(aiErr, "cron-job");
         summary = null;
       }
 
@@ -117,23 +127,20 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    console.log("Successfully retrieved rows");
+    logDriveCronJobSuccess("Successfully retrieved rows");
 
-    // Simple response: number of rows
     return NextResponse.json(
       { ok: true, error: "No new rows found" },
       { status: 204 },
     );
   } catch (err) {
-    console.error("Error reading sheet", err);
+    logDriveCronJobError("Error reading google sheet", { err });
     return NextResponse.json(
-      { ok: false, error: "read_failed" },
+      { ok: false, error: "Error reading google sheet" },
       { status: 500 },
     );
   }
 }
-
-// Type definitions for the sheet format
 
 type TruthHeader = [
   "title",
