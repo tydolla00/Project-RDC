@@ -81,7 +81,7 @@ export async function getGameIdFromName(gameName: string) {
  * Inserts a new session from the admin form.
  *
  * @param {FormValues} session - The session details to be inserted.
- * @returns {Promise<{ error: null | string }>} - A promise that resolves to an object containing an error message if any error occurs, otherwise null.
+ * @returns {Promise<{ error: null | string }>}
  *
  * @example
  * const session = {
@@ -324,3 +324,95 @@ export const insertNewSessionFromAdmin = async (
 };
 
 export const revalidateAction = async (path: string) => revalidateTag(path);
+
+export async function addGame(formData: FormData) {
+  const session = await auth();
+
+  if (!session) {
+    console.log("User not authenticated.");
+    return;
+  }
+
+  const gameName = formData.get("gameName") as string;
+
+  if (!gameName) {
+    console.log("Game name is required.");
+    return;
+  }
+
+  const res = await handlePrismaOperation(() =>
+    prisma.game.create({
+      data: {
+        gameName,
+      },
+    }),
+  );
+
+  if (!res.success) console.log("Failed to add game.");
+  else {
+    revalidateTag("getAllGames");
+    console.log("Game added successfully!");
+  }
+}
+
+export async function addPlayer(formData: FormData) {
+  const session = await auth();
+
+  if (!session) {
+    console.log("User not authenticated.");
+    return;
+  }
+
+  const playerName = formData.get("playerName") as string;
+
+  if (!playerName) {
+    console.log("Player name is required.");
+    return;
+  }
+
+  const res = await handlePrismaOperation(() =>
+    prisma.player.create({
+      data: {
+        playerName,
+      },
+    }),
+  );
+  if (!res.success) console.log("Failed to add player.");
+  else {
+    revalidateTag("allMembers");
+    console.log("Player added successfully!");
+  }
+}
+
+export async function addGameStat(formData: FormData) {
+  const session = await auth();
+
+  if (!session) {
+    console.log("User not authenticated.");
+    return;
+  }
+
+  const statName = formData.get("statName") as string;
+  const gameId = Number(formData.get("gameId"));
+  const type = formData.get("type") as string;
+
+  if (!statName || !gameId || !type) {
+    console.log("Missing required fields.");
+    return;
+  }
+
+  // const res = await handlePrismaOperation(() =>
+  //   prisma.gameStat.create({
+  //     data: {
+  //       statName: statName, // TODO Refactor
+  //       gameId: gameId,
+  //       type: type === "INT" ? "INT" : "STRING",
+  //     },
+  //   }),
+  // );
+  // if (!res.success) console.log("Failed to add game stat.");
+  // else {
+  //   revalidateTag("getAllGameStats");
+  //   console.log("Game stat added successfully!");
+  // }
+}
