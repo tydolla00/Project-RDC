@@ -191,6 +191,35 @@ async function seedGames() {
     },
   });
 
+  await prisma.game.upsert({
+    where: { gameName: "Marvel Rivals" },
+    update: {},
+    create: {
+      gameName: "Marvel Rivals",
+      gameStats: {
+        create: [
+          { statName: StatName.MR_KILLS },
+          { statName: StatName.MR_DEATHS },
+          { statName: StatName.MR_ASSISTS },
+          { statName: StatName.MR_TRIPLE_KILL },
+          { statName: StatName.MR_QUADRA_KILL },
+          { statName: StatName.MR_PENTA_KILL },
+          { statName: StatName.MR_HEXA_KILL },
+          { statName: StatName.MR_MEDALS },
+          { statName: StatName.MR_HIGHEST_DMG },
+          { statName: StatName.MR_HIGHEST_DMG_BLOCKED },
+          { statName: StatName.MR_MOST_HEALING },
+          { statName: StatName.MR_MOST_ASSISTS_FIST },
+          { statName: StatName.MR_FINAL_HITS },
+          { statName: StatName.MR_DMG },
+          { statName: StatName.MR_DMG_BLOCKED },
+          { statName: StatName.MR_HEALING },
+          { statName: StatName.MR_ACCURACY },
+        ],
+      },
+    },
+  });
+
   console.log("Games seeded successfully\n");
 }
 
@@ -204,7 +233,7 @@ async function importSessions() {
 
   // Read the sessions.json file
   // ! Add File Path Here
-  const sessionsPath = "";
+  const sessionsPath = "/Users/silver/repos/Project-RDC/sessions_backup.json";
   let sessionsData: EnrichedSession[];
 
   try {
