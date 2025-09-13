@@ -13,9 +13,9 @@ import LethalCompany from "./_components/games/lethalcompany";
 import { gameImages, GamesEnum } from "@/lib/constants";
 import { TimelineChart } from "./_components/timeline/timeline-chart";
 import { Separator } from "@/components/ui/separator";
-import { getAllMembers } from "prisma/lib/members";
+import { getAllMembers } from "../../../../../../prisma/lib/members";
 import { NoMembers } from "../../members/_components/members";
-import { calcWinsPerPlayer } from "./_functions/stats";
+import { calcWinsPerPlayer } from "./_helpers/stats";
 
 // ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,

@@ -1,9 +1,8 @@
-import { NoMembers } from "@/app/(routes)/(groups)/members/_components/members";
 import { ChartConfig } from "@/components/ui/chart";
-import { CustomChart } from "./charts";
-import { TabbedChart } from "../../../_components/tabbed-chart";
-import { getAvgAndSum } from "../_functions/stats";
-import { Members } from "../page";
+import { CustomChart } from "../charts";
+import { TabbedChart } from "../tabbed-chart";
+import { getAvgAndSum } from "../../_helpers/stats";
+import { Members } from "../../page";
 
 const Speedrunners = async ({
   game,
