@@ -20,7 +20,8 @@ const PlayerAvatar = ({
   handleOnClick,
   optionalClassName,
 }: PlayerAvatarProps) => {
-  const avatarSrc = PLAYER_MAPPINGS[player.playerName as keyof typeof PLAYER_MAPPINGS].image;
+  const avatarSrc =
+    PLAYER_MAPPINGS[player.playerName as keyof typeof PLAYER_MAPPINGS].image;
 
   return (
     <TooltipProvider>
@@ -37,15 +38,7 @@ const PlayerAvatar = ({
             <AvatarFallback className="AvatarFallback">
               {player.playerName.slice(0, 2)}
             </AvatarFallback>
-            <AvatarImage
-              src={avatarSrc}
-              alt={player.playerName}
-              onLoadingStatusChange={(status) => {
-                if (status === "loaded") {
-                  // Image is ready
-                }
-              }}
-            />
+            <AvatarImage src={avatarSrc} alt={player.playerName} />
           </Avatar>
         </TooltipTrigger>
         <TooltipContent className="dark:bg-purple-700 dark:text-white">
