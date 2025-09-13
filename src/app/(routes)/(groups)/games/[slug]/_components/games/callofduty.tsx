@@ -1,24 +1,21 @@
 import { NoMembers } from "@/app/(routes)/(groups)/members/_components/members";
 import { ChartConfig } from "@/components/ui/chart";
-import { getWinsPerPlayer } from "../../../../../../../../prisma/lib/games";
-import { getAllMembers } from "../../../../../../../../prisma/lib/members";
-import { getAvgAndSum, calcWinsPerPlayer } from "../../_helpers/stats";
-import { CustomChart } from "../charts";
-import { TabbedChart } from "../tabbed-chart";
+import { CustomChart } from "./charts";
+import { TabbedChart } from "../../../_components/tabbed-chart";
+import { getAvgAndSum } from "../_functions/stats";
+import { Members } from "../page";
 
 const CallOfDuty = async ({
   game,
+  members,
+  winsPerPlayer,
 }: {
   game: { gameId: number; gameName: string };
+  members: Members;
+  winsPerPlayer: unknown[];
 }) => {
-  const members = await getAllMembers();
-
-  if (!members.success || !members.data) {
-    return <NoMembers />;
-  }
-
   let membersMap = await Promise.all(
-    members.data.map(async (member) => {
+    members.map(async (member) => {
       try {
         const { kills, deaths, score, pos, melees } = await getAvgAndSum(
           member.playerId,
@@ -46,10 +43,6 @@ const CallOfDuty = async ({
     }),
   );
   membersMap = membersMap.filter((d) => d?.score.sum > 0);
-  const wins = await getWinsPerPlayer(game.gameId);
-  if (!wins.success || !wins.data) wins.data = { sessions: [] };
-
-  const winsPerPlayer = calcWinsPerPlayer(wins.data);
 
   const config = {
     player: { label: "Player" },
