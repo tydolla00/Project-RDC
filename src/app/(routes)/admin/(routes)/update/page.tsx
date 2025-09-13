@@ -109,13 +109,18 @@ export default async function Page() {
             placeholder="Stat Name"
             required
           />
-          <Input
-            className="max-w-sm"
-            name="gameId"
-            placeholder="Game ID"
-            type="number"
-            required
-          />
+          <Select name="gameId" required>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a game" />
+            </SelectTrigger>
+            <SelectContent>
+              {games.map((game) => (
+                <SelectItem key={game.gameId} value={String(game.gameId)}>
+                  {game.gameName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select name="type" required>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select a type" />
