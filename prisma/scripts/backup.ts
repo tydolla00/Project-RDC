@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import fs from "fs";
+import path from "path";
 import { EnrichedSession } from "../types/session";
 
 const prisma = new PrismaClient();
@@ -8,7 +9,11 @@ async function backupSessions() {
   try {
     const sessions: EnrichedSession[] = await prisma.session.findMany({
       include: {
-        Game: true,
+        Game: {
+          include: {
+            gameStats: true,
+          },
+        },
         dayWinners: true,
         mvp: true,
         sets: {
@@ -34,8 +39,9 @@ async function backupSessions() {
       },
     });
 
-    fs.writeFileSync("sessions_backup.json", JSON.stringify(sessions, null, 2));
-    console.log("Successfully backed up sessions to sessions_backup.json");
+    const outPath = path.resolve(process.cwd(), "sessions_backup.json");
+    fs.writeFileSync(outPath, JSON.stringify(sessions, null, 2));
+    console.log(`Successfully backed up sessions to ${outPath}`);
   } catch (error) {
     console.error("Error backing up sessions:", error);
   } finally {
