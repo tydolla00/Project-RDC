@@ -16,7 +16,7 @@ import {
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { PaginationButtons } from "../(routes)/submissions/_components/PaginationButtons";
-import prisma from "../../../../../prisma/db";
+import prisma from "prisma/db";
 
 export const SubmissionTable = async ({
   page = "1",
