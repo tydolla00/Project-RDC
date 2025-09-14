@@ -243,7 +243,7 @@ async function importSessions() {
           thumbnail: sessionData.thumbnail,
           videoId: sessionData.videoId,
           gameId: game.gameId,
-          date: sessionData.date || new Date(),
+          date: new Date(sessionData.date),
           dayWinners: {
             connect: sessionData.dayWinners.map((sd) => ({
               playerId: sd.playerId,

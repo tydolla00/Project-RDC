@@ -1,7 +1,7 @@
 import { $Enums } from "@prisma/client";
 import { getAllGames } from "prisma/lib/games";
 import { getAllMembers } from "prisma/lib/members";
-import { PLAYER_MAPPINGS } from "../app/(routes)/admin/_utils/player-mappings";
+import { findPlayer } from "../app/(routes)/admin/_utils/player-mappings";
 
 /**
  * Returns navigation data for all RDC members.
@@ -22,16 +22,15 @@ export const getMembersNav = async () => {
     desc: string;
     stats: { prop: string; val: string }[];
   }[] = members.data.map((member) => {
-    const memberKey = member.playerName as keyof typeof PLAYER_MAPPINGS;
-    const rdcMember = PLAYER_MAPPINGS[memberKey]!;
+    const rdcMember = findPlayer(member.playerName) ?? undefined;
     return {
-      alt: rdcMember.nav.alt,
+      alt: rdcMember?.nav?.alt ?? member.playerName,
       name: member.playerName,
-      navName: rdcMember.nav.name,
-      url: rdcMember.nav.url,
-      src: rdcMember.nav.src,
-      desc: rdcMember.desc,
-      stats: rdcMember.stats,
+      navName: rdcMember?.nav?.name ?? member.playerName,
+      url: rdcMember?.nav?.url ?? `/members/${member.playerName.toLowerCase()}`,
+      src: rdcMember?.nav?.src ?? "",
+      desc: rdcMember?.desc ?? "",
+      stats: rdcMember?.stats ?? [],
     };
   });
   return navMembers;

@@ -125,6 +125,7 @@ export const calcMostPerPlacing = async (
       for (const match of set.matches) {
         const race = [];
         for (const ps of match.playerSessions) {
+          // TODO Potentially unsafe if no stats found
           const pos = Number(ps.playerStats[0].value);
           if (isNaN(pos)) {
             logNAN("calcMostPerPlacing", ps.playerStats[0].playerStatId);

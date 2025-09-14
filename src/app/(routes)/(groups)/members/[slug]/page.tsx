@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { getAllMembers } from "prisma/lib/members";
-import { PLAYER_MAPPINGS } from "@/app/(routes)/admin/_utils/player-mappings";
+import { findPlayer } from "@/app/(routes)/admin/_utils/player-mappings";
 
 export const dynamicParams = false; // true | false,
 
@@ -40,11 +40,7 @@ export default async function Page({
         <CardHeader>
           <div className="flex items-center gap-4">
             <Image
-              src={
-                PLAYER_MAPPINGS[
-                  member.data.playerName as keyof typeof PLAYER_MAPPINGS
-                ].image
-              }
+              src={findPlayer(member.data.playerName)?.image || ""}
               alt={member.data.playerName}
               width={100}
               height={100}
