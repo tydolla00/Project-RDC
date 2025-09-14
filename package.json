@@ -14,7 +14,8 @@
     "test:watch": "jest --watch"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "backup": "tsx prisma/backup.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.1",

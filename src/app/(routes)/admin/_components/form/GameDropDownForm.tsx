@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/popover";
 import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
-import { getAllGames } from "../../../../../../prisma/lib/games";
+import { getAllGames } from "prisma/lib/games";
 import { FormValues } from "../../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
 import { toast } from "sonner";
