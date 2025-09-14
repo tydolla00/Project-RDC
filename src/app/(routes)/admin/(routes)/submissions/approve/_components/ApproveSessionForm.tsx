@@ -29,6 +29,7 @@ export function ApproveSessionForm({
 
     if (error) {
       toast.error(error);
+      setIsDisabled(false);
       return;
     }
     setIsDisabled(false);

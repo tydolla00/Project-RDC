@@ -11,9 +11,12 @@ import { after } from "next/server";
 
 export async function approveSession(sessionId: number) {
   try {
+    const authUser = await auth();
+    if (!authUser) return { error: errorCodes.NotAuthenticated };
+
     const query = await handlePrismaOperation(() =>
       prisma.session.update({
-        where: { sessionId },
+        where: { sessionId, isApproved: false },
         data: { isApproved: true },
         select: { sessionId: true },
       }),
@@ -24,7 +27,7 @@ export async function approveSession(sessionId: number) {
     }
 
     revalidateTag("getAllSessions");
-    return { success: true };
+    return { error: null };
   } catch (error) {
     console.error("Error approving session:", error);
     return { error: "Failed to approve session" };
@@ -325,81 +328,54 @@ export const insertNewSessionFromAdmin = async (
 
 export const revalidateAction = async (path: string) => revalidateTag(path);
 
-export async function addGame(formData: FormData) {
+export async function addGame(
+  formData: FormData,
+): Promise<{ error: string | null }> {
   const session = await auth();
-
-  if (!session) {
-    console.log("User not authenticated.");
-    return;
-  }
+  if (!session) return { error: errorCodes.NotAuthenticated };
 
   const gameName = formData.get("gameName") as string;
-
-  if (!gameName) {
-    console.log("Game name is required.");
-    return;
-  }
+  if (!gameName) return { error: "Game name is required." };
 
   const res = await handlePrismaOperation(() =>
-    prisma.game.create({
-      data: {
-        gameName,
-      },
-    }),
+    prisma.game.create({ data: { gameName } }),
   );
 
-  if (!res.success) console.log("Failed to add game.");
-  else {
-    revalidateTag("getAllGames");
-    console.log("Game added successfully!");
-  }
+  if (!res.success) return { error: res.error || "Failed to add game." };
+  revalidateTag("getAllGames");
+  return { error: null };
 }
 
-export async function addPlayer(formData: FormData) {
+export async function addPlayer(
+  formData: FormData,
+): Promise<{ error: string | null }> {
   const session = await auth();
-
-  if (!session) {
-    console.log("User not authenticated.");
-    return;
-  }
+  if (!session) return { error: errorCodes.NotAuthenticated };
 
   const playerName = formData.get("playerName") as string;
-
-  if (!playerName) {
-    console.log("Player name is required.");
-    return;
-  }
+  if (!playerName) return { error: "Player name is required." };
 
   const res = await handlePrismaOperation(() =>
-    prisma.player.create({
-      data: {
-        playerName,
-      },
-    }),
+    prisma.player.create({ data: { playerName } }),
   );
-  if (!res.success) console.log("Failed to add player.");
-  else {
-    revalidateTag("allMembers");
-    console.log("Player added successfully!");
-  }
+
+  if (!res.success) return { error: res.error || "Failed to add player." };
+  revalidateTag("allMembers");
+  return { error: null };
 }
 
-export async function addGameStat(formData: FormData) {
+export async function addGameStat(
+  formData: FormData,
+): Promise<{ error: string | null }> {
   const session = await auth();
-
-  if (!session) {
-    console.log("User not authenticated.");
-    return;
-  }
+  if (!session) return { error: errorCodes.NotAuthenticated };
 
   const statName = formData.get("statName") as string;
   const gameId = Number(formData.get("gameId"));
   const type = formData.get("type") as string;
 
-  if (!statName || !gameId || !type) {
-    console.log("Missing required fields.");
-    return;
-  }
+  if (!statName || !gameId || !type)
+    return { error: "Missing required fields." };
 
   // const res = await handlePrismaOperation(() =>
   //   prisma.gameStat.create({
@@ -410,9 +386,7 @@ export async function addGameStat(formData: FormData) {
   //     },
   //   }),
   // );
-  // if (!res.success) console.log("Failed to add game stat.");
-  // else {
-  //   revalidateTag("getAllGameStats");
-  //   console.log("Game stat added successfully!");
-  // }
+  // if (!res.success) return { error: res.error || "Failed to add game stat." };
+  // revalidateTag("getAllGameStats");
+  return { error: null };
 }

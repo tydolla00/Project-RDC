@@ -1,6 +1,5 @@
 import { getSessionById } from "../../../../../../../../prisma/lib/session";
 import { FormValues } from "../../../../_utils/form-helpers";
-import { Player } from "@prisma/client";
 import { ApproveSessionForm } from "../_components/ApproveSessionForm";
 
 export default async function Page({
@@ -19,37 +18,38 @@ export default async function Page({
     return <div className="container mx-auto py-6">Session not found</div>;
   }
 
-  const players = new Set<
-    Player & {
-      playerName:
-        | "Mark"
-        | "Dylan"
-        | "Ben"
-        | "Lee"
-        | "Des"
-        | "John"
-        | "Aff"
-        | "Ipi";
+  // Only these playerName values are allowed
+  type AllowedName =
+    | "Mark"
+    | "Dylan"
+    | "Ben"
+    | "Lee"
+    | "Des"
+    | "John"
+    | "Aff"
+    | "Ipi";
+
+  // Map to collect unique players by playerId
+  const playerMap = new Map<
+    number,
+    { playerId: number; playerName: AllowedName }
+  >();
+
+  // Iterate every set, every match, every player session
+  for (const set of session.data.sets) {
+    for (const match of set.matches) {
+      for (const ps of match.playerSessions) {
+        const name = ps.player.playerName as AllowedName;
+        playerMap.set(ps.player.playerId, {
+          playerId: ps.player.playerId,
+          playerName: name,
+        });
+      }
     }
-  >(
-    session.data.sets
-      .at(0)
-      ?.matches.at(0)
-      ?.playerSessions.map((playerSession) => {
-        return {
-          playerId: playerSession.player.playerId,
-          playerName: playerSession.player.playerName as
-            | "Mark"
-            | "Dylan"
-            | "Ben"
-            | "Lee"
-            | "Des"
-            | "John"
-            | "Aff"
-            | "Ipi",
-        };
-      }) || [],
-  );
+  }
+
+  // Final list of unique players
+  const players = Array.from(playerMap.values());
 
   const sessionData = session.data;
 
