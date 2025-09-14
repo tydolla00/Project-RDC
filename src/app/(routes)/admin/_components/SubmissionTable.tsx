@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllSessions } from "../../../../../prisma/lib/admin";
+import { getAllSessions } from "prisma/lib/admin";
 import Link from "next/link";
 
 export const SubmissionTable = async () => {

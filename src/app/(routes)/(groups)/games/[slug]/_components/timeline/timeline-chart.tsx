@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { getAllSessionsByGame } from "../../../../../../../../prisma/lib/admin";
+import { getAllSessionsByGame } from "prisma/lib/admin";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
@@ -25,7 +25,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 import { gameImages } from "@/lib/constants";
-import { QueryResponseData } from "../../../../../../../../prisma/db";
+import { QueryResponseData } from "prisma/db";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { VideoInfo } from "./video-info";

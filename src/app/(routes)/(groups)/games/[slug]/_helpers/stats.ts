@@ -5,8 +5,8 @@ import {
   StatEndsWith,
   getStatPerPlayer,
   getSumPerStat,
-} from "../../../../../../../prisma/lib/games";
-import { QueryResponseData } from "../../../../../../../prisma/db";
+} from "prisma/lib/games";
+import { QueryResponseData } from "prisma/db";
 import { Decimal } from "@prisma/client/runtime/library";
 import { logNAN } from "@/posthog/server-analytics";
 

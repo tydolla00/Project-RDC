@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import fs from "fs";
-import { EnrichedSession } from "prisma/types/session";
+import { EnrichedSession } from "../types/session";
 
 const prisma = new PrismaClient();
 

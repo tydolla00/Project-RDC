@@ -1,7 +1,7 @@
 import { H1 } from "@/components/headings";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getAllMembers } from "../../../../prisma/lib/members";
+import { getAllMembers } from "prisma/lib/members";
 import EntryCreatorForm from "./_components/form/EntryCreatorForm";
 import { NoMembers } from "../(groups)/members/_components/members";
 

@@ -1,6 +1,6 @@
 import { $Enums } from "@prisma/client";
-import { getAllGames } from "../../prisma/lib/games";
-import { getAllMembers } from "../../prisma/lib/members";
+import { getAllGames } from "prisma/lib/games";
+import { getAllMembers } from "prisma/lib/members";
 import { PLAYER_MAPPINGS } from "../app/(routes)/admin/_utils/player-mappings";
 
 /**
