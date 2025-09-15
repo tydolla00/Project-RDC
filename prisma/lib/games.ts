@@ -2,8 +2,8 @@
 
 import { unstable_cache } from "next/cache";
 import prisma, { handlePrismaOperation } from "../db";
-import { StatName } from "@prisma/client";
 import { getSumOfStat } from "@prisma/client/sql";
+import { StatName } from "prisma/generated/enums";
 
 export type StatEndsWith<
   Suffix extends string,
