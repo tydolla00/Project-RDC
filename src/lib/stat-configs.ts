@@ -1,11 +1,11 @@
-import { StatName } from "prisma/generated/enums";
+import { $Enums } from "@prisma/client";
 
 /**
  * Interface describing a stat configuration for a game.
  */
 export interface StatConfig {
   id: string;
-  name: StatName;
+  name: $Enums.StatName;
   description: string;
   gameId: number;
   fieldKey: string; // The key from Document Intelligence
@@ -26,7 +26,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   // Mario Kart 8 Stats
   mk8_place: {
     id: "1",
-    name: StatName.MK8_POS,
+    name: $Enums.StatName.MK8_POS,
     description: "Mario Kart 8 Position",
     gameId: 1,
     fieldKey: "mk8_place",
@@ -37,7 +37,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   mk8_day: {
     id: "2",
-    name: StatName.MK8_DAY,
+    name: $Enums.StatName.MK8_DAY,
     description: "Mario Kart 8 Days",
     gameId: 1,
     fieldKey: "mk8_day",
@@ -50,7 +50,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   // Rocket League Stats
   rl_score: {
     id: "3",
-    name: StatName.RL_SCORE,
+    name: $Enums.StatName.RL_SCORE,
     description: "Rocket League Score",
     gameId: 2,
     fieldKey: "rl_score",
@@ -61,7 +61,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   rl_goals: {
     id: "4",
-    name: StatName.RL_GOALS,
+    name: $Enums.StatName.RL_GOALS,
     description: "Rocket League Goals",
     gameId: 2,
     fieldKey: "rl_goals",
@@ -72,7 +72,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   rl_assists: {
     id: "5",
-    name: StatName.RL_ASSISTS,
+    name: $Enums.StatName.RL_ASSISTS,
     description: "Rocket League Assists",
     gameId: 2,
     fieldKey: "rl_assists",
@@ -83,7 +83,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   rl_saves: {
     id: "6",
-    name: StatName.RL_SAVES,
+    name: $Enums.StatName.RL_SAVES,
     description: "Rocket League Saves",
     gameId: 2,
     fieldKey: "rl_saves",
@@ -94,7 +94,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   rl_shots: {
     id: "7",
-    name: StatName.RL_SHOTS,
+    name: $Enums.StatName.RL_SHOTS,
     description: "Rocket League Shots",
     gameId: 2,
     fieldKey: "rl_shots",
@@ -105,7 +105,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   rl_day: {
     id: "8",
-    name: StatName.RL_DAY,
+    name: $Enums.StatName.RL_DAY,
     description: "Rocket League Days",
     gameId: 2,
     fieldKey: "rl_day",
@@ -118,7 +118,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   // Call of Duty Stats
   cod_score: {
     id: "9",
-    name: StatName.COD_SCORE,
+    name: $Enums.StatName.COD_SCORE,
     description: "Call of Duty Score",
     gameId: 3,
     fieldKey: "cod_score",
@@ -129,7 +129,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   cod_kills: {
     id: "10",
-    name: StatName.COD_KILLS,
+    name: $Enums.StatName.COD_KILLS,
     description: "Call of Duty Kills",
     gameId: 3,
     fieldKey: "cod_kills",
@@ -140,7 +140,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   cod_deaths: {
     id: "11",
-    name: StatName.COD_DEATHS,
+    name: $Enums.StatName.COD_DEATHS,
     description: "Call of Duty Deaths",
     gameId: 3,
     fieldKey: "cod_deaths",
@@ -151,7 +151,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   cod_pos: {
     id: "12",
-    name: StatName.COD_POS,
+    name: $Enums.StatName.COD_POS,
     description: "Call of Duty Position",
     gameId: 3,
     fieldKey: "cod_pos",
@@ -162,7 +162,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   cod_melees: {
     id: "13",
-    name: StatName.COD_MELEES,
+    name: $Enums.StatName.COD_MELEES,
     description: "Call of Duty Melee Kills",
     gameId: 3,
     fieldKey: "cod_melees",
@@ -177,7 +177,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   // Lethal Company Stats
   lc_deaths: {
     id: "14",
-    name: StatName.LC_DEATHS,
+    name: $Enums.StatName.LC_DEATHS,
     description: "Lethal Company Deaths",
     gameId: 4,
     fieldKey: "lc_deaths",
@@ -190,7 +190,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   // Speed Runners Stats
   sr_wins: {
     id: "15",
-    name: StatName.SR_WINS,
+    name: $Enums.StatName.SR_WINS,
     description: "Speedrunners Wins",
     gameId: 5,
     fieldKey: "sr_wins",
@@ -201,7 +201,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   sr_sets: {
     id: "16",
-    name: StatName.SR_SETS,
+    name: $Enums.StatName.SR_SETS,
     description: "Speedrunners Sets",
     gameId: 5,
     fieldKey: "sr_sets",
@@ -212,7 +212,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
   },
   sr_pos: {
     id: "17",
-    name: StatName.SR_POS,
+    name: $Enums.StatName.SR_POS,
     description: "Speedrunners Position",
     gameId: 5,
     fieldKey: "sr_pos",
@@ -258,12 +258,11 @@ export const getStatConfigsByCategory = (
 };
 
 // TODO: Replace the existing statDescriptions with this derived object
-export const statDescriptions: { [key in StatName]: string } = Object.values(
-  STAT_CONFIGS,
-).reduce(
-  (acc, config) => {
-    acc[config.name] = config.description;
-    return acc;
-  },
-  {} as { [key in StatName]: string },
-);
+export const statDescriptions: { [key in $Enums.StatName]: string } =
+  Object.values(STAT_CONFIGS).reduce(
+    (acc, config) => {
+      acc[config.name] = config.description;
+      return acc;
+    },
+    {} as { [key in $Enums.StatName]: string },
+  );
