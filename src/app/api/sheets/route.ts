@@ -2,7 +2,7 @@ import { google } from "googleapis";
 import { NextRequest, NextResponse } from "next/server";
 import config from "../../../lib/config";
 import { getVideoId } from "@/app/(routes)/admin/_utils/helper-functions";
-import prisma from "../../../../prisma/db";
+import prisma from "prisma/db";
 import { generateObject } from "ai";
 import { google as aiGoogle } from "@ai-sdk/google";
 import z from "zod";
