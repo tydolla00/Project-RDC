@@ -59,8 +59,6 @@ export default async function Page({
     return <NoMembers />;
   }
 
-  console.log(sessions.data);
-
   switch (gameName) {
     case GamesEnum.MarioKart8:
       component = (
