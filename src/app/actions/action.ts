@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "../../../prisma/db";
+import prisma from "prisma/db";
 import config from "@/lib/config";
 import { Session } from "next-auth";
 import { signOut, auth } from "@/auth";

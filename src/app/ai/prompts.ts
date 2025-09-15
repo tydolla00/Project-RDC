@@ -6,7 +6,7 @@ export const mvpSystemPrompt = `
 
     OUTPUT (return ONLY valid JSON, no prose, no markdown):  
     {  
-      "mvp": "<player name>",  
+      "player": "<player name>",  
       "description": "<why this player was chosen>",  
       "stats": [  
         { "statName": "<string>", "sum": <number>, "average": <number optional> }  
@@ -15,8 +15,8 @@ export const mvpSystemPrompt = `
     - Do not include "average" for a stat if it doesn't make sense.  
     - Do not output anything except the JSON object above. 
 
-    If you are given data from a game that you do not recognize, respond with "I am not familiar with this game."
-
+    If you are given data from a game that you do not recognize, return:
+    { "player": "", "description": "Unrecognized game", "stats": [] }
     For a Rocket League session, you will receive data in the following format:
     [
         {

@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { PLAYER_MAPPINGS } from "@/app/(routes)/admin/_utils/player-mappings";
+import { findPlayer } from "@/app/(routes)/admin/_utils/player-mappings";
 
 interface PlayerAvatarProps {
   player: Player;
@@ -20,7 +20,7 @@ const PlayerAvatar = ({
   handleOnClick,
   optionalClassName,
 }: PlayerAvatarProps) => {
-  const avatarSrc = PLAYER_MAPPINGS[player.playerName as keyof typeof PLAYER_MAPPINGS].image;
+  const avatarSrc = findPlayer(player.playerName)?.image || "";
 
   return (
     <TooltipProvider>

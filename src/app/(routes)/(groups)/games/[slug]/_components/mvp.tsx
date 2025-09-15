@@ -14,8 +14,7 @@ import { analyzeMvp } from "@/app/ai/actions";
 import { getSetsData, ProcessedSet } from "./match-data";
 import { capitalizeFirst } from "@/lib/utils";
 import type { MvpOutput } from "@/app/ai/types";
-import { PLAYER_MAPPINGS } from "@/app/(routes)/admin/_utils/player-mappings";
-// import { readStreamableValue } from "@ai-sdk/rsc";
+import { findPlayer } from "@/app/(routes)/admin/_utils/player-mappings";
 
 type Sessions = QueryResponseData<
   Awaited<ReturnType<typeof getAllSessionsByGame>>
@@ -35,33 +34,27 @@ export const MVP = ({
   // const [generation, setGeneration] = useState<string | null>(null);
 
   return (
-    <Card className="relative overflow-hidden">
+    <Card className="relative h-[400px] overflow-auto">
       <div className="from-primary/10 pointer-events-none absolute top-0 right-0 h-full w-1/2 bg-gradient-to-l to-transparent" />
       <CardHeader>
         <CardTitle className="flex items-center gap-2">MVP</CardTitle>
         <CardDescription>Match Statistics</CardDescription>
-        {/* {generation && (
-          <pre className="bg-muted mt-2 rounded-md p-4 text-sm">
-            {generation}
-          </pre>
-        )} */}
       </CardHeader>
       <CardContent>
         {mvp ? (
           <div className="relative space-y-6">
             <div className="flex items-center gap-4">
-              <Avatar className="border-primary/20 h-16 w-16 border-2">
+              <Avatar className="border-primary/20 sticky top-2 h-16 w-16 border-2">
                 <AvatarImage
-                  src={
-                    PLAYER_MAPPINGS[mvp.player as keyof typeof PLAYER_MAPPINGS]
-                      .image
-                  }
+                  src={findPlayer(mvp.player)?.image || ""}
                   alt={mvp.player}
                 />
                 <AvatarFallback>{mvp.player[0]}</AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="text-xl font-bold">{mvp.player}</h3>
+                <h3 className="sticky top-2 bg-inherit text-xl font-bold">
+                  {mvp.player}
+                </h3>
                 <p className="text-muted-foreground text-sm">
                   {mvp.description}
                 </p>
@@ -100,22 +93,23 @@ export const MVP = ({
                 try {
                   const stats = getSetsData(session);
                   console.log({ stats });
-                  // const { object } = await analyzeMvp(stats as ProcessedRLSet[]);
-                  // for await (const partialObject of readStreamableValue(object)) {
-                  //   if (partialObject) {
-                  //     console.log(partialObject);
-                  //     setGeneration(
-                  //       JSON.stringify(partialObject.notifications, null, 2),
-                  //     );
-                  //   }
-                  // }
                   const mvp = await analyzeMvp(
                     stats as ProcessedSet[],
                     session.sessionId,
                   );
-                  // TODO use proper id, fix player lookup throughout app.
+                  const mapped = findPlayer(mvp.player);
+                  const player = mapped
+                    ? {
+                        playerId: mapped.playerId,
+                        playerName: mapped.playerName,
+                      }
+                    : undefined;
                   // Update the in memory record of a session to keep mvp in state.
-                  session.mvp = { playerName: mvp.player, playerId: 1 };
+                  // TODO Maybe pass proper set to keep session state in sync
+                  session.mvp = {
+                    playerName: mvp.player,
+                    playerId: player?.playerId ?? 1,
+                  };
                   session.mvpDescription = mvp.description;
                   session.mvpStats = mvp.stats;
                   setMvp(mvp);
