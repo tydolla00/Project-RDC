@@ -71,7 +71,13 @@ export default async function Page() {
 
       <div>
         <H2>Games</H2>
-        <form action={addGame} className="flex items-center gap-2">
+        <form
+          action={async (fd) => {
+            "use server";
+            await addGame(fd);
+          }}
+          className="flex items-center gap-2"
+        >
           <Input
             className="max-w-sm"
             name="gameName"
@@ -88,7 +94,13 @@ export default async function Page() {
 
       <div>
         <H2>Players</H2>
-        <form action={addPlayer} className="flex items-center gap-2">
+        <form
+          action={async (fd) => {
+            "use server";
+            await addPlayer(fd);
+          }}
+          className="flex items-center gap-2"
+        >
           <Input
             className="max-w-sm"
             name="playerName"
@@ -102,7 +114,13 @@ export default async function Page() {
 
       <div>
         <H2>Game Stats</H2>
-        <form action={addGameStat} className="flex items-center gap-2">
+        <form
+          action={async (fd) => {
+            "use server";
+            await addGameStat(fd);
+          }}
+          className="flex items-center gap-2"
+        >
           <Input
             className="max-w-sm"
             name="statName"

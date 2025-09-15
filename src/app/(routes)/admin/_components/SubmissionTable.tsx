@@ -41,7 +41,7 @@ export const SubmissionTable = async ({
         },
       },
     }),
-    prisma.session.count(),
+    prisma.session.count({ where: { isApproved: false } }),
   ]);
 
   if (!sessions.length) {
