@@ -1,0 +1,41 @@
+import prisma, { handlePrismaOperation } from "../db";
+
+export const getSessionById = async (sessionId: number) => {
+  return handlePrismaOperation(() =>
+    prisma.session.findUnique({
+      where: { sessionId },
+      include: {
+        Game: { select: { gameName: true } },
+        sets: {
+          include: {
+            setWinners: true,
+            matches: {
+              include: {
+                matchWinners: true,
+                playerSessions: {
+                  include: {
+                    player: true,
+                    playerStats: {
+                      include: {
+                        player: true,
+                        gameStat: {
+                          select: {
+                            statName: true,
+                            statId: true,
+                            type: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        dayWinners: true,
+        mvp: true,
+      },
+    }),
+  );
+};

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import { getAllSessionsByGame } from "../../../../../../../prisma/lib/admin";
+import { getAllSessionsByGame } from "prisma/lib/admin";
 import { SetData } from "./set-data";
-import { QueryResponseData } from "../../../../../../../prisma/db";
+import { QueryResponseData } from "prisma/db";
 import {
   Pagination,
   PaginationContent,

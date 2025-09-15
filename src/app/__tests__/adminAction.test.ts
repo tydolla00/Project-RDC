@@ -1,9 +1,9 @@
 import { insertNewSessionFromAdmin } from "../actions/adminAction";
-import prisma from "../../../prisma/db";
+import prisma from "prisma/db";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 
-jest.mock("../../../prisma/db");
+jest.mock("prisma/db");
 jest.mock("@/auth");
 
 describe("adminAction tests", () => {

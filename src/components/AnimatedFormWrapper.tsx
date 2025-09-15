@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import useMeasure from "react-use-measure";
 import { CardContent, CardFooter } from "./ui/card";
 import { useForm, useFormContext } from "react-hook-form";
-import { Dispatch, JSX, SetStateAction, useState } from "react";
+import { Dispatch, JSX, MouseEvent, SetStateAction } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
@@ -25,7 +25,6 @@ export const AnimatedFormWrapper = ({
 };
 
 type NavigationButtonsProps = {
-  isPending: boolean;
   form: ReturnType<typeof useForm<FormValues>>;
   step: number;
   setStep: Dispatch<SetStateAction<number>>;
@@ -33,15 +32,16 @@ type NavigationButtonsProps = {
 };
 export const NavigationButtons = ({
   step,
-  isPending,
   form,
   setStep,
   setModifier,
 }: NavigationButtonsProps) => {
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const { getValues } = useFormContext<FormValues>();
+  const { getValues, formState } = useFormContext<FormValues>();
 
-  const handleNextClicked = async () => {
+  const handleNextClicked = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     let isValid: boolean = false;
     switch (step) {
       // TODO Validate video and game combo not already existing.
@@ -73,9 +73,6 @@ export const NavigationButtons = ({
       });
     setModifier(1);
     setStep(step + 1);
-
-    // Necessary because submit event is being triggered
-    if (step == 1) setTimeout(() => setIsSubmitDisabled(false), 1000);
   };
 
   return (
@@ -86,7 +83,6 @@ export const NavigationButtons = ({
           onClick={() => {
             setModifier(-1);
             setStep(step - 1);
-            setIsSubmitDisabled(true);
           }}
           className="cursor-pointer disabled:cursor-not-allowed"
           variant="secondary"
@@ -96,7 +92,7 @@ export const NavigationButtons = ({
         </Button>
         {step === 2 ? (
           <Button
-            disabled={isSubmitDisabled || isPending}
+            disabled={formState.isSubmitting || !formState.isDirty}
             className="cursor-pointer"
             type="submit"
           >
@@ -104,9 +100,9 @@ export const NavigationButtons = ({
               initial={{ y: -25 }}
               animate={{ y: 0 }}
               exit={{ y: 25 }}
-              key={String(isPending)}
+              key={String(formState.isSubmitting)}
             >
-              {isPending ? (
+              {formState.isSubmitting ? (
                 <span className="animate-spin">
                   <LoaderIcon />
                 </span>

@@ -1,13 +1,38 @@
 "use server";
 
 import { GameStat } from "@prisma/client";
-import prisma, { handlePrismaOperation } from "../../../prisma/db";
+import prisma, { handlePrismaOperation } from "prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { revalidateTag } from "next/cache";
 import { logFormError, logFormSuccess } from "@/posthog/server-analytics";
 import { after } from "next/server";
+
+export async function approveSession(sessionId: number) {
+  try {
+    const authUser = await auth();
+    if (!authUser) return { error: errorCodes.NotAuthenticated };
+
+    const query = await handlePrismaOperation(() =>
+      prisma.session.update({
+        where: { sessionId, isApproved: false },
+        data: { isApproved: true },
+        select: { sessionId: true },
+      }),
+    );
+
+    if (!query.success) {
+      return { error: query.error || "Failed to approve session" };
+    }
+
+    revalidateTag("getAllSessions");
+    return { error: null };
+  } catch (error) {
+    console.error("Error approving session:", error);
+    return { error: "Failed to approve session" };
+  }
+}
 
 /**
  * Retrieves the statistics for a specified game.
@@ -59,7 +84,7 @@ export async function getGameIdFromName(gameName: string) {
  * Inserts a new session from the admin form.
  *
  * @param {FormValues} session - The session details to be inserted.
- * @returns {Promise<{ error: null | string }>} - A promise that resolves to an object containing an error message if any error occurs, otherwise null.
+ * @returns {Promise<{ error: null | string }>}
  *
  * @example
  * const session = {
@@ -302,3 +327,66 @@ export const insertNewSessionFromAdmin = async (
 };
 
 export const revalidateAction = async (path: string) => revalidateTag(path);
+
+export async function addGame(
+  formData: FormData,
+): Promise<{ error: string | null }> {
+  const session = await auth();
+  if (!session) return { error: errorCodes.NotAuthenticated };
+
+  const gameName = formData.get("gameName") as string;
+  if (!gameName) return { error: "Game name is required." };
+
+  const res = await handlePrismaOperation(() =>
+    prisma.game.create({ data: { gameName } }),
+  );
+
+  if (!res.success) return { error: res.error || "Failed to add game." };
+  revalidateTag("getAllGames");
+  return { error: null };
+}
+
+export async function addPlayer(
+  formData: FormData,
+): Promise<{ error: string | null }> {
+  const session = await auth();
+  if (!session) return { error: errorCodes.NotAuthenticated };
+
+  const playerName = formData.get("playerName") as string;
+  if (!playerName) return { error: "Player name is required." };
+
+  const res = await handlePrismaOperation(() =>
+    prisma.player.create({ data: { playerName } }),
+  );
+
+  if (!res.success) return { error: res.error || "Failed to add player." };
+  revalidateTag("allMembers");
+  return { error: null };
+}
+
+export async function addGameStat(
+  formData: FormData,
+): Promise<{ error: string | null }> {
+  const session = await auth();
+  if (!session) return { error: errorCodes.NotAuthenticated };
+
+  const statName = formData.get("statName") as string;
+  const gameId = Number(formData.get("gameId"));
+  const type = formData.get("type") as string;
+
+  if (!statName || !gameId || !type)
+    return { error: "Missing required fields." };
+
+  // const res = await handlePrismaOperation(() =>
+  //   prisma.gameStat.create({
+  //     data: {
+  //       statName: statName, // TODO Refactor
+  //       gameId: gameId,
+  //       type: type === "INT" ? "INT" : "STRING",
+  //     },
+  //   }),
+  // );
+  // if (!res.success) return { error: res.error || "Failed to add game stat." };
+  // revalidateTag("getAllGameStats");
+  return { error: null };
+}

@@ -17,7 +17,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { Session } from "next-auth";
-import prisma from "@/../prisma/db";
+import prisma from "prisma/db";
 
 export default async function Page() {
   const session = (await auth()) as Session;

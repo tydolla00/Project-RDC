@@ -7,7 +7,7 @@ import type { ProcessedSet } from "../(routes)/(groups)/games/[slug]/_components
 // import { createStreamableValue } from "@ai-sdk/rsc";
 
 import { mvpSystemPrompt } from "./prompts";
-import prisma, { handlePrismaOperation } from "../../../prisma/db";
+import prisma, { handlePrismaOperation } from "prisma/db";
 import {
   logMvpUpdateFailure,
   logMvpUpdateSuccess,
