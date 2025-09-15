@@ -16,10 +16,9 @@ import {
   ChartLegendContent,
   ChartConfig,
 } from "@/components/ui/chart";
-import { BarChart, YAxis } from "recharts";
-import { CartesianGrid, XAxis, Bar } from "recharts";
+import { BarChart, YAxis, CartesianGrid, XAxis, Bar } from "recharts";
 
-export const CustomChart = <T extends unknown[]>({
+export function CustomChart<T extends unknown[]>({
   data,
   nameKey,
   config,
@@ -35,7 +34,7 @@ export const CustomChart = <T extends unknown[]>({
   title: string;
   description: string;
   ignoreWarnings?: boolean;
-}) => {
+}): React.ReactElement {
   // if (!ignoreWarnings && data.some((d) => typeof d=== "object" && d !== null && d[nameKey] === undefined))
   //   console.error("NameKey not present in data passed to chart.");
   // if (!ignoreWarnings && data.some((d) => typeof d=== "object" && d !== null && d[dataKey] === undefined))
@@ -69,4 +68,4 @@ export const CustomChart = <T extends unknown[]>({
       <CardFooter></CardFooter>
     </Card>
   );
-};
+}
