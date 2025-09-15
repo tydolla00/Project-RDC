@@ -70,7 +70,7 @@
     "react-hook-form": "^7.57.0",
     "react-scan": "^0.4.3",
     "react-use-measure": "^2.1.7",
-    "recharts": "^2.15.3",
+    "recharts": "^3.1.2",
     "server-only": "^0.0.1",
     "sharp": "^0.34.3",
     "sonner": "^2.0.5",
@@ -79,7 +79,7 @@
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^12.0.0",
     "ws": "^8.18.2",
-    "zod": "^4.0.14"
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -103,7 +103,7 @@
     "prisma": "^6.16.1",
     "prisma-json-types-generator": "^3.5.2",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.4",
+    "tsx": "^4.20.5",
     "typescript": "^5.8.3"
   }
 }

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  Tooltip,
-  TooltipProps,
-  XAxis,
-} from "recharts";
+import { CartesianGrid, Line, LineChart, Tooltip, XAxis } from "recharts";
 
 import {
   Card,
@@ -141,16 +134,27 @@ export function TimelineChart({
   );
 }
 
+type CustomTooltipProps = {
+  active?: boolean;
+  payload?: Array<{
+    payload?: Sessions[0];
+    [key: string]: unknown;
+  }>;
+  label?: string | number;
+};
+
 const CustomTooltip = ({
   active,
   payload,
   setSession,
   showMatchData,
-}: TooltipProps<string, string> & {
+}: CustomTooltipProps & {
   setSession: (session: Sessions[0]) => void;
   showMatchData: boolean;
 }) => {
-  const session = payload?.at(0)?.payload as Sessions[0] | undefined;
+  const session = (payload && payload[0] && payload[0].payload) as
+    | Sessions[0]
+    | undefined;
 
   useEffect(() => {
     if (active && showMatchData && session) {
