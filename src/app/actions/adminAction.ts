@@ -1,6 +1,6 @@
 "use server";
 
-import { GameStat } from "@prisma/client";
+import { GameStatModel as GameStat } from "prisma/generated/models/GameStat";
 import prisma, { handlePrismaOperation } from "prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";

@@ -2,8 +2,10 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["typedSql", "driverAdapters"]
+  provider        = "prisma-client"
+  output = "./generated"
+  engineType = "client"
+  previewFeatures = ["typedSql"]
 }
 
 generator json {

@@ -4,7 +4,7 @@ import {
   VisionResult,
   VisionPlayer,
 } from "@/app/actions/visionAction";
-import { Player } from "@prisma/client";
+import { PlayerModel as Player } from "prisma/generated/models/Player";
 import {
   GameProcessor,
   isAnalyzedTeamDataArray,
