@@ -34,7 +34,7 @@ export const MVP = ({
   // const [generation, setGeneration] = useState<string | null>(null);
 
   return (
-    <Card className="relative overflow-hidden">
+    <Card className="relative h-[400px] overflow-auto">
       <div className="from-primary/10 pointer-events-none absolute top-0 right-0 h-full w-1/2 bg-gradient-to-l to-transparent" />
       <CardHeader>
         <CardTitle className="flex items-center gap-2">MVP</CardTitle>
@@ -44,7 +44,7 @@ export const MVP = ({
         {mvp ? (
           <div className="relative space-y-6">
             <div className="flex items-center gap-4">
-              <Avatar className="border-primary/20 h-16 w-16 border-2">
+              <Avatar className="border-primary/20 sticky top-2 h-16 w-16 border-2">
                 <AvatarImage
                   src={findPlayer(mvp.player)?.image || ""}
                   alt={mvp.player}
@@ -52,7 +52,9 @@ export const MVP = ({
                 <AvatarFallback>{mvp.player[0]}</AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="text-xl font-bold">{mvp.player}</h3>
+                <h3 className="sticky top-2 bg-inherit text-xl font-bold">
+                  {mvp.player}
+                </h3>
                 <p className="text-muted-foreground text-sm">
                   {mvp.description}
                 </p>

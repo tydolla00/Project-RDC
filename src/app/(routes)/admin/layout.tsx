@@ -1,7 +1,15 @@
+import { auth } from "@/auth";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -11,13 +19,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+// import { VersionSwitcher } from "@/components/version-switcher";
 import { AdminProvider } from "@/lib/adminContext";
-
-import { Home, Gamepad, Notebook } from "lucide-react";
-import { cookies } from "next/headers";
+import { Separator } from "@radix-ui/react-separator";
+import { Gamepad, Home, Notebook } from "lucide-react";
+import { cookies, headers } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const items = [
   { label: "Dashboard", icon: Home, href: "/admin" },
@@ -30,45 +41,73 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+  if (!session) redirect("/");
+
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
+  const headersList = await headers();
+  const pathname = headersList.get("x-invoke-path") || "";
+
   return (
-    <div className="m-16">
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <AdminSidebar />
-        <SidebarInset>
-          <AdminProvider>
-            <SidebarTrigger className="-ml-1" />
-            {children}
-          </AdminProvider>
-        </SidebarInset>
-      </SidebarProvider>
-    </div>
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <AdminSidebar pathname={pathname} />
+      <SidebarInset className="m-16">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator
+            orientation="vertical"
+            className="mr-2 data-[orientation=vertical]:h-4"
+          />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="#">
+                  Building Your Application
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </header>
+        <AdminProvider>{children}</AdminProvider>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 
-const AdminSidebar = () => (
-  <Sidebar>
-    <SidebarHeader />
+const AdminSidebar = ({
+  pathname,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { pathname: string }) => (
+  <Sidebar {...props}>
+    <SidebarHeader>
+      {/* <VersionSwitcher
+          versions={data.versions}
+          defaultVersion={data.versions[0]}
+        />
+        <SearchForm /> */}
+    </SidebarHeader>
     <SidebarContent>
-      <SidebarGroup>
-        <SidebarGroupLabel>Admin Panel</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {items.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton asChild>
-                  <Link href={item.href}>
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </Link>
+      {/* We create a SidebarGroup for each parent. */}
+      {items.map((item) => (
+        <SidebarGroup key={item.label}>
+          <SidebarGroupLabel>{item.label}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem key={item.label}>
+                <SidebarMenuButton asChild isActive={pathname === item.href}>
+                  <Link href={item.href}>{item.label}</Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      ))}
     </SidebarContent>
-    <SidebarFooter />
+    <SidebarRail />
   </Sidebar>
 );
