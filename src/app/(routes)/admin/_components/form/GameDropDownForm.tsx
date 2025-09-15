@@ -28,7 +28,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { GameModel as Game } from "prisma/generated/models/Game";
+import { Game } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { getAllGames } from "prisma/lib/games";
 import { FormValues } from "../../_utils/form-helpers";
