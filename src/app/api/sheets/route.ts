@@ -3,9 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import config from "../../../lib/config";
 import { getVideoId } from "@/app/(routes)/admin/_utils/helper-functions";
 import prisma from "prisma/db";
-import { generateObject } from "ai";
+import { generateText } from "ai";
 import { google as aiGoogle } from "@ai-sdk/google";
-import z from "zod";
 import {
   logAiGenFailure,
   logAiGenSuccess,
@@ -89,12 +88,7 @@ export async function GET(req: NextRequest) {
       const lastVideoId = getVideoId(items.at(-1)?.videoId || "");
       let summary: string | null = null;
       try {
-        const summarySchema = z.object({ summary: z.string() });
-
-        const {
-          object: { summary: generatedSummary },
-        } = await generateObject({
-          schema: summarySchema,
+        const { text } = await generateText({
           model: aiGoogle("gemini-2.5-pro"),
           system:
             "You are a concise summarizer. Produce a short summary highlighting the new rows inserted",
@@ -103,7 +97,7 @@ export async function GET(req: NextRequest) {
           )}`,
         });
 
-        summary = generatedSummary;
+        summary = text;
         logAiGenSuccess("Google Drive Summary Generation Success", "cron-job", {
           summary,
           newLastRow,
