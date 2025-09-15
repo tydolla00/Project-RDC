@@ -1,4 +1,4 @@
-import { getSessionById } from "../../../../../../../../prisma/lib/session";
+import { getSessionById } from "prisma/lib/session";
 import { FormValues } from "../../../../_utils/form-helpers";
 import { ApproveSessionForm } from "../_components/ApproveSessionForm";
 
