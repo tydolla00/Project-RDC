@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { neonConfig } from "@neondatabase/serverless";
 // import config from "../lib/config";
@@ -44,26 +44,31 @@ export async function handlePrismaOperation<T>(
   } catch (error) {
     // posthog.captureException(error, v4());
     console.log(error);
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return {
-        success: false,
-        error: `Database error: ${error.message}`,
-        code: error.code,
-        data: null,
-      };
-    }
-    if (error instanceof Prisma.PrismaClientValidationError) {
-      return {
-        success: false,
-        error: "Invalid query parameters",
-        data: null,
-      };
-    }
     return {
       success: false,
-      error: `An unexpected error occurred: ${error}`,
+      error: `Database error: ${error instanceof Error ? error.message : "Unknown error"}`,
       data: null,
     };
+    // if (error instanceof PrismaClientKnownRequestError) {
+    //   return {
+    //     success: false,
+    //     error: `Database error: ${error.message}`,
+    //     code: error.code,
+    //     data: null,
+    //   };
+    // }
+    // if (error instanceof PrismaClientValidationError) {
+    //   return {
+    //     success: false,
+    //     error: "Invalid query parameters",
+    //     data: null,
+    //   };
+    // }
+    // return {
+    //   success: false,
+    //   error: `An unexpected error occurred: ${error}`,
+    //   data: null,
+    // };
   }
 }
 
