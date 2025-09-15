@@ -1,4 +1,4 @@
-import { Player } from "@prisma/client";
+import { PlayerModel as Player } from "prisma/generated/models/Player";
 import React from "react";
 import { useFieldArray } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
