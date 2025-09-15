@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { GameStat } from "@prisma/client";
+import { GameStatModel as GameStat } from "prisma/generated/models/GameStat";
 import { getGameStats } from "@/app/actions/adminAction";
 import { ReactNode } from "react";
 

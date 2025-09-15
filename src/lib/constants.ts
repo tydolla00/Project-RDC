@@ -1,4 +1,4 @@
-import { $Enums } from "@prisma/client";
+import { StatName } from "prisma/generated/enums";
 import { getAllGames } from "prisma/lib/games";
 import { getAllMembers } from "prisma/lib/members";
 import { findPlayer } from "../app/(routes)/admin/_utils/player-mappings";
@@ -104,24 +104,24 @@ export const gameImages = {
   [GamesEnum.CallOfDuty]: "callofduty.jpeg",
 };
 
-export const statDescriptions: { [key in $Enums.StatName]: string } = {
-  [$Enums.StatName.MK8_DAY]: "Mario Kart 8 Days",
-  [$Enums.StatName.MK8_POS]: "Mario Kart 8 Position",
-  [$Enums.StatName.COD_SCORE]: "Call of Duty Score",
-  [$Enums.StatName.COD_KILLS]: "Call of Duty Kills",
-  [$Enums.StatName.COD_DEATHS]: "Call of Duty Deaths",
-  [$Enums.StatName.COD_MELEES]: "Call of Duty Melees",
-  [$Enums.StatName.COD_POS]: "Call of Duty Position",
-  [$Enums.StatName.LC_DEATHS]: "Lethal Company Deaths",
-  [$Enums.StatName.SR_SETS]: "Speedrunners Sets",
-  [$Enums.StatName.SR_WINS]: "Speedrunners Wins",
-  [$Enums.StatName.SR_POS]: "Speedrunners Position",
-  [$Enums.StatName.RL_GOALS]: "Rocket League Goals",
-  [$Enums.StatName.RL_ASSISTS]: "Rocket League Assists",
-  [$Enums.StatName.RL_SAVES]: "Rocket League Saves",
-  [$Enums.StatName.RL_SHOTS]: "Rocket League Shots",
-  [$Enums.StatName.RL_SCORE]: "Rocket League Score",
-  [$Enums.StatName.RL_DAY]: "Rocket League Position",
+export const statDescriptions: { [key in StatName]: string } = {
+  [StatName.MK8_DAY]: "Mario Kart 8 Days",
+  [StatName.MK8_POS]: "Mario Kart 8 Position",
+  [StatName.COD_SCORE]: "Call of Duty Score",
+  [StatName.COD_KILLS]: "Call of Duty Kills",
+  [StatName.COD_DEATHS]: "Call of Duty Deaths",
+  [StatName.COD_MELEES]: "Call of Duty Melees",
+  [StatName.COD_POS]: "Call of Duty Position",
+  [StatName.LC_DEATHS]: "Lethal Company Deaths",
+  [StatName.SR_SETS]: "Speedrunners Sets",
+  [StatName.SR_WINS]: "Speedrunners Wins",
+  [StatName.SR_POS]: "Speedrunners Position",
+  [StatName.RL_GOALS]: "Rocket League Goals",
+  [StatName.RL_ASSISTS]: "Rocket League Assists",
+  [StatName.RL_SAVES]: "Rocket League Saves",
+  [StatName.RL_SHOTS]: "Rocket League Shots",
+  [StatName.RL_SCORE]: "Rocket League Score",
+  [StatName.RL_DAY]: "Rocket League Position",
 };
 
 export enum errorCodes {

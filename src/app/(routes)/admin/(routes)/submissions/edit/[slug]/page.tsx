@@ -1,6 +1,6 @@
 import EntryCreatorForm from "../../../../_components/form/EntryCreatorForm";
 import prisma, { handlePrismaOperation } from "prisma/db";
-import { Player } from "@prisma/client";
+import { PlayerModel as Player } from "prisma/generated/models/Player";
 import { FormValues } from "../../../../_utils/form-helpers";
 
 export default async function Page({
