@@ -15,7 +15,7 @@ reviews:
   fail_commit_status: false
   collapse_walkthrough: true
   changed_files_summary: true
-  sequence_diagrams: true
+  sequence_diagrams: false
   assess_linked_issues: true
   related_issues: true
   related_prs: true

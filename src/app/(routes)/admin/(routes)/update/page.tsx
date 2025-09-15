@@ -7,11 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  getAllGameStats,
-  getAllGames,
-} from "../../../../../../prisma/lib/games";
-import { getAllMembers } from "../../../../../../prisma/lib/members";
+import { getAllGameStats, getAllGames } from "prisma/lib/games";
+import { getAllMembers } from "prisma/lib/members";
 import { addGame, addPlayer, addGameStat } from "@/app/actions/adminAction";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
