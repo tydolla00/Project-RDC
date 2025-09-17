@@ -58,43 +58,6 @@ model GameSetToPlayer {
   @@map("_GameSetToPlayer")
 }
 
-enum StatName {
-  MK8_POS
-  MK8_DAY
-  RL_SCORE
-  RL_GOALS
-  RL_ASSISTS
-  RL_SAVES
-  RL_SHOTS
-  RL_DAY
-  COD_KILLS
-  COD_DEATHS
-  COD_SCORE
-  COD_POS
-  COD_MELEES
-  LC_DEATHS
-  SR_WINS
-  SR_SETS
-  SR_POS
-  MR_KILLS
-  MR_DEATHS
-  MR_ASSISTS
-  MR_TRIPLE_KILL
-  MR_QUADRA_KILL
-  MR_PENTA_KILL
-  MR_HEXA_KILL
-  MR_MEDALS
-  MR_HIGHEST_DMG
-  MR_HIGHEST_DMG_BLOCKED
-  MR_MOST_HEALING
-  MR_MOST_ASSISTS_FIST
-  MR_FINAL_HITS
-  MR_DMG
-  MR_DMG_BLOCKED
-  MR_HEALING
-  MR_ACCURACY
-}
-
 enum StatType {
   INT
   STRING
@@ -103,7 +66,7 @@ enum StatType {
 // { stat_id: 1, game_id: 1, stat_name: 'MK_POS', playerStats: [], type: 'int' }
 model GameStat {
   statId      Int          @id @default(autoincrement()) @map("stat_id")
-  statName    StatName     @map("stat_name")
+  statName    String     @map("stat_name")
   gameId      Int          @map("game_id")
   game        Game         @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
   playerStats PlayerStat[]

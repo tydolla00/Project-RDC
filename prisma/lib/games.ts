@@ -2,7 +2,7 @@
 
 import { unstable_cache } from "next/cache";
 import prisma, { handlePrismaOperation } from "../db";
-import { StatName } from "@prisma/client";
+import { StatName } from "@/lib/stat-names";
 import { getSumOfStat } from "@prisma/client/sql";
 
 export type StatEndsWith<

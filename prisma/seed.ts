@@ -1,9 +1,46 @@
-import { StatName } from "@prisma/client";
+import { statNames } from "@/lib/stat-names";
 import * as fs from "fs";
 import prisma from "./db";
 import { capitalizeFirst } from "@/lib/utils";
 import { MembersEnum } from "@/lib/constants";
 import { EnrichedSession } from "./types/session";
+
+const [
+  MK8_POS,
+  MK8_DAY,
+  RL_SCORE,
+  RL_GOALS,
+  RL_ASSISTS,
+  RL_SAVES,
+  RL_SHOTS,
+  RL_DAY,
+  COD_KILLS,
+  COD_DEATHS,
+  COD_SCORE,
+  COD_POS,
+  COD_MELEES,
+  LC_DEATHS,
+  SR_WINS,
+  SR_SETS,
+  SR_POS,
+  MR_KILLS,
+  MR_DEATHS,
+  MR_ASSISTS,
+  MR_TRIPLE_KILL,
+  MR_QUADRA_KILL,
+  MR_PENTA_KILL,
+  MR_HEXA_KILL,
+  MR_MEDALS,
+  MR_HIGHEST_DMG,
+  MR_HIGHEST_DMG_BLOCKED,
+  MR_MOST_HEALING,
+  MR_MOST_ASSISTS_FIST,
+  MR_FINAL_HITS,
+  MR_DMG,
+  MR_DMG_BLOCKED,
+  MR_HEALING,
+  MR_ACCURACY,
+] = statNames;
 
 /**
  * Seeds the database with RDC members, games, and sessions.
@@ -122,10 +159,7 @@ async function seedGames() {
     create: {
       gameName: "Mario Kart 8",
       gameStats: {
-        create: [
-          { statName: StatName.MK8_POS },
-          { statName: StatName.MK8_DAY },
-        ],
+        create: [{ statName: MK8_POS }, { statName: MK8_DAY }],
       },
     },
   });
@@ -137,12 +171,12 @@ async function seedGames() {
       gameName: "Rocket League",
       gameStats: {
         create: [
-          { statName: StatName.RL_SCORE },
-          { statName: StatName.RL_GOALS },
-          { statName: StatName.RL_ASSISTS },
-          { statName: StatName.RL_SAVES },
-          { statName: StatName.RL_SHOTS },
-          { statName: StatName.RL_DAY },
+          { statName: RL_SCORE },
+          { statName: RL_GOALS },
+          { statName: RL_ASSISTS },
+          { statName: RL_SAVES },
+          { statName: RL_SHOTS },
+          { statName: RL_DAY },
         ],
       },
     },
@@ -155,11 +189,11 @@ async function seedGames() {
       gameName: "Call of Duty",
       gameStats: {
         create: [
-          { statName: StatName.COD_SCORE },
-          { statName: StatName.COD_KILLS },
-          { statName: StatName.COD_DEATHS },
-          { statName: StatName.COD_MELEES },
-          { statName: StatName.COD_POS },
+          { statName: COD_SCORE },
+          { statName: COD_KILLS },
+          { statName: COD_DEATHS },
+          { statName: COD_POS },
+          { statName: COD_MELEES },
         ],
       },
     },
@@ -171,21 +205,21 @@ async function seedGames() {
     create: {
       gameName: "Lethal Company",
       gameStats: {
-        create: [{ statName: StatName.LC_DEATHS }],
+        create: [{ statName: LC_DEATHS }],
       },
     },
   });
 
   await prisma.game.upsert({
-    where: { gameName: "Speedrunners" },
+    where: { gameName: "SpeedRunners" },
     update: {},
     create: {
-      gameName: "Speedrunners",
+      gameName: "SpeedRunners",
       gameStats: {
         create: [
-          { statName: StatName.SR_SETS },
-          { statName: StatName.SR_WINS },
-          { statName: StatName.SR_POS },
+          { statName: SR_WINS },
+          { statName: SR_SETS },
+          { statName: SR_POS },
         ],
       },
     },
@@ -198,31 +232,31 @@ async function seedGames() {
       gameName: "Marvel Rivals",
       gameStats: {
         create: [
-          { statName: StatName.MR_KILLS },
-          { statName: StatName.MR_DEATHS },
-          { statName: StatName.MR_ASSISTS },
-          { statName: StatName.MR_TRIPLE_KILL },
-          { statName: StatName.MR_QUADRA_KILL },
-          { statName: StatName.MR_PENTA_KILL },
-          { statName: StatName.MR_HEXA_KILL },
-          { statName: StatName.MR_MEDALS },
-          { statName: StatName.MR_HIGHEST_DMG },
-          { statName: StatName.MR_HIGHEST_DMG_BLOCKED },
-          { statName: StatName.MR_MOST_HEALING },
-          { statName: StatName.MR_MOST_ASSISTS_FIST },
-          { statName: StatName.MR_FINAL_HITS },
-          { statName: StatName.MR_DMG },
-          { statName: StatName.MR_DMG_BLOCKED },
-          { statName: StatName.MR_HEALING },
-          { statName: StatName.MR_ACCURACY },
+          { statName: MR_KILLS },
+          { statName: MR_DEATHS },
+          { statName: MR_ASSISTS },
+          { statName: MR_TRIPLE_KILL },
+          { statName: MR_QUADRA_KILL },
+          { statName: MR_PENTA_KILL },
+          { statName: MR_HEXA_KILL },
+          { statName: MR_MEDALS },
+          { statName: MR_HIGHEST_DMG },
+          { statName: MR_HIGHEST_DMG_BLOCKED },
+          { statName: MR_MOST_HEALING },
+          { statName: MR_MOST_ASSISTS_FIST },
+          { statName: MR_FINAL_HITS },
+          { statName: MR_DMG },
+          { statName: MR_DMG_BLOCKED },
+          { statName: MR_HEALING },
+          { statName: MR_ACCURACY },
         ],
       },
     },
   });
-
-  console.log("Games seeded successfully\n");
+  console.log("Games Seeded Successfully.\n");
 }
 
+// Import and Process Sessions
 async function importSessions() {
   /**
    * Imports sessions from a JSON file and populates the database.
@@ -233,7 +267,7 @@ async function importSessions() {
 
   // Read the sessions.json file
   // ! Add File Path Here
-  const sessionsPath = "/Users/silver/repos/Project-RDC/sessions_backup.json";
+  const sessionsPath = "D:/repos/Project-RDC/sessions_backup.json";
   let sessionsData: EnrichedSession[];
 
   try {

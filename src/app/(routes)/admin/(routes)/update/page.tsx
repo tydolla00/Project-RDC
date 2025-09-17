@@ -34,7 +34,9 @@ export default async function Page() {
             ) : (
               stats.data.map((stat) => (
                 <SelectItem key={stat.statId} value={stat.statName}>
-                  {statDescriptions[stat.statName]}
+                  {statDescriptions[
+                    stat.statName as keyof typeof statDescriptions
+                  ] ?? stat.statName}
                 </SelectItem>
               ))
             )}
