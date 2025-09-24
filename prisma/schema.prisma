@@ -2,8 +2,10 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["typedSql", "driverAdapters"]
+  provider        = "prisma-client"
+  output = "./generated"
+  engineType = "client"
+  previewFeatures = ["typedSql"]
 }
 
 generator json {
@@ -199,4 +201,15 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model SheetSync {
+  id          Int      @id @default(autoincrement())
+  sheetName   String   @unique
+  lastRow     Int      @default(0)
+  lastVideoId String?
+  lastUpdated DateTime @updatedAt
+  summary     String?
+
+  @@map("sheet_sync")
 }

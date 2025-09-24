@@ -1,6 +1,6 @@
 import { H1 } from "@/components/headings";
-import { getAllGames } from "../../../../../../prisma/lib/games";
-import { getAllSessionsByGame } from "../../../../../../prisma/lib/admin"; // Import getAllSessions
+import { getAllGames, getWinsPerPlayer } from "prisma/lib/games";
+import { getAllSessionsByGame } from "prisma/lib/admin"; // Import getAllSessions
 import Mariokart from "./_components/games/mariokart";
 import CallOfDuty from "./_components/games/callofduty";
 import RocketLeague from "./_components/games/rocketleague";
@@ -10,9 +10,16 @@ import LethalCompany from "./_components/games/lethalcompany";
 import { gameImages, GamesEnum } from "@/lib/constants";
 import { TimelineChart } from "./_components/timeline/timeline-chart";
 import { Separator } from "@/components/ui/separator";
+import { getAllMembers } from "prisma/lib/members";
+import { NoMembers } from "../../members/_components/members";
+import { calcWinsPerPlayer } from "./_helpers/stats";
 
 // ? Force non specified routes to return 404
 export const dynamicParams = false; // true | false,
+
+export type Members = NonNullable<
+  Awaited<ReturnType<typeof getAllMembers>>["data"]
+>;
 
 export async function generateStaticParams() {
   const games = await getAllGames();
@@ -43,21 +50,60 @@ export default async function Page({
   const gameName = slug as GamesEnum;
   let component: React.ReactNode;
 
+  const members = await getAllMembers();
+  const wins = await getWinsPerPlayer(game.gameId);
+  if (!wins.success || !wins.data) wins.data = { sessions: [] };
+  const winsPerPlayer = calcWinsPerPlayer(wins.data);
+
+  if (!members.success || !members.data) {
+    return <NoMembers />;
+  }
+
   switch (gameName) {
     case GamesEnum.MarioKart8:
-      component = <Mariokart game={game} />;
+      component = (
+        <Mariokart
+          game={game}
+          members={members.data}
+          winsPerPlayer={winsPerPlayer}
+        />
+      );
       break;
     case GamesEnum.CallOfDuty:
-      component = <CallOfDuty game={game} />;
+      component = (
+        <CallOfDuty
+          game={game}
+          members={members.data}
+          winsPerPlayer={winsPerPlayer}
+        />
+      );
       break;
     case GamesEnum.RocketLeague:
-      component = <RocketLeague game={game} />;
+      component = (
+        <RocketLeague
+          game={game}
+          members={members.data}
+          winsPerPlayer={winsPerPlayer}
+        />
+      );
       break;
     case GamesEnum.SpeedRunners:
-      component = <Speedrunners game={game} />;
+      component = (
+        <Speedrunners
+          game={game}
+          members={members.data}
+          winsPerPlayer={winsPerPlayer}
+        />
+      );
       break;
     case GamesEnum.LethalCompany:
-      component = <LethalCompany game={game} />;
+      component = (
+        <LethalCompany
+          game={game}
+          members={members.data}
+          winsPerPlayer={winsPerPlayer}
+        />
+      );
       break;
     // case "golfwithfriends":
     //   component = <GolfWithFriends game={game} />;

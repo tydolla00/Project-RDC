@@ -32,7 +32,7 @@ import {
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { EnrichedSession } from "../../../../../prisma/types/session";
+import { EnrichedSession } from "prisma/types/session";
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];

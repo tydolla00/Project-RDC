@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Player } from "@prisma/client";
+import { PlayerModel as Player } from "prisma/generated/models/Player";
 import SetManager from "./SetManager";
 import { insertNewSessionFromAdmin } from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
@@ -23,31 +23,16 @@ import { userSignOut } from "@/app/actions/signOut";
 
 interface AdminFormProps {
   rdcMembers: Player[];
+  defaultValues?: FormValues;
 }
 
-const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
-  const [isLoading, setIsLoading] = useState(false);
+const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
   const [step, setStep] = useState(0);
   const [modifier, setModifier] = useState(0);
 
   const form = useForm<FormValues, unknown>({
     resolver: zodResolver(formSchema),
-
-    // async (data, context, options) => {
-    //   try {
-    //     // Validate the form data against the Zod schema
-    //     console.log(await formSchema.parseAsync(data));
-    //   } catch (error) {
-    //     // If validation fails, return the error to the resolver
-    //     console.log(error);
-    //     return {
-    //       values: {},
-    //       errors: error.flatten().fieldErrors,
-    //     };
-    //   }
-    //   return zodResolver(formSchema)(data, context, options);
-    // },
-    defaultValues: {
+    defaultValues: defaultValues || {
       game: "Mario Kart 8",
       sessionName: "",
       sessionUrl: "https://www.youtube.com/watch?v=",
@@ -57,6 +42,7 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
     },
     mode: "onChange",
   });
+  console.log(form.formState.isDirty); // make sure formState is read before render to enable the Proxy
 
   const { handleSubmit } = form;
 
@@ -73,8 +59,6 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
    * If the insertion is successful, displays a success toast message and revalidates the session data.
    */
   const onSubmit = async (data: FormValues): Promise<void> => {
-    setIsLoading(true);
-
     console.log("Form Data Being Submitted:", {
       data,
       stringified: JSON.stringify(data, null, 2),
@@ -94,7 +78,6 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
       form.reset();
       setStep(0);
     }
-    setIsLoading(false);
   };
 
   /**
@@ -184,7 +167,6 @@ const EntryCreatorForm = ({ rdcMembers }: AdminFormProps) => {
                   </motion.div>
                   <NavigationButtons
                     form={form}
-                    isPending={isLoading}
                     step={step}
                     setStep={setStep}
                     setModifier={setModifier}

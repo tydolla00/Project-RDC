@@ -127,8 +127,7 @@ const StatsTable = ({
   game?: string;
 }) => {
   if (!players.length) return null;
-  const isRocketLeague = (p: PlayerStats): p is RLPlayerStats =>
-    "score" in p;
+  const isRocketLeague = (p: PlayerStats): p is RLPlayerStats => "score" in p;
   const isMarioKart = (p: PlayerStats): p is MarioKartPlayerStats =>
     "position" in p;
   const isCoDStats = (p: PlayerStats): p is CoDPlayerStats => "kills" in p;

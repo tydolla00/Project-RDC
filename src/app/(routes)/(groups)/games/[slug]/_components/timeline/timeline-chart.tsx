@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  Tooltip,
-  TooltipProps,
-  XAxis,
-} from "recharts";
+import { CartesianGrid, Line, LineChart, Tooltip, XAxis } from "recharts";
 
 import {
   Card,
@@ -17,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { getAllSessionsByGame } from "../../../../../../../../prisma/lib/admin";
+import { getAllSessionsByGame } from "prisma/lib/admin";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
@@ -25,7 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 import { gameImages } from "@/lib/constants";
-import { QueryResponseData } from "../../../../../../../../prisma/db";
+import { QueryResponseData } from "prisma/db";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { VideoInfo } from "./video-info";
@@ -141,16 +134,27 @@ export function TimelineChart({
   );
 }
 
+type CustomTooltipProps = {
+  active?: boolean;
+  payload?: Array<{
+    payload?: Sessions[0];
+    [key: string]: unknown;
+  }>;
+  label?: string | number;
+};
+
 const CustomTooltip = ({
   active,
   payload,
   setSession,
   showMatchData,
-}: TooltipProps<string, string> & {
+}: CustomTooltipProps & {
   setSession: (session: Sessions[0]) => void;
   showMatchData: boolean;
 }) => {
-  const session = payload?.at(0)?.payload as Sessions[0] | undefined;
+  const session = (payload && payload[0] && payload[0].payload) as
+    | Sessions[0]
+    | undefined;
 
   useEffect(() => {
     if (active && showMatchData && session) {

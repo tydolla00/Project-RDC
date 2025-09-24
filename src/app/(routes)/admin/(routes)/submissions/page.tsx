@@ -2,10 +2,15 @@ import { Suspense } from "react";
 import { SubmissionTable } from "../../_components/SubmissionTable";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
+  const resolvedSearchParams = await searchParams;
   return (
     <Suspense fallback={<Skeleton className="h-72 w-full" />}>
-      <SubmissionTable />
+      <SubmissionTable page={resolvedSearchParams.page} />
     </Suspense>
   );
 }

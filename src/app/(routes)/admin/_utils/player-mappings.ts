@@ -1,4 +1,3 @@
-import { Player } from "@prisma/client";
 import z from "zod";
 import { playerSchema } from "./form-helpers";
 
@@ -149,7 +148,12 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
     aliases: ["john"],
     gamerTags: ["I will never forget that day in Lockdown..."],
     image: "/images/john_rdc.jpg",
-    nav: { alt: "RDC John", name: "J.O.H.N.", url: "/members/john", src: "/images/john_rdc.jpg" },
+    nav: {
+      alt: "RDC John",
+      name: "J.O.H.N.",
+      url: "/members/john",
+      src: "/images/john_rdc.jpg",
+    },
     desc: "If you've ever seen or been to DreamCon, this man has had a hand in it. Don't let his sorry gaming skills fool you, John is very valuable in the backend and his contributions should not go unnoticed. Don't forget his immaculate singing ability, John is clearly the best singer in RDC.",
     stats: [
       { prop: "", val: "" },
@@ -182,7 +186,12 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
     aliases: ["ipi"],
     gamerTags: ["iceman_ip"],
     image: "/images/ipi_rdc.jpg",
-    nav: { alt: "Ipi", name: "Iceman Ip", url: "/members/ipi", src: "/images/ipi_rdc.jpg" },
+    nav: {
+      alt: "Ipi",
+      name: "Iceman Ip",
+      url: "/members/ipi",
+      src: "/images/ipi_rdc.jpg",
+    },
     desc: "Ipi is a newcomer in the eyes of RDC, while not yet an official member of RDC yet, one can assume that it's only a matter of time as he has been beating down the crew in Golf and Mario Kart.",
     stats: [
       { prop: "", val: "" },
@@ -192,19 +201,16 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
   },
 } as const;
 
-export const findPlayer = (searchTerm: string): Player | undefined => {
-  const lowerCaseSearchTerm = searchTerm.toLowerCase();
+export const findPlayer = (searchTerm: string) => {
+  const lowerCasePlayer = searchTerm.toLowerCase();
   for (const playerName in PLAYER_MAPPINGS) {
     const player = PLAYER_MAPPINGS[playerName as keyof PlayerMapping];
     if (
-      player.playerName.toLowerCase() === lowerCaseSearchTerm ||
-      player.aliases.includes(lowerCaseSearchTerm) ||
-      player.gamerTags.some((tag) => tag.toLowerCase() === lowerCaseSearchTerm)
+      player.playerName.toLowerCase() === lowerCasePlayer ||
+      player.aliases.some((alias) => alias.toLowerCase() === lowerCasePlayer) ||
+      player.gamerTags.some((tag) => tag.toLowerCase() === lowerCasePlayer)
     ) {
-      return {
-        playerId: player.playerId,
-        playerName: player.playerName,
-      } as Player;
+      return player;
     }
   }
   return undefined;

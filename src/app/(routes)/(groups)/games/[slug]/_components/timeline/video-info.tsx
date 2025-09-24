@@ -40,7 +40,7 @@ export const VideoInfo = ({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {session ? (
           <>
-            <div className="space-y-4">
+            <div className="flex h-[400px] flex-col space-y-4">
               <Link
                 target="_blank"
                 rel="noreferrer noopener"
@@ -60,7 +60,7 @@ export const VideoInfo = ({
               </Link>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full flex-1">
                     Show Session Data
                   </Button>
                 </DialogTrigger>
