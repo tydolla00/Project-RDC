@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
-import { getAllGames } from "../../prisma/lib/games";
-import { getAllMembers } from "../../prisma/lib/members";
+import { getAllGames } from "prisma/lib/games";
+import { getAllMembers } from "prisma/lib/members";
 
 /**
  * Generates a sitemap for the Project-RDC application.

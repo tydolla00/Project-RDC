@@ -1,12 +1,12 @@
-import { $Enums, StatName } from "@prisma/client";
+import type { StatName } from "prisma/generated/enums";
 import {
   getWinsPerPlayer,
   getMatchesPerGame,
   StatEndsWith,
   getStatPerPlayer,
   getSumPerStat,
-} from "../../../../../../../prisma/lib/games";
-import { QueryResponseData } from "../../../../../../../prisma/db";
+} from "prisma/lib/games";
+import { QueryResponseData } from "prisma/db";
 import { Decimal } from "@prisma/client/runtime/library";
 import { logNAN } from "@/posthog/server-analytics";
 
@@ -28,7 +28,7 @@ type SumAndAvg<
 
 export const getAvgAndSum = async (
   playerId: number,
-  stats: $Enums.StatName[],
+  stats: StatName[],
 ): Promise<SumAndAvg<typeof stats, "RL" | "COD" | "MK8" | "LC" | "SR">> => {
   return await Promise.all(
     stats.map((stat) => getSumPerStat(Number(playerId), stat)),
@@ -125,6 +125,7 @@ export const calcMostPerPlacing = async (
       for (const match of set.matches) {
         const race = [];
         for (const ps of match.playerSessions) {
+          // TODO Potentially unsafe if no stats found
           const pos = Number(ps.playerStats[0].value);
           if (isNaN(pos)) {
             logNAN("calcMostPerPlacing", ps.playerStats[0].playerStatId);

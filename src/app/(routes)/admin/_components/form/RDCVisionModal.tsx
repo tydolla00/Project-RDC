@@ -28,7 +28,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Player } from "@prisma/client";
+import { PlayerModel as Player } from "prisma/generated/models/Player";
 import Image from "next/image";
 import { VisionResultCodes } from "@/lib/constants";
 import { toast } from "sonner";

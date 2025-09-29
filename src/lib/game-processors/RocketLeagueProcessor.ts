@@ -3,7 +3,7 @@ import {
   AnalyzedPlayersObj,
 } from "@/app/actions/visionAction";
 import { VisionPlayer, VisionResult } from "../visionTypes";
-import { Player } from "@prisma/client";
+import { PlayerModel as Player } from "prisma/generated/models/Player";
 import { RL_TEAM_MAPPING, VisionResultCodes } from "../constants";
 import {
   GameProcessor,

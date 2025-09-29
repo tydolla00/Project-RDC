@@ -5,6 +5,7 @@ import { ErrorModelOutput } from "@azure-rest/ai-document-intelligence";
 import { Session } from "next-auth";
 import { v4 } from "uuid";
 import type { MvpOutput } from "@/app/ai/types";
+import { after } from "next/server";
 
 /**
  * Logs an authentication error to PostHog
@@ -113,5 +114,60 @@ export const logMvpUpdateSuccess = async (
       timeStamp,
       fnDuration: duration,
     },
+  });
+};
+
+export const logDriveCronJobError = (
+  message: string,
+  additionalInfo?: Record<string, unknown>,
+) => {
+  after(() => {
+    posthog.captureException(message, "cron-job", {
+      ...additionalInfo,
+    });
+  });
+};
+
+export const logDriveCronJobSuccess = (
+  message: string,
+  additionalInfo?: Record<string, unknown>,
+) => {
+  after(() => {
+    posthog.capture({
+      event: "drive-read-success",
+      distinctId: "cron-job",
+      properties: {
+        message,
+        ...additionalInfo,
+      },
+    });
+  });
+};
+
+export const logAiGenSuccess = (
+  event: string,
+  distinctId: string,
+  additionalInfo: Record<string, unknown>,
+) => {
+  after(() => {
+    posthog.capture({
+      event,
+      distinctId,
+      properties: {
+        ...additionalInfo,
+      },
+    });
+  });
+};
+
+export const logAiGenFailure = (
+  error: unknown,
+  distinctId: string,
+  additionalInfo?: Record<string, unknown>,
+) => {
+  after(() => {
+    posthog.captureException(error, distinctId, {
+      ...additionalInfo,
+    });
   });
 };

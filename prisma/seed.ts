@@ -263,12 +263,12 @@ async function importSessions() {
    *
    * Reads sessions.json, processes each session, and logs progress/errors.
    */
-  console.log("Importing sessions from sessions.json...");
 
   // Read the sessions.json file
   // ! Add File Path Here
   const sessionsPath = "D:/repos/Project-RDC/sessions_backup.json";
   let sessionsData: EnrichedSession[];
+  console.log(`Importing sessions from ${sessionsPath}...`);
 
   try {
     sessionsData = JSON.parse(fs.readFileSync(sessionsPath, "utf-8"));
@@ -279,26 +279,28 @@ async function importSessions() {
     throw error;
   }
 
-  // Process each session
-  for (const sessionData of sessionsData) {
+  // Process sessions in parallel with configurable concurrency
+  const concurrency = Number(process.env.SEED_CONCURRENCY) || 4;
+  console.log(
+    `Importing ${sessionsData.length} sessions with concurrency=${concurrency}`,
+  );
+
+  const processSession = async (sessionData: EnrichedSession) => {
     try {
-      // First find the game outside of transaction
       const game = await prisma.game.findFirst({
         where: { gameName: sessionData.Game.gameName },
       });
-
       if (!game) {
         console.log(
           `Skipping session ${sessionData.sessionId} (${sessionData.sessionName}) - game ${sessionData.Game.gameName} not found`,
         );
-        continue;
+        return;
       }
 
       console.log(
         `Processing session ${sessionData.sessionId}: ${sessionData.sessionName}`,
       );
 
-      // Create session
       const session = await prisma.session.create({
         data: {
           sessionName: sessionData.sessionName,
@@ -306,7 +308,7 @@ async function importSessions() {
           thumbnail: sessionData.thumbnail,
           videoId: sessionData.videoId,
           gameId: game.gameId,
-          date: sessionData.date || new Date(),
+          date: new Date(sessionData.date),
           dayWinners: {
             connect: sessionData.dayWinners.map((sd) => ({
               playerId: sd.playerId,
@@ -318,26 +320,20 @@ async function importSessions() {
         },
       });
 
-      // Process each set in its own transaction
+      // TODO Need to handle dynamic stats and players
+
       for (const setData of sessionData.sets) {
         await prisma.$transaction(
           async (tx) => {
             const set = await tx.gameSet.create({
-              data: {
-                sessionId: session.sessionId,
-              },
+              data: { sessionId: session.sessionId },
             });
 
-            // Process matches
             for (const matchData of setData.matches) {
               const match = await tx.match.create({
-                data: {
-                  setId: set.setId,
-                  date: new Date(matchData.date),
-                },
+                data: { setId: set.setId, date: new Date(matchData.date) },
               });
 
-              // Process player sessions and stats
               for (const playerSessionData of matchData.playerSessions) {
                 const playerSession = await tx.playerSession.create({
                   data: {
@@ -348,27 +344,27 @@ async function importSessions() {
                   },
                 });
 
-                // Create player stats in batch using createMany
-                await tx.playerStat.createMany({
-                  data: playerSessionData.playerStats.map((statData) => ({
-                    value: statData.value,
-                    date: new Date(statData.date),
-                    playerId: playerSessionData.player.playerId,
-                    gameId: game.gameId,
-                    playerSessionId: playerSession.playerSessionId,
-                    statId: statData.gameStat.statId,
-                  })),
-                });
+                if (playerSessionData.playerStats?.length) {
+                  await tx.playerStat.createMany({
+                    data: playerSessionData.playerStats.map((statData) => ({
+                      value: statData.value,
+                      date: new Date(statData.date),
+                      playerId: playerSessionData.player.playerId,
+                      gameId: game.gameId,
+                      playerSessionId: playerSession.playerSessionId,
+                      statId: statData.gameStat.statId,
+                    })),
+                  });
+                }
               }
 
-              // Set match winners
               if (matchData.matchWinners?.length) {
                 await tx.match.update({
                   where: { matchId: match.matchId },
                   data: {
                     matchWinners: {
-                      connect: matchData.matchWinners.map((winner) => ({
-                        playerId: winner.playerId,
+                      connect: matchData.matchWinners.map((w) => ({
+                        playerId: w.playerId,
                       })),
                     },
                   },
@@ -376,24 +372,20 @@ async function importSessions() {
               }
             }
 
-            // Set set winners if they exist
             if (setData.setWinners?.length) {
               await tx.gameSet.update({
                 where: { setId: set.setId },
                 data: {
                   setWinners: {
-                    connect: setData.setWinners.map((winner) => ({
-                      playerId: winner.playerId,
+                    connect: setData.setWinners.map((w) => ({
+                      playerId: w.playerId,
                     })),
                   },
                 },
               });
             }
           },
-          {
-            timeout: 20000, // 20 second timeout for each set transaction
-            maxWait: 25000, // Maximum time to wait for transaction
-          },
+          { timeout: 20000, maxWait: 25000 },
         );
       }
 
@@ -405,10 +397,25 @@ async function importSessions() {
         `Failed to import session ${sessionData.sessionId} (${sessionData.sessionName}):`,
         error instanceof Error ? error.message : "Unknown error",
       );
-      // Continue with next session instead of throwing
-      continue;
     }
+  };
+
+  // Simple worker pool
+  let nextIndex = 0;
+  const workers: Promise<void>[] = [];
+  for (let i = 0; i < concurrency; i++) {
+    workers.push(
+      (async () => {
+        while (true) {
+          const idx = nextIndex++;
+          if (idx >= sessionsData.length) return;
+          await processSession(sessionsData[idx]);
+        }
+      })(),
+    );
   }
+
+  await Promise.all(workers);
 
   console.log("All sessions imported successfully");
 }

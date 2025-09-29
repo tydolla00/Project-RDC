@@ -1,6 +1,8 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters", "typedSql"]
+  provider        = "prisma-client"
+  output          = "./generated"
+  engineType      = "client"
+  previewFeatures = ["typedSql"]
 }
 
 generator json {
@@ -66,7 +68,7 @@ enum StatType {
 // { stat_id: 1, game_id: 1, stat_name: 'MK_POS', playerStats: [], type: 'int' }
 model GameStat {
   statId      Int          @id @default(autoincrement()) @map("stat_id")
-  statName    String     @map("stat_name")
+  statName    String       @map("stat_name")
   gameId      Int          @map("game_id")
   game        Game         @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
   playerStats PlayerStat[]
@@ -170,4 +172,15 @@ model PlayerStat {
   date            DateTime      @default(now()) // Date video posted
 
   @@map("player_stats")
+}
+
+model SheetSync {
+  id          Int      @id @default(autoincrement())
+  sheetName   String   @unique
+  lastRow     Int      @default(0)
+  lastVideoId String?
+  lastUpdated DateTime @updatedAt
+  summary     String?
+
+  @@map("sheet_sync")
 }

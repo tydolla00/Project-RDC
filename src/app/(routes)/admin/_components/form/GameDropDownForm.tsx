@@ -28,9 +28,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Game } from "@prisma/client";
+import { GameModel as Game } from "prisma/generated/models/Game";
 import { useState, useEffect } from "react";
-import { getAllGames } from "../../../../../../prisma/lib/games";
+import { getAllGames } from "prisma/lib/games";
 import { FormValues } from "../../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
 import { toast } from "sonner";
@@ -40,6 +40,7 @@ import { toast } from "sonner";
 const GameDropDownForm = ({
   control,
   reset,
+  field,
 }: {
   control: Control<FormValues>;
   field: ControllerRenderProps<FormValues>;
@@ -48,17 +49,24 @@ const GameDropDownForm = ({
   const [testGames, setTestGames] = useState<Game[]>([]);
   const { getGameStatsFromDb } = useAdmin();
 
+  // 1) Fetch games once on mount
   useEffect(() => {
     const fetchGames = async () => {
       const games = await getAllGames();
-      if (!games.success || !games.data)
+      if (!games.success || !games.data) {
         toast.error("Failed to fetch games. Please try again.");
-      else setTestGames(games.data);
+      } else {
+        setTestGames(games.data);
+      }
     };
     fetchGames();
-    getGameStatsFromDb("Mario Kart 8"); // ! TODO TEMP FIX to load games due to needing to pass game as default value in form
-  }, [getGameStatsFromDb]);
+  }, []);
 
+  // 2) Fetch stats when the selected game changes
+  useEffect(() => {
+    const selected = String(field.value) || "Mario Kart 8";
+    void getGameStatsFromDb(selected);
+  }, [field.value, getGameStatsFromDb]);
   return (
     <FormField
       control={control}

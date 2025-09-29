@@ -1,7 +1,7 @@
 "use server";
 
 import { VisionResultCodes } from "@/lib/constants";
-import { Player } from "@prisma/client";
+import { PlayerModel as Player } from "prisma/generated/models/Player";
 import { analyzeScreenShot } from "@/app/actions/visionAction";
 import { getGameIdFromName } from "@/app/actions/adminAction";
 import { VisionResult } from "@/lib/visionTypes";

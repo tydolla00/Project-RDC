@@ -154,9 +154,16 @@ export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
  *
  * @returns Promise resolving to an array of game stats.
  */
-export const getAllGameStats = async () =>
-  await handlePrismaOperation(() =>
-    prisma.gameStat.findMany({
-      select: { statName: true, statId: true },
-    }),
-  );
+export const getAllGameStats = unstable_cache(
+  async () =>
+    await handlePrismaOperation(() =>
+      prisma.gameStat.findMany({
+        select: { statName: true, statId: true },
+      }),
+    ),
+  undefined,
+  {
+    tags: ["getAllGameStats"],
+    revalidate: false,
+  },
+);

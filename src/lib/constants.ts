@@ -1,8 +1,7 @@
-import { $Enums } from "@prisma/client";
-import { getAllGames } from "../../prisma/lib/games";
-import { getAllMembers } from "../../prisma/lib/members";
-import { PLAYER_MAPPINGS } from "../app/(routes)/admin/_utils/player-mappings";
-import { statNames, StatName } from "./stat-names";
+import { StatName } from "prisma/generated/enums";
+import { getAllGames } from "prisma/lib/games";
+import { getAllMembers } from "prisma/lib/members";
+import { findPlayer } from "../app/(routes)/admin/_utils/player-mappings";
 
 /**
  * Returns navigation data for all RDC members.
@@ -23,16 +22,15 @@ export const getMembersNav = async () => {
     desc: string;
     stats: { prop: string; val: string }[];
   }[] = members.data.map((member) => {
-    const memberKey = member.playerName as keyof typeof PLAYER_MAPPINGS;
-    const rdcMember = PLAYER_MAPPINGS[memberKey]!;
+    const rdcMember = findPlayer(member.playerName) ?? undefined;
     return {
-      alt: rdcMember.nav.alt,
+      alt: rdcMember?.nav?.alt ?? member.playerName,
       name: member.playerName,
-      navName: rdcMember.nav.name,
-      url: rdcMember.nav.url,
-      src: rdcMember.nav.src,
-      desc: rdcMember.desc,
-      stats: rdcMember.stats,
+      navName: rdcMember?.nav?.name ?? member.playerName,
+      url: rdcMember?.nav?.url ?? `/members/${member.playerName.toLowerCase()}`,
+      src: rdcMember?.nav?.src ?? "",
+      desc: rdcMember?.desc ?? "",
+      stats: rdcMember?.stats ?? [],
     };
   });
   return navMembers;
@@ -104,6 +102,26 @@ export const gameImages = {
   [GamesEnum.MarioKart8]: "mk8.jpg",
   [GamesEnum.SpeedRunners]: "speedrunners.jpeg",
   [GamesEnum.CallOfDuty]: "callofduty.jpeg",
+};
+
+export const statDescriptions: { [key in StatName]: string } = {
+  [StatName.MK8_DAY]: "Mario Kart 8 Days",
+  [StatName.MK8_POS]: "Mario Kart 8 Position",
+  [StatName.COD_SCORE]: "Call of Duty Score",
+  [StatName.COD_KILLS]: "Call of Duty Kills",
+  [StatName.COD_DEATHS]: "Call of Duty Deaths",
+  [StatName.COD_MELEES]: "Call of Duty Melees",
+  [StatName.COD_POS]: "Call of Duty Position",
+  [StatName.LC_DEATHS]: "Lethal Company Deaths",
+  [StatName.SR_SETS]: "Speedrunners Sets",
+  [StatName.SR_WINS]: "Speedrunners Wins",
+  [StatName.SR_POS]: "Speedrunners Position",
+  [StatName.RL_GOALS]: "Rocket League Goals",
+  [StatName.RL_ASSISTS]: "Rocket League Assists",
+  [StatName.RL_SAVES]: "Rocket League Saves",
+  [StatName.RL_SHOTS]: "Rocket League Shots",
+  [StatName.RL_SCORE]: "Rocket League Score",
+  [StatName.RL_DAY]: "Rocket League Position",
 };
 
 export enum errorCodes {
