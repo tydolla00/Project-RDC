@@ -3,6 +3,5 @@
 /* eslint-disable */
 // @ts-nocheck 
 export interface $DbEnums {
-  StatName: "MK8_POS" | "MK8_DAY" | "RL_SCORE" | "RL_GOALS" | "RL_ASSISTS" | "RL_SAVES" | "RL_SHOTS" | "RL_DAY" | "COD_KILLS" | "COD_DEATHS" | "COD_SCORE" | "COD_POS" | "COD_MELEES" | "LC_DEATHS" | "SR_WINS" | "SR_SETS" | "SR_POS"
   StatType: "INT" | "STRING"
 }

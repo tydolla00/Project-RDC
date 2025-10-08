@@ -1,10 +1,30 @@
+import { VisionResultCodes } from "../constants";
+
+// Shared validateResults function for all GameProcessors
+export const validateResults = (
+  visionPlayers: VisionPlayer[],
+  visionWinners: VisionPlayer[],
+  requiresCheck: boolean,
+) => {
+  return requiresCheck
+    ? {
+        status: VisionResultCodes.CheckRequest,
+        data: { players: visionPlayers, winner: visionWinners },
+        message:
+          "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
+      }
+    : {
+        status: VisionResultCodes.Success,
+        data: { players: visionPlayers, winner: visionWinners },
+        message: "Results have been successfully imported.",
+      };
+};
 import {
   AnalyzedPlayer,
   AnalyzedPlayersObj,
   AnalyzedTeamData,
 } from "@/app/actions/visionAction";
 import { PlayerModel as Player } from "prisma/generated/models/Player";
-import { VisionResultCodes } from "../constants";
 import {
   findPlayer,
   PLAYER_MAPPINGS,

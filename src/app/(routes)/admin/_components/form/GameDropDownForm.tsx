@@ -28,12 +28,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { GameModel as Game } from "prisma/generated/models/Game";
 import { useState, useEffect } from "react";
 import { getAllGames } from "prisma/lib/games";
 import { FormValues } from "../../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
 import { toast } from "sonner";
+import { Game } from "@prisma/client";
 
 // TODO Cache results
 
@@ -46,7 +46,7 @@ const GameDropDownForm = ({
   field: ControllerRenderProps<FormValues>;
   reset: UseFormResetField<FormValues>;
 }) => {
-  const [testGames, setTestGames] = useState<Game[]>([]);
+  const [fetchedGames, setFetchedGames] = useState<Game[]>([]);
   const { getGameStatsFromDb } = useAdmin();
 
   // 1) Fetch games once on mount
@@ -56,7 +56,7 @@ const GameDropDownForm = ({
       if (!games.success || !games.data) {
         toast.error("Failed to fetch games. Please try again.");
       } else {
-        setTestGames(games.data);
+        setFetchedGames(games.data);
       }
     };
     fetchGames();
@@ -86,7 +86,7 @@ const GameDropDownForm = ({
                   )}
                 >
                   {field.value
-                    ? testGames.find((game) => game.gameName === field.value)
+                    ? fetchedGames.find((game) => game.gameName === field.value)
                         ?.gameName
                     : "Select Game"}
                   <ChevronsUpDown className="opacity-50" />
@@ -102,7 +102,7 @@ const GameDropDownForm = ({
                 <CommandList>
                   <CommandEmpty>No game found.</CommandEmpty>
                   <CommandGroup>
-                    {testGames.map((game) => (
+                    {fetchedGames.map((game) => (
                       <CommandItem
                         value={game.gameName}
                         key={game.gameId}

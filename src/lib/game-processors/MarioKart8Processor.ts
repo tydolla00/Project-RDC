@@ -11,8 +11,8 @@ import {
   validateProcessedPlayer,
   WinnerConfig,
   calculateIndividualWinner,
+  validateResults,
 } from "./game-processor-utils";
-import { VisionResultCodes } from "../constants";
 
 // Vision Processor sometimes mistakes a 1 for a 7, so we need to validate the stat value
 const validateMKStatValue = (
@@ -99,23 +99,5 @@ export const MarioKart8Processor: GameProcessor = {
     return mk8Winners;
   },
   validateStats: validateMKStatValue,
-  validateResults: (
-    visionPlayers: VisionPlayer[],
-    visionWinners: VisionPlayer[],
-    requiresCheck: boolean,
-  ) => {
-    // VisionResult AKA data is  passed into HandleCreateMatchFromVision
-    return requiresCheck
-      ? {
-          status: VisionResultCodes.CheckRequest,
-          data: { players: visionPlayers, winner: visionWinners },
-          message:
-            "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
-        }
-      : {
-          status: VisionResultCodes.Success,
-          data: { players: visionPlayers, winner: visionWinners },
-          message: "Results have been successfully imported.",
-        };
-  },
+  validateResults,
 };

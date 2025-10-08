@@ -1,4 +1,4 @@
-import { StatName } from "prisma/generated/enums";
+import { StatName } from "@/lib/stat-names";
 import { z } from "zod/v4";
 
 // Session Schema Definitions
@@ -9,6 +9,7 @@ const gameSchema = z.union([
     "Mario Kart 8",
     "Lethal Company",
     "Speedrunners",
+    "Marvel Rivals",
   ]),
   z.string().min(1, "Game is required"),
 ]);
@@ -53,7 +54,7 @@ const playersSchema = z
 
 // ? Rocket League
 const rocketLeagueStats = z.object({
-  statId: z.string().trim().min(1, "StatId is required"),
+  statId: z.int().min(1, "StatId is required"),
   stat: z.literal([
     StatName.RL_GOALS,
     StatName.RL_ASSISTS,
@@ -72,7 +73,7 @@ const rocketLeagueStats = z.object({
 // ? Mario Kart 8
 
 const marioKart8Stats = z.object({
-  statId: z.string().trim().min(1, "StatId is required"),
+  statId: z.int().min(1, "StatId is required"),
   stat: z.literal(StatName.MK8_POS),
   statValue: z
     .string()
@@ -103,11 +104,41 @@ const codStats = z.object({
     .transform((val) => String(parseInt(val) || 0)),
 });
 
+const marvelRivalsStats = z.object({
+  statId: z.int().min(1, "StatId is required"),
+  stat: z.literal([
+    StatName.MR_KILLS,
+    StatName.MR_DEATHS,
+    StatName.MR_ASSISTS,
+    StatName.MR_TRIPLE_KILL,
+    StatName.MR_QUADRA_KILL,
+    StatName.MR_PENTA_KILL,
+    StatName.MR_HEXA_KILL,
+    StatName.MR_MEDALS,
+    StatName.MR_HIGHEST_DMG,
+    StatName.MR_HIGHEST_DMG_BLOCKED,
+    StatName.MR_MOST_HEALING,
+    StatName.MR_MOST_ASSISTS_FIST,
+    StatName.MR_FINAL_HITS,
+    StatName.MR_DMG,
+    StatName.MR_DMG_BLOCKED,
+    StatName.MR_HEALING,
+    StatName.MR_ACCURACY,
+  ]),
+  statValue: z
+    .string()
+    .trim()
+    .min(1, "Required")
+    .regex(/^\d+$/, "Stat value must be a number")
+    .transform((val) => String(parseInt(val) || 0)),
+});
+
 // Stat Schema Union
 const statSchema = z.discriminatedUnion("stat", [
   rocketLeagueStats,
   marioKart8Stats,
   codStats,
+  marvelRivalsStats,
 ]);
 
 // ! End of Stat Schema Definitions
@@ -251,7 +282,11 @@ const lethalCompanySchema = baseSessionSchema.extend({
 const speedrunnersSchema = baseSessionSchema.extend({
   game: z.literal("Speedrunners"),
 });
-// Other game schemas...
+
+const marvelRivalsSchema = baseSessionSchema.extend({
+  game: z.literal("Marvel Rivals"),
+});
+
 const codSchema = baseSessionSchema.extend({
   game: z.literal("Call of Duty"),
   sets: z.array(
@@ -333,6 +368,7 @@ export const formSchema = z.discriminatedUnion("game", [
   marioKart8MatchSchema,
   lethalCompanySchema,
   speedrunnersSchema,
+  marvelRivalsSchema,
 ]);
 
 // Define types based on the Zod schema

@@ -12,6 +12,7 @@ import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";
 import { logVisionError } from "@/posthog/server-analytics";
 import { after } from "next/server";
 import { AnalysisResults, Stat, VisionPlayer } from "@/lib/visionTypes";
+import { MarvelRivalsProcessor } from "@/lib/game-processors/MarvelRivalsProcessor";
 
 const client = DocumentIntelligence(
   process.env["NEXT_PUBLIC_DOCUMENT_INTELLIGENCE_ENDPOINT"]!,
@@ -28,6 +29,8 @@ export const getGameProcessor = (gameId: number): GameProcessor => {
       return RocketLeagueProcessor;
     case 3:
       return CoDGunGameProcessor;
+    case 6:
+      return MarvelRivalsProcessor;
     default:
       throw new Error(`Invalid game id: ${gameId}`);
   }

@@ -10,20 +10,7 @@ import { Label } from "@/components/ui/label";
 import RDCVisionModal from "./RDCVisionModal";
 import { FormValues } from "../../_utils/form-helpers";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { VisionPlayer } from "@/lib/visionTypes";
-import { STAT_CONFIGS } from "@/lib/stat-configs"; // <— add
-
-// Build a statId (number) -> stat enum name (e.g., "RL_GOALS") map from STAT_CONFIGS.
-const STAT_ID_TO_ENUM: Record<number, string> = Object.values(
-  STAT_CONFIGS,
-).reduce(
-  (acc, cfg) => {
-    const idNum = Number(cfg.id);
-    if (!Number.isNaN(idNum)) acc[idNum] = cfg.name as unknown as string;
-    return acc;
-  },
-  {} as Record<number, string>,
-);
+import { Stat, VisionPlayer } from "@/lib/visionTypes";
 
 interface Props {
   setIndex: number;
@@ -69,31 +56,13 @@ const MatchManager = (props: Props) => {
   const processTeamPlayers = (teamPlayers: VisionPlayer[]) => {
     console.log("Processing Team Players: ", teamPlayers);
 
-    // Infer the exact player stat shape from the form schema
-    type FormPlayerStat =
-      FormValues["sets"][number]["matches"][number]["playerSessions"][number]["playerStats"][number];
-
-    // Infer the Vision stat item type from VisionPlayer
-    type VisionStat = NonNullable<VisionPlayer["stats"]>[number];
-
-    const toFormStat = (s: VisionStat): FormPlayerStat | null => {
-      const statName = STAT_ID_TO_ENUM[s.statId];
-      if (!statName) return null; // skip unknown stat ids
-      return {
-        statId: String(s.statId),
-        stat: statName as FormPlayerStat["stat"], // narrow to the form union
-        statValue: String(s.statValue),
-      };
-    };
-
-    // Type-guard to eliminate nulls for TS
-    const isFormPlayerStat = (s: FormPlayerStat | null): s is FormPlayerStat =>
-      s !== null;
-
     return teamPlayers.map((player) => {
-      const formattedStats = (player.stats ?? [])
-        .map(toFormStat)
-        .filter(isFormPlayerStat);
+      // Map over the stats from the vision player to format them for the form
+      const formattedStats = player.stats.map((stat: Stat) => ({
+        statId: stat.statId,
+        stat: stat.stat,
+        statValue: stat.statValue,
+      })) as FormValues["sets"][number]["matches"][number]["playerSessions"][number]["playerStats"];
 
       return {
         playerId: player?.playerId || 0,

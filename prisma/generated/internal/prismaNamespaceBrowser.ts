@@ -21,13 +21,14 @@ export const Decimal = runtime.Decimal
 export const ModelName = {
   Player: 'Player',
   Game: 'Game',
+  User: 'User',
+  GameSetToPlayer: 'GameSetToPlayer',
   GameStat: 'GameStat',
   Session: 'Session',
   GameSet: 'GameSet',
   Match: 'Match',
   PlayerSession: 'PlayerSession',
   PlayerStat: 'PlayerStat',
-  User: 'User',
   SheetSync: 'SheetSync'
 } as const
 
@@ -56,12 +57,31 @@ export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof 
 
 export const GameScalarFieldEnum = {
   gameId: 'gameId',
-  gameName: 'gameName',
+  gameName: 'gameName'
+} as const
+
+export type GameScalarFieldEnum = (typeof GameScalarFieldEnum)[keyof typeof GameScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  emailVerified: 'emailVerified',
+  image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type GameScalarFieldEnum = (typeof GameScalarFieldEnum)[keyof typeof GameScalarFieldEnum]
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const GameSetToPlayerScalarFieldEnum = {
+  A: 'A',
+  B: 'B'
+} as const
+
+export type GameSetToPlayerScalarFieldEnum = (typeof GameSetToPlayerScalarFieldEnum)[keyof typeof GameSetToPlayerScalarFieldEnum]
 
 
 export const GameStatScalarFieldEnum = {
@@ -144,19 +164,6 @@ export const PlayerStatScalarFieldEnum = {
 export type PlayerStatScalarFieldEnum = (typeof PlayerStatScalarFieldEnum)[keyof typeof PlayerStatScalarFieldEnum]
 
 
-export const UserScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  email: 'email',
-  emailVerified: 'emailVerified',
-  image: 'image',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
 export const SheetSyncScalarFieldEnum = {
   id: 'id',
   sheetName: 'sheetName',
@@ -193,6 +200,14 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -200,12 +215,4 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

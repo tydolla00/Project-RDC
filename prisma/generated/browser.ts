@@ -27,6 +27,16 @@ export type Player = Prisma.PlayerModel
  */
 export type Game = Prisma.GameModel
 /**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel
+/**
+ * Model GameSetToPlayer
+ * 
+ */
+export type GameSetToPlayer = Prisma.GameSetToPlayerModel
+/**
  * Model GameStat
  * 
  */
@@ -56,11 +66,6 @@ export type PlayerSession = Prisma.PlayerSessionModel
  * 
  */
 export type PlayerStat = Prisma.PlayerStatModel
-/**
- * Model User
- * 
- */
-export type User = Prisma.UserModel
 /**
  * Model SheetSync
  * 

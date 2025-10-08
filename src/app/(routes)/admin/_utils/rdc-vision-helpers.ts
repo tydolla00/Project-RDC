@@ -46,7 +46,7 @@ export const handleAnalyzeBtnClick = async (
       gameId, // TODO: This should be from the selected game
     );
 
-    console.log({ analysisResults });
+    console.log("Analysis results", { analysisResults });
 
     switch (analysisResults.status) {
       case VisionResultCodes.Success:

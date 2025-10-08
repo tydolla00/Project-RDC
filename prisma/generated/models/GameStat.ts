@@ -39,7 +39,7 @@ export type GameStatSumAggregateOutputType = {
 
 export type GameStatMinAggregateOutputType = {
   statId: number | null
-  statName: $Enums.StatName | null
+  statName: string | null
   gameId: number | null
   type: $Enums.StatType | null
   createdAt: Date | null
@@ -49,7 +49,7 @@ export type GameStatMinAggregateOutputType = {
 
 export type GameStatMaxAggregateOutputType = {
   statId: number | null
-  statName: $Enums.StatName | null
+  statName: string | null
   gameId: number | null
   type: $Enums.StatType | null
   createdAt: Date | null
@@ -198,7 +198,7 @@ export type GameStatGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type GameStatGroupByOutputType = {
   statId: number
-  statName: $Enums.StatName
+  statName: string
   gameId: number
   type: $Enums.StatType
   createdAt: Date
@@ -231,7 +231,7 @@ export type GameStatWhereInput = {
   OR?: Prisma.GameStatWhereInput[]
   NOT?: Prisma.GameStatWhereInput | Prisma.GameStatWhereInput[]
   statId?: Prisma.IntFilter<"GameStat"> | number
-  statName?: Prisma.EnumStatNameFilter<"GameStat"> | $Enums.StatName
+  statName?: Prisma.StringFilter<"GameStat"> | string
   gameId?: Prisma.IntFilter<"GameStat"> | number
   type?: Prisma.EnumStatTypeFilter<"GameStat"> | $Enums.StatType
   createdAt?: Prisma.DateTimeFilter<"GameStat"> | Date | string
@@ -258,7 +258,7 @@ export type GameStatWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.GameStatWhereInput | Prisma.GameStatWhereInput[]
   OR?: Prisma.GameStatWhereInput[]
   NOT?: Prisma.GameStatWhereInput | Prisma.GameStatWhereInput[]
-  statName?: Prisma.EnumStatNameFilter<"GameStat"> | $Enums.StatName
+  statName?: Prisma.StringFilter<"GameStat"> | string
   gameId?: Prisma.IntFilter<"GameStat"> | number
   type?: Prisma.EnumStatTypeFilter<"GameStat"> | $Enums.StatType
   createdAt?: Prisma.DateTimeFilter<"GameStat"> | Date | string
@@ -288,7 +288,7 @@ export type GameStatScalarWhereWithAggregatesInput = {
   OR?: Prisma.GameStatScalarWhereWithAggregatesInput[]
   NOT?: Prisma.GameStatScalarWhereWithAggregatesInput | Prisma.GameStatScalarWhereWithAggregatesInput[]
   statId?: Prisma.IntWithAggregatesFilter<"GameStat"> | number
-  statName?: Prisma.EnumStatNameWithAggregatesFilter<"GameStat"> | $Enums.StatName
+  statName?: Prisma.StringWithAggregatesFilter<"GameStat"> | string
   gameId?: Prisma.IntWithAggregatesFilter<"GameStat"> | number
   type?: Prisma.EnumStatTypeWithAggregatesFilter<"GameStat"> | $Enums.StatType
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"GameStat"> | Date | string
@@ -297,7 +297,7 @@ export type GameStatScalarWhereWithAggregatesInput = {
 }
 
 export type GameStatCreateInput = {
-  statName: $Enums.StatName
+  statName: string
   type?: $Enums.StatType
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -308,7 +308,7 @@ export type GameStatCreateInput = {
 
 export type GameStatUncheckedCreateInput = {
   statId?: number
-  statName: $Enums.StatName
+  statName: string
   gameId: number
   type?: $Enums.StatType
   createdAt?: Date | string
@@ -318,7 +318,7 @@ export type GameStatUncheckedCreateInput = {
 }
 
 export type GameStatUpdateInput = {
-  statName?: Prisma.EnumStatNameFieldUpdateOperationsInput | $Enums.StatName
+  statName?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStatTypeFieldUpdateOperationsInput | $Enums.StatType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -329,7 +329,7 @@ export type GameStatUpdateInput = {
 
 export type GameStatUncheckedUpdateInput = {
   statId?: Prisma.IntFieldUpdateOperationsInput | number
-  statName?: Prisma.EnumStatNameFieldUpdateOperationsInput | $Enums.StatName
+  statName?: Prisma.StringFieldUpdateOperationsInput | string
   gameId?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumStatTypeFieldUpdateOperationsInput | $Enums.StatType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -340,7 +340,7 @@ export type GameStatUncheckedUpdateInput = {
 
 export type GameStatCreateManyInput = {
   statId?: number
-  statName: $Enums.StatName
+  statName: string
   gameId: number
   type?: $Enums.StatType
   createdAt?: Date | string
@@ -349,7 +349,7 @@ export type GameStatCreateManyInput = {
 }
 
 export type GameStatUpdateManyMutationInput = {
-  statName?: Prisma.EnumStatNameFieldUpdateOperationsInput | $Enums.StatName
+  statName?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStatTypeFieldUpdateOperationsInput | $Enums.StatType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -358,7 +358,7 @@ export type GameStatUpdateManyMutationInput = {
 
 export type GameStatUncheckedUpdateManyInput = {
   statId?: Prisma.IntFieldUpdateOperationsInput | number
-  statName?: Prisma.EnumStatNameFieldUpdateOperationsInput | $Enums.StatName
+  statName?: Prisma.StringFieldUpdateOperationsInput | string
   gameId?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumStatTypeFieldUpdateOperationsInput | $Enums.StatType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -463,10 +463,6 @@ export type GameStatUncheckedUpdateManyWithoutGameNestedInput = {
   deleteMany?: Prisma.GameStatScalarWhereInput | Prisma.GameStatScalarWhereInput[]
 }
 
-export type EnumStatNameFieldUpdateOperationsInput = {
-  set?: $Enums.StatName
-}
-
 export type EnumStatTypeFieldUpdateOperationsInput = {
   set?: $Enums.StatType
 }
@@ -486,7 +482,7 @@ export type GameStatUpdateOneRequiredWithoutPlayerStatsNestedInput = {
 }
 
 export type GameStatCreateWithoutGameInput = {
-  statName: $Enums.StatName
+  statName: string
   type?: $Enums.StatType
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -496,7 +492,7 @@ export type GameStatCreateWithoutGameInput = {
 
 export type GameStatUncheckedCreateWithoutGameInput = {
   statId?: number
-  statName: $Enums.StatName
+  statName: string
   type?: $Enums.StatType
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -535,7 +531,7 @@ export type GameStatScalarWhereInput = {
   OR?: Prisma.GameStatScalarWhereInput[]
   NOT?: Prisma.GameStatScalarWhereInput | Prisma.GameStatScalarWhereInput[]
   statId?: Prisma.IntFilter<"GameStat"> | number
-  statName?: Prisma.EnumStatNameFilter<"GameStat"> | $Enums.StatName
+  statName?: Prisma.StringFilter<"GameStat"> | string
   gameId?: Prisma.IntFilter<"GameStat"> | number
   type?: Prisma.EnumStatTypeFilter<"GameStat"> | $Enums.StatType
   createdAt?: Prisma.DateTimeFilter<"GameStat"> | Date | string
@@ -544,7 +540,7 @@ export type GameStatScalarWhereInput = {
 }
 
 export type GameStatCreateWithoutPlayerStatsInput = {
-  statName: $Enums.StatName
+  statName: string
   type?: $Enums.StatType
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -554,7 +550,7 @@ export type GameStatCreateWithoutPlayerStatsInput = {
 
 export type GameStatUncheckedCreateWithoutPlayerStatsInput = {
   statId?: number
-  statName: $Enums.StatName
+  statName: string
   gameId: number
   type?: $Enums.StatType
   createdAt?: Date | string
@@ -579,7 +575,7 @@ export type GameStatUpdateToOneWithWhereWithoutPlayerStatsInput = {
 }
 
 export type GameStatUpdateWithoutPlayerStatsInput = {
-  statName?: Prisma.EnumStatNameFieldUpdateOperationsInput | $Enums.StatName
+  statName?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStatTypeFieldUpdateOperationsInput | $Enums.StatType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -589,7 +585,7 @@ export type GameStatUpdateWithoutPlayerStatsInput = {
 
 export type GameStatUncheckedUpdateWithoutPlayerStatsInput = {
   statId?: Prisma.IntFieldUpdateOperationsInput | number
-  statName?: Prisma.EnumStatNameFieldUpdateOperationsInput | $Enums.StatName
+  statName?: Prisma.StringFieldUpdateOperationsInput | string
   gameId?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.EnumStatTypeFieldUpdateOperationsInput | $Enums.StatType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -599,7 +595,7 @@ export type GameStatUncheckedUpdateWithoutPlayerStatsInput = {
 
 export type GameStatCreateManyGameInput = {
   statId?: number
-  statName: $Enums.StatName
+  statName: string
   type?: $Enums.StatType
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -607,7 +603,7 @@ export type GameStatCreateManyGameInput = {
 }
 
 export type GameStatUpdateWithoutGameInput = {
-  statName?: Prisma.EnumStatNameFieldUpdateOperationsInput | $Enums.StatName
+  statName?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStatTypeFieldUpdateOperationsInput | $Enums.StatType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -617,7 +613,7 @@ export type GameStatUpdateWithoutGameInput = {
 
 export type GameStatUncheckedUpdateWithoutGameInput = {
   statId?: Prisma.IntFieldUpdateOperationsInput | number
-  statName?: Prisma.EnumStatNameFieldUpdateOperationsInput | $Enums.StatName
+  statName?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStatTypeFieldUpdateOperationsInput | $Enums.StatType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -627,7 +623,7 @@ export type GameStatUncheckedUpdateWithoutGameInput = {
 
 export type GameStatUncheckedUpdateManyWithoutGameInput = {
   statId?: Prisma.IntFieldUpdateOperationsInput | number
-  statName?: Prisma.EnumStatNameFieldUpdateOperationsInput | $Enums.StatName
+  statName?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStatTypeFieldUpdateOperationsInput | $Enums.StatType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -731,7 +727,7 @@ export type $GameStatPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     statId: number
-    statName: $Enums.StatName
+    statName: string
     gameId: number
     type: $Enums.StatType
     createdAt: Date
@@ -1163,7 +1159,7 @@ export interface Prisma__GameStatClient<T, Null = never, ExtArgs extends runtime
  */
 export interface GameStatFieldRefs {
   readonly statId: Prisma.FieldRef<"GameStat", 'Int'>
-  readonly statName: Prisma.FieldRef<"GameStat", 'StatName'>
+  readonly statName: Prisma.FieldRef<"GameStat", 'String'>
   readonly gameId: Prisma.FieldRef<"GameStat", 'Int'>
   readonly type: Prisma.FieldRef<"GameStat", 'StatType'>
   readonly createdAt: Prisma.FieldRef<"GameStat", 'DateTime'>

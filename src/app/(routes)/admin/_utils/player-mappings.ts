@@ -31,6 +31,7 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
       "SupremeMvp 0020",
       "Mark",
       "SupremeMvp0020#4772468",
+      "SupremeMVP",
     ],
     image: "/images/mark_rdc.jpg",
     nav: {
@@ -56,6 +57,7 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
       "L. Opatel254",
       "Dylan",
       "RdcDylan#2869564",
+      "RdcDylan",
     ],
     image: "/images/dylan_rdc.jpg",
     nav: {
@@ -75,7 +77,7 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
     playerId: 3,
     playerName: "Ben",
     aliases: ["ben", "benny"],
-    gamerTags: ["Jabenixem", "Ben"],
+    gamerTags: ["Jabenixem", "Ben", "Ben-San"],
     image: "/images/ben_rdc.jpg",
     nav: {
       alt: "RDC Ben",
@@ -127,6 +129,7 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
       "Desmond",
       "Des",
       "Des#5052521",
+      "DesmondJ",
     ],
     image: "/images/desmond_rdc.jpg",
     nav: {

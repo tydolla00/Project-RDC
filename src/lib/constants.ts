@@ -1,4 +1,4 @@
-import { StatName } from "prisma/generated/enums";
+import { StatName } from "@/lib/stat-names";
 import { getAllGames } from "prisma/lib/games";
 import { getAllMembers } from "prisma/lib/members";
 import { findPlayer } from "../app/(routes)/admin/_utils/player-mappings";
@@ -103,7 +103,6 @@ export const gameImages = {
   [GamesEnum.SpeedRunners]: "speedrunners.jpeg",
   [GamesEnum.CallOfDuty]: "callofduty.jpeg",
 };
-
 export const statDescriptions: { [key in StatName]: string } = {
   [StatName.MK8_DAY]: "Mario Kart 8 Days",
   [StatName.MK8_POS]: "Mario Kart 8 Position",
@@ -121,7 +120,24 @@ export const statDescriptions: { [key in StatName]: string } = {
   [StatName.RL_SAVES]: "Rocket League Saves",
   [StatName.RL_SHOTS]: "Rocket League Shots",
   [StatName.RL_SCORE]: "Rocket League Score",
-  [StatName.RL_DAY]: "Rocket League Position",
+  [StatName.RL_DAY]: "Rocket League Days",
+  [StatName.MR_KILLS]: "Marvel Rivals Kills",
+  [StatName.MR_DEATHS]: "Marvel Rivals Deaths",
+  [StatName.MR_ASSISTS]: "Marvel Rivals Assists",
+  [StatName.MR_TRIPLE_KILL]: "Marvel Rivals Triple Kills",
+  [StatName.MR_QUADRA_KILL]: "Marvel Rivals Quadra Kills",
+  [StatName.MR_PENTA_KILL]: "Marvel Rivals Penta Kills",
+  [StatName.MR_HEXA_KILL]: "Marvel Rivals Hexa Kills",
+  [StatName.MR_MEDALS]: "Marvel Rivals Medals",
+  [StatName.MR_HIGHEST_DMG]: "Marvel Rivals Highest Damage",
+  [StatName.MR_HIGHEST_DMG_BLOCKED]: "Marvel Rivals Highest Damage Blocked",
+  [StatName.MR_MOST_HEALING]: "Marvel Rivals Most Healing",
+  [StatName.MR_MOST_ASSISTS_FIST]: "Marvel Rivals Most Assists (Fist)",
+  [StatName.MR_FINAL_HITS]: "Marvel Rivals Final Hits",
+  [StatName.MR_DMG]: "Marvel Rivals Damage",
+  [StatName.MR_DMG_BLOCKED]: "Marvel Rivals Damage Blocked",
+  [StatName.MR_HEALING]: "Marvel Rivals Healing",
+  [StatName.MR_ACCURACY]: "Marvel Rivals Accuracy",
 };
 
 export enum errorCodes {
@@ -194,6 +210,31 @@ export const GAME_CONFIGS: Record<number, GameConfig> = {
     name: "Speed Runners",
     modelId: "RDC-SR",
     supportedStats: ["sr_wins", "sr_sets", "sr_pos"],
+  },
+  6: {
+    type: "SOLO",
+    id: 6,
+    name: "Marvel Rivals",
+    modelId: "RDC-MR",
+    supportedStats: [
+      "mr_kills",
+      "mr_deaths",
+      "mr_assists",
+      "mr_triple_kill",
+      "mr_quadra_kill",
+      "mr_penta_kill",
+      "mr_hexa_kill",
+      "mr_medals",
+      "mr_highest_dmg",
+      "mr_highest_dmg_blocked",
+      "mr_most_healing",
+      "mr_most_assists_fist",
+      "mr_final_hits",
+      "mr_dmg",
+      "mr_dmg_blocked",
+      "mr_healing",
+      "mr_accuracy",
+    ],
   },
 };
 

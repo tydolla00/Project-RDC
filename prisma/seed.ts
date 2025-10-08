@@ -1,46 +1,9 @@
-import { statNames } from "@/lib/stat-names";
+import { StatName } from "@/lib/stat-names";
 import * as fs from "fs";
 import prisma from "./db";
 import { capitalizeFirst } from "@/lib/utils";
 import { MembersEnum } from "@/lib/constants";
 import { EnrichedSession } from "./types/session";
-
-const [
-  MK8_POS,
-  MK8_DAY,
-  RL_SCORE,
-  RL_GOALS,
-  RL_ASSISTS,
-  RL_SAVES,
-  RL_SHOTS,
-  RL_DAY,
-  COD_KILLS,
-  COD_DEATHS,
-  COD_SCORE,
-  COD_POS,
-  COD_MELEES,
-  LC_DEATHS,
-  SR_WINS,
-  SR_SETS,
-  SR_POS,
-  MR_KILLS,
-  MR_DEATHS,
-  MR_ASSISTS,
-  MR_TRIPLE_KILL,
-  MR_QUADRA_KILL,
-  MR_PENTA_KILL,
-  MR_HEXA_KILL,
-  MR_MEDALS,
-  MR_HIGHEST_DMG,
-  MR_HIGHEST_DMG_BLOCKED,
-  MR_MOST_HEALING,
-  MR_MOST_ASSISTS_FIST,
-  MR_FINAL_HITS,
-  MR_DMG,
-  MR_DMG_BLOCKED,
-  MR_HEALING,
-  MR_ACCURACY,
-] = statNames;
 
 /**
  * Seeds the database with RDC members, games, and sessions.
@@ -159,7 +122,7 @@ async function seedGames() {
     create: {
       gameName: "Mario Kart 8",
       gameStats: {
-        create: [{ statName: MK8_POS }, { statName: MK8_DAY }],
+        create: [{ statName: StatName.MK8_POS }, { statName: StatName.MK8_DAY }],
       },
     },
   });
@@ -171,12 +134,12 @@ async function seedGames() {
       gameName: "Rocket League",
       gameStats: {
         create: [
-          { statName: RL_SCORE },
-          { statName: RL_GOALS },
-          { statName: RL_ASSISTS },
-          { statName: RL_SAVES },
-          { statName: RL_SHOTS },
-          { statName: RL_DAY },
+          { statName: StatName.RL_SCORE },
+          { statName: StatName.RL_GOALS },
+          { statName: StatName.RL_ASSISTS },
+          { statName: StatName.RL_SAVES },
+          { statName: StatName.RL_SHOTS },
+          { statName: StatName.RL_DAY },
         ],
       },
     },
@@ -189,11 +152,11 @@ async function seedGames() {
       gameName: "Call of Duty",
       gameStats: {
         create: [
-          { statName: COD_SCORE },
-          { statName: COD_KILLS },
-          { statName: COD_DEATHS },
-          { statName: COD_POS },
-          { statName: COD_MELEES },
+          { statName: StatName.COD_SCORE },
+          { statName: StatName.COD_KILLS },
+          { statName: StatName.COD_DEATHS },
+          { statName: StatName.COD_POS },
+          { statName: StatName.COD_MELEES },
         ],
       },
     },
@@ -205,7 +168,7 @@ async function seedGames() {
     create: {
       gameName: "Lethal Company",
       gameStats: {
-        create: [{ statName: LC_DEATHS }],
+        create: [{ statName: StatName.LC_DEATHS }],
       },
     },
   });
@@ -217,9 +180,9 @@ async function seedGames() {
       gameName: "SpeedRunners",
       gameStats: {
         create: [
-          { statName: SR_WINS },
-          { statName: SR_SETS },
-          { statName: SR_POS },
+          { statName: StatName.SR_WINS },
+          { statName: StatName.SR_SETS },
+          { statName: StatName.SR_POS },
         ],
       },
     },
@@ -232,23 +195,23 @@ async function seedGames() {
       gameName: "Marvel Rivals",
       gameStats: {
         create: [
-          { statName: MR_KILLS },
-          { statName: MR_DEATHS },
-          { statName: MR_ASSISTS },
-          { statName: MR_TRIPLE_KILL },
-          { statName: MR_QUADRA_KILL },
-          { statName: MR_PENTA_KILL },
-          { statName: MR_HEXA_KILL },
-          { statName: MR_MEDALS },
-          { statName: MR_HIGHEST_DMG },
-          { statName: MR_HIGHEST_DMG_BLOCKED },
-          { statName: MR_MOST_HEALING },
-          { statName: MR_MOST_ASSISTS_FIST },
-          { statName: MR_FINAL_HITS },
-          { statName: MR_DMG },
-          { statName: MR_DMG_BLOCKED },
-          { statName: MR_HEALING },
-          { statName: MR_ACCURACY },
+          { statName: StatName.MR_KILLS },
+          { statName: StatName.MR_DEATHS },
+          { statName: StatName.MR_ASSISTS },
+          { statName: StatName.MR_TRIPLE_KILL },
+          { statName: StatName.MR_QUADRA_KILL },
+          { statName: StatName.MR_PENTA_KILL },
+          { statName: StatName.MR_HEXA_KILL },
+          { statName: StatName.MR_MEDALS },
+          { statName: StatName.MR_HIGHEST_DMG },
+          { statName: StatName.MR_HIGHEST_DMG_BLOCKED },
+          { statName: StatName.MR_MOST_HEALING },
+          { statName: StatName.MR_MOST_ASSISTS_FIST },
+          { statName: StatName.MR_FINAL_HITS },
+          { statName: StatName.MR_DMG },
+          { statName: StatName.MR_DMG_BLOCKED },
+          { statName: StatName.MR_HEALING },
+          { statName: StatName.MR_ACCURACY },
         ],
       },
     },
