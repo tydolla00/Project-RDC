@@ -2,8 +2,7 @@
 import { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlayerModel as Player } from "prisma/generated/models/Player";
-import { createSessionEditRequest } from "@/app/actions/editSession";
+import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
 import { insertNewSessionFromAdmin } from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
@@ -21,6 +20,7 @@ import { VideoInfo } from "./VideoInfo";
 import { cn } from "@/lib/utils";
 import { FormSummary } from "./Summary";
 import { userSignOut } from "@/app/actions/signOut";
+import { createSessionEditRequest } from "@/app/actions/editSession";
 
 interface AdminFormProps {
   rdcMembers: Player[];

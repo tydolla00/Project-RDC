@@ -1,4 +1,4 @@
-import { StatName } from "prisma/generated/enums";
+import { $Enums } from "@prisma/client";
 import { z } from "zod/v4";
 
 // Session Schema Definitions
@@ -56,11 +56,11 @@ const playersSchema = z
 const rocketLeagueStats = z.object({
   statId: z.string().trim().min(1, "StatId is required"),
   stat: z.literal([
-    StatName.RL_GOALS,
-    StatName.RL_ASSISTS,
-    StatName.RL_SAVES,
-    StatName.RL_SHOTS,
-    StatName.RL_SCORE,
+    $Enums.StatName.RL_GOALS,
+    $Enums.StatName.RL_ASSISTS,
+    $Enums.StatName.RL_SAVES,
+    $Enums.StatName.RL_SHOTS,
+    $Enums.StatName.RL_SCORE,
   ]),
   statValue: z
     .string()
@@ -74,7 +74,7 @@ const rocketLeagueStats = z.object({
 
 const marioKart8Stats = z.object({
   statId: z.string().trim().min(1, "StatId is required"),
-  stat: z.literal(StatName.MK8_POS),
+  stat: z.literal($Enums.StatName.MK8_POS),
   statValue: z
     .string()
     .trim()
@@ -88,11 +88,11 @@ const marioKart8Stats = z.object({
 const codStats = z.object({
   statId: z.string().trim().min(1, "StatId is required"),
   stat: z.literal([
-    StatName.COD_KILLS,
-    StatName.COD_DEATHS,
-    StatName.COD_POS,
-    StatName.COD_SCORE,
-    StatName.COD_MELEES,
+    $Enums.StatName.COD_KILLS,
+    $Enums.StatName.COD_DEATHS,
+    $Enums.StatName.COD_POS,
+    $Enums.StatName.COD_SCORE,
+    $Enums.StatName.COD_MELEES,
   ]),
   statValue: z
     .string()
@@ -171,7 +171,7 @@ const rocketLeagueSchema = baseSessionSchema.extend({
                 (mw) => mw.playerId === ps.playerId,
               );
               ps.playerStats.forEach((stat) => {
-                if (stat.stat === StatName.RL_GOALS) {
+                if (stat.stat === $Enums.StatName.RL_GOALS) {
                   if (onWinningTeam) winningTeam += Number(stat.statValue) || 0;
                   else losingTeam += Number(stat.statValue) || 0;
                 }
@@ -213,7 +213,7 @@ const marioKart8MatchSchema = baseSessionSchema.extend({
           let highestPosition = [0, Infinity] as [number, number]; // playerId, position
           match.playerSessions.forEach((ps) => {
             ps.playerStats.forEach((stat) => {
-              if (stat.stat === StatName.MK8_POS) {
+              if (stat.stat === $Enums.StatName.MK8_POS) {
                 const position = parseInt(stat.statValue);
                 if (position === 1) firstPlace.push(ps.playerId);
                 if (position < highestPosition[1])
@@ -276,7 +276,7 @@ const codSchema = baseSessionSchema.extend({
 
           match.playerSessions.forEach((ps) => {
             ps.playerStats.forEach((stat) => {
-              if (stat.stat === StatName.COD_SCORE) {
+              if (stat.stat === $Enums.StatName.COD_SCORE) {
                 const score = parseInt(stat.statValue) || 0;
                 highestScoreOverall = Math.max(highestScoreOverall, score);
                 if (ps.playerId === winnerId) {
@@ -284,7 +284,7 @@ const codSchema = baseSessionSchema.extend({
                 }
               }
               if (
-                stat.stat === StatName.COD_POS &&
+                stat.stat === $Enums.StatName.COD_POS &&
                 parseInt(stat.statValue) === 1
               ) {
                 winner.position = parseInt(stat.statValue) || 0;
