@@ -66,3 +66,13 @@ export type User = Prisma.UserModel
  * 
  */
 export type SheetSync = Prisma.SheetSyncModel
+/**
+ * Model SessionEditRequest
+ * 
+ */
+export type SessionEditRequest = Prisma.SessionEditRequestModel
+/**
+ * Model SessionRevision
+ * 
+ */
+export type SessionRevision = Prisma.SessionRevisionModel

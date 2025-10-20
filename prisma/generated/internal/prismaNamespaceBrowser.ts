@@ -28,7 +28,9 @@ export const ModelName = {
   PlayerSession: 'PlayerSession',
   PlayerStat: 'PlayerStat',
   User: 'User',
-  SheetSync: 'SheetSync'
+  SheetSync: 'SheetSync',
+  SessionEditRequest: 'SessionEditRequest',
+  SessionRevision: 'SessionRevision'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -169,6 +171,35 @@ export const SheetSyncScalarFieldEnum = {
 export type SheetSyncScalarFieldEnum = (typeof SheetSyncScalarFieldEnum)[keyof typeof SheetSyncScalarFieldEnum]
 
 
+export const SessionEditRequestScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  proposerId: 'proposerId',
+  proposedData: 'proposedData',
+  status: 'status',
+  reviewerId: 'reviewerId',
+  reviewNote: 'reviewNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  reviewedAt: 'reviewedAt',
+  appliedAt: 'appliedAt',
+  appliedBy: 'appliedBy'
+} as const
+
+export type SessionEditRequestScalarFieldEnum = (typeof SessionEditRequestScalarFieldEnum)[keyof typeof SessionEditRequestScalarFieldEnum]
+
+
+export const SessionRevisionScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  snapshot: 'snapshot',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+} as const
+
+export type SessionRevisionScalarFieldEnum = (typeof SessionRevisionScalarFieldEnum)[keyof typeof SessionRevisionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -183,6 +214,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

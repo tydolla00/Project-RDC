@@ -296,7 +296,9 @@ export type SessionWhereInput = {
   Game?: Prisma.XOR<Prisma.GameScalarRelationFilter, Prisma.GameWhereInput>
   sets?: Prisma.GameSetListRelationFilter
   dayWinners?: Prisma.PlayerListRelationFilter
+  sessionEditRequests?: Prisma.SessionEditRequestListRelationFilter
   mvp?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
+  sessionRevisions?: Prisma.SessionRevisionListRelationFilter
 }
 
 export type SessionOrderByWithRelationInput = {
@@ -317,7 +319,9 @@ export type SessionOrderByWithRelationInput = {
   Game?: Prisma.GameOrderByWithRelationInput
   sets?: Prisma.GameSetOrderByRelationAggregateInput
   dayWinners?: Prisma.PlayerOrderByRelationAggregateInput
+  sessionEditRequests?: Prisma.SessionEditRequestOrderByRelationAggregateInput
   mvp?: Prisma.PlayerOrderByWithRelationInput
+  sessionRevisions?: Prisma.SessionRevisionOrderByRelationAggregateInput
 }
 
 export type SessionWhereUniqueInput = Prisma.AtLeast<{
@@ -342,7 +346,9 @@ export type SessionWhereUniqueInput = Prisma.AtLeast<{
   Game?: Prisma.XOR<Prisma.GameScalarRelationFilter, Prisma.GameWhereInput>
   sets?: Prisma.GameSetListRelationFilter
   dayWinners?: Prisma.PlayerListRelationFilter
+  sessionEditRequests?: Prisma.SessionEditRequestListRelationFilter
   mvp?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
+  sessionRevisions?: Prisma.SessionRevisionListRelationFilter
 }, "sessionId" | "gameId_videoId">
 
 export type SessionOrderByWithAggregationInput = {
@@ -402,7 +408,9 @@ export type SessionCreateInput = {
   Game: Prisma.GameCreateNestedOneWithoutSessionsInput
   sets?: Prisma.GameSetCreateNestedManyWithoutSessionInput
   dayWinners?: Prisma.PlayerCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestCreateNestedManyWithoutSessionInput
   mvp?: Prisma.PlayerCreateNestedOneWithoutMvpOfInput
+  sessionRevisions?: Prisma.SessionRevisionCreateNestedManyWithoutSessionInput
 }
 
 export type SessionUncheckedCreateInput = {
@@ -422,6 +430,8 @@ export type SessionUncheckedCreateInput = {
   createdBy?: string
   sets?: Prisma.GameSetUncheckedCreateNestedManyWithoutSessionInput
   dayWinners?: Prisma.PlayerUncheckedCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedCreateNestedManyWithoutSessionInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedCreateNestedManyWithoutSessionInput
 }
 
 export type SessionUpdateInput = {
@@ -439,7 +449,9 @@ export type SessionUpdateInput = {
   Game?: Prisma.GameUpdateOneRequiredWithoutSessionsNestedInput
   sets?: Prisma.GameSetUpdateManyWithoutSessionNestedInput
   dayWinners?: Prisma.PlayerUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUpdateManyWithoutSessionNestedInput
   mvp?: Prisma.PlayerUpdateOneWithoutMvpOfNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionUncheckedUpdateInput = {
@@ -459,6 +471,8 @@ export type SessionUncheckedUpdateInput = {
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   sets?: Prisma.GameSetUncheckedUpdateManyWithoutSessionNestedInput
   dayWinners?: Prisma.PlayerUncheckedUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedUpdateManyWithoutSessionNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionCreateManyInput = {
@@ -742,6 +756,34 @@ export type SessionUpdateOneRequiredWithoutSetsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SessionUpdateToOneWithWhereWithoutSetsInput, Prisma.SessionUpdateWithoutSetsInput>, Prisma.SessionUncheckedUpdateWithoutSetsInput>
 }
 
+export type SessionCreateNestedOneWithoutSessionEditRequestsInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutSessionEditRequestsInput, Prisma.SessionUncheckedCreateWithoutSessionEditRequestsInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutSessionEditRequestsInput
+  connect?: Prisma.SessionWhereUniqueInput
+}
+
+export type SessionUpdateOneRequiredWithoutSessionEditRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutSessionEditRequestsInput, Prisma.SessionUncheckedCreateWithoutSessionEditRequestsInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutSessionEditRequestsInput
+  upsert?: Prisma.SessionUpsertWithoutSessionEditRequestsInput
+  connect?: Prisma.SessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SessionUpdateToOneWithWhereWithoutSessionEditRequestsInput, Prisma.SessionUpdateWithoutSessionEditRequestsInput>, Prisma.SessionUncheckedUpdateWithoutSessionEditRequestsInput>
+}
+
+export type SessionCreateNestedOneWithoutSessionRevisionsInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutSessionRevisionsInput, Prisma.SessionUncheckedCreateWithoutSessionRevisionsInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutSessionRevisionsInput
+  connect?: Prisma.SessionWhereUniqueInput
+}
+
+export type SessionUpdateOneRequiredWithoutSessionRevisionsNestedInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutSessionRevisionsInput, Prisma.SessionUncheckedCreateWithoutSessionRevisionsInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutSessionRevisionsInput
+  upsert?: Prisma.SessionUpsertWithoutSessionRevisionsInput
+  connect?: Prisma.SessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SessionUpdateToOneWithWhereWithoutSessionRevisionsInput, Prisma.SessionUpdateWithoutSessionRevisionsInput>, Prisma.SessionUncheckedUpdateWithoutSessionRevisionsInput>
+}
+
 export type SessionCreateWithoutDayWinnersInput = {
   sessionName: string
   sessionUrl: string
@@ -756,7 +798,9 @@ export type SessionCreateWithoutDayWinnersInput = {
   createdBy?: string
   Game: Prisma.GameCreateNestedOneWithoutSessionsInput
   sets?: Prisma.GameSetCreateNestedManyWithoutSessionInput
+  sessionEditRequests?: Prisma.SessionEditRequestCreateNestedManyWithoutSessionInput
   mvp?: Prisma.PlayerCreateNestedOneWithoutMvpOfInput
+  sessionRevisions?: Prisma.SessionRevisionCreateNestedManyWithoutSessionInput
 }
 
 export type SessionUncheckedCreateWithoutDayWinnersInput = {
@@ -775,6 +819,8 @@ export type SessionUncheckedCreateWithoutDayWinnersInput = {
   isApproved?: boolean
   createdBy?: string
   sets?: Prisma.GameSetUncheckedCreateNestedManyWithoutSessionInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedCreateNestedManyWithoutSessionInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedCreateNestedManyWithoutSessionInput
 }
 
 export type SessionCreateOrConnectWithoutDayWinnersInput = {
@@ -797,6 +843,8 @@ export type SessionCreateWithoutMvpInput = {
   Game: Prisma.GameCreateNestedOneWithoutSessionsInput
   sets?: Prisma.GameSetCreateNestedManyWithoutSessionInput
   dayWinners?: Prisma.PlayerCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestCreateNestedManyWithoutSessionInput
+  sessionRevisions?: Prisma.SessionRevisionCreateNestedManyWithoutSessionInput
 }
 
 export type SessionUncheckedCreateWithoutMvpInput = {
@@ -815,6 +863,8 @@ export type SessionUncheckedCreateWithoutMvpInput = {
   createdBy?: string
   sets?: Prisma.GameSetUncheckedCreateNestedManyWithoutSessionInput
   dayWinners?: Prisma.PlayerUncheckedCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedCreateNestedManyWithoutSessionInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedCreateNestedManyWithoutSessionInput
 }
 
 export type SessionCreateOrConnectWithoutMvpInput = {
@@ -893,7 +943,9 @@ export type SessionCreateWithoutGameInput = {
   createdBy?: string
   sets?: Prisma.GameSetCreateNestedManyWithoutSessionInput
   dayWinners?: Prisma.PlayerCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestCreateNestedManyWithoutSessionInput
   mvp?: Prisma.PlayerCreateNestedOneWithoutMvpOfInput
+  sessionRevisions?: Prisma.SessionRevisionCreateNestedManyWithoutSessionInput
 }
 
 export type SessionUncheckedCreateWithoutGameInput = {
@@ -912,6 +964,8 @@ export type SessionUncheckedCreateWithoutGameInput = {
   createdBy?: string
   sets?: Prisma.GameSetUncheckedCreateNestedManyWithoutSessionInput
   dayWinners?: Prisma.PlayerUncheckedCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedCreateNestedManyWithoutSessionInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedCreateNestedManyWithoutSessionInput
 }
 
 export type SessionCreateOrConnectWithoutGameInput = {
@@ -954,7 +1008,9 @@ export type SessionCreateWithoutSetsInput = {
   createdBy?: string
   Game: Prisma.GameCreateNestedOneWithoutSessionsInput
   dayWinners?: Prisma.PlayerCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestCreateNestedManyWithoutSessionInput
   mvp?: Prisma.PlayerCreateNestedOneWithoutMvpOfInput
+  sessionRevisions?: Prisma.SessionRevisionCreateNestedManyWithoutSessionInput
 }
 
 export type SessionUncheckedCreateWithoutSetsInput = {
@@ -973,6 +1029,8 @@ export type SessionUncheckedCreateWithoutSetsInput = {
   isApproved?: boolean
   createdBy?: string
   dayWinners?: Prisma.PlayerUncheckedCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedCreateNestedManyWithoutSessionInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedCreateNestedManyWithoutSessionInput
 }
 
 export type SessionCreateOrConnectWithoutSetsInput = {
@@ -1005,7 +1063,9 @@ export type SessionUpdateWithoutSetsInput = {
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   Game?: Prisma.GameUpdateOneRequiredWithoutSessionsNestedInput
   dayWinners?: Prisma.PlayerUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUpdateManyWithoutSessionNestedInput
   mvp?: Prisma.PlayerUpdateOneWithoutMvpOfNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionUncheckedUpdateWithoutSetsInput = {
@@ -1024,6 +1084,196 @@ export type SessionUncheckedUpdateWithoutSetsInput = {
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   dayWinners?: Prisma.PlayerUncheckedUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedUpdateManyWithoutSessionNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedUpdateManyWithoutSessionNestedInput
+}
+
+export type SessionCreateWithoutSessionEditRequestsInput = {
+  sessionName: string
+  sessionUrl: string
+  thumbnail: string
+  date?: Date | string
+  videoId: string
+  mvpDescription?: string | null
+  mvpStats?: PrismaJson.MvpOutput | Prisma.NullableJsonNullValueInput
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isApproved?: boolean
+  createdBy?: string
+  Game: Prisma.GameCreateNestedOneWithoutSessionsInput
+  sets?: Prisma.GameSetCreateNestedManyWithoutSessionInput
+  dayWinners?: Prisma.PlayerCreateNestedManyWithoutDayWinsInput
+  mvp?: Prisma.PlayerCreateNestedOneWithoutMvpOfInput
+  sessionRevisions?: Prisma.SessionRevisionCreateNestedManyWithoutSessionInput
+}
+
+export type SessionUncheckedCreateWithoutSessionEditRequestsInput = {
+  sessionId?: number
+  sessionName: string
+  sessionUrl: string
+  gameId: number
+  thumbnail: string
+  date?: Date | string
+  videoId: string
+  mvpId?: number | null
+  mvpDescription?: string | null
+  mvpStats?: PrismaJson.MvpOutput | Prisma.NullableJsonNullValueInput
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isApproved?: boolean
+  createdBy?: string
+  sets?: Prisma.GameSetUncheckedCreateNestedManyWithoutSessionInput
+  dayWinners?: Prisma.PlayerUncheckedCreateNestedManyWithoutDayWinsInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedCreateNestedManyWithoutSessionInput
+}
+
+export type SessionCreateOrConnectWithoutSessionEditRequestsInput = {
+  where: Prisma.SessionWhereUniqueInput
+  create: Prisma.XOR<Prisma.SessionCreateWithoutSessionEditRequestsInput, Prisma.SessionUncheckedCreateWithoutSessionEditRequestsInput>
+}
+
+export type SessionUpsertWithoutSessionEditRequestsInput = {
+  update: Prisma.XOR<Prisma.SessionUpdateWithoutSessionEditRequestsInput, Prisma.SessionUncheckedUpdateWithoutSessionEditRequestsInput>
+  create: Prisma.XOR<Prisma.SessionCreateWithoutSessionEditRequestsInput, Prisma.SessionUncheckedCreateWithoutSessionEditRequestsInput>
+  where?: Prisma.SessionWhereInput
+}
+
+export type SessionUpdateToOneWithWhereWithoutSessionEditRequestsInput = {
+  where?: Prisma.SessionWhereInput
+  data: Prisma.XOR<Prisma.SessionUpdateWithoutSessionEditRequestsInput, Prisma.SessionUncheckedUpdateWithoutSessionEditRequestsInput>
+}
+
+export type SessionUpdateWithoutSessionEditRequestsInput = {
+  sessionName?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  videoId?: Prisma.StringFieldUpdateOperationsInput | string
+  mvpDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mvpStats?: PrismaJson.MvpOutput | Prisma.NullableJsonNullValueInput
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  Game?: Prisma.GameUpdateOneRequiredWithoutSessionsNestedInput
+  sets?: Prisma.GameSetUpdateManyWithoutSessionNestedInput
+  dayWinners?: Prisma.PlayerUpdateManyWithoutDayWinsNestedInput
+  mvp?: Prisma.PlayerUpdateOneWithoutMvpOfNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUpdateManyWithoutSessionNestedInput
+}
+
+export type SessionUncheckedUpdateWithoutSessionEditRequestsInput = {
+  sessionId?: Prisma.IntFieldUpdateOperationsInput | number
+  sessionName?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  gameId?: Prisma.IntFieldUpdateOperationsInput | number
+  thumbnail?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  videoId?: Prisma.StringFieldUpdateOperationsInput | string
+  mvpId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mvpDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mvpStats?: PrismaJson.MvpOutput | Prisma.NullableJsonNullValueInput
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  sets?: Prisma.GameSetUncheckedUpdateManyWithoutSessionNestedInput
+  dayWinners?: Prisma.PlayerUncheckedUpdateManyWithoutDayWinsNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedUpdateManyWithoutSessionNestedInput
+}
+
+export type SessionCreateWithoutSessionRevisionsInput = {
+  sessionName: string
+  sessionUrl: string
+  thumbnail: string
+  date?: Date | string
+  videoId: string
+  mvpDescription?: string | null
+  mvpStats?: PrismaJson.MvpOutput | Prisma.NullableJsonNullValueInput
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isApproved?: boolean
+  createdBy?: string
+  Game: Prisma.GameCreateNestedOneWithoutSessionsInput
+  sets?: Prisma.GameSetCreateNestedManyWithoutSessionInput
+  dayWinners?: Prisma.PlayerCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestCreateNestedManyWithoutSessionInput
+  mvp?: Prisma.PlayerCreateNestedOneWithoutMvpOfInput
+}
+
+export type SessionUncheckedCreateWithoutSessionRevisionsInput = {
+  sessionId?: number
+  sessionName: string
+  sessionUrl: string
+  gameId: number
+  thumbnail: string
+  date?: Date | string
+  videoId: string
+  mvpId?: number | null
+  mvpDescription?: string | null
+  mvpStats?: PrismaJson.MvpOutput | Prisma.NullableJsonNullValueInput
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isApproved?: boolean
+  createdBy?: string
+  sets?: Prisma.GameSetUncheckedCreateNestedManyWithoutSessionInput
+  dayWinners?: Prisma.PlayerUncheckedCreateNestedManyWithoutDayWinsInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedCreateNestedManyWithoutSessionInput
+}
+
+export type SessionCreateOrConnectWithoutSessionRevisionsInput = {
+  where: Prisma.SessionWhereUniqueInput
+  create: Prisma.XOR<Prisma.SessionCreateWithoutSessionRevisionsInput, Prisma.SessionUncheckedCreateWithoutSessionRevisionsInput>
+}
+
+export type SessionUpsertWithoutSessionRevisionsInput = {
+  update: Prisma.XOR<Prisma.SessionUpdateWithoutSessionRevisionsInput, Prisma.SessionUncheckedUpdateWithoutSessionRevisionsInput>
+  create: Prisma.XOR<Prisma.SessionCreateWithoutSessionRevisionsInput, Prisma.SessionUncheckedCreateWithoutSessionRevisionsInput>
+  where?: Prisma.SessionWhereInput
+}
+
+export type SessionUpdateToOneWithWhereWithoutSessionRevisionsInput = {
+  where?: Prisma.SessionWhereInput
+  data: Prisma.XOR<Prisma.SessionUpdateWithoutSessionRevisionsInput, Prisma.SessionUncheckedUpdateWithoutSessionRevisionsInput>
+}
+
+export type SessionUpdateWithoutSessionRevisionsInput = {
+  sessionName?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  videoId?: Prisma.StringFieldUpdateOperationsInput | string
+  mvpDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mvpStats?: PrismaJson.MvpOutput | Prisma.NullableJsonNullValueInput
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  Game?: Prisma.GameUpdateOneRequiredWithoutSessionsNestedInput
+  sets?: Prisma.GameSetUpdateManyWithoutSessionNestedInput
+  dayWinners?: Prisma.PlayerUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUpdateManyWithoutSessionNestedInput
+  mvp?: Prisma.PlayerUpdateOneWithoutMvpOfNestedInput
+}
+
+export type SessionUncheckedUpdateWithoutSessionRevisionsInput = {
+  sessionId?: Prisma.IntFieldUpdateOperationsInput | number
+  sessionName?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  gameId?: Prisma.IntFieldUpdateOperationsInput | number
+  thumbnail?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  videoId?: Prisma.StringFieldUpdateOperationsInput | string
+  mvpId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mvpDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mvpStats?: PrismaJson.MvpOutput | Prisma.NullableJsonNullValueInput
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  sets?: Prisma.GameSetUncheckedUpdateManyWithoutSessionNestedInput
+  dayWinners?: Prisma.PlayerUncheckedUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionCreateManyMvpInput = {
@@ -1056,7 +1306,9 @@ export type SessionUpdateWithoutDayWinnersInput = {
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   Game?: Prisma.GameUpdateOneRequiredWithoutSessionsNestedInput
   sets?: Prisma.GameSetUpdateManyWithoutSessionNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUpdateManyWithoutSessionNestedInput
   mvp?: Prisma.PlayerUpdateOneWithoutMvpOfNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionUncheckedUpdateWithoutDayWinnersInput = {
@@ -1075,6 +1327,8 @@ export type SessionUncheckedUpdateWithoutDayWinnersInput = {
   isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   sets?: Prisma.GameSetUncheckedUpdateManyWithoutSessionNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedUpdateManyWithoutSessionNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionUncheckedUpdateManyWithoutDayWinnersInput = {
@@ -1109,6 +1363,8 @@ export type SessionUpdateWithoutMvpInput = {
   Game?: Prisma.GameUpdateOneRequiredWithoutSessionsNestedInput
   sets?: Prisma.GameSetUpdateManyWithoutSessionNestedInput
   dayWinners?: Prisma.PlayerUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUpdateManyWithoutSessionNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionUncheckedUpdateWithoutMvpInput = {
@@ -1127,6 +1383,8 @@ export type SessionUncheckedUpdateWithoutMvpInput = {
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   sets?: Prisma.GameSetUncheckedUpdateManyWithoutSessionNestedInput
   dayWinners?: Prisma.PlayerUncheckedUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedUpdateManyWithoutSessionNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionUncheckedUpdateManyWithoutMvpInput = {
@@ -1175,7 +1433,9 @@ export type SessionUpdateWithoutGameInput = {
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   sets?: Prisma.GameSetUpdateManyWithoutSessionNestedInput
   dayWinners?: Prisma.PlayerUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUpdateManyWithoutSessionNestedInput
   mvp?: Prisma.PlayerUpdateOneWithoutMvpOfNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionUncheckedUpdateWithoutGameInput = {
@@ -1194,6 +1454,8 @@ export type SessionUncheckedUpdateWithoutGameInput = {
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   sets?: Prisma.GameSetUncheckedUpdateManyWithoutSessionNestedInput
   dayWinners?: Prisma.PlayerUncheckedUpdateManyWithoutDayWinsNestedInput
+  sessionEditRequests?: Prisma.SessionEditRequestUncheckedUpdateManyWithoutSessionNestedInput
+  sessionRevisions?: Prisma.SessionRevisionUncheckedUpdateManyWithoutSessionNestedInput
 }
 
 export type SessionUncheckedUpdateManyWithoutGameInput = {
@@ -1220,11 +1482,15 @@ export type SessionUncheckedUpdateManyWithoutGameInput = {
 export type SessionCountOutputType = {
   sets: number
   dayWinners: number
+  sessionEditRequests: number
+  sessionRevisions: number
 }
 
 export type SessionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sets?: boolean | SessionCountOutputTypeCountSetsArgs
   dayWinners?: boolean | SessionCountOutputTypeCountDayWinnersArgs
+  sessionEditRequests?: boolean | SessionCountOutputTypeCountSessionEditRequestsArgs
+  sessionRevisions?: boolean | SessionCountOutputTypeCountSessionRevisionsArgs
 }
 
 /**
@@ -1251,6 +1517,20 @@ export type SessionCountOutputTypeCountDayWinnersArgs<ExtArgs extends runtime.Ty
   where?: Prisma.PlayerWhereInput
 }
 
+/**
+ * SessionCountOutputType without action
+ */
+export type SessionCountOutputTypeCountSessionEditRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SessionEditRequestWhereInput
+}
+
+/**
+ * SessionCountOutputType without action
+ */
+export type SessionCountOutputTypeCountSessionRevisionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SessionRevisionWhereInput
+}
+
 
 export type SessionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   sessionId?: boolean
@@ -1270,7 +1550,9 @@ export type SessionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   Game?: boolean | Prisma.GameDefaultArgs<ExtArgs>
   sets?: boolean | Prisma.Session$setsArgs<ExtArgs>
   dayWinners?: boolean | Prisma.Session$dayWinnersArgs<ExtArgs>
+  sessionEditRequests?: boolean | Prisma.Session$sessionEditRequestsArgs<ExtArgs>
   mvp?: boolean | Prisma.Session$mvpArgs<ExtArgs>
+  sessionRevisions?: boolean | Prisma.Session$sessionRevisionsArgs<ExtArgs>
   _count?: boolean | Prisma.SessionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["session"]>
 
@@ -1334,7 +1616,9 @@ export type SessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   Game?: boolean | Prisma.GameDefaultArgs<ExtArgs>
   sets?: boolean | Prisma.Session$setsArgs<ExtArgs>
   dayWinners?: boolean | Prisma.Session$dayWinnersArgs<ExtArgs>
+  sessionEditRequests?: boolean | Prisma.Session$sessionEditRequestsArgs<ExtArgs>
   mvp?: boolean | Prisma.Session$mvpArgs<ExtArgs>
+  sessionRevisions?: boolean | Prisma.Session$sessionRevisionsArgs<ExtArgs>
   _count?: boolean | Prisma.SessionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SessionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1352,7 +1636,9 @@ export type $SessionPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     Game: Prisma.$GamePayload<ExtArgs>
     sets: Prisma.$GameSetPayload<ExtArgs>[]
     dayWinners: Prisma.$PlayerPayload<ExtArgs>[]
+    sessionEditRequests: Prisma.$SessionEditRequestPayload<ExtArgs>[]
     mvp: Prisma.$PlayerPayload<ExtArgs> | null
+    sessionRevisions: Prisma.$SessionRevisionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     sessionId: number
@@ -1769,7 +2055,9 @@ export interface Prisma__SessionClient<T, Null = never, ExtArgs extends runtime.
   Game<T extends Prisma.GameDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GameDefaultArgs<ExtArgs>>): Prisma.Prisma__GameClient<runtime.Types.Result.GetResult<Prisma.$GamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   sets<T extends Prisma.Session$setsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Session$setsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GameSetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   dayWinners<T extends Prisma.Session$dayWinnersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Session$dayWinnersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sessionEditRequests<T extends Prisma.Session$sessionEditRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Session$sessionEditRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionEditRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   mvp<T extends Prisma.Session$mvpArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Session$mvpArgs<ExtArgs>>): Prisma.Prisma__PlayerClient<runtime.Types.Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  sessionRevisions<T extends Prisma.Session$sessionRevisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Session$sessionRevisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionRevisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2257,6 +2545,30 @@ export type Session$dayWinnersArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
+ * Session.sessionEditRequests
+ */
+export type Session$sessionEditRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SessionEditRequest
+   */
+  select?: Prisma.SessionEditRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SessionEditRequest
+   */
+  omit?: Prisma.SessionEditRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SessionEditRequestInclude<ExtArgs> | null
+  where?: Prisma.SessionEditRequestWhereInput
+  orderBy?: Prisma.SessionEditRequestOrderByWithRelationInput | Prisma.SessionEditRequestOrderByWithRelationInput[]
+  cursor?: Prisma.SessionEditRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SessionEditRequestScalarFieldEnum | Prisma.SessionEditRequestScalarFieldEnum[]
+}
+
+/**
  * Session.mvp
  */
 export type Session$mvpArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2273,6 +2585,30 @@ export type Session$mvpArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   include?: Prisma.PlayerInclude<ExtArgs> | null
   where?: Prisma.PlayerWhereInput
+}
+
+/**
+ * Session.sessionRevisions
+ */
+export type Session$sessionRevisionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SessionRevision
+   */
+  select?: Prisma.SessionRevisionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SessionRevision
+   */
+  omit?: Prisma.SessionRevisionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SessionRevisionInclude<ExtArgs> | null
+  where?: Prisma.SessionRevisionWhereInput
+  orderBy?: Prisma.SessionRevisionOrderByWithRelationInput | Prisma.SessionRevisionOrderByWithRelationInput[]
+  cursor?: Prisma.SessionRevisionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SessionRevisionScalarFieldEnum | Prisma.SessionRevisionScalarFieldEnum[]
 }
 
 /**

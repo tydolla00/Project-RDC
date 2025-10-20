@@ -37,3 +37,12 @@ export const StatType = {
 } as const
 
 export type StatType = (typeof StatType)[keyof typeof StatType]
+
+
+export const EditStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type EditStatus = (typeof EditStatus)[keyof typeof EditStatus]

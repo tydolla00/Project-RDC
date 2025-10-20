@@ -398,7 +398,9 @@ export const ModelName = {
   PlayerSession: 'PlayerSession',
   PlayerStat: 'PlayerStat',
   User: 'User',
-  SheetSync: 'SheetSync'
+  SheetSync: 'SheetSync',
+  SessionEditRequest: 'SessionEditRequest',
+  SessionRevision: 'SessionRevision'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -414,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "player" | "game" | "gameStat" | "session" | "gameSet" | "match" | "playerSession" | "playerStat" | "user" | "sheetSync"
+    modelProps: "player" | "game" | "gameStat" | "session" | "gameSet" | "match" | "playerSession" | "playerStat" | "user" | "sheetSync" | "sessionEditRequest" | "sessionRevision"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1158,6 +1160,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SessionEditRequest: {
+      payload: Prisma.$SessionEditRequestPayload<ExtArgs>
+      fields: Prisma.SessionEditRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SessionEditRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SessionEditRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.SessionEditRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SessionEditRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload>
+        }
+        findMany: {
+          args: Prisma.SessionEditRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload>[]
+        }
+        create: {
+          args: Prisma.SessionEditRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload>
+        }
+        createMany: {
+          args: Prisma.SessionEditRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SessionEditRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.SessionEditRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload>
+        }
+        update: {
+          args: Prisma.SessionEditRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.SessionEditRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SessionEditRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SessionEditRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.SessionEditRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionEditRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.SessionEditRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSessionEditRequest>
+        }
+        groupBy: {
+          args: Prisma.SessionEditRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SessionEditRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SessionEditRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SessionEditRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    SessionRevision: {
+      payload: Prisma.$SessionRevisionPayload<ExtArgs>
+      fields: Prisma.SessionRevisionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SessionRevisionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SessionRevisionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload>
+        }
+        findFirst: {
+          args: Prisma.SessionRevisionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SessionRevisionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload>
+        }
+        findMany: {
+          args: Prisma.SessionRevisionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload>[]
+        }
+        create: {
+          args: Prisma.SessionRevisionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload>
+        }
+        createMany: {
+          args: Prisma.SessionRevisionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SessionRevisionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload>[]
+        }
+        delete: {
+          args: Prisma.SessionRevisionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload>
+        }
+        update: {
+          args: Prisma.SessionRevisionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload>
+        }
+        deleteMany: {
+          args: Prisma.SessionRevisionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SessionRevisionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SessionRevisionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload>[]
+        }
+        upsert: {
+          args: Prisma.SessionRevisionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SessionRevisionPayload>
+        }
+        aggregate: {
+          args: Prisma.SessionRevisionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSessionRevision>
+        }
+        groupBy: {
+          args: Prisma.SessionRevisionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SessionRevisionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SessionRevisionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SessionRevisionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1324,6 +1474,35 @@ export const SheetSyncScalarFieldEnum = {
 export type SheetSyncScalarFieldEnum = (typeof SheetSyncScalarFieldEnum)[keyof typeof SheetSyncScalarFieldEnum]
 
 
+export const SessionEditRequestScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  proposerId: 'proposerId',
+  proposedData: 'proposedData',
+  status: 'status',
+  reviewerId: 'reviewerId',
+  reviewNote: 'reviewNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  reviewedAt: 'reviewedAt',
+  appliedAt: 'appliedAt',
+  appliedBy: 'appliedBy'
+} as const
+
+export type SessionEditRequestScalarFieldEnum = (typeof SessionEditRequestScalarFieldEnum)[keyof typeof SessionEditRequestScalarFieldEnum]
+
+
+export const SessionRevisionScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  snapshot: 'snapshot',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+} as const
+
+export type SessionRevisionScalarFieldEnum = (typeof SessionRevisionScalarFieldEnum)[keyof typeof SessionRevisionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1338,6 +1517,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -1463,6 +1649,20 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'EditStatus'
+ */
+export type EnumEditStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EditStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'EditStatus[]'
+ */
+export type ListEnumEditStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EditStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1572,6 +1772,8 @@ export type GlobalOmitConfig = {
   playerStat?: Prisma.PlayerStatOmit
   user?: Prisma.UserOmit
   sheetSync?: Prisma.SheetSyncOmit
+  sessionEditRequest?: Prisma.SessionEditRequestOmit
+  sessionRevision?: Prisma.SessionRevisionOmit
 }
 
 /* Types for Logging */
