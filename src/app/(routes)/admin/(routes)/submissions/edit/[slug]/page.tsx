@@ -98,6 +98,7 @@ export default async function Page({
 
   const defaultValues: FormValues = {
     game,
+    sessionId: sessionData.sessionId,
     sessionName: sessionData.sessionName,
     sessionUrl: sessionData.sessionUrl,
     thumbnail: sessionData.thumbnail,
@@ -135,6 +136,7 @@ export default async function Page({
       <EntryCreatorForm
         rdcMembers={Array.from(players)}
         defaultValues={defaultValues}
+        type="edit"
       />
     </div>
   );
