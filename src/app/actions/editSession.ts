@@ -6,6 +6,8 @@ import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { revalidateTag } from "next/cache";
 import { after } from "next/server";
+import { UseFormReturn } from "react-hook-form";
+import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 
 type CreateEditResult = { error: string | null };
 
@@ -14,18 +16,27 @@ type CreateEditResult = { error: string | null };
  */
 export async function createSessionEditRequest(
   sessionId: number,
-  proposedData: Record<string, unknown>,
+  proposedData: FormValues,
+  dirtyFields: UseFormReturn<FormValues>["formState"]["dirtyFields"],
 ): Promise<CreateEditResult> {
   const user = await auth();
   if (!user) return { error: errorCodes.NotAuthenticated };
+  else if (Object.keys(dirtyFields).length === 0) {
+    return { error: "No changes detected to submit." };
+  }
 
   try {
+    const json = JSON.stringify(
+      { proposedData: proposedData, dirtyFields: dirtyFields },
+      null,
+      2,
+    );
     const res = await handlePrismaOperation(() =>
-      (prisma as any).sessionEditRequest.create({
+      prisma.sessionEditRequest.create({
         data: {
           sessionId,
           proposerId: user.user?.id,
-          proposedData,
+          proposedData: json,
         },
       }),
     );
@@ -47,7 +58,7 @@ export async function listPendingEdits() {
 
   // Only allow admins - this project doesn't have roles implemented here, so assume authenticated is fine
   const res = await handlePrismaOperation(() =>
-    (prisma as any).sessionEditRequest.findMany({
+    prisma.sessionEditRequest.findMany({
       where: { status: "PENDING" },
       include: { session: true, proposer: true },
       orderBy: { createdAt: "desc" },
@@ -59,13 +70,14 @@ export async function listPendingEdits() {
   return { error: null, data: res.data };
 }
 
+// Todo rework function
 /** Approve an edit: create a SessionRevision snapshot, apply changes to Session, mark request APPROVED */
 export async function approveEditRequest(editId: number) {
   const user = await auth();
   if (!user) return { error: errorCodes.NotAuthenticated };
 
   try {
-    await (prisma as any).$transaction(async (tx: any) => {
+    await prisma.$transaction(async (tx: any) => {
       const edit = await tx.sessionEditRequest.findUnique({
         where: { id: editId },
       });
@@ -146,7 +158,7 @@ export async function rejectEditRequest(editId: number, note?: string) {
 
   try {
     const res = await handlePrismaOperation(() =>
-      (prisma as any).sessionEditRequest.update({
+      prisma.sessionEditRequest.update({
         where: { id: editId },
         data: {
           status: "REJECTED",
