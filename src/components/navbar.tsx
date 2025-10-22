@@ -91,16 +91,9 @@ export const Navbar = async () => {
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem className="hidden md:block">
-          <FeatureFlag
-            devOnly
-            shouldRedirect={false}
-            user={session}
-            flagName="ADMIN_FORM"
-          >
-            <Link className={navigationMenuTriggerStyle()} href="/admin">
-              <FillText className="text-chart-4" text="Admin" />
-            </Link>
-          </FeatureFlag>
+          <Link className={navigationMenuTriggerStyle()} href="/admin">
+            <FillText className="text-chart-4" text="Admin" />
+          </Link>
         </NavigationMenuItem>
 
         {/* MOBILE */}
@@ -119,30 +112,23 @@ export const Navbar = async () => {
         </NavigationMenuItem>
         {/* END MOBILE */}
 
-        <FeatureFlag
-          shouldRedirect={false}
-          flagName="AUTH"
-          user={session}
-          devOnly
-        >
-          <NavigationMenuItem className="hidden sm:block">
-            {session && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Avatar asChild>
-                      <Link href="/profile">
-                        <AvatarImage src={session.user?.image || Icon.src} />
-                        <AvatarFallback>Icon</AvatarFallback>
-                      </Link>
-                    </Avatar>
-                  </TooltipTrigger>
-                  <TooltipContent>{session.user?.name}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </NavigationMenuItem>
-        </FeatureFlag>
+        <NavigationMenuItem className="hidden sm:block">
+          {session && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Avatar asChild>
+                    <Link href="/profile">
+                      <AvatarImage src={session.user?.image || Icon.src} />
+                      <AvatarFallback>Icon</AvatarFallback>
+                    </Link>
+                  </Avatar>
+                </TooltipTrigger>
+                <TooltipContent>{session.user?.name}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </NavigationMenuItem>
         <AuthButton hideOnSmallScreens session={session} />
         <NavigationMenuItem className="hidden sm:block">
           <ModeToggle className="" />
