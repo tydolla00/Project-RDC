@@ -50,7 +50,6 @@ const EntryCreatorForm = ({
     mode: "onChange",
   });
   console.log(form.formState.isDirty); // make sure formState is read before render to enable the Proxy
-  console.log(form.formState.defaultValues);
 
   const { handleSubmit } = form;
 
@@ -87,6 +86,7 @@ const EntryCreatorForm = ({
         const editResult = await createSessionEditRequest(
           defaultValues.sessionId,
           data, // the form data becomes the proposed changes
+          form.formState.dirtyFields,
         );
         err = editResult.error;
         if (!err) {

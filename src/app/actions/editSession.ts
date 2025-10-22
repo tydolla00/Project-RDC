@@ -11,6 +11,11 @@ import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 
 type CreateEditResult = { error: string | null };
 
+export type ProposedData = {
+  proposedData: FormValues;
+  dirtyFields: UseFormReturn<FormValues>["formState"]["dirtyFields"];
+};
+
 /**
  * Create a session edit request. Stores proposed changes in JSON and marks as PENDING.
  */

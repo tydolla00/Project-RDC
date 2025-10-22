@@ -72,9 +72,7 @@ export const SubmissionTable = async ({
             <TableRow key={session.sessionId}>
               <TableCell>{session.sessionId}</TableCell>
               <TableCell className="hover:underline">
-                <Link href={`/admin/submissions/approve/${session.sessionId}`}>
-                  {session.sessionName}
-                </Link>
+                {session.sessionName}
               </TableCell>
               <TableCell>{session.Game.gameName}</TableCell>
               <TableCell className="hover:underline">
@@ -110,7 +108,13 @@ export const SubmissionTable = async ({
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link
-                        className="cursor-pointer"
+                        href={`/admin/submissions/approve/${session.sessionId}`}
+                      >
+                        Approve
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
                         href={`/admin/submissions/edit/${session.sessionId}`}
                       >
                         Edit
