@@ -36,7 +36,7 @@ export async function createSessionEditRequest(
       null,
       2,
     );
-    const res = await handlePrismaOperation(() =>
+    const res = await handlePrismaOperation((prisma) =>
       prisma.sessionEditRequest.create({
         data: {
           sessionId,
@@ -62,7 +62,7 @@ export async function listPendingEdits() {
   if (!user) return { error: errorCodes.NotAuthenticated };
 
   // Only allow admins - this project doesn't have roles implemented here, so assume authenticated is fine
-  const res = await handlePrismaOperation(() =>
+  const res = await handlePrismaOperation((prisma) =>
     prisma.sessionEditRequest.findMany({
       where: { status: "PENDING" },
       include: { session: true, proposer: true },
@@ -162,7 +162,7 @@ export async function rejectEditRequest(editId: number, note?: string) {
   if (!user) return { error: errorCodes.NotAuthenticated };
 
   try {
-    const res = await handlePrismaOperation(() =>
+    const res = await handlePrismaOperation((prisma) =>
       prisma.sessionEditRequest.update({
         where: { id: editId },
         data: {
