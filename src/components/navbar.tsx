@@ -23,7 +23,6 @@ import {
 } from "./ui/tooltip";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { getGamesNav, getMembersNav } from "@/lib/constants";
-import { FeatureFlag } from "@/lib/featureflag";
 import { auth } from "@/auth";
 import { AuthButton, ToggleThemeButton } from "./client-buttons";
 

@@ -57,10 +57,9 @@ export const SessionChangesWrapper = ({
   return (
     <>
       {set.matches.map((match, matchIdx) => {
-        const players = formatChanges(
-          match,
-          json.proposedData.sets[setIndex].matches[matchIdx],
-        );
+        const newMatch = json.proposedData.sets[setIndex].matches[matchIdx];
+        if (!newMatch) return null;
+        const players = formatChanges(match, newMatch);
         if (players.length === 0) return null;
 
         return (

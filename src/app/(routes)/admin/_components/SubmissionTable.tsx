@@ -71,9 +71,7 @@ export const SubmissionTable = async ({
           {sessions.map((session) => (
             <TableRow key={session.sessionId}>
               <TableCell>{session.sessionId}</TableCell>
-              <TableCell className="hover:underline">
-                {session.sessionName}
-              </TableCell>
+              <TableCell>{session.sessionName}</TableCell>
               <TableCell>{session.Game.gameName}</TableCell>
               <TableCell className="hover:underline">
                 <Link

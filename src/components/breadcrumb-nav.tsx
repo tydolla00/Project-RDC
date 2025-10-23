@@ -46,7 +46,7 @@ export function BreadcrumbNav() {
                     </>
                   )}
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                {!isLast && <BreadcrumbSeparator />}
               </Fragment>
             );
           })}

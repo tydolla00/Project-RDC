@@ -89,11 +89,6 @@ const EntryCreatorForm = ({
           form.formState.dirtyFields,
         );
         err = editResult.error;
-        if (!err) {
-          toast.success("Edit request submitted for approval", {
-            richColors: true,
-          });
-        }
         break;
       default:
         err = "Invalid form type.";

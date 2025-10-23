@@ -112,9 +112,19 @@ export default async function Page({
           ) : (
             <div className="space-y-6">
               {editRequests.map((edit) => {
-                const parsedJson = JSON.parse(
-                  edit.proposedData as string,
-                ) as ProposedData;
+                let parsedJson: ProposedData;
+                try {
+                  parsedJson = JSON.parse(edit.proposedData) as ProposedData;
+                } catch {
+                  return (
+                    <div key={edit.id} className="space-y-2">
+                      <p className="text-destructive">
+                        Error parsing edit request data.
+                      </p>
+                      <Separator className="mt-4" />
+                    </div>
+                  );
+                }
 
                 return (
                   <div key={edit.id} className="space-y-2">
@@ -142,22 +152,25 @@ export default async function Page({
                         )}
                         {session?.sets.map((set, setIdx) => (
                           <div key={setIdx}>
-                            {set.matches.length !==
-                              parsedJson.proposedData.sets[setIdx].matches
-                                .length && (
-                              <h4 className="mb-1 text-sm font-medium">
-                                New number of matches:
-                                {
-                                  parsedJson.proposedData.sets[setIdx].matches
-                                    .length
-                                }
-                              </h4>
+                            {parsedJson.proposedData.sets[setIdx] &&
+                              set.matches.length !==
+                                parsedJson.proposedData.sets[setIdx].matches
+                                  .length && (
+                                <h4 className="mb-1 text-sm font-medium">
+                                  New number of matches:
+                                  {
+                                    parsedJson.proposedData.sets[setIdx].matches
+                                      .length
+                                  }
+                                </h4>
+                              )}
+                            {parsedJson.proposedData.sets[setIdx] && (
+                              <SessionChangesWrapper
+                                set={set}
+                                json={parsedJson}
+                                setIndex={setIdx}
+                              />
                             )}
-                            <SessionChangesWrapper
-                              set={set}
-                              json={parsedJson}
-                              setIndex={setIdx}
-                            />
                           </div>
                         ))}
                       </div>
