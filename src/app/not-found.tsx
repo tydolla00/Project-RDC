@@ -34,7 +34,6 @@ export default async function NotFound({
           height="315"
           src="https://www.youtube.com/embed/ij2AxfZanRE?si=B3l9M6O1RjFTYyvE"
           title="YouTube video player"
-          frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
           allowFullScreen
