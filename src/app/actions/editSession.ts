@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import prisma, { handlePrismaOperation } from "prisma/db";
@@ -8,6 +7,8 @@ import { revalidateTag } from "next/cache";
 import { after } from "next/server";
 import { UseFormReturn } from "react-hook-form";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
+import { Prisma } from "@prisma/client";
+import { Session } from "next-auth";
 
 type CreateEditResult = { error: string | null };
 
@@ -77,12 +78,203 @@ export async function listPendingEdits() {
 
 // Todo rework function
 /** Approve an edit: create a SessionRevision snapshot, apply changes to Session, mark request APPROVED */
-export async function approveEditRequest(editId: number) {
+export async function approveEditRequest(editId: number, note?: string) {
+  type SessionSelect = {
+    sessionId: number;
+    date: Date;
+    sets: {
+      sessionId: number;
+      setId: number;
+      createdAt: Date;
+      updatedAt: Date;
+    }[];
+    gameId: number;
+  };
   const user = await auth();
   if (!user) return { error: errorCodes.NotAuthenticated };
 
+  // Helper: create a revision snapshot
+  async function createRevision(
+    tx: Prisma.TransactionClient,
+    session: SessionSelect,
+    createdBy?: string | null,
+  ) {
+    const json = JSON.stringify(session, null, 2);
+    await tx.sessionRevision.create({
+      data: {
+        sessionId: session.sessionId,
+        snapshot: json,
+        createdBy,
+      },
+    });
+  }
+
+  // Helper: mark edit request as approved
+  async function markRequestApproved(
+    tx: Prisma.TransactionClient,
+    id: number,
+    reviewer: Session,
+    reviewNote?: string,
+  ) {
+    await tx.sessionEditRequest.update({
+      where: { id },
+      data: {
+        status: "APPROVED",
+        reviewerId: reviewer.user?.id,
+        reviewNote,
+        reviewedAt: new Date(),
+        appliedAt: new Date(),
+        appliedBy: reviewer.user?.email,
+      },
+    });
+  }
+
+  // Helper: apply top-level session field updates
+  async function applyTopLevelUpdates(
+    tx: Prisma.TransactionClient,
+    sessionId: number,
+    dirtyFields: ProposedData["dirtyFields"],
+    proposedData: ProposedData["proposedData"],
+  ) {
+    await tx.session.update({
+      where: { sessionId },
+      data: {
+        ...(dirtyFields.sessionUrl && { sessionUrl: proposedData.sessionUrl }),
+        ...(dirtyFields.sessionName && {
+          sessionName: proposedData.sessionName,
+        }),
+        ...(dirtyFields.thumbnail && { thumbnail: proposedData.thumbnail }),
+        ...(dirtyFields.videoId && { videoId: proposedData.videoId }),
+      },
+    });
+  }
+
+  // Helper: create match + nested playerSessions and playerStats
+  async function createMatchAndNested(
+    tx: Prisma.TransactionClient,
+    session: SessionSelect,
+    setId: number,
+    match: ProposedData["proposedData"]["sets"][number]["matches"][number],
+  ) {
+    const newMatch = await tx.match.create({
+      data: {
+        setId,
+        matchWinners: {
+          connect:
+            match.matchWinners?.map((w) => ({ playerId: w.playerId })) || [],
+        },
+      },
+    });
+
+    for (
+      let psIndex = 0;
+      psIndex < (match.playerSessions || []).length;
+      psIndex++
+    ) {
+      const ps = match.playerSessions[psIndex];
+      const newPs = await tx.playerSession.create({
+        data: {
+          playerId: ps.playerId,
+          sessionId: session.sessionId,
+          matchId: newMatch.matchId,
+          setId,
+        },
+      });
+
+      if (ps.playerStats && ps.playerStats.length > 0) {
+        const statsToCreate = ps.playerStats.map((stat) => ({
+          playerId: newPs.playerId,
+          gameId: session.gameId,
+          playerSessionId: newPs.playerSessionId,
+          statId: Number(stat.statId),
+          value: stat.statValue,
+          date: session.date,
+        }));
+        await tx.playerStat.createMany({ data: statsToCreate });
+      }
+    }
+  }
+
+  // Helper: create a set and its nested matches/playerSessions/playerStats and connect winners
+  async function createSetWithMatches(
+    tx: Prisma.TransactionClient,
+    session: SessionSelect,
+    set: ProposedData["proposedData"]["sets"][number],
+  ) {
+    const newSet = await tx.gameSet.create({
+      data: { sessionId: session.sessionId },
+    });
+
+    if (set.setWinners && set.setWinners.length > 0) {
+      await tx.gameSet.update({
+        where: { setId: newSet.setId },
+        data: {
+          setWinners: {
+            connect: set.setWinners.map((w) => ({ playerId: w.playerId })),
+          },
+        },
+      });
+    }
+
+    for (let m = 0; m < (set.matches || []).length; m++) {
+      await createMatchAndNested(tx, session, newSet.setId, set.matches[m]);
+    }
+  }
+
+  // Helper: replace all sets for a session
+  async function replaceAllSets(
+    tx: Prisma.TransactionClient,
+    session: SessionSelect,
+    proposedSets: ProposedData["proposedData"]["sets"],
+  ) {
+    await tx.gameSet.deleteMany({ where: { sessionId: session.sessionId } });
+
+    for (let i = 0; i < proposedSets.length; i++) {
+      await createSetWithMatches(tx, session, proposedSets[i]);
+    }
+  }
+
+  // Helper: update existing sets (same count) by replacing winners and matches
+  async function updateExistingSets(
+    tx: Prisma.TransactionClient,
+    session: SessionSelect,
+    proposedSets: ProposedData["proposedData"]["sets"],
+  ) {
+    for (const set of proposedSets) {
+      const existingSet = session.sets.find((s) => set.setId === s.setId);
+      if (!existingSet) {
+        console.warn(
+          `No existing set found for proposed set with ID ${set.setId}`,
+        );
+        continue;
+      }
+
+      // replace set winners (keeps previous approach, even if it uses a project-specific pattern)
+      await tx.gameSet.update({
+        where: { setId: existingSet.setId },
+        data: {
+          setWinners: {
+            set: set.setWinners?.map((w) => ({ playerId: w.playerId })) || [],
+          },
+        },
+      });
+
+      // remove existing matches for this set and recreate
+      await tx.match.deleteMany({ where: { setId: existingSet.setId } });
+
+      for (let m = 0; m < (set.matches || []).length; m++) {
+        await createMatchAndNested(
+          tx,
+          session,
+          existingSet.setId,
+          set.matches[m],
+        );
+      }
+    }
+  }
+
   try {
-    await prisma.$transaction(async (tx: any) => {
+    await prisma.$transaction(async (tx) => {
       const edit = await tx.sessionEditRequest.findUnique({
         where: { id: editId },
       });
@@ -92,60 +284,31 @@ export async function approveEditRequest(editId: number) {
 
       const session = await tx.session.findUnique({
         where: { sessionId: edit.sessionId },
+        select: { sessionId: true, sets: true, gameId: true, date: true },
       });
       if (!session) throw new Error("Session not found");
 
-      // create revision snapshot
-      await tx.sessionRevision.create({
-        data: {
-          sessionId: session.sessionId,
-          snapshot: session as unknown as Record<string, unknown>,
-          createdBy: user.user?.id,
-        },
-      });
+      const newJson = JSON.parse(edit.proposedData as string) as ProposedData;
 
-      // prepare allowed update fields
-      const allowed = [
-        "sessionName",
-        "sessionUrl",
-        "thumbnail",
-        "mvpId",
-        "mvpDescription",
-        "mvpStats",
-        "videoId",
-        "gameId",
-        "date",
-        "isApproved",
-      ];
+      // create revision and mark approved
+      await createRevision(tx, session, user.user?.email ?? null);
+      await markRequestApproved(tx, editId, user, note);
 
-      const updateData: Record<string, unknown> = {};
-      for (const key of allowed) {
-        const proposed = edit.proposedData as unknown as Record<
-          string,
-          unknown
-        >;
-        if (Object.prototype.hasOwnProperty.call(proposed, key)) {
-          updateData[key] = proposed[key];
-        }
+      // top-level updates
+      await applyTopLevelUpdates(
+        tx,
+        session.sessionId,
+        newJson.dirtyFields,
+        newJson.proposedData,
+      );
+
+      const proposedSets = newJson.proposedData.sets || [];
+
+      if (session.sets.length !== proposedSets.length) {
+        await replaceAllSets(tx, session, proposedSets);
+      } else {
+        await updateExistingSets(tx, session, proposedSets);
       }
-
-      if (Object.keys(updateData).length > 0) {
-        await tx.session.update({
-          where: { sessionId: session.sessionId },
-          data: updateData as any,
-        });
-      }
-
-      await tx.sessionEditRequest.update({
-        where: { id: editId },
-        data: {
-          status: "APPROVED",
-          reviewerId: user.user?.id,
-          reviewedAt: new Date(),
-          appliedAt: new Date(),
-          appliedBy: user.user?.id,
-        },
-      });
     });
 
     revalidateTag("getAllSessions");

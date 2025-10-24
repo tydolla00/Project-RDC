@@ -1,46 +1,13 @@
 import prisma from "prisma/db";
 import { notFound } from "next/navigation";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { EditStatus } from "@prisma/client";
 import { ProposedData } from "@/app/actions/editSession";
 import { SessionChangesWrapper } from "../_components/Changes";
 import { Status } from "../_components/Status";
-
-export type Session = {
-  sessionId: number;
-  sessionName: string;
-  Game: {
-    gameName: string;
-  } | null;
-  sets: {
-    setId: number;
-    matches: {
-      matchId: number;
-      matchWinners: { playerId: number; playedName: string }[]; // kept generic since shape isn't used
-      playerSessions: {
-        playerStats: Array<{
-          statId: number | string;
-          value: string;
-          gameStat: {
-            statName: string;
-          };
-        }>;
-      }[];
-    }[];
-  }[];
-};
-
-type EditRequest = {
-  id: number;
-  status: EditStatus;
-  proposedData: string;
-  createdAt: Date;
-  reviewedAt: Date | null;
-  reviewNote: string | null;
-  proposer: { name: string | null } | null;
-  reviewer: { name: string | null } | null;
-};
+import { H1, H2 } from "@/components/headings";
+import { ApproveButton, DeclineButton } from "../_components/ActionButtons";
 
 export default async function Page({
   params,
@@ -50,63 +17,18 @@ export default async function Page({
   const sessionId = parseInt((await params).slug);
   if (isNaN(sessionId)) notFound();
 
-  const [session, editRequests] = (await Promise.all([
-    prisma.session.findUnique({
-      where: { sessionId },
-      include: {
-        Game: {
-          select: {
-            gameName: true,
-          },
-        },
-        sets: {
-          include: {
-            matches: {
-              include: {
-                matchWinners: true,
-                playerSessions: {
-                  include: {
-                    playerStats: {
-                      include: {
-                        gameStat: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    }),
-    prisma.sessionEditRequest.findMany({
-      where: { sessionId },
-      select: {
-        proposedData: true,
-        id: true,
-        status: true,
-        createdAt: true,
-        reviewedAt: true,
-        reviewNote: true,
-        proposer: { select: { name: true } },
-        reviewer: { select: { name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-  ])) as [Session | null, EditRequest[]];
+  const [session, editRequests] = await fetchEditRequests(sessionId);
 
   if (!session) notFound();
 
   return (
     <div className="container mx-auto py-8">
-      <Card className="relative">
-        <CardHeader>
-          <CardTitle>Review History: {session.sessionName}</CardTitle>
-          <div className="text-muted-foreground mt-2 text-sm">
-            Game: {session.Game?.gameName}
-          </div>
-        </CardHeader>
-        <CardContent>
+      <H1>Review Session: {session.sessionName}</H1>
+      <H2 className="text-muted-foreground mt-2 text-sm">
+        Game: {session.Game?.gameName}
+      </H2>
+      <Card className="my-2">
+        <CardContent className="p-6">
           {editRequests.length === 0 ? (
             <p className="text-muted-foreground">No revision history found.</p>
           ) : (
@@ -127,7 +49,7 @@ export default async function Page({
                 }
 
                 return (
-                  <div key={edit.id} className="space-y-2">
+                  <div key={edit.id} className="relative space-y-2">
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="font-medium">
@@ -187,6 +109,12 @@ export default async function Page({
                         )}
                       </div>
                     )}
+                    {edit.status === "PENDING" ? (
+                      <div className="flex gap-2">
+                        <ApproveButton editId={edit.id} />
+                        <DeclineButton editId={edit.id} />
+                      </div>
+                    ) : null}
                     <Separator className="mt-4" />
                   </div>
                 );
@@ -198,3 +126,87 @@ export default async function Page({
     </div>
   );
 }
+
+export type Session = {
+  sessionId: number;
+  sessionName: string;
+  Game: {
+    gameName: string;
+  } | null;
+  sets: {
+    setId: number;
+    matches: {
+      matchId: number;
+      matchWinners: { playerId: number; playedName: string }[]; // kept generic since shape isn't used
+      playerSessions: {
+        playerStats: Array<{
+          statId: number | string;
+          value: string;
+          gameStat: {
+            statName: string;
+          };
+        }>;
+      }[];
+    }[];
+  }[];
+};
+
+type EditRequest = {
+  id: number;
+  status: EditStatus;
+  proposedData: string;
+  createdAt: Date;
+  reviewedAt: Date | null;
+  reviewNote: string | null;
+  proposer: { name: string | null } | null;
+  reviewer: { name: string | null } | null;
+};
+
+const fetchEditRequests = async (
+  sessionId: number,
+): Promise<[Session | null, EditRequest[]]> => {
+  return Promise.all([
+    prisma.session.findUnique({
+      where: { sessionId },
+      include: {
+        Game: {
+          select: {
+            gameName: true,
+          },
+        },
+        sets: {
+          include: {
+            matches: {
+              include: {
+                matchWinners: true,
+                playerSessions: {
+                  include: {
+                    playerStats: {
+                      include: {
+                        gameStat: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    }),
+    prisma.sessionEditRequest.findMany({
+      where: { sessionId },
+      select: {
+        proposedData: true,
+        id: true,
+        status: true,
+        createdAt: true,
+        reviewedAt: true,
+        reviewNote: true,
+        proposer: { select: { name: true } },
+        reviewer: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]) as Promise<[Session | null, EditRequest[]]>;
+};
