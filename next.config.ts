@@ -1,7 +1,7 @@
 import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // experimental: { reactCompiler: true },
+  reactCompiler: true,
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "i.ytimg.com" },
