@@ -2,7 +2,7 @@ import prisma from "prisma/db";
 import { notFound } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { EditStatus } from "@prisma/client";
+import { EditStatus, Player } from "@prisma/client";
 import { ProposedData } from "@/app/actions/editSession";
 import { SessionChangesWrapper } from "../_components/Changes";
 import { Status } from "../_components/Status";
@@ -135,9 +135,10 @@ export type Session = {
   } | null;
   sets: {
     setId: number;
+    setWinners: { playerId: number; playerName: string }[];
     matches: {
       matchId: number;
-      matchWinners: { playerId: number; playedName: string }[]; // kept generic since shape isn't used
+      matchWinners: Player[]; // kept generic since shape isn't used
       playerSessions: {
         playerStats: Array<{
           statId: number | string;
@@ -176,6 +177,7 @@ const fetchEditRequests = async (
         },
         sets: {
           include: {
+            setWinners: true,
             matches: {
               include: {
                 matchWinners: true,

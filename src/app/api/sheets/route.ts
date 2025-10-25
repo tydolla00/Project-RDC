@@ -31,6 +31,8 @@ function getServiceAccount(): {
 }
 
 export async function GET(req: NextRequest) {
+  // Ensure only authorized cron jobs can access this route
+
   const cronSecret = config.CRON_SECRET;
   const authHeader = req.headers.get("authorization") ?? "";
 
@@ -38,6 +40,8 @@ export async function GET(req: NextRequest) {
 
   if (authHeader !== `Bearer ${cronSecret}`)
     return new Response("Unauthorized", { status: 401 });
+
+  // Start work
 
   const sa = getServiceAccount();
   const spreadsheetId = config.SHEET_ID;

@@ -13,13 +13,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { toast } from "sonner";
+
+const maxLength = 300;
 
 export const ApproveButton = ({ editId }: { editId: number }) => {
   const [note, setNote] = useState("");
   return (
-    <Dialog>
+    <Dialog onOpenChange={() => setNote("")}>
       <DialogTrigger asChild>
         <Button type="button">Approve</Button>
       </DialogTrigger>
@@ -27,11 +30,24 @@ export const ApproveButton = ({ editId }: { editId: number }) => {
         <DialogHeader>
           <DialogTitle>Approve Edit Request</DialogTitle>
         </DialogHeader>
-        <Input value={note} onChange={(e) => setNote(e.target.value)} />
+        <Textarea
+          maxLength={maxLength}
+          className="resize-y"
+          placeholder="Optional note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
         <Button
           type="button"
           onClick={async () => {
-            await approveEditRequest(editId, note || undefined);
+            console.log(note.length);
+            if (note.length > maxLength) {
+              toast.error(`Note must be less than ${maxLength} characters`, {
+                richColors: true,
+              });
+            } else {
+              await approveEditRequest(editId, note || undefined);
+            }
           }}
         >
           Confirm
@@ -49,7 +65,7 @@ export const ApproveButton = ({ editId }: { editId: number }) => {
 export const DeclineButton = ({ editId }: { editId: number }) => {
   const [note, setNote] = useState("");
   return (
-    <Dialog>
+    <Dialog onOpenChange={() => setNote("")}>
       <DialogTrigger asChild>
         <Button type="button" variant="destructive">
           Decline
@@ -59,12 +75,24 @@ export const DeclineButton = ({ editId }: { editId: number }) => {
         <DialogHeader>
           <DialogTitle>Decline Edit Request</DialogTitle>
         </DialogHeader>
-        <Input value={note} onChange={(e) => setNote(e.target.value)} />
+        <Textarea
+          className="resize-y"
+          placeholder="Optional note"
+          maxLength={300}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
         <Button
           type="button"
           variant="destructive"
           onClick={async () => {
-            await rejectEditRequest(editId, note || undefined);
+            if (note.length > maxLength) {
+              toast.error(`Note must be less than ${maxLength} characters`, {
+                richColors: true,
+              });
+            } else {
+              await rejectEditRequest(editId, note || undefined);
+            }
           }}
         >
           Confirm

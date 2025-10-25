@@ -3,6 +3,8 @@ import { findPlayer } from "@/app/(routes)/admin/_utils/player-mappings";
 import { Session } from "../[slug]/page";
 import { FormValues } from "@/app/(routes)/admin/_utils/form-helpers";
 import { ProposedData } from "@/app/actions/editSession";
+import { Separator } from "@/components/ui/separator";
+import { Player } from "@prisma/client";
 
 type ProposedChange = {
   player: string;
@@ -54,19 +56,82 @@ export const SessionChangesWrapper = ({
   json: ProposedData;
   setIndex: number;
 }) => {
+  const newSet = json.proposedData.sets[setIndex];
+  let isNewSetWinners = false;
+
+  for (const winner of set.setWinners) {
+    const newWinner = newSet.setWinners.find(
+      (nw) => nw.playerId === winner.playerId,
+    );
+    if (!newWinner) {
+      isNewSetWinners = true;
+      break;
+    }
+  }
   return (
     <>
+      {/* TODO Set winners not working bc json  */}
+      {isNewSetWinners && (
+        <div className="my-3 flex flex-wrap items-center">
+          <div className="text-red-500">Set winners have changed</div>
+          {set.setWinners.map((winner) => (
+            <PlayerAndName
+              key={winner.playerId}
+              winner={winner}
+              newWinner={false}
+            />
+          ))}
+          {newSet.setWinners.map((winner) => (
+            <PlayerAndName
+              key={winner.playerId}
+              winner={winner}
+              newWinner={true}
+            />
+          ))}
+        </div>
+      )}
       {set.matches.map((match, matchIdx) => {
-        const newMatch = json.proposedData.sets[setIndex].matches[matchIdx];
+        const newMatch = newSet.matches[matchIdx];
         if (!newMatch) return null;
         const players = formatChanges(match, newMatch);
         if (players.length === 0) return null;
+
+        let isNewMatchWinners = false;
+        for (const winner of match.matchWinners) {
+          const newWinner = newSet.matches[matchIdx].matchWinners.find(
+            (nw) => nw.playerId === winner.playerId,
+          );
+          if (!newWinner) {
+            isNewMatchWinners = true;
+            break;
+          }
+        }
 
         return (
           <div key={matchIdx} className="mb-4">
             <div className="text-muted-foreground mb-2 text-sm">
               Set {setIndex + 1}, Match {matchIdx + 1}
             </div>
+            {isNewMatchWinners && (
+              <div className="my-3 flex flex-wrap items-center">
+                <div className="text-red-500">Match winners have changed</div>
+                {match.matchWinners.map((winner) => (
+                  <PlayerAndName
+                    key={winner.playerId}
+                    winner={winner}
+                    newWinner={false}
+                  />
+                ))}
+                {newMatch.matchWinners.map((winner) => (
+                  <PlayerAndName
+                    key={winner.playerId}
+                    winner={winner}
+                    newWinner={true}
+                  />
+                ))}
+              </div>
+            )}
+            <Separator />
             <Changes players={players} />
           </div>
         );
@@ -105,5 +170,24 @@ export const Changes = ({
         );
       })}
     </>
+  );
+};
+
+const PlayerAndName = ({
+  winner,
+  newWinner,
+}: {
+  winner: Player;
+  newWinner: boolean;
+}) => {
+  return (
+    <div key={winner.playerId} className="flex items-center gap-4 pl-4">
+      <PlayerAvatar player={findPlayer(winner.playerName)!} />
+      <span
+        className={`text-sm font-medium ${newWinner ? "text-green-500" : "text-red-500"}`}
+      >
+        {winner.playerName}
+      </span>
+    </div>
   );
 };
