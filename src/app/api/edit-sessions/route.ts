@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
   );
   if (res.success) {
     console.log(`Deleted ${res.data.count} edit sessions`);
-  }
-  return new Response("Cleaned up edit sessions", { status: 200 });
+    return new Response("Cleaned up edit sessions", { status: 200 });
+  } else
+    return new Response("Error cleaning up edit sessions", { status: 500 });
 }
