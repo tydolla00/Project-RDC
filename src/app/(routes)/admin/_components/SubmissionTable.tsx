@@ -11,11 +11,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { PaginationButtons } from "../(routes)/submissions/_components/PaginationButtons";
+import { PaginationButtons } from "../(admin_routes)/submissions/_components/PaginationButtons";
 import prisma from "prisma/db";
 
 export const SubmissionTable = async ({
@@ -38,6 +39,9 @@ export const SubmissionTable = async ({
         isApproved: true,
         Game: {
           select: { gameName: true },
+        },
+        sessionEditRequests: {
+          select: { id: true },
         },
       },
     }),
@@ -67,11 +71,7 @@ export const SubmissionTable = async ({
           {sessions.map((session) => (
             <TableRow key={session.sessionId}>
               <TableCell>{session.sessionId}</TableCell>
-              <TableCell className="hover:underline">
-                <Link href={`/admin/submissions/approve/${session.sessionId}`}>
-                  {session.sessionName}
-                </Link>
-              </TableCell>
+              <TableCell>{session.sessionName}</TableCell>
               <TableCell>{session.Game.gameName}</TableCell>
               <TableCell className="hover:underline">
                 <Link
@@ -92,9 +92,27 @@ export const SubmissionTable = async ({
                     <DotsVerticalIcon className="h-4 w-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem
+                      disabled={session.sessionEditRequests.length === 0}
+                      asChild
+                    >
                       <Link
                         className="cursor-pointer"
+                        href={`/admin/submissions/review/${session.sessionId}`}
+                      >
+                        Revisions ({session.sessionEditRequests.length})
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={`/admin/submissions/approve/${session.sessionId}`}
+                      >
+                        Approve
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
                         href={`/admin/submissions/edit/${session.sessionId}`}
                       >
                         Edit

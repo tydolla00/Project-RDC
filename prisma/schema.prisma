@@ -101,21 +101,23 @@ model GameStat {
 }
 
 model Session {
-  sessionId      Int       @id @default(autoincrement()) @map("session_id")
-  sessionName    String    @map("session_name")
-  sessionUrl     String    @map("session_url")
-  gameId         Int       @map("game_id")
-  Game           Game      @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
-  sets           GameSet[]
-  dayWinners     Player[]  @relation("DayWinners")
-  thumbnail      String
-  date           DateTime  @default(now()) // Date video posted
-  videoId        String
-  mvp            Player?   @relation("Mvp", fields: [mvpId], references: [playerId], onDelete: SetNull) // on delete not in schema
-  mvpId          Int? 
-  mvpDescription String?  
+  sessionId           Int                  @id @default(autoincrement()) @map("session_id")
+  sessionName         String               @map("session_name")
+  sessionUrl          String               @map("session_url")
+  gameId              Int                  @map("game_id")
+  Game                Game                 @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
+  sets                GameSet[]
+  dayWinners          Player[]             @relation("DayWinners")
+  sessionEditRequests SessionEditRequest[]
+  thumbnail           String
+  date                DateTime             @default(now()) // Date video posted
+  videoId             String
+  mvp                 Player?              @relation("Mvp", fields: [mvpId], references: [playerId], onDelete: SetNull) // on delete not in schema
+  mvpId               Int?
+  mvpDescription      String?
   /// [MvpOutput]
-  mvpStats       Json? // json not in schema
+  mvpStats            Json? // json not in schema
+  sessionRevisions    SessionRevision[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -123,7 +125,7 @@ model Session {
   isApproved Boolean @default(false) @map("is_approved")
   createdBy  String  @default("SYSTEM") @map("created_by")
 
-  @@unique([gameId, videoId]) 
+  @@unique([gameId, videoId])
   @@map("sessions")
 }
 
@@ -192,13 +194,16 @@ model PlayerStat {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String               @id @default(cuid())
   name          String?
-  email         String    @unique
+  email         String               @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  // Inverse relations for session edit requests
+  proposedEdits SessionEditRequest[] @relation("SessionEditProposer")
+  reviewedEdits SessionEditRequest[] @relation("SessionEditReviewer")
 }
 
 model SheetSync {
@@ -210,4 +215,42 @@ model SheetSync {
   summary     String?
 
   @@map("sheet_sync")
+}
+
+enum EditStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model SessionEditRequest {
+  id           Int        @id @default(autoincrement())
+  sessionId    Int        @map("session_id")
+  session      Session    @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+  proposerId   String?    @map("proposer_id")
+  proposer     User?      @relation("SessionEditProposer", fields: [proposerId], references: [id])
+  proposedData Json       @map("proposed_data") // arbitrary proposed fields, e.g. { sessionName, thumbnail, mvpId, mvpDescription, mvpStats, videoId, ... }
+  status       EditStatus @default(PENDING)
+  reviewerId   String?    @map("reviewer_id")
+  reviewer     User?      @relation("SessionEditReviewer", fields: [reviewerId], references: [id])
+  reviewNote   String?    @map("review_note")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  reviewedAt   DateTime?  @map("reviewed_at")
+  appliedAt    DateTime?  @map("applied_at") // when changes were applied to sessions
+  appliedBy    String?    @map("applied_by")
+
+  @@index([sessionId, status])
+  @@map("session_edit_requests")
+}
+
+model SessionRevision {
+  id        Int      @id @default(autoincrement())
+  sessionId Int      @map("session_id")
+  session   Session  @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+  snapshot  Json // full session snapshot before change
+  createdBy String?  @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("session_revisions")
 }

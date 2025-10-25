@@ -56,7 +56,7 @@ export const analyzeMvp = async (
     });
 
     // Atomically update the session ONLY if an MVP has not been set.
-    const updateResult = await handlePrismaOperation(() =>
+    const updateResult = await handlePrismaOperation((prisma) =>
       prisma.session.updateMany({
         where: {
           sessionId,

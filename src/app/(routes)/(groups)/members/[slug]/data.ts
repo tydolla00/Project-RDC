@@ -1,8 +1,8 @@
-import prisma, { handlePrismaOperation } from "prisma/db";
+import { handlePrismaOperation } from "prisma/db";
 import { cache } from "react";
 
 export const getMember = cache(async (slug: string) => {
-  const member = await handlePrismaOperation(() =>
+  const member = await handlePrismaOperation((prisma) =>
     prisma.player.findFirst({
       where: {
         playerName: {

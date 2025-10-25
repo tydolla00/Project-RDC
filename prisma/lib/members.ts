@@ -1,4 +1,4 @@
-import prisma, { handlePrismaOperation } from "../db";
+import { handlePrismaOperation } from "../db";
 import { unstable_cache } from "next/cache";
 
 /**
@@ -10,7 +10,7 @@ import { unstable_cache } from "next/cache";
  * @returns {Promise<Array<Player>>} A promise that resolves to an array of player objects.
  */
 export const getAllMembers = unstable_cache(
-  async () => await handlePrismaOperation(() => prisma.player.findMany()),
+  async () => await handlePrismaOperation((prisma) => prisma.player.findMany()),
   undefined,
   { tags: ["allMembers"], revalidate: false },
 );

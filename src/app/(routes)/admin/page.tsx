@@ -13,7 +13,7 @@ export default async function Page() {
     <div>
       <H1>Admin</H1>
       <Suspense fallback={<Skelly />}>
-        <EntryCreatorForm rdcMembers={members.data} />
+        <EntryCreatorForm rdcMembers={members.data} type="create" />
       </Suspense>
     </div>
   );

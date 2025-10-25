@@ -1,5 +1,5 @@
 import EntryCreatorForm from "../../../../_components/form/EntryCreatorForm";
-import prisma, { handlePrismaOperation } from "prisma/db";
+import { handlePrismaOperation } from "prisma/db";
 import { Player } from "@prisma/client";
 import { FormValues } from "../../../../_utils/form-helpers";
 
@@ -13,7 +13,7 @@ export default async function Page({
   if (isNaN(sessionId))
     return <div className="container mx-auto py-6">Invalid session ID</div>;
 
-  const session = await handlePrismaOperation(() =>
+  const session = await handlePrismaOperation((prisma) =>
     prisma.session.findUnique({
       where: { sessionId },
       include: {
@@ -98,6 +98,7 @@ export default async function Page({
 
   const defaultValues: FormValues = {
     game,
+    sessionId: sessionData.sessionId,
     sessionName: sessionData.sessionName,
     sessionUrl: sessionData.sessionUrl,
     thumbnail: sessionData.thumbnail,
@@ -135,6 +136,7 @@ export default async function Page({
       <EntryCreatorForm
         rdcMembers={Array.from(players)}
         defaultValues={defaultValues}
+        type="edit"
       />
     </div>
   );
