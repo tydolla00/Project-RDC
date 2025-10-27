@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -9,66 +9,42 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { submitFeedback } from "@/app/actions/feedback";
 import { toast } from "sonner";
 
-export type FeedbackType = "bug" | "feature" | "general" | "other";
-
 // TODO Use React Form Semantics
 export default function Page() {
-  const [type, setType] = useState<FeedbackType>("general");
-  const [otherType, setOtherType] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [actionState, action, isPending] = useActionState<
+    { error: string | null } | undefined
+    // @ts-expect-error Action type incorrect.
+  >(submitFeedback, undefined);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-
-    if (!message.trim()) {
-      setError("Please enter your feedback message.");
-      return;
+  useEffect(() => {
+    if (actionState?.error === null) {
+      toast.success(
+        "Thank you for your feedback. We greatly appreciate it. We may be in touch if we need more information.",
+        { richColors: true },
+      );
+      formRef.current?.reset();
     }
-
-    setLoading(true);
-    try {
-      const res = await submitFeedback(type, message.trim());
-
-      if (!res) {
-        throw new Error("Failed to submit feedback");
-      }
-
-      toast.success("Thanks — your feedback was sent.", { richColors: true });
-      setMessage("");
-      setOtherType("");
-      setType("general");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      setError(message || "An error occurred");
-    } finally {
-      setLoading(false);
-    }
-  }
+  }, [actionState]);
 
   return (
     <div className="mx-auto max-w-xl p-6">
       <h1 className="mb-4 text-2xl font-semibold">Feedback</h1>
-
       <form
-        onSubmit={handleSubmit}
+        ref={formRef}
+        action={action}
+        method="POST"
         aria-label="Feedback form"
         className="space-y-4"
       >
         <div className="grid gap-1">
           <Label htmlFor="feedback-type">Type</Label>
-          <Select
-            value={type}
-            onValueChange={(v) => setType(v as FeedbackType)}
-          >
+          <Select name="type" required>
             <SelectTrigger id="feedback-type" className="w-full">
               <SelectValue placeholder="Select a type" />
             </SelectTrigger>
@@ -81,41 +57,28 @@ export default function Page() {
           </Select>
         </div>
 
-        {type === "other" && (
-          <div className="grid gap-1">
-            <Label htmlFor="other-type">Please specify</Label>
-            <Input
-              id="other-type"
-              value={otherType}
-              onChange={(e) => setOtherType(e.target.value)}
-              placeholder="e.g. billing, accessibility"
-            />
-          </div>
-        )}
-
         <div className="grid gap-1">
           <Label htmlFor="message">Message</Label>
           <Textarea
+            required
             id="message"
+            name="message"
             rows={6}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
             className="min-h-[140px]"
           />
         </div>
 
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={loading}>
-            {loading ? "Sending…" : "Send feedback"}
+          <Button type="submit" disabled={isPending}>
+            {isPending ? "Sending…" : "Send feedback"}
           </Button>
-
-          {error && (
-            <p role="alert" className="text-sm text-red-600">
-              {error}
-            </p>
-          )}
         </div>
       </form>
+      {actionState?.error && (
+        <p role="alert" className="mt-4 text-sm text-red-600">
+          {actionState.error}
+        </p>
+      )}
     </div>
   );
 }
