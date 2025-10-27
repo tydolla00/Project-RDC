@@ -66,10 +66,14 @@ export const logFormError = async (
   });
 };
 
-export const logFormSuccess = async (userSession?: Session | null) => {
+type Forms = "ADMIN_FORM" | "FEEDBACK_FORM";
+export const logFormSuccess = async (
+  event: Forms,
+  userSession?: Session | null,
+) => {
   const session = userSession ?? (await auth());
   posthog.capture({
-    event: "ADMIN_FORM_SUCCESS",
+    event: `${event}_SUBMISSION_SUCCESS`,
     distinctId: session?.user?.email || v4(),
     properties: {
       submittedAt: new Date().toISOString(),

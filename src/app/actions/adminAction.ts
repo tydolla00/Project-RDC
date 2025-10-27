@@ -314,7 +314,7 @@ export const insertNewSessionFromAdmin = async (
         }),
       );
     });
-    after(() => logFormSuccess(user));
+    after(() => logFormSuccess("ADMIN_FORM", user));
     revalidateTag("getAllSessions");
     return { error: null };
   } catch (err) {
