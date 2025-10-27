@@ -104,7 +104,13 @@ export default async function Home() {
   );
 }
 
-const data = [
+export type SorryData = {
+  player: string;
+  sorryCounter: number;
+  sorryScale: number;
+  fill: string;
+};
+const data: SorryData[] = [
   {
     player: "mark",
     sorryCounter: 100,
