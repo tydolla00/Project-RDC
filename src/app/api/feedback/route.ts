@@ -6,6 +6,15 @@ import { Resend } from "resend";
 
 const resend = new Resend(config.RESEND_API_KEY!);
 
+const escapeHtml = (unsafe: string) => {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 export async function GET(req: NextRequest) {
   try {
     // Ensure only authorized cron jobs can access this route
@@ -41,9 +50,9 @@ export async function GET(req: NextRequest) {
 
     const feedback = feedBack.data
       .flatMap((fb) => [
-        `<p>Type: ${fb.type}</p>`,
-        `<p>Message: ${fb.message}</p>`,
-        `<p>User Email: ${fb.userEmail}</p>`,
+        `<p>Type: ${escapeHtml(fb.type)}</p>`,
+        `<p>Message: ${escapeHtml(fb.message)}</p>`,
+        `<p>User Email: ${escapeHtml(fb.userEmail)}</p>`,
         `<p>Created At: ${fb.createdAt}</p>`,
         `<hr />`,
       ])
