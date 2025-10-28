@@ -58,8 +58,22 @@ export async function GET(req: NextRequest) {
       // react: EmailTemplate(),
     });
     if (error) throw error;
+    else {
+      const res = await handlePrismaOperation((prisma) =>
+        prisma.feedback.deleteMany({
+          where: {
+            // when created in the past 7 days
+            createdAt: {
+              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+            },
+          },
+        }),
+      );
+      if (!res.success) throw new Error(res.error);
+    }
     return new Response("Emails sent successfully", { status: 200 });
-  } catch {
+  } catch (error) {
+    console.error("Error sending feedback emails", { error });
     return new Response("Failed to send emails", { status: 500 });
   }
 }
