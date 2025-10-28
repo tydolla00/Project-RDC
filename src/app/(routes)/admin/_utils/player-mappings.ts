@@ -58,6 +58,7 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
       "Dylan",
       "RdcDylan#2869564",
       "RdcDylan",
+      "RdcDylann",
     ],
     image: "/images/dylan_rdc.jpg",
     nav: {
@@ -102,6 +103,7 @@ export const PLAYER_MAPPINGS: PlayerMapping & {} = {
       "Leland",
       "Lee",
       "MysticLeland#1739668",
+      "MysticLeland",
     ],
     image: "/images/leland_rdc.jpg",
     nav: {

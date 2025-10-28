@@ -1,6 +1,19 @@
 import { StatName } from "@/lib/stat-names";
 import { z } from "zod/v4";
 
+// Marvel Rivals optional stats (expandable stats that can be left empty)
+const MARVEL_RIVALS_OPTIONAL_STATS = [
+  StatName.MR_TRIPLE_KILL,
+  StatName.MR_QUADRA_KILL,
+  StatName.MR_PENTA_KILL,
+  StatName.MR_HEXA_KILL,
+  StatName.MR_MEDALS,
+  StatName.MR_HIGHEST_DMG,
+  StatName.MR_HIGHEST_DMG_BLOCKED,
+  StatName.MR_MOST_HEALING,
+  StatName.MR_MOST_ASSISTS_FIST,
+] as const;
+
 // Session Schema Definitions
 const sessionIdSchema = z.number().optional();
 const gameSchema = z.union([
@@ -105,34 +118,63 @@ const codStats = z.object({
     .transform((val) => String(parseInt(val) || 0)),
 });
 
-const marvelRivalsStats = z.object({
-  statId: z.int().min(1, "StatId is required"),
-  stat: z.literal([
-    StatName.MR_KILLS,
-    StatName.MR_DEATHS,
-    StatName.MR_ASSISTS,
-    StatName.MR_TRIPLE_KILL,
-    StatName.MR_QUADRA_KILL,
-    StatName.MR_PENTA_KILL,
-    StatName.MR_HEXA_KILL,
-    StatName.MR_MEDALS,
-    StatName.MR_HIGHEST_DMG,
-    StatName.MR_HIGHEST_DMG_BLOCKED,
-    StatName.MR_MOST_HEALING,
-    StatName.MR_MOST_ASSISTS_FIST,
-    StatName.MR_FINAL_HITS,
-    StatName.MR_DMG,
-    StatName.MR_DMG_BLOCKED,
-    StatName.MR_HEALING,
-    StatName.MR_ACCURACY,
-  ]),
-  statValue: z
-    .string()
-    .trim()
-    .min(1, "Required")
-    .regex(/^\d+$/, "Stat value must be a number")
-    .transform((val) => String(parseInt(val) || 0)),
-});
+const marvelRivalsStats = z
+  .object({
+    statId: z.int().min(1, "StatId is required"),
+    stat: z.literal([
+      StatName.MR_KILLS,
+      StatName.MR_DEATHS,
+      StatName.MR_ASSISTS,
+      StatName.MR_TRIPLE_KILL,
+      StatName.MR_QUADRA_KILL,
+      StatName.MR_PENTA_KILL,
+      StatName.MR_HEXA_KILL,
+      StatName.MR_MEDALS,
+      StatName.MR_HIGHEST_DMG,
+      StatName.MR_HIGHEST_DMG_BLOCKED,
+      StatName.MR_MOST_HEALING,
+      StatName.MR_MOST_ASSISTS_FIST,
+      StatName.MR_FINAL_HITS,
+      StatName.MR_DMG,
+      StatName.MR_DMG_BLOCKED,
+      StatName.MR_HEALING,
+      StatName.MR_ACCURACY,
+    ]),
+    statValue: z.string().trim(),
+  })
+  .superRefine((data, ctx) => {
+    const isOptionalStat = MARVEL_RIVALS_OPTIONAL_STATS.includes(
+      data.stat as (typeof MARVEL_RIVALS_OPTIONAL_STATS)[number],
+    );
+
+    // If the stat is optional and empty, that's fine - just set to "0"
+    if (isOptionalStat && data.statValue === "") {
+      return;
+    }
+
+    // For required stats or non-empty optional stats, validate
+    if (!isOptionalStat && data.statValue === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["statValue"],
+      });
+      return;
+    }
+
+    // Validate that it's a number
+    if (!/^\d+$/.test(data.statValue)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Stat value must be a number",
+        path: ["statValue"],
+      });
+    }
+  })
+  .transform((data) => ({
+    ...data,
+    statValue: String(parseInt(data.statValue) || 0),
+  }));
 
 // Stat Schema Union
 const statSchema = z.discriminatedUnion("stat", [
