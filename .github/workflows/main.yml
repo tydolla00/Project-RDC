@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install Vercel CLI
         run: npm install -g vercel
@@ -38,6 +38,9 @@ jobs:
 
       - name: Set Posthog Key
         run: echo "NEXT_PUBLIC_POSTHOG_KEY=${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}" >> $GITHUB_ENV
+
+      - name: Set Resend Key
+        run: echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> $GITHUB_ENV
 
       - name: Build with Vercel
         env:
