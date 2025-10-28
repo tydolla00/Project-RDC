@@ -53,4 +53,5 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: vercel build --token ${{ secrets.VERCEL_TOKEN }} --prod
