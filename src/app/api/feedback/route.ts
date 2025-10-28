@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 import { handlePrismaOperation } from "prisma/db";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+const resend = new Resend(config.RESEND_API_KEY!);
 
 export async function GET(req: NextRequest) {
   try {
