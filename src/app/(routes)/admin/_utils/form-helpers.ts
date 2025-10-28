@@ -2,6 +2,7 @@ import { StatName } from "@/lib/stat-names";
 import { z } from "zod/v4";
 
 // Session Schema Definitions
+const sessionIdSchema = z.number().optional();
 const gameSchema = z.union([
   z.literal([
     "Rocket League",
@@ -176,6 +177,7 @@ const setsSchema = z.array(setSchema).nonempty("At least one set is required");
 
 // Base schema for common fields
 const baseSessionSchema = z.object({
+  sessionId: sessionIdSchema,
   game: gameSchema,
   sessionName: sessionNameSchema,
   sessionUrl: sessionUrlSchema,

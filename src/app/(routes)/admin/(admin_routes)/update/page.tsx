@@ -29,6 +29,9 @@ function DbTable<T extends Record<string, unknown>>({
   data,
   columns,
 }: DbTableProps<T>) {
+  if (data.length === 0) {
+    return <div>No data available</div>;
+  }
   return (
     <Table className="w-1/2">
       <TableHeader>
@@ -84,7 +87,7 @@ export default async function Page() {
           <Button type="submit">Add Game</Button>
         </form>
         <DbTable
-          data={games ?? []}
+          data={games}
           columns={["gameId", "gameName", "createdAt", "updatedAt"]}
         />
       </div>
@@ -106,7 +109,7 @@ export default async function Page() {
           />
           <Button type="submit">Add Player</Button>
         </form>
-        <DbTable data={players ?? []} columns={["playerId", "playerName"]} />
+        <DbTable data={players} columns={["playerId", "playerName"]} />
       </div>
 
       <div>
@@ -147,7 +150,7 @@ export default async function Page() {
           </Select>
           <Button type="submit">Add Game Stat</Button>
         </form>
-        <DbTable data={stats ?? []} columns={["statId", "statName"]} />
+        <DbTable data={stats} columns={["statId", "statName"]} />
       </div>
     </div>
   );

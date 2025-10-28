@@ -36,10 +36,10 @@ export type QueryResponseData<T, Y = unknown> = NonNullable<
 >;
 
 export async function handlePrismaOperation<T>(
-  operation: () => Promise<T>,
+  operation: (prisma: PrismaClient) => Promise<T>,
 ): Promise<QueryResponse<T>> {
   try {
-    const data = await operation();
+    const data = await operation(prisma);
     return { success: true, data };
   } catch (error) {
     // posthog.captureException(error, v4());

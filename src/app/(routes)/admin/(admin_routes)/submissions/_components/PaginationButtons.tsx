@@ -24,7 +24,9 @@ export const PaginationButtons = ({
   const pathname = usePathname();
 
   const handlePageChange = (newPage: number) => {
-    router.push(`${pathname}?page=${newPage}`);
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("page", newPage.toString());
+    router.push(`${pathname}?${searchParams.toString()}`);
   };
 
   const totalPages = Math.ceil(count / pageSize);

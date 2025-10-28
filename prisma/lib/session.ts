@@ -1,7 +1,7 @@
-import prisma, { handlePrismaOperation } from "../db";
+import { handlePrismaOperation } from "../db";
 
 export const getSessionById = async (sessionId: number) => {
-  return handlePrismaOperation(() =>
+  return handlePrismaOperation((prisma) =>
     prisma.session.findUnique({
       where: { sessionId },
       include: {

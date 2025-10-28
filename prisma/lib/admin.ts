@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import prisma, { handlePrismaOperation } from "../db";
+import { handlePrismaOperation } from "../db";
 
 /**
  * Retrieves all video sessions from the database, including associated game names.
@@ -10,7 +10,7 @@ import prisma, { handlePrismaOperation } from "../db";
  */
 export const getAllSessions = unstable_cache(
   async () =>
-    await handlePrismaOperation(() =>
+    await handlePrismaOperation((prisma) =>
       prisma.session.findMany({
         include: { Game: { select: { gameName: true } } },
       }),
@@ -34,7 +34,7 @@ export const getAllSessions = unstable_cache(
  */
 export const getAllSessionsByGame = unstable_cache(
   async (gameId: number) =>
-    await handlePrismaOperation(() =>
+    await handlePrismaOperation((prisma) =>
       prisma.session.findMany({
         where: { gameId },
         select: {

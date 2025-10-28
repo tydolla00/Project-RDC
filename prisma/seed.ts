@@ -122,7 +122,10 @@ async function seedGames() {
     create: {
       gameName: "Mario Kart 8",
       gameStats: {
-        create: [{ statName: StatName.MK8_POS }, { statName: StatName.MK8_DAY }],
+        create: [
+          { statName: StatName.MK8_POS },
+          { statName: StatName.MK8_DAY },
+        ],
       },
     },
   });

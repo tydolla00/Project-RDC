@@ -1,8 +1,8 @@
 "use server";
 
 import { unstable_cache } from "next/cache";
-import prisma, { handlePrismaOperation } from "../db";
-import { StatName } from "@/lib/stat-names";
+import { handlePrismaOperation } from "../db";
+import { StatName } from "@prisma/client";
 import { getSumOfStat } from "@prisma/client/sql";
 
 export type StatEndsWith<
@@ -20,7 +20,7 @@ export type StatEndsWith<
  * @returns Promise resolving to an array of games.
  */
 export const getAllGames = unstable_cache(
-  async () => await handlePrismaOperation(() => prisma.game.findMany()),
+  async () => await handlePrismaOperation((prisma) => prisma.game.findMany()),
   undefined,
   {
     tags: ["getAllGames"],
@@ -29,7 +29,7 @@ export const getAllGames = unstable_cache(
 );
 
 export const getGame = async (gameName: string) =>
-  await handlePrismaOperation(() =>
+  await handlePrismaOperation((prisma) =>
     prisma.game.findFirst({
       where: { gameName },
     }),
@@ -43,7 +43,7 @@ export const getGame = async (gameName: string) =>
  * @returns A promise that resolves to the sum of the specified statistic for the player.
  */
 export const getSumPerStat = async (playerId: number, statName: StatName) =>
-  await handlePrismaOperation(() =>
+  await handlePrismaOperation((prisma) =>
     prisma.$queryRawTyped(getSumOfStat(playerId, statName)),
   );
 
@@ -56,7 +56,7 @@ export const getSumPerStat = async (playerId: number, statName: StatName) =>
  * each containing the count of sets and their associated matches.
  */
 export const getSetsPerPlayer = async (gameId: number) =>
-  await handlePrismaOperation(() =>
+  await handlePrismaOperation((prisma) =>
     prisma.session.findMany({
       where: { gameId },
       include: { sets: { select: { _count: true, matches: true } } },
@@ -70,7 +70,7 @@ export const getSetsPerPlayer = async (gameId: number) =>
  * @returns {Promise<object | null>} A promise that resolves to an object containing the sessions and their respective match winners and set winners, or null if no game is found.
  */
 export const getWinsPerPlayer = async (gameId: number) =>
-  await handlePrismaOperation(() =>
+  await handlePrismaOperation((prisma) =>
     prisma.game.findFirst({
       where: { gameId },
       select: {
@@ -105,7 +105,7 @@ export const getMatchesPerGame = async <T extends StatName = StatName>(
   gameId: number,
   statName: StatEndsWith<"POS", T>,
 ) =>
-  await handlePrismaOperation(() =>
+  await handlePrismaOperation((prisma) =>
     prisma.session.findMany({
       where: { gameId },
       select: {
@@ -142,7 +142,7 @@ export const getMatchesPerGame = async <T extends StatName = StatName>(
  * @returns Promise resolving to an array of player statistics.
  */
 export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
-  await handlePrismaOperation(() =>
+  await handlePrismaOperation((prisma) =>
     prisma.playerStat.findMany({
       where: { gameId, AND: { gameStat: { statName } } },
       select: { player: true, value: true, statId: true },
@@ -156,7 +156,7 @@ export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
  */
 export const getAllGameStats = unstable_cache(
   async () =>
-    await handlePrismaOperation(() =>
+    await handlePrismaOperation((prisma) =>
       prisma.gameStat.findMany({
         select: { statName: true, statId: true },
       }),

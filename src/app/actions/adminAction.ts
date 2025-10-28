@@ -1,6 +1,6 @@
 "use server";
 
-import { GameStatModel as GameStat } from "prisma/generated/models/GameStat";
+import { GameStat } from "@prisma/client";
 import prisma, { handlePrismaOperation } from "prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";
@@ -14,7 +14,7 @@ export async function approveSession(sessionId: number) {
     const authUser = await auth();
     if (!authUser) return { error: errorCodes.NotAuthenticated };
 
-    const query = await handlePrismaOperation(() =>
+    const query = await handlePrismaOperation((prisma) =>
       prisma.session.update({
         where: { sessionId, isApproved: false },
         data: { isApproved: true },
@@ -45,14 +45,14 @@ export async function approveSession(sessionId: number) {
  */
 export async function getGameStats(gameName: string): Promise<GameStat[]> {
   console.log("Looking for gameStats for ", gameName);
-  const game = await handlePrismaOperation(() =>
+  const game = await handlePrismaOperation((prisma) =>
     prisma.game.findFirst({ where: { gameName } }),
   );
 
   if (!game.success || !game.data) return [];
 
   const gameId = game.data.gameId;
-  const gameStats = await handlePrismaOperation(() =>
+  const gameStats = await handlePrismaOperation((prisma) =>
     prisma.gameStat.findMany({
       where: {
         gameId: gameId,
@@ -337,7 +337,7 @@ export async function addGame(
   const gameName = formData.get("gameName") as string;
   if (!gameName) return { error: "Game name is required." };
 
-  const res = await handlePrismaOperation(() =>
+  const res = await handlePrismaOperation((prisma) =>
     prisma.game.create({ data: { gameName } }),
   );
 
@@ -355,7 +355,7 @@ export async function addPlayer(
   const playerName = formData.get("playerName") as string;
   if (!playerName) return { error: "Player name is required." };
 
-  const res = await handlePrismaOperation(() =>
+  const res = await handlePrismaOperation((prisma) =>
     prisma.player.create({ data: { playerName } }),
   );
 

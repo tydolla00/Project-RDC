@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlayerModel as Player } from "prisma/generated/models/Player";
+import { Player } from "@prisma/client";
 import SetManager from "./SetManager";
 import { insertNewSessionFromAdmin } from "@/app/actions/adminAction";
 import { Form } from "@/components/ui/form";
@@ -20,19 +20,26 @@ import { VideoInfo } from "./VideoInfo";
 import { cn } from "@/lib/utils";
 import { FormSummary } from "./Summary";
 import { userSignOut } from "@/app/actions/signOut";
+import { createSessionEditRequest } from "@/app/actions/editSession";
 
 interface AdminFormProps {
   rdcMembers: Player[];
   defaultValues?: FormValues;
+  type: "create" | "edit";
 }
 
-const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
+const EntryCreatorForm = ({
+  rdcMembers,
+  defaultValues,
+  type,
+}: AdminFormProps) => {
   const [step, setStep] = useState(0);
   const [modifier, setModifier] = useState(0);
 
   const form = useForm<FormValues, unknown>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues || {
+      sessionId: undefined,
       game: "Mario Kart 8",
       sessionName: "",
       sessionUrl: "https://www.youtube.com/watch?v=",
@@ -63,7 +70,28 @@ const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
       stringified: JSON.stringify(data, null, 2),
     });
     console.time("Form Submission Time Start: ");
-    const { error: err } = await insertNewSessionFromAdmin(data);
+
+    let err: string | null;
+    switch (type) {
+      case "create":
+        err = (await insertNewSessionFromAdmin(data)).error;
+        break;
+      case "edit":
+        if (!defaultValues?.sessionId) {
+          err = "Session ID is required for editing";
+          break;
+        }
+        // Create an edit request that admins will need to approve
+        const editResult = await createSessionEditRequest(
+          defaultValues.sessionId,
+          data, // the form data becomes the proposed changes
+          form.formState.dirtyFields,
+        );
+        err = editResult.error;
+        break;
+      default:
+        err = "Invalid form type.";
+    }
     console.timeEnd("Form Submission Time End: ");
 
     if (err) {
@@ -73,7 +101,11 @@ const EntryCreatorForm = ({ rdcMembers, defaultValues }: AdminFormProps) => {
         toast.error(err, { richColors: true });
       }
     } else {
-      toast.success("Session successfully created.", { richColors: true });
+      const message =
+        type === "create"
+          ? "Session successfully created."
+          : "Edit request submitted for review.";
+      toast.success(message, { richColors: true });
       form.reset();
       setStep(0);
     }
