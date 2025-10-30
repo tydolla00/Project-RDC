@@ -3,7 +3,7 @@
 import { unstable_cache } from "next/cache";
 import { handlePrismaOperation } from "../db";
 import { StatName } from "@/lib/stat-names";
-// import { getSumOfStat } from "@prisma/client/sql";
+import { getSumOfStat } from "@prisma/client/sql";
 
 export type StatEndsWith<
   Suffix extends string,
@@ -42,10 +42,10 @@ export const getGame = async (gameName: string) =>
  * @param statName - The name of the statistic to sum.
  * @returns A promise that resolves to the sum of the specified statistic for the player.
  */
-// export const getSumPerStat = async (playerId: number, statName: StatName) =>
-//   await handlePrismaOperation((prisma) =>
-//     prisma.$queryRawTyped(getSumOfStat(playerId, statName)),
-//   );
+export const getSumPerStat = async (playerId: number, statName: StatName) =>
+  await handlePrismaOperation((prisma) =>
+    prisma.$queryRawTyped(getSumOfStat(playerId, statName)),
+  );
 
 /**
  * Retrieves the sets associated with a specific player in a game.

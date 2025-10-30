@@ -1,4 +1,4 @@
-import { $Enums, StatName } from "@prisma/client";
+import { StatName } from "@/lib/stat-names";
 import {
   getWinsPerPlayer,
   getMatchesPerGame,
@@ -28,7 +28,7 @@ type SumAndAvg<
 
 export const getAvgAndSum = async (
   playerId: number,
-  stats: $Enums.StatName[],
+  stats: StatName[],
 ): Promise<SumAndAvg<typeof stats, "RL" | "COD" | "MK8" | "LC" | "SR">> => {
   return await Promise.all(
     stats.map((stat) => getSumPerStat(Number(playerId), stat)),

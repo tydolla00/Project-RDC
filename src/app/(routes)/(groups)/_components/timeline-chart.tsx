@@ -208,24 +208,27 @@ export type RLStats = {
 };
 
 // TODO Show session info about sets/matches.
+type CustomTooltipProps = {
+  active?: boolean;
+  payload?: Array<{ payload: Sessions[0] }>;
+  setSession: (session: Sessions[0]) => void;
+  showMatchData: boolean;
+};
+
 const CustomTooltip = ({
   active,
   payload,
   setSession,
   showMatchData,
-}: TooltipProps<number, string> & {
-  setSession: (session: Sessions[0]) => void;
-  showMatchData: boolean;
-}) => {
-  const session = payload?.at(0)?.payload as Sessions[0];
+}: CustomTooltipProps) => {
+  const session = payload?.[0]?.payload as Sessions[0];
   useEffect(() => {
-    if (active && showMatchData) {
-      console.log(showMatchData);
+    if (active && showMatchData && session) {
       setSession(session);
     }
   }, [active, session, setSession, showMatchData]);
 
-  if (active) {
+  if (active && session) {
     return (
       <div className="max-w-48 flex-wrap rounded-md p-2 shadow-md">
         <Card>
