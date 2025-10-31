@@ -86,10 +86,7 @@ export default async function Page() {
           />
           <Button type="submit">Add Game</Button>
         </form>
-        <DbTable
-          data={games}
-          columns={["gameId", "gameName", "createdAt", "updatedAt"]}
-        />
+        <DbTable data={games} columns={["gameId", "gameName"]} />
       </div>
 
       <div>
