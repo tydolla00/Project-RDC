@@ -28,7 +28,9 @@ export default function RootLayout({
   return (
     <html className="h-screen" lang="en" suppressHydrationWarning>
       <head>
-        <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        {process.env.NODE_ENV === "development" && (
+          <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+        )}
       </head>
       {/* <ReactScan /> */}
       <body className={inter.className}>
