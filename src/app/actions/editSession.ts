@@ -311,7 +311,7 @@ export async function approveEditRequest(editId: number, note?: string) {
       }
     });
 
-    revalidateTag("getAllSessions");
+    revalidateTag("getAllSessions", "max");
     after(() => console.log(`Edit ${editId} approved by ${user.user?.id}`));
     return { error: null };
   } catch (err) {

@@ -26,7 +26,7 @@ export async function approveSession(sessionId: number) {
       return { error: query.error || "Failed to approve session" };
     }
 
-    revalidateTag("getAllSessions");
+    revalidateTag("getAllSessions", "max");
     return { error: null };
   } catch (error) {
     console.error("Error approving session:", error);
@@ -315,7 +315,7 @@ export const insertNewSessionFromAdmin = async (
       );
     });
     after(() => logFormSuccess(user));
-    revalidateTag("getAllSessions");
+    revalidateTag("getAllSessions", "max");
     return { error: null };
   } catch (err) {
     after(() => logFormError(err, session));
@@ -326,7 +326,8 @@ export const insertNewSessionFromAdmin = async (
   }
 };
 
-export const revalidateAction = async (path: string) => revalidateTag(path);
+export const revalidateAction = async (path: string) =>
+  revalidateTag(path, "max");
 
 export async function addGame(
   formData: FormData,
@@ -342,7 +343,7 @@ export async function addGame(
   );
 
   if (!res.success) return { error: res.error || "Failed to add game." };
-  revalidateTag("getAllGames");
+  revalidateTag("getAllGames", "max");
   return { error: null };
 }
 
@@ -360,7 +361,7 @@ export async function addPlayer(
   );
 
   if (!res.success) return { error: res.error || "Failed to add player." };
-  revalidateTag("allMembers");
+  revalidateTag("allMembers", "max");
   return { error: null };
 }
 
