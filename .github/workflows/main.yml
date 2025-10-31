@@ -7,9 +7,8 @@ on:
   pull_request:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -17,7 +16,23 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20.9.0'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.9.0'
 
       - name: Install Vercel CLI
         run: npm install -g vercel
@@ -27,20 +42,11 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: vercel pull --yes --token ${{ secrets.VERCEL_TOKEN }}
 
-      - name: Set Database URL
-        run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
-
-      - name: Set Direct URL
-        run: echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> $GITHUB_ENV
-
-      - name: Set Posthog Host
-        run: echo "NEXT_PUBLIC_POSTHOG_HOST=${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}" >> $GITHUB_ENV
-
-      - name: Set Posthog Key
-        run: echo "NEXT_PUBLIC_POSTHOG_KEY=${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}" >> $GITHUB_ENV
-
       - name: Build with Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
         run: vercel build --token ${{ secrets.VERCEL_TOKEN }} --prod
