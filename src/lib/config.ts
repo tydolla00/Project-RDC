@@ -17,6 +17,8 @@ interface Config {
   SHEET_ID: string | undefined;
   GCP_SA_KEY: string | undefined;
   CRON_SECRET: string | undefined;
+  RESEND_API_KEY: string | undefined;
+  RESEND_JOB_SEND_LIST?: string | undefined;
 }
 
 const getConfig = (): Config => {
@@ -40,6 +42,8 @@ const getConfig = (): Config => {
     SHEET_ID: process.env.SHEET_ID,
     GCP_SA_KEY: process.env.GCP_SA_KEY,
     CRON_SECRET: process.env.CRON_SECRET,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_JOB_SEND_LIST: process.env.RESEND_JOB_SEND_LIST,
   };
 };
 
