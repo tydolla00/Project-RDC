@@ -74,7 +74,7 @@ export const analyzeMvp = async (
 
     // If we successfully updated the record (count > 0), we won the race.
     if (updateResult.success && updateResult.data.count > 0) {
-      revalidateTag("getAllSessions");
+      revalidateTag("getAllSessions", "max");
       after(() =>
         logMvpUpdateSuccess(sessionId, object, new Date(), duration, session),
       );
