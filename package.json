@@ -8,7 +8,7 @@
     "build": "next build",
     "build-memory": "next build --experimental-debug-memory-usage",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "dbcrashout": "npx prisma db push --force-reset && npx prisma db push && npx tsx prisma/seed.ts",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -82,7 +82,6 @@
     "zod": "^4.1.8"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
