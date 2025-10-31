@@ -1,4 +1,4 @@
-name: Vercel Build
+name: Actions CI
 
 on:
   push:
