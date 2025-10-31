@@ -2,7 +2,7 @@ import {
   AnalyzedPlayersObj,
   AnalyzedTeamData,
 } from "@/app/actions/visionAction";
-import { Player } from "prisma/generated/client";
+import { Player } from "@prisma/client";
 import {
   GameProcessor,
   isAnalyzedTeamDataArray,
