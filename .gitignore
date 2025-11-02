@@ -41,4 +41,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-prisma\scripts\backup.ts
+sessions_backup.json
