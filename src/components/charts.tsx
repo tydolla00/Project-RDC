@@ -16,13 +16,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "./ui/chart";
+import { SorryData } from "@/app/page";
 
 export const PieChartRDC = ({
   config,
   data,
 }: {
   config: ChartConfig;
-  data: unknown[];
+  data: SorryData[];
 }) => {
   // This Chart will rank the average of placements in each category.
   // TODO Responsive not working. May need to mess with config or use grid resizing via css.
