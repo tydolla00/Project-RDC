@@ -6,12 +6,12 @@ import { type ChartConfig } from "@/components/ui/chart";
 import Link from "next/link";
 import { getGamesNav } from "@/lib/constants";
 import { FeatureFlag } from "@/lib/featureflag";
-import { auth } from "@/auth";
 import Image from "next/image";
+
+export const dynamic = "force-static";
 
 export default async function Home() {
   const games = await getGamesNav();
-  const session = await auth();
   return (
     <>
       <div className="m-16">
@@ -52,10 +52,7 @@ export default async function Home() {
             <div key={game.url}>
               {game.src && (
                 <Card className="group relative aspect-square h-52 w-full min-w-24 overflow-hidden transition-transform duration-700 sm:w-52">
-                  <Link
-                    href={game.url}
-                    className="relative block h-full w-full"
-                  >
+                  <Link href={game.url} className="relative block h-full w-full">
                     <Image
                       className="object-cover transition-transform duration-500 group-hover:scale-125"
                       fill
@@ -77,16 +74,16 @@ export default async function Home() {
         <FeatureFlag
           devOnly
           flagName="SUBMISSION_FORM"
-          user={session}
+          user={null}
           shouldRedirect={false}
         >
           <H2 className="text-chart-4 mx-auto my-10 w-fit">Want to Help</H2>
           <Card className="mx-auto md:w-1/2">
             <CardHeader>
               <p>
-                Keeping track of stats, takes a lot of time. If you would like
-                to help us keep a record of the games they play, please login
-                and complete the form.
+                Keeping track of stats, takes a lot of time. If you would like to
+                help us keep a record of the games they play, please login and
+                complete the form.
               </p>
             </CardHeader>
             <CardFooter>
