@@ -14,7 +14,7 @@ neonConfig.poolQueryViaFetch = true;
 
 // Type definitions
 declare global {
-  const prisma: PrismaClient | undefined;
+  var prisma: PrismaClient | undefined;
 }
 
 export type ErrorResponse<T> = {

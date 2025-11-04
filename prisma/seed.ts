@@ -232,7 +232,7 @@ async function importSessions() {
 
   // Read the sessions.json file
   // ! Add File Path Here
-  const sessionsPath = "D:/repos/Project-RDC/sessions_backup.json";
+  const sessionsPath = process.cwd() + "/sessions_backup.json";
   let sessionsData: EnrichedSession[];
   console.log(`Importing sessions from ${sessionsPath}...`);
 

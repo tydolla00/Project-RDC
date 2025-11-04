@@ -21,27 +21,37 @@ const processMarvelRivalsPlayers = (
   const mrVisionResult: VisionResult = {
     players: [],
   };
-  const requiresCheck = false;
+  let requiresCheck = false;
 
   if (isAnalyzedTeamDataArray(mrPlayers)) {
     console.error("Invalid data format for Marvel Rivals players.");
     return { processedPlayers: [], reqCheckFlag: true };
   }
 
-  mrPlayers[0].valueArray.forEach((player) => {
+  const playerContainer = mrPlayers[0];
+  if (!playerContainer?.valueArray?.length) {
+    console.error("No Marvel Rivals player data detected.");
+    return { processedPlayers: [], reqCheckFlag: true };
+  }
+
+  for (const player of playerContainer.valueArray) {
     console.log("Player before processing: ", player);
     const processedPlayer = processPlayer(player);
+    if (processedPlayer.reqCheckFlag) {
+      requiresCheck = true;
+    }
     const validatedPlayer = validateProcessedPlayer(
       processedPlayer,
       sessionPlayers,
     );
     if (!validatedPlayer) {
       console.error("Player validation failed: ", processedPlayer);
-      return;
+      requiresCheck = true;
+      continue;
     }
     console.log("Successfully validated player: ", validatedPlayer);
     mrVisionResult.players.push(validatedPlayer);
-  });
+  }
 
   return {
     processedPlayers: mrVisionResult.players,

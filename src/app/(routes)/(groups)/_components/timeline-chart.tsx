@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  Tooltip,
-  TooltipProps,
-  XAxis,
-} from "recharts";
+import { CartesianGrid, Line, LineChart, Tooltip, XAxis } from "recharts";
 
 import {
   Card,

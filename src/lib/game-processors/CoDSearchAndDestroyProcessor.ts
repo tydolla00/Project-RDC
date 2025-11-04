@@ -10,6 +10,7 @@ import {
   processPlayer,
   validateProcessedPlayer,
   WinnerConfig,
+  validateResults,
 } from "./game-processor-utils";
 import { VisionResultCodes } from "../constants";
 import { Player } from "@prisma/client";
@@ -57,8 +58,9 @@ export const CoDSearchAndDestroyProcessor: GameProcessor = {
     } else {
       // Handle individual player data format (fallback)
       console.log("Processing individual player data for Search and Destroy");
-      codPlayers[0].valueArray.forEach((player) => {
-        const processedPlayer = processPlayer(player);
+      const fallbackPlayers = codPlayers[0]?.valueArray ?? [];
+      fallbackPlayers.forEach((player) => {
+        const processedPlayer = processPlayer(player, "TEAM");
         const validatedPlayer = validateProcessedPlayer(
           processedPlayer,
           sessionPlayers,
@@ -118,22 +120,5 @@ export const CoDSearchAndDestroyProcessor: GameProcessor = {
     }
     return { statValue, reqCheck: false };
   },
-  validateResults: (
-    visionPlayers: VisionPlayer[],
-    visionWinners: VisionPlayer[],
-    requiresCheck: boolean,
-  ) => {
-    return requiresCheck
-      ? {
-          status: VisionResultCodes.CheckRequest,
-          data: { players: visionPlayers, winner: visionWinners },
-          message:
-            "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
-        }
-      : {
-          status: VisionResultCodes.Success,
-          data: { players: visionPlayers, winner: visionWinners },
-          message: "Results have been successfully imported.",
-        };
-  },
+  validateResults: validateResults,
 };
