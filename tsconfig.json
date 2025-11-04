@@ -38,7 +38,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "prisma/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".next\\dev/types/**/*.ts",
+    ".next\\dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

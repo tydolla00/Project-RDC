@@ -7,8 +7,16 @@ import { useAdmin } from "@/lib/adminContext";
 import { FormValues } from "../../_utils/form-helpers";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Swords,
+  Shield,
+  Heart,
+  HandMetal,
+} from "lucide-react";
 import { StatName } from "@/lib/stat-names";
+import { cn } from "@/lib/utils";
 
 interface Props {
   player: Player;
@@ -115,6 +123,71 @@ const PlayerStatManager = (props: Props) => {
     );
   };
 
+  const renderToggleField = (field: (typeof fields)[number], index: number) => {
+    const curr = `${curPlayerSession}.playerStats.${index}.statValue` as const;
+
+    // Function to get icon for each stat
+    const getStatIcon = (statName: string) => {
+      switch (statName) {
+        case StatName.MR_TRIPLE_KILL:
+          return <span className="font-bold">3</span>;
+        case StatName.MR_QUADRA_KILL:
+          return <span className="font-bold">4</span>;
+        case StatName.MR_PENTA_KILL:
+          return <span className="font-bold">5</span>;
+        case StatName.MR_HEXA_KILL:
+          return <span className="font-bold">6</span>;
+        case StatName.MR_HIGHEST_DMG:
+          return <Swords className="h-4 w-4" />;
+        case StatName.MR_HIGHEST_DMG_BLOCKED:
+          return <Shield className="h-4 w-4" />;
+        case StatName.MR_MOST_HEALING:
+          return <Heart className="h-4 w-4" />;
+        case StatName.MR_MOST_ASSISTS_FIST:
+          return <HandMetal className="h-4 w-4" />;
+        default:
+          return null;
+      }
+    };
+
+    return (
+      <FormField
+        key={field.id}
+        control={control}
+        name={curr}
+        render={({ field: formField }) => (
+          <FormItem>
+            <Button
+              type="button"
+              variant={
+                formField.value === "1" || formField.value === "true"
+                  ? "default"
+                  : "outline"
+              }
+              size="sm"
+              onClick={() => {
+                const isActive =
+                  formField.value === "1" || formField.value === "true";
+                formField.onChange(isActive ? "0" : "1");
+              }}
+              className={cn(
+                "flex items-center justify-start gap-2",
+                formField.value === "1" ||
+                  (formField.value === "true" &&
+                    "bg-primary text-primary-foreground"),
+              )}
+            >
+              {getStatIcon(field.stat)}
+              <span className="text-[8px]">
+                {field.stat.replace("MR_", "").replace(/_/g, " ")}
+              </span>
+            </Button>
+          </FormItem>
+        )}
+      />
+    );
+  };
+
   return (
     <>
       {regularFields.map((field) => {
@@ -140,10 +213,10 @@ const PlayerStatManager = (props: Props) => {
           </Button>
 
           {isExtraStatExpanded && (
-            <div className="mt-2 flex flex-wrap gap-3 rounded-lg border p-3">
+            <div className="mt-2 grid grid-cols-3 gap-2 rounded-lg border p-3">
               {expandableFields.map((field) => {
                 const actualIndex = fields.findIndex((f) => f.id === field.id);
-                return renderStatField(field, actualIndex);
+                return renderToggleField(field, actualIndex);
               })}
             </div>
           )}
