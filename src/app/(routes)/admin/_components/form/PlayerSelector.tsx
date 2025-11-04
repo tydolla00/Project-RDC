@@ -1,11 +1,10 @@
 "use client";
 import { Player } from "@prisma/client";
-import React, { useEffect, useState } from "react";
-import PlayerAvatar from "./PlayerAvatar";
 import { ControllerRenderProps, UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { FormValues } from "../../_utils/form-helpers";
+import PlayerAvatar from "./PlayerAvatar";
 interface Props {
   rdcMembers: Player[];
   handlePlayerClick?: (player: Player) => void;
@@ -24,16 +23,8 @@ const PlayerSelector = ({
   sticky = false,
   label,
 }: Props) => {
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>(
-    currentSelectedPlayers ?? [],
-  );
-
-  // TODO Figure out reason selected players is not being set when updating via form.reset
-  useEffect(() => {
-    if (field.value) {
-      setSelectedPlayers(field.value as Player[]);
-    }
-  }, [field.value]);
+  const selectedPlayers =
+    (field.value as Player[]) ?? currentSelectedPlayers ?? [];
 
   const reactHookFormHandlePlayerClick = (player: Player): void => {
     const isSelected = getIsSelected(player);
@@ -42,7 +33,6 @@ const PlayerSelector = ({
       ? selectedPlayers.filter((p) => p.playerId !== player.playerId)
       : [...selectedPlayers, player];
 
-    setSelectedPlayers(updatedPlayers);
     field.onChange(updatedPlayers);
   };
 
