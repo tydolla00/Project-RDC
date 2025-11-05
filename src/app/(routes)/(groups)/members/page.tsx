@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/hover-card";
 import { getMembersNav } from "@/lib/constants";
 
-export const revalidate = 604_800; // 1 week
+// export const revalidate = 604_800; // 1 week
 
 export default async function Page() {
   const members = await getMembersNav();

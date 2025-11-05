@@ -1,12 +1,22 @@
 import { getSessionById } from "prisma/lib/session";
 import { FormValues } from "../../../../_utils/form-helpers";
 import { ApproveSessionForm } from "../_components/ApproveSessionForm";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default async function Page({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  return (
+    <Suspense fallback={<Skeleton className="h-72 w-full" />}>
+      <Component params={params} />
+    </Suspense>
+  );
+}
+
+const Component = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const sessionId = parseInt((await params).slug);
 
   if (isNaN(sessionId))
@@ -99,4 +109,4 @@ export default async function Page({
       <ApproveSessionForm defaultValues={defaultValues} sessionId={sessionId} />
     </div>
   );
-}
+};
