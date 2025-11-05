@@ -35,7 +35,7 @@ const MARVEL_RIVALS_EXPANDABLE_STATS: StatName[] = [
   StatName.MR_HIGHEST_DMG,
   StatName.MR_HIGHEST_DMG_BLOCKED,
   StatName.MR_MOST_HEALING,
-  StatName.MR_MOST_ASSISTS_FIST,
+  StatName.MR_MOST_ASSISTS,
 ];
 
 const PlayerStatManager = (props: Props) => {
@@ -143,7 +143,7 @@ const PlayerStatManager = (props: Props) => {
           return <Shield className="h-4 w-4" />;
         case StatName.MR_MOST_HEALING:
           return <Heart className="h-4 w-4" />;
-        case StatName.MR_MOST_ASSISTS_FIST:
+        case StatName.MR_MOST_ASSISTS:
           return <HandMetal className="h-4 w-4" />;
         default:
           return null;

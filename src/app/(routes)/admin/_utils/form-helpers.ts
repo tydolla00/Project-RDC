@@ -11,7 +11,7 @@ const MARVEL_RIVALS_OPTIONAL_STATS = [
   StatName.MR_HIGHEST_DMG,
   StatName.MR_HIGHEST_DMG_BLOCKED,
   StatName.MR_MOST_HEALING,
-  StatName.MR_MOST_ASSISTS_FIST,
+  StatName.MR_MOST_ASSISTS,
 ] as const;
 
 // Session Schema Definitions
@@ -133,7 +133,7 @@ const marvelRivalsStats = z
       StatName.MR_HIGHEST_DMG,
       StatName.MR_HIGHEST_DMG_BLOCKED,
       StatName.MR_MOST_HEALING,
-      StatName.MR_MOST_ASSISTS_FIST,
+      StatName.MR_MOST_ASSISTS,
       StatName.MR_FINAL_HITS,
       StatName.MR_DMG,
       StatName.MR_DMG_BLOCKED,

@@ -209,7 +209,7 @@ async function seedGames() {
           { statName: StatName.MR_HIGHEST_DMG },
           { statName: StatName.MR_HIGHEST_DMG_BLOCKED },
           { statName: StatName.MR_MOST_HEALING },
-          { statName: StatName.MR_MOST_ASSISTS_FIST },
+          { statName: StatName.MR_MOST_ASSISTS },
           { statName: StatName.MR_FINAL_HITS },
           { statName: StatName.MR_DMG },
           { statName: StatName.MR_DMG_BLOCKED },
