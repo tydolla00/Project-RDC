@@ -18,8 +18,18 @@ import { redirect } from "next/navigation";
 
 import { Session } from "next-auth";
 import prisma from "prisma/db";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default async function Page() {
+  return (
+    <Suspense fallback={<Skeleton className="h-72 w-full" />}>
+      <Component />
+    </Suspense>
+  );
+}
+
+const Component = async () => {
   const session = (await auth()) as Session;
   if (!session) redirect("/");
 
@@ -66,7 +76,7 @@ export default async function Page() {
       </div>
     </div>
   );
-}
+};
 
 function ProfileTabs({
   userSessions,

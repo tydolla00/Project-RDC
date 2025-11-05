@@ -15,7 +15,7 @@ import { NoMembers } from "../../members/_components/members";
 import { calcWinsPerPlayer } from "./_helpers/stats";
 
 // ? Force non specified routes to return 404
-export const dynamicParams = false; // true | false,
+// export const dynamicParams = false; // true | false,
 
 export type Members = NonNullable<
   Awaited<ReturnType<typeof getAllMembers>>["data"]
@@ -24,10 +24,13 @@ export type Members = NonNullable<
 export async function generateStaticParams() {
   const games = await getAllGames();
 
-  if (!games.success || !games.data) games.data = [];
-  return games.data.map((game) => ({
+  if (!games.success || !games.data || games.data.length === 0) {
+    return [{ slug: "__placeholder__" }];
+  }
+  const params = games.data.map((game) => ({
     slug: game.gameName.replace(/\s/g, "").toLowerCase(),
   }));
+  return params;
 }
 
 export default async function Page({
@@ -38,7 +41,8 @@ export default async function Page({
   const { slug } = await params;
   const games = await getAllGames();
 
-  if (!games.success || !games.data) return <NoGames />;
+  if (!games.success || !games.data || slug === "__placeholder__")
+    return <NoGames />;
 
   const game = games.data.find(
     (game) => game.gameName.replace(/\s/g, "").toLowerCase() === slug,

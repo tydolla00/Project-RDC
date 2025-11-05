@@ -7,6 +7,7 @@
     "postinstall": "prisma generate --sql",
     "build": "next build",
     "build-memory": "next build --experimental-debug-memory-usage",
+    "build-prerender": "next build --debug-prerender",
     "start": "next start",
     "lint": "eslint .",
     "dbcrashout": "npx prisma db push --force-reset && npx prisma db push && npx tsx prisma/seed.ts",

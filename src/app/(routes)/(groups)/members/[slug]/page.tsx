@@ -11,17 +11,18 @@ import Image from "next/image";
 import { getAllMembers } from "prisma/lib/members";
 import { findPlayer } from "@/app/(routes)/admin/_utils/player-mappings";
 
-export const dynamicParams = false; // true | false,
+// export const dynamicParams = false; // true | false,
 
 export async function generateStaticParams() {
   const members = await getAllMembers();
-  if (!members.success || !members.data) {
+  if (!members.success || !members.data || members.data.length === 0) {
     console.error("Failed to fetch members");
-    return [];
+    return [{ slug: "__placeholder__" }];
   }
-  return members.data.map((member) => ({
+  const params = members.data.map((member) => ({
     slug: member.playerName.toLowerCase(),
   }));
+  return params;
 }
 
 export default async function Page({
@@ -32,7 +33,7 @@ export default async function Page({
   const { slug } = await params;
   const member = await getMember(slug);
 
-  if (!member.success || !member.data) notFound();
+  if (!member.success || !member.data || slug === "__placeholder__") notFound();
 
   return (
     <div className="container mx-auto p-4">
