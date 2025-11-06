@@ -1,8 +1,8 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../generated";
 
 // Things we need for each Mario Kart Session
 // RDC names, stat names and values
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const playerSessionWithPlayerStats =
   Prisma.validator<Prisma.PlayerSessionDefaultArgs>()({
     include: {

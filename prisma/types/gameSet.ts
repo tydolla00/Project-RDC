@@ -1,6 +1,5 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../generated";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const enrichedGameSet = Prisma.validator<Prisma.GameSetDefaultArgs>()({
   include: {
     matches: {

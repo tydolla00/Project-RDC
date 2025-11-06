@@ -1,4 +1,4 @@
-import { $Enums } from "@prisma/client";
+import { $Enums } from "prisma/generated";
 import { z } from "zod/v4";
 
 // Session Schema Definitions

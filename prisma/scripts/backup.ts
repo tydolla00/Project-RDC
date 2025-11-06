@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../generated";
 import fs from "fs";
 import path from "path";
 import { EnrichedSession } from "../types/session";

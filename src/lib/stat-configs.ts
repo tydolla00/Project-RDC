@@ -1,4 +1,4 @@
-import { $Enums } from "@prisma/client";
+import { $Enums } from "prisma/generated";
 
 /**
  * Interface describing a stat configuration for a game.

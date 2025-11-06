@@ -1,4 +1,3 @@
-import { Prisma, PrismaClient } from "@prisma/client";
 import {
   PrismaClientKnownRequestError,
   PrismaClientValidationError,
@@ -8,6 +7,7 @@ import { neonConfig, NeonDbError } from "@neondatabase/serverless";
 // import config from "../lib/config";
 
 import ws from "ws";
+import { PrismaClient } from "./generated";
 // import posthog from "@/posthog/server-init";
 // import { v4 } from "uuid";
 

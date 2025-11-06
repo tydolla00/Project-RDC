@@ -4,7 +4,7 @@ import {
   VisionResult,
   VisionPlayer,
 } from "@/app/actions/visionAction";
-import { Player } from "@prisma/client";
+import { Player } from "prisma/generated";
 import { RL_TEAM_MAPPING, VisionResultCodes } from "../constants";
 import {
   GameProcessor,
