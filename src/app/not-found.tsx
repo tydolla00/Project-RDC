@@ -54,7 +54,6 @@ const ErrorMessage = async ({
     <>
       {!error && <H2>Page Not Found</H2>}
       <p className="my-6">{msg}</p>
-      <p>{msg}</p>
     </>
   );
 };
