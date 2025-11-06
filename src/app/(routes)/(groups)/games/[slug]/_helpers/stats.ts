@@ -1,4 +1,4 @@
-import { $Enums, StatName } from "@prisma/client";
+import { $Enums, StatName } from "prisma/generated";
 import {
   getWinsPerPlayer,
   getMatchesPerGame,
