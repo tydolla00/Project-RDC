@@ -1,6 +1,6 @@
 "use server";
 
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { handlePrismaOperation } from "../db";
 import { StatName } from "@prisma/client";
 import { getSumOfStat } from "@prisma/client/sql";
@@ -22,6 +22,7 @@ export type StatEndsWith<
 export const getAllGames = async () => {
   "use cache";
   cacheLife("max");
+  cacheTag("getAllGames");
   return await handlePrismaOperation(
     async (prisma) => await prisma.game.findMany(),
   );
@@ -156,6 +157,7 @@ export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
 export const getAllGameStats = async () => {
   "use cache";
   cacheLife("max");
+  cacheTag("getAllGameStats");
   return await handlePrismaOperation((prisma) =>
     prisma.gameStat.findMany({ select: { statName: true, statId: true } }),
   );
