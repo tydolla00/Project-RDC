@@ -1,6 +1,6 @@
 import { findPlayer } from "@/app/(routes)/admin/_utils/player-mappings";
 import { handlePrismaOperation } from "../db";
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import "server-only";
 
 /**
@@ -11,6 +11,7 @@ import "server-only";
 export const getAllMembers = async () => {
   "use cache";
   cacheLife("max");
+  cacheTag("getAllMembers");
   return await handlePrismaOperation((prisma) => prisma.player.findMany());
 };
 

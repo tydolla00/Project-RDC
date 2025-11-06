@@ -361,7 +361,7 @@ export async function addPlayer(
   );
 
   if (!res.success) return { error: res.error || "Failed to add player." };
-  revalidateTag("allMembers", "max");
+  revalidateTag("getAllMembers", "max");
   return { error: null };
 }
 
