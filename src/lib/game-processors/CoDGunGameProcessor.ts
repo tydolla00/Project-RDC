@@ -13,7 +13,7 @@ import {
   WinnerConfig,
 } from "./game-processor-utils";
 import { VisionResultCodes } from "../constants";
-import { Player } from "@prisma/client";
+import { Player } from "prisma/generated";
 import { getStatConfigByFieldKey } from "../stat-configs";
 
 // Helper function to rank players by COD_KILLS and set COD_POS

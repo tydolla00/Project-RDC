@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Player } from "@prisma/client";
+import { Player } from "prisma/generated";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";

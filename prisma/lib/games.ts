@@ -2,8 +2,8 @@
 
 import { cacheLife, cacheTag } from "next/cache";
 import { handlePrismaOperation } from "../db";
-import { StatName } from "@prisma/client";
-import { getSumOfStat } from "@prisma/client/sql";
+import { StatName } from "../generated";
+import { getSumOfStat } from "../generated/sql";
 
 export type StatEndsWith<
   Suffix extends string,
