@@ -1,4 +1,4 @@
-import { StatName } from "@/lib/stat-names";
+import { StatName } from "prisma/generated";
 import { getAllGames } from "prisma/lib/games";
 
 /**

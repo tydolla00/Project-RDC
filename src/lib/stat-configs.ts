@@ -1,4 +1,4 @@
-import { StatName } from "./stat-names";
+import { StatName } from "prisma/generated";
 
 /**
  * Interface describing a stat configuration for a game.
