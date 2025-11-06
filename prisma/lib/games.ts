@@ -1,6 +1,6 @@
 "use server";
 
-import { unstable_cache } from "next/cache";
+import { cacheLife } from "next/cache";
 import { handlePrismaOperation } from "../db";
 import { StatName } from "@prisma/client";
 import { getSumOfStat } from "@prisma/client/sql";
@@ -19,14 +19,13 @@ export type StatEndsWith<
  *
  * @returns Promise resolving to an array of games.
  */
-export const getAllGames = unstable_cache(
-  async () => await handlePrismaOperation((prisma) => prisma.game.findMany()),
-  undefined,
-  {
-    tags: ["getAllGames"],
-    revalidate: false,
-  },
-);
+export const getAllGames = async () => {
+  "use cache";
+  cacheLife("max");
+  return await handlePrismaOperation(
+    async (prisma) => await prisma.game.findMany(),
+  );
+};
 
 export const getGame = async (gameName: string) =>
   await handlePrismaOperation((prisma) =>
@@ -154,16 +153,10 @@ export const getStatPerPlayer = async (gameId: number, statName: StatName) =>
  *
  * @returns Promise resolving to an array of game stats.
  */
-export const getAllGameStats = unstable_cache(
-  async () =>
-    await handlePrismaOperation((prisma) =>
-      prisma.gameStat.findMany({
-        select: { statName: true, statId: true },
-      }),
-    ),
-  undefined,
-  {
-    tags: ["getAllGameStats"],
-    revalidate: false,
-  },
-);
+export const getAllGameStats = async () => {
+  "use cache";
+  cacheLife("max");
+  return await handlePrismaOperation((prisma) =>
+    prisma.gameStat.findMany({ select: { statName: true, statId: true } }),
+  );
+};

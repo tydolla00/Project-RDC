@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
     }
     return new Response("Emails sent successfully", { status: 200 });
   } catch (error) {
-    console.error("Error sending feedback emails", { error });
+    // console.error("Error sending feedback emails", { error });
     return new Response("Failed to send emails", { status: 500 });
   }
 }

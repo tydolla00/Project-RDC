@@ -1,3 +1,4 @@
+"use cache";
 import { PieChartRDC } from "@/components/charts";
 import { H1, H2 } from "@/components/headings";
 import { Button } from "@/components/ui/button";

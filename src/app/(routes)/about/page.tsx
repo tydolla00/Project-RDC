@@ -1,7 +1,8 @@
+"use cache";
 import { H1 } from "@/components/headings";
 import Link from "next/link";
 
-export default function AboutPage() {
+export default async function AboutPage() {
   return (
     <div className="container mx-auto py-8">
       <H1 className="mb-6 text-center">About Us</H1>

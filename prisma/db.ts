@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { neonConfig } from "@neondatabase/serverless";
+import { neonConfig, NeonDbError } from "@neondatabase/serverless";
 // import config from "../lib/config";
 
 import ws from "ws";
@@ -10,7 +10,8 @@ import ws from "ws";
 neonConfig.webSocketConstructor = ws;
 
 // To work in edge environments (Cloudflare Workers, Vercel Edge, etc.), enable querying over fetch
-neonConfig.poolQueryViaFetch = true;
+// ! Broken currently due to Cache Components
+// neonConfig.poolQueryViaFetch = true;
 
 // Type definitions
 declare global {
@@ -59,6 +60,13 @@ export async function handlePrismaOperation<T>(
         data: null,
       };
     }
+    if (error instanceof NeonDbError)
+      return {
+        success: false,
+        error: `Neon error: ${error.message}`,
+        code: error.code,
+        data: null,
+      };
     return {
       success: false,
       error: `An unexpected error occurred: ${error}`,
