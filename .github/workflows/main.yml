@@ -44,6 +44,9 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Generate Prisma client
         run: npm run postinstall
 
