@@ -1,4 +1,4 @@
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { handlePrismaOperation } from "../db";
 
 /**
@@ -11,6 +11,7 @@ import { handlePrismaOperation } from "../db";
 export const getAllSessions = async () => {
   "use cache";
   cacheLife("max");
+  cacheTag("getAllSessions");
   return await handlePrismaOperation((prisma) =>
     prisma.session.findMany({
       include: { Game: { select: { gameName: true } } },
@@ -34,6 +35,7 @@ export const getAllSessions = async () => {
 export const getAllSessionsByGame = async (gameId: number) => {
   "use cache";
   cacheLife("max");
+  cacheTag("getAllSessions", gameId.toString());
   return await handlePrismaOperation((prisma) =>
     prisma.session.findMany({
       where: { gameId },
