@@ -11,6 +11,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { getMembersNav } from "prisma/lib/members";
+import { Battle } from "./_components/Battle";
 
 export default async function Page() {
   const members = await getMembersNav();
@@ -69,6 +70,7 @@ export default async function Page() {
           </CardHeader>
         </Card>
       </div>
+      <Battle />
     </div>
   );
 }
