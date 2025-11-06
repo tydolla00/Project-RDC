@@ -13,7 +13,6 @@ import { SessionProvider } from "next-auth/react";
 import PostHogIdentify from "@/posthog/PosthogIdentify";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ReactScan } from "@/components/ReactScan";
 
 const inter = Inter({ subsets: ["latin"] });
 
