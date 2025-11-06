@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-sync-scripts */
 // import { ReactScan } from "@/components/ReactScan";
 
 import type { Metadata } from "next";
@@ -14,6 +13,7 @@ import { SessionProvider } from "next-auth/react";
 import PostHogIdentify from "@/posthog/PosthogIdentify";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ReactScan } from "@/components/ReactScan";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,7 +31,10 @@ export default function RootLayout({
     <html className="h-screen" lang="en" suppressHydrationWarning>
       <head>
         {process.env.NODE_ENV === "development" && (
-          <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+          <script
+            async
+            src="https://unpkg.com/react-scan/dist/auto.global.js"
+          />
         )}
       </head>
       {/* <ReactScan /> */}

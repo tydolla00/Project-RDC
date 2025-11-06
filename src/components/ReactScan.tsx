@@ -6,7 +6,7 @@ import { JSX, useEffect } from "react";
 export function ReactScan(): JSX.Element {
   useEffect(() => {
     scan({
-      enabled: false,
+      enabled: true,
       _debug: "verbose",
     });
   }, []);
