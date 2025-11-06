@@ -13,8 +13,6 @@ import {
 import { getMembersNav } from "prisma/lib/members";
 import { Battle } from "./_components/Battle";
 
-// export const revalidate = 604_800; // 1 week
-
 export default async function Page() {
   const members = await getMembersNav();
   return (
