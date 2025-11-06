@@ -10,7 +10,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { getMembersNav } from "@/lib/constants";
+import { getMembersNav } from "prisma/lib/members";
 import { Battle } from "./_components/Battle";
 
 // export const revalidate = 604_800; // 1 week
