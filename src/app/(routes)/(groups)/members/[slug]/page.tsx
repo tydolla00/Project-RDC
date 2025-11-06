@@ -1,3 +1,4 @@
+"use cache";
 import { notFound } from "next/navigation";
 import { getMember } from "./data";
 import {

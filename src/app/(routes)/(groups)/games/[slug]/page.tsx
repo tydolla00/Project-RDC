@@ -1,3 +1,4 @@
+"use cache";
 import { H1 } from "@/components/headings";
 import { getAllGames, getWinsPerPlayer } from "prisma/lib/games";
 import { getAllSessionsByGame } from "prisma/lib/admin"; // Import getAllSessions
@@ -13,9 +14,6 @@ import { Separator } from "@/components/ui/separator";
 import { getAllMembers } from "prisma/lib/members";
 import { NoMembers } from "../../members/_components/members";
 import { calcWinsPerPlayer } from "./_helpers/stats";
-
-// ? Force non specified routes to return 404
-// export const dynamicParams = false; // true | false,
 
 export type Members = NonNullable<
   Awaited<ReturnType<typeof getAllMembers>>["data"]
