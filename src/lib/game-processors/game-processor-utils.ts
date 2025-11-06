@@ -5,7 +5,7 @@ import {
   Stat,
   VisionPlayer,
 } from "@/app/actions/visionAction";
-import { Player } from "@prisma/client";
+import { Player } from "prisma/generated";
 import { VisionResultCodes } from "../constants";
 import {
   findPlayer,

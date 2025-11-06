@@ -1,4 +1,4 @@
-import { $Enums, StatName } from "@prisma/client";
+import { $Enums, StatName } from "prisma/generated";
 import {
   getWinsPerPlayer,
   getMatchesPerGame,
@@ -7,12 +7,10 @@ import {
   getSumPerStat,
 } from "prisma/lib/games";
 import { QueryResponseData } from "prisma/db";
-import { Decimal } from "@prisma/client/runtime/library";
+import { Decimal } from "prisma/generated/runtime/library";
 import { logNAN } from "@/posthog/server-analytics";
 
-type Result = NonNullable<
-  NonNullable<Awaited<ReturnType<typeof getSumPerStat>>["data"]>[number]
-> & {
+type Result = NonNullable<Awaited<ReturnType<typeof getSumPerStat>>>["data"] & {
   avg: number;
   sum: number;
 };

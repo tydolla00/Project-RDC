@@ -1,6 +1,5 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../generated";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const playerStatWithStatName = Prisma.validator<Prisma.PlayerStatDefaultArgs>()(
   {
     include: {

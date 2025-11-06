@@ -1,9 +1,13 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+} from "./generated/runtime/library";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { neonConfig, NeonDbError } from "@neondatabase/serverless";
 // import config from "../lib/config";
 
 import ws from "ws";
+import { PrismaClient } from "./generated";
 // import posthog from "@/posthog/server-init";
 // import { v4 } from "uuid";
 
@@ -45,7 +49,7 @@ export async function handlePrismaOperation<T>(
   } catch (error) {
     // posthog.captureException(error, v4());
     console.log(error);
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof PrismaClientKnownRequestError) {
       return {
         success: false,
         error: `Database error: ${error.message}`,
@@ -53,7 +57,7 @@ export async function handlePrismaOperation<T>(
         data: null,
       };
     }
-    if (error instanceof Prisma.PrismaClientValidationError) {
+    if (error instanceof PrismaClientValidationError) {
       return {
         success: false,
         error: "Invalid query parameters",
