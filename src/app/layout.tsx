@@ -12,6 +12,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { CSPostHogProvider } from "@/posthog/client-init";
 import { SessionProvider } from "next-auth/react";
 import PostHogIdentify from "@/posthog/PosthogIdentify";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,7 +43,10 @@ export default function RootLayout({
           <SessionProvider>
             <CSPostHogProvider>
               <PostHogIdentify />
-              <Navbar />
+              {/* Comment this out to see ssg */}
+              <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+                <Navbar />
+              </Suspense>
               <main>{children}</main>
               <Toaster />
               <Footer />
