@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { cacheLife } from "next/cache";
 import { handlePrismaOperation } from "../db";
 
 /**
@@ -8,16 +8,15 @@ import { handlePrismaOperation } from "../db";
  *
  * @returns Promise resolving to an array of video sessions with game names.
  */
-export const getAllSessions = unstable_cache(
-  async () =>
-    await handlePrismaOperation((prisma) =>
-      prisma.session.findMany({
-        include: { Game: { select: { gameName: true } } },
-      }),
-    ),
-  undefined,
-  { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
-);
+export const getAllSessions = async () => {
+  "use cache";
+  cacheLife("max");
+  return await handlePrismaOperation((prisma) =>
+    prisma.session.findMany({
+      include: { Game: { select: { gameName: true } } },
+    }),
+  );
+};
 
 /**
  * Retrieves all sessions for a specific game.
@@ -32,40 +31,40 @@ export const getAllSessions = unstable_cache(
  * const sessions = await getAllSessionsByGame(1);
  * console.log(sessions);
  */
-export const getAllSessionsByGame = unstable_cache(
-  async (gameId: number) =>
-    await handlePrismaOperation((prisma) =>
-      prisma.session.findMany({
-        where: { gameId },
-        select: {
-          date: true,
-          sessionId: true,
-          sessionName: true,
-          sessionUrl: true,
-          thumbnail: true,
-          dayWinners: true,
-          mvp: true,
-          mvpDescription: true,
-          mvpStats: true,
-          Game: { select: { gameName: true } },
-          sets: {
-            select: {
-              setWinners: true,
-              matches: {
-                select: {
-                  matchWinners: true,
-                  playerSessions: {
-                    select: {
-                      playerStats: {
-                        select: {
-                          value: true,
-                          player: true,
-                          gameStat: {
-                            select: {
-                              statName: true,
-                              statId: true,
-                              type: true,
-                            },
+export const getAllSessionsByGame = async (gameId: number) => {
+  "use cache";
+  cacheLife("max");
+  return await handlePrismaOperation((prisma) =>
+    prisma.session.findMany({
+      where: { gameId },
+      select: {
+        date: true,
+        sessionId: true,
+        sessionName: true,
+        sessionUrl: true,
+        thumbnail: true,
+        dayWinners: true,
+        mvp: true,
+        mvpDescription: true,
+        mvpStats: true,
+        Game: { select: { gameName: true } },
+        sets: {
+          select: {
+            setWinners: true,
+            matches: {
+              select: {
+                matchWinners: true,
+                playerSessions: {
+                  select: {
+                    playerStats: {
+                      select: {
+                        value: true,
+                        player: true,
+                        gameStat: {
+                          select: {
+                            statName: true,
+                            statId: true,
+                            type: true,
                           },
                         },
                       },
@@ -76,9 +75,8 @@ export const getAllSessionsByGame = unstable_cache(
             },
           },
         },
-        orderBy: { date: "asc" },
-      }),
-    ),
-  undefined,
-  { revalidate: 604800, tags: ["getAllSessions"] }, // 1 week
-);
+      },
+      orderBy: { date: "asc" },
+    }),
+  );
+};
