@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { getAllSessionsByGame } from "prisma/lib/admin";
+import { type getAllSessionsByGame } from "prisma/lib/admin";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 

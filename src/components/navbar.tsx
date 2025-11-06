@@ -22,7 +22,8 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { getGamesNav, getMembersNav } from "@/lib/constants";
+import { getGamesNav } from "@/lib/constants";
+import { getMembersNav } from "prisma/lib/members";
 import { auth } from "@/auth";
 import { AuthButton, ToggleThemeButton } from "./client-buttons";
 
