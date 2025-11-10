@@ -28,7 +28,7 @@
     "@azure/core-auth": "^1.9.0",
     "@azure/ms-rest-azure-js": "^2.1.0",
     "@hookform/resolvers": "^5.2.2",
-    "@neondatabase/serverless": "^1.0.1",
+    "@neondatabase/serverless": "^1.0.2",
     "@prisma/adapter-neon": "^6.19.0",
     "@prisma/client": "^6.19.0",
     "@radix-ui/react-avatar": "^1.1.10",
