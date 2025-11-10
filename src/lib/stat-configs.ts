@@ -299,17 +299,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
     dataType: "number",
     validationRules: { min: 0, allowZero: true },
   },
-  mr_medals: {
-    id: 25,
-    name: StatName.MR_MEDALS,
-    description: "Marvel Rivals Medals",
-    gameId: 6,
-    fieldKey: "mr_medals",
-    displayName: "Medals",
-    category: "performance",
-    dataType: "number",
-    validationRules: { min: 0, allowZero: true },
-  },
+
   mr_highest_dmg: {
     id: 26,
     name: StatName.MR_HIGHEST_DMG,

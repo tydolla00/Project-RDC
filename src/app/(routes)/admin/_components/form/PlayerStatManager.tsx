@@ -31,7 +31,6 @@ const MARVEL_RIVALS_EXPANDABLE_STATS: StatName[] = [
   StatName.MR_QUADRA_KILL,
   StatName.MR_PENTA_KILL,
   StatName.MR_HEXA_KILL,
-  StatName.MR_MEDALS,
   StatName.MR_HIGHEST_DMG,
   StatName.MR_HIGHEST_DMG_BLOCKED,
   StatName.MR_MOST_HEALING,
