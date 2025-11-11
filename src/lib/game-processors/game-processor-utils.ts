@@ -24,7 +24,7 @@ import {
   AnalyzedPlayersObj,
   AnalyzedTeamData,
 } from "@/app/actions/visionAction";
-import { Player } from "@prisma/client";
+import { Player } from "prisma/generated";
 import {
   findPlayer,
   PLAYER_MAPPINGS,

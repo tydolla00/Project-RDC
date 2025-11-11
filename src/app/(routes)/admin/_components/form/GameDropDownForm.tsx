@@ -33,7 +33,7 @@ import { getAllGames } from "prisma/lib/games";
 import { FormValues } from "../../_utils/form-helpers";
 import { useAdmin } from "@/lib/adminContext";
 import { toast } from "sonner";
-import { Game } from "@prisma/client";
+import { Game } from "prisma/generated";
 
 // TODO Cache results
 

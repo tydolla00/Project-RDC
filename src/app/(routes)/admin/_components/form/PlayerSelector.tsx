@@ -1,6 +1,5 @@
 "use client";
-import { Player } from "@prisma/client";
-import React, { useEffect, useState } from "react";
+import { Player } from "prisma/generated";
 import { ControllerRenderProps, UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";

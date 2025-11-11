@@ -12,8 +12,7 @@ import {
   WinnerConfig,
   validateResults,
 } from "./game-processor-utils";
-import { VisionResultCodes } from "../constants";
-import { Player } from "@prisma/client";
+import { Player } from "prisma/generated";
 
 export const CoDSearchAndDestroyProcessor: GameProcessor = {
   processPlayers: function (
