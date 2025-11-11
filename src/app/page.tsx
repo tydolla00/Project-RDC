@@ -1,3 +1,4 @@
+"use cache";
 import { PieChartRDC } from "@/components/charts";
 import { H1, H2 } from "@/components/headings";
 import { Button } from "@/components/ui/button";
@@ -5,13 +6,10 @@ import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { type ChartConfig } from "@/components/ui/chart";
 import Link from "next/link";
 import { getGamesNav } from "@/lib/constants";
-import { FeatureFlag } from "@/lib/featureflag";
-import { auth } from "@/auth";
 import Image from "next/image";
 
 export default async function Home() {
   const games = await getGamesNav();
-  const session = await auth();
   return (
     <>
       <div className="m-16">
@@ -74,31 +72,24 @@ export default async function Home() {
             </div>
           ))}
         </div>
-        <FeatureFlag
-          devOnly
-          flagName="SUBMISSION_FORM"
-          user={session}
-          shouldRedirect={false}
-        >
-          <H2 className="text-chart-4 mx-auto my-10 w-fit">Want to Help</H2>
-          <Card className="mx-auto md:w-1/2">
-            <CardHeader>
-              <p>
-                Keeping track of stats, takes a lot of time. If you would like
-                to help us keep a record of the games they play, please login
-                and complete the form.
-              </p>
-            </CardHeader>
-            <CardFooter>
-              <Button
-                asChild
-                className="mt-4 w-full sm:mx-auto sm:block sm:w-fit"
-              >
-                <Link href="/submissions">Submit new entry</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        </FeatureFlag>
+        <H2 className="text-chart-4 mx-auto my-10 w-fit">Want to Help</H2>
+        <Card className="mx-auto md:w-1/2">
+          <CardHeader>
+            <p>
+              Keeping track of stats, takes a lot of time. If you would like to
+              help us keep a record of the games they play, please login and
+              complete the form.
+            </p>
+          </CardHeader>
+          <CardFooter>
+            <Button
+              asChild
+              className="mt-4 w-full sm:mx-auto sm:block sm:w-fit"
+            >
+              <Link href="/admin/submissions">Submit new entry</Link>
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     </>
   );

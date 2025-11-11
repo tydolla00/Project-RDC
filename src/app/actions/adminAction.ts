@@ -1,6 +1,6 @@
 "use server";
 
-import { GameStat } from "@prisma/client";
+import { GameStat } from "prisma/generated";
 import prisma, { handlePrismaOperation } from "prisma/db";
 import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";
@@ -361,7 +361,7 @@ export async function addPlayer(
   );
 
   if (!res.success) return { error: res.error || "Failed to add player." };
-  revalidateTag("allMembers", "max");
+  revalidateTag("getAllMembers", "max");
   return { error: null };
 }
 

@@ -11,12 +11,22 @@ import { Separator } from "@radix-ui/react-separator";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminSidebar } from "@/components/admin-sidebar";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  return (
+    <Suspense fallback={<Skeleton className="h-72 w-full" />}>
+      <Component>{children}</Component>
+    </Suspense>
+  );
+}
+
+const Component = async ({ children }: { children: React.ReactNode }) => {
   const session = await auth();
   if (!session) redirect("/");
 
@@ -39,4 +49,4 @@ export default async function Layout({
       </SidebarInset>
     </SidebarProvider>
   );
-}
+};

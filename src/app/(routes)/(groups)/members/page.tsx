@@ -10,9 +10,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { getMembersNav } from "@/lib/constants";
-
-export const revalidate = 604_800; // 1 week
+import { getMembersNav } from "prisma/lib/members";
 
 export default async function Page() {
   const members = await getMembersNav();

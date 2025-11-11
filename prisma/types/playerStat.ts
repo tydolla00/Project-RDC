@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../generated";
 
 export const playerStatWithStatName =
   Prisma.validator<Prisma.PlayerStatDefaultArgs>()({

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-sync-scripts */
 // import { ReactScan } from "@/components/ReactScan";
 
 import type { Metadata } from "next";
@@ -12,6 +11,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { CSPostHogProvider } from "@/posthog/client-init";
 import { SessionProvider } from "next-auth/react";
 import PostHogIdentify from "@/posthog/PosthogIdentify";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ReactScan } from "@/components/ReactScan";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,9 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html className="h-screen" lang="en" suppressHydrationWarning>
-      <head>
+      {/* <head>
         <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
-      </head>
+      </head> */}
       {/* <ReactScan /> */}
       <body className={inter.className}>
         <ThemeProvider
@@ -41,7 +43,10 @@ export default function RootLayout({
           <SessionProvider>
             <CSPostHogProvider>
               <PostHogIdentify />
-              <Navbar />
+              {/* Comment this out to see ssg */}
+              <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+                <Navbar />
+              </Suspense>
               <main>{children}</main>
               <Toaster />
               <Footer />
