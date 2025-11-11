@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider        = "prisma-client-js"
   output          = "./generated"
@@ -14,69 +11,42 @@ generator json {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL") // Used during development to connect to dev db
+  directUrl = env("DIRECT_URL")
 }
 
-/////////////////////////
-// Project RDC Models   
-// Player Ids      
-// 1. Mark 
-// 2. Dylan
-// 3. Des 
-// 4. Ben
-// 5. Lee
-// 6. John 
-// 7. Aff 
-// 8. Ippi 
-//////////////////////
-
-// {player_id: 1, player_name: "Mark", player_game_stats: []}
 model Player {
-  playerId       Int             @id @default(autoincrement()) @map("player_id")
-  playerName     String          @map("player_name")
-  playerSessions PlayerSession[]
-  playerStats    PlayerStat[]
-  matchWins      Match[]
-  setWins        GameSet[]
-  dayWins        Session[]       @relation("DayWinners")
-  mvpOf          Session[]       @relation("Mvp")
+  playerId        Int               @id @default(autoincrement()) @map("player_id")
+  playerName      String            @map("player_name")
+  playerSessions  PlayerSession[]
+  playerStats     PlayerStat[]
+  matchWins       Match[]
+  setWins         GameSet[]
+  dayWins         Session[]         @relation("DayWinners")
+  mvpOf           Session[]         @relation("Mvp")
+  GameSetToPlayer GameSetToPlayer[]
 
   @@map("players")
 }
 
-// { game_id: 1, game_name: 'Mario Kart', game_stats: [], player_game_stats: [] }
 model Game {
   gameId      Int          @id @default(autoincrement()) @map("game_id")
   gameName    String       @unique @map("game_name")
   gameStats   GameStat[]
   playerStats PlayerStat[]
   sessions    Session[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
 
   @@map("games")
 }
 
-// Define enum for stat names
-// Keep in sync with enum in utils and seed.
-enum StatName {
-  MK8_POS
-  MK8_DAY
-  RL_SCORE
-  RL_GOALS
-  RL_ASSISTS
-  RL_SAVES
-  RL_SHOTS
-  RL_DAY
-  COD_KILLS
-  COD_DEATHS
-  COD_SCORE
-  COD_POS
-  COD_MELEES
-  LC_DEATHS
-  SR_WINS
-  SR_SETS
-  SR_POS
+model GameSetToPlayer {
+  A       Int
+  B       Int
+  sets    GameSet @relation(fields: [A], references: [setId], onDelete: Cascade)
+  players Player  @relation(fields: [B], references: [playerId], onDelete: Cascade)
+
+  @@id([A, B], map: "_GameSetToPlayer_AB_pkey")
+  @@index([B], map: "_GameSetToPlayer_B_index")
+  @@map("_GameSetToPlayer")
 }
 
 enum StatType {
@@ -87,7 +57,7 @@ enum StatType {
 // { stat_id: 1, game_id: 1, stat_name: 'MK_POS', playerStats: [], type: 'int' }
 model GameStat {
   statId      Int          @id @default(autoincrement()) @map("stat_id")
-  statName    StatName     @map("stat_name")
+  statName    String       @map("stat_name")
   gameId      Int          @map("game_id")
   game        Game         @relation(fields: [gameId], references: [gameId], onDelete: Cascade)
   playerStats PlayerStat[]
@@ -139,8 +109,9 @@ model GameSet {
   session        Session         @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
   setWinners     Player[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  GameSetToPlayer GameSetToPlayer[]
 
   @@map("sets")
 }
