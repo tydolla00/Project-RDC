@@ -1,7 +1,7 @@
 import posthog from "@/posthog/server-init";
 import { auth } from "@/auth";
 import { FormValues } from "@/app/(routes)/admin/_utils/form-helpers";
-import { ErrorModelOutput } from "@azure-rest/ai-document-intelligence";
+import ErrorModelOutput from "@azure-rest/ai-document-intelligence";
 import { Session } from "next-auth";
 import { v4 } from "uuid";
 import type { MvpOutput } from "@/app/ai/types";
@@ -82,7 +82,7 @@ export const logFormSuccess = async (
 };
 
 export const logVisionError = async (
-  error: ErrorModelOutput | unknown,
+  error: typeof ErrorModelOutput | unknown,
   userSession?: Session | null,
 ) => {
   const session = userSession ?? (await auth());
