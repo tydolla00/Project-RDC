@@ -93,6 +93,7 @@ export const statDescriptions: { [key in StatName]: string } = {
   [StatName.MR_QUADRA_KILL]: "Marvel Rivals Quadra Kills",
   [StatName.MR_PENTA_KILL]: "Marvel Rivals Penta Kills",
   [StatName.MR_HEXA_KILL]: "Marvel Rivals Hexa Kills",
+  [StatName.MR_MOST_KILLS]: "Marvel Rivals Most Kills",
   [StatName.MR_HIGHEST_DMG]: "Marvel Rivals Highest Damage",
   [StatName.MR_HIGHEST_DMG_BLOCKED]: "Marvel Rivals Highest Damage Blocked",
   [StatName.MR_MOST_HEALING]: "Marvel Rivals Most Healing",

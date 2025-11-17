@@ -1,7 +1,7 @@
 import { GAME_CONFIGS, VisionResultCodes } from "@/lib/constants";
 import DocumentIntelligence, {
   getLongRunningPoller,
-  AnalyzeResultOperationOutput,
+  AnalyzeOperationOutput,
   isUnexpected,
 } from "@azure-rest/ai-document-intelligence";
 import { Player } from "prisma/generated";
@@ -85,8 +85,8 @@ export const analyzeScreenShot = async (
     }
 
     const poller = await getLongRunningPoller(client, response);
-    const result = (await poller.pollUntilDone())
-      .body as AnalyzeResultOperationOutput;
+
+    const result = (await poller.body) as AnalyzeOperationOutput;
 
     if (!result.analyzeResult || !result.analyzeResult.documents) {
       return {

@@ -205,6 +205,7 @@ async function seedGames() {
           { statName: StatName.MR_QUADRA_KILL },
           { statName: StatName.MR_PENTA_KILL },
           { statName: StatName.MR_HEXA_KILL },
+          { statName: StatName.MR_MOST_KILLS },
           { statName: StatName.MR_HIGHEST_DMG },
           { statName: StatName.MR_HIGHEST_DMG_BLOCKED },
           { statName: StatName.MR_MOST_HEALING },

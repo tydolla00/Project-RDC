@@ -416,8 +416,11 @@ export const formSchema = z.discriminatedUnion("game", [
 // Define types based on the Zod schema
 export type FormValues = z.infer<typeof formSchema>;
 
-// Derive specific types from the FormValues type
-export type Match = FormValues["sets"][number]["matches"][number];
+// Extract from a specific schema to avoid union indexing issues
+type BaseGameForm = Extract<FormValues, { game: "Call of Duty" }>;
+
+// Derive specific types from the base schema
+export type Match = BaseGameForm["sets"][number]["matches"][number];
 export type MatchWinners = Match["matchWinners"];
 export type PlayerSessions = Match["playerSessions"];
-export type SetWinners = FormValues["sets"][number]["setWinners"];
+export type SetWinners = BaseGameForm["sets"][number]["setWinners"];

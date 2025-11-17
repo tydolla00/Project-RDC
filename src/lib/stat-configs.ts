@@ -1,4 +1,4 @@
-import { StatName, statNames } from "./stat-names";
+import { StatName } from "./stat-names";
 
 /**
  * Interface describing a stat configuration for a game.
@@ -398,6 +398,17 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
     category: "performance",
     dataType: "number",
     validationRules: { min: 0, max: 100, allowZero: true },
+  },
+  mr_most_kills: {
+    id: 35,
+    name: StatName.MR_MOST_KILLS,
+    description: "Marvel Rivals Most Kills",
+    gameId: 6,
+    fieldKey: "mr_most_kills",
+    displayName: "Most Kills",
+    category: "offensive",
+    dataType: "number",
+    validationRules: { min: 0, allowZero: true },
   },
 };
 

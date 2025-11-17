@@ -12,8 +12,9 @@ import {
   ChevronUp,
   Swords,
   Shield,
-  Heart,
+  Plus,
   HandMetal,
+  Flame,
 } from "lucide-react";
 import { StatName } from "@/lib/stat-names";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,7 @@ const MARVEL_RIVALS_EXPANDABLE_STATS: StatName[] = [
   StatName.MR_QUADRA_KILL,
   StatName.MR_PENTA_KILL,
   StatName.MR_HEXA_KILL,
+  StatName.MR_MOST_KILLS,
   StatName.MR_HIGHEST_DMG,
   StatName.MR_HIGHEST_DMG_BLOCKED,
   StatName.MR_MOST_HEALING,
@@ -137,13 +139,15 @@ const PlayerStatManager = (props: Props) => {
         case StatName.MR_HEXA_KILL:
           return <span className="font-bold">6</span>;
         case StatName.MR_HIGHEST_DMG:
-          return <Swords className="h-4 w-4" />;
+          return <Flame className="h-4 w-4" />;
         case StatName.MR_HIGHEST_DMG_BLOCKED:
           return <Shield className="h-4 w-4" />;
         case StatName.MR_MOST_HEALING:
-          return <Heart className="h-4 w-4" />;
+          return <Plus className="h-4 w-4" />;
         case StatName.MR_MOST_ASSISTS:
           return <HandMetal className="h-4 w-4" />;
+        case StatName.MR_MOST_KILLS:
+          return <Swords className="h-4 w-4" />;
         default:
           return null;
       }
