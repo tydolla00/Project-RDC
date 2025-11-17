@@ -333,7 +333,7 @@ export const STAT_CONFIGS: Record<string, StatConfig> = {
     dataType: "number",
     validationRules: { min: 0, allowZero: true },
   },
-  MR_MOST_ASSISTS: {
+  mr_most_assists: {
     id: 29,
     name: StatName.MR_MOST_ASSISTS,
     description: "Marvel Rivals Most Assists Fist",

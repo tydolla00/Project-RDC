@@ -44,7 +44,7 @@ const MatchManager = (props: Props) => {
     const playerSessions = players.map((player: Player) => ({
       playerId: player.playerId,
       playerSessionName: player.playerName,
-      playerStats: [], // TypeScript now knows this is the correct, specific stat array type.
+      playerStats: [],
     }));
     console.log("Player Sessions: ", playerSessions);
     append({

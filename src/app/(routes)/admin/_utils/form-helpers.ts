@@ -128,6 +128,7 @@ const marvelRivalsStats = z
       StatName.MR_QUADRA_KILL,
       StatName.MR_PENTA_KILL,
       StatName.MR_HEXA_KILL,
+      StatName.MR_MOST_KILLS,
       StatName.MR_HIGHEST_DMG,
       StatName.MR_HIGHEST_DMG_BLOCKED,
       StatName.MR_MOST_HEALING,
@@ -327,6 +328,15 @@ const speedrunnersSchema = baseSessionSchema.extend({
 
 const marvelRivalsSchema = baseSessionSchema.extend({
   game: z.literal("Marvel Rivals"),
+  sets: z.array(
+    setSchema.extend({
+      matches: z.array(
+        matchSchema.extend({
+          matchWinners: z.array(playerSchema),
+        }),
+      ),
+    }),
+  ),
 });
 
 const codSchema = baseSessionSchema.extend({

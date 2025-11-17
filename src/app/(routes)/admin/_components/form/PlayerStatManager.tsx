@@ -56,17 +56,27 @@ const PlayerStatManager = (props: Props) => {
   const currentGame = getValues("game");
   const isMarvelRivals = currentGame === "Marvel Rivals";
 
+  console.log("game stats: ", gameStats);
+
   // TODO: Move to PlayerSessionManager or above
   // TODO: Error message doesn't show up for RL bc refine doesn't pass.
 
   useEffect(() => {
     let ignore = false;
     const matchFields = getValues(`${curPlayerSession}.playerStats`);
-    gameStats.forEach((stat) => {
+    gameStats.forEach((stat, index) => {
       const isMatch = matchFields.some((f) => f.stat === stat.statName); // Need to do this in dev because useEffect renders twice.
+      const isToggleStat =
+        isMarvelRivals &&
+        (MARVEL_RIVALS_EXPANDABLE_STATS as readonly StatName[]).includes(
+          stat.statName as StatName,
+        );
       if (!ignore && !isMatch)
-        // @ts-expect-error Need to exclude unused stats TODO FIX
-        append({ statId: uuidv4(), stat: stat.statName, statValue: "" });
+        append({
+          statId: stat.statId,
+          stat: stat.statName as any, // Runtime: gameStats filtered by game. Validation: Zod schema ensures correct type
+          statValue: isToggleStat ? "0" : "",
+        });
     });
 
     return () => {

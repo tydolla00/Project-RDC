@@ -122,7 +122,7 @@ export function zodResolver<Input extends FieldValues, Context, Output>(
       }
 
       return {
-        errors: {} as FieldErrors,
+        errors: {} as Record<string, never>,
         values: resolverOptions.raw ? Object.assign({}, values) : data,
       } satisfies ResolverSuccess<Output | Input>;
     } catch (error) {
