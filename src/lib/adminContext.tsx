@@ -34,7 +34,6 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
           (stat) => !stat.statName.endsWith("_DAY"),
         );
         setGameStats(filteredGameStats);
-
         return filteredGameStats;
       } catch (error) {
         console.error("Error getting game stats: ", error);

@@ -1,5 +1,17 @@
-import { $Enums } from "prisma/generated";
+import { StatName } from "@/lib/stat-names";
 import { z } from "zod/v4";
+
+// Marvel Rivals optional stats (expandable stats that can be left empty)
+const MARVEL_RIVALS_OPTIONAL_STATS = [
+  StatName.MR_TRIPLE_KILL,
+  StatName.MR_QUADRA_KILL,
+  StatName.MR_PENTA_KILL,
+  StatName.MR_HEXA_KILL,
+  StatName.MR_HIGHEST_DMG,
+  StatName.MR_HIGHEST_DMG_BLOCKED,
+  StatName.MR_MOST_HEALING,
+  StatName.MR_MOST_ASSISTS,
+] as const;
 
 // Session Schema Definitions
 const sessionIdSchema = z.number().optional();
@@ -10,6 +22,7 @@ const gameSchema = z.union([
     "Mario Kart 8",
     "Lethal Company",
     "Speedrunners",
+    "Marvel Rivals",
   ]),
   z.string().min(1, "Game is required"),
 ]);
@@ -54,13 +67,13 @@ const playersSchema = z
 
 // ? Rocket League
 const rocketLeagueStats = z.object({
-  statId: z.string().trim().min(1, "StatId is required"),
+  statId: z.int().min(1, "StatId is required"),
   stat: z.literal([
-    $Enums.StatName.RL_GOALS,
-    $Enums.StatName.RL_ASSISTS,
-    $Enums.StatName.RL_SAVES,
-    $Enums.StatName.RL_SHOTS,
-    $Enums.StatName.RL_SCORE,
+    StatName.RL_GOALS,
+    StatName.RL_ASSISTS,
+    StatName.RL_SAVES,
+    StatName.RL_SHOTS,
+    StatName.RL_SCORE,
   ]),
   statValue: z
     .string()
@@ -73,8 +86,8 @@ const rocketLeagueStats = z.object({
 // ? Mario Kart 8
 
 const marioKart8Stats = z.object({
-  statId: z.string().trim().min(1, "StatId is required"),
-  stat: z.literal($Enums.StatName.MK8_POS),
+  statId: z.int().min(1, "StatId is required"),
+  stat: z.literal(StatName.MK8_POS),
   statValue: z
     .string()
     .trim()
@@ -83,17 +96,19 @@ const marioKart8Stats = z.object({
     .transform((val) => String(parseInt(val) || 0)),
 });
 
-// ? COD
+// ? COD Gun Game Stats
 
 const codStats = z.object({
   statId: z.string().trim().min(1, "StatId is required"),
   stat: z.literal([
-    $Enums.StatName.COD_KILLS,
-    $Enums.StatName.COD_DEATHS,
-    $Enums.StatName.COD_POS,
-    $Enums.StatName.COD_SCORE,
-    $Enums.StatName.COD_MELEES,
+    StatName.COD_KILLS,
+    StatName.COD_DEATHS,
+    StatName.COD_POS,
+    StatName.COD_SCORE,
+    StatName.COD_MELEES,
   ]),
+
+  // CoD
   statValue: z
     .string()
     .trim()
@@ -101,12 +116,71 @@ const codStats = z.object({
     .regex(/^\d+$/, "Stat value must be a number")
     .transform((val) => String(parseInt(val) || 0)),
 });
+
+const marvelRivalsStats = z
+  .object({
+    statId: z.int().min(1, "StatId is required"),
+    stat: z.literal([
+      StatName.MR_KILLS,
+      StatName.MR_DEATHS,
+      StatName.MR_ASSISTS,
+      StatName.MR_TRIPLE_KILL,
+      StatName.MR_QUADRA_KILL,
+      StatName.MR_PENTA_KILL,
+      StatName.MR_HEXA_KILL,
+      StatName.MR_MOST_KILLS,
+      StatName.MR_HIGHEST_DMG,
+      StatName.MR_HIGHEST_DMG_BLOCKED,
+      StatName.MR_MOST_HEALING,
+      StatName.MR_MOST_ASSISTS,
+      StatName.MR_FINAL_HITS,
+      StatName.MR_DMG,
+      StatName.MR_DMG_BLOCKED,
+      StatName.MR_HEALING,
+      StatName.MR_ACCURACY,
+    ]),
+    statValue: z.string().trim(),
+  })
+  .superRefine((data, ctx) => {
+    const isOptionalStat = MARVEL_RIVALS_OPTIONAL_STATS.includes(
+      data.stat as (typeof MARVEL_RIVALS_OPTIONAL_STATS)[number],
+    );
+
+    // If the stat is optional and empty, that's fine - just set to "0"
+    if (isOptionalStat && data.statValue === "") {
+      return;
+    }
+
+    // For required stats or non-empty optional stats, validate
+    if (!isOptionalStat && data.statValue === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["statValue"],
+      });
+      return;
+    }
+
+    // Validate that it's a number
+    if (!/^\d+$/.test(data.statValue)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Stat value must be a number",
+        path: ["statValue"],
+      });
+    }
+  })
+  .transform((data) => ({
+    ...data,
+    statValue: String(parseInt(data.statValue) || 0),
+  }));
 
 // Stat Schema Union
 const statSchema = z.discriminatedUnion("stat", [
   rocketLeagueStats,
   marioKart8Stats,
   codStats,
+  marvelRivalsStats,
 ]);
 
 // ! End of Stat Schema Definitions
@@ -171,7 +245,7 @@ const rocketLeagueSchema = baseSessionSchema.extend({
                 (mw) => mw.playerId === ps.playerId,
               );
               ps.playerStats.forEach((stat) => {
-                if (stat.stat === $Enums.StatName.RL_GOALS) {
+                if (stat.stat === StatName.RL_GOALS) {
                   if (onWinningTeam) winningTeam += Number(stat.statValue) || 0;
                   else losingTeam += Number(stat.statValue) || 0;
                 }
@@ -213,7 +287,7 @@ const marioKart8MatchSchema = baseSessionSchema.extend({
           let highestPosition = [0, Infinity] as [number, number]; // playerId, position
           match.playerSessions.forEach((ps) => {
             ps.playerStats.forEach((stat) => {
-              if (stat.stat === $Enums.StatName.MK8_POS) {
+              if (stat.stat === StatName.MK8_POS) {
                 const position = parseInt(stat.statValue);
                 if (position === 1) firstPlace.push(ps.playerId);
                 if (position < highestPosition[1])
@@ -251,7 +325,20 @@ const lethalCompanySchema = baseSessionSchema.extend({
 const speedrunnersSchema = baseSessionSchema.extend({
   game: z.literal("Speedrunners"),
 });
-// Other game schemas...
+
+const marvelRivalsSchema = baseSessionSchema.extend({
+  game: z.literal("Marvel Rivals"),
+  sets: z.array(
+    setSchema.extend({
+      matches: z.array(
+        matchSchema.extend({
+          matchWinners: z.array(playerSchema),
+        }),
+      ),
+    }),
+  ),
+});
+
 const codSchema = baseSessionSchema.extend({
   game: z.literal("Call of Duty"),
   sets: z.array(
@@ -276,7 +363,7 @@ const codSchema = baseSessionSchema.extend({
 
           match.playerSessions.forEach((ps) => {
             ps.playerStats.forEach((stat) => {
-              if (stat.stat === $Enums.StatName.COD_SCORE) {
+              if (stat.stat === StatName.COD_SCORE) {
                 const score = parseInt(stat.statValue) || 0;
                 highestScoreOverall = Math.max(highestScoreOverall, score);
                 if (ps.playerId === winnerId) {
@@ -284,7 +371,7 @@ const codSchema = baseSessionSchema.extend({
                 }
               }
               if (
-                stat.stat === $Enums.StatName.COD_POS &&
+                stat.stat === StatName.COD_POS &&
                 parseInt(stat.statValue) === 1
               ) {
                 winner.position = parseInt(stat.statValue) || 0;
@@ -333,13 +420,17 @@ export const formSchema = z.discriminatedUnion("game", [
   marioKart8MatchSchema,
   lethalCompanySchema,
   speedrunnersSchema,
+  marvelRivalsSchema,
 ]);
 
 // Define types based on the Zod schema
 export type FormValues = z.infer<typeof formSchema>;
 
-// Derive specific types from the FormValues type
-export type Match = FormValues["sets"][number]["matches"][number];
+// Extract from a specific schema to avoid union indexing issues
+type BaseGameForm = Extract<FormValues, { game: "Call of Duty" }>;
+
+// Derive specific types from the base schema
+export type Match = BaseGameForm["sets"][number]["matches"][number];
 export type MatchWinners = Match["matchWinners"];
 export type PlayerSessions = Match["playerSessions"];
-export type SetWinners = FormValues["sets"][number]["setWinners"];
+export type SetWinners = BaseGameForm["sets"][number]["setWinners"];

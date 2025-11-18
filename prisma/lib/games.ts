@@ -2,7 +2,7 @@
 
 import { cacheLife, cacheTag } from "next/cache";
 import { handlePrismaOperation } from "../db";
-import { StatName } from "../generated";
+import { StatName } from "@/lib/stat-names";
 import { getSumOfStat } from "../generated/sql";
 
 export type StatEndsWith<

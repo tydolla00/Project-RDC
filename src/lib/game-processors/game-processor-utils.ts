@@ -1,18 +1,37 @@
+import { VisionResultCodes } from "../constants";
+
+// Shared validateResults function for all GameProcessors
+export const validateResults = (
+  visionPlayers: VisionPlayer[],
+  visionWinners: VisionPlayer[],
+  requiresCheck: boolean,
+) => {
+  return requiresCheck
+    ? {
+        status: VisionResultCodes.CheckRequest,
+        data: { players: visionPlayers, winner: visionWinners },
+        message:
+          "There was some trouble processing some stats. They have been assigned the most probable value but please check to ensure all stats are correct before submitting.",
+      }
+    : {
+        status: VisionResultCodes.Success,
+        data: { players: visionPlayers, winner: visionWinners },
+        message: "Results have been successfully imported.",
+      };
+};
 import {
   AnalyzedPlayer,
   AnalyzedPlayersObj,
   AnalyzedTeamData,
-  Stat,
-  VisionPlayer,
 } from "@/app/actions/visionAction";
 import { Player } from "prisma/generated";
-import { VisionResultCodes } from "../constants";
 import {
   findPlayer,
   PLAYER_MAPPINGS,
   PlayerNotFoundError,
 } from "@/app/(routes)/admin/_utils/player-mappings";
 import { STAT_CONFIGS, getStatConfigByFieldKey } from "../stat-configs";
+import { Stat, VisionPlayer } from "../visionTypes";
 
 type WinnerType = "TEAM" | "INDIVIDUAL";
 
@@ -170,6 +189,7 @@ export const processPlayer = (
           acc[fieldKey] = validateVisionStatValue(
             field.content,
             statConfig.validationRules,
+            fieldKey,
           );
         } else {
           console.warn(`No stat config found for field: ${fieldKey}`);
@@ -190,7 +210,7 @@ export const processPlayer = (
       stats: Object.entries(statValidations).map(([statKey, validation]) => {
         const statConfig = getStatConfigByFieldKey(statKey);
         return {
-          statId: statConfig?.id || "0",
+          statId: statConfig?.id || 0,
           stat: statConfig?.name || "UNKNOWN_STAT",
           statValue: validation.statValue,
         };
@@ -207,6 +227,7 @@ export const validateVisionStatValue = (
     max?: number;
     allowZero?: boolean;
   },
+  fieldKey?: string,
 ): { statValue: string; reqCheck: boolean } => {
   // Handle common OCR errors
   if (statValue === "Z" || statValue === "Ø") {
@@ -217,28 +238,34 @@ export const validateVisionStatValue = (
     return { statValue: "0", reqCheck: true };
   }
 
+  // Strip percentage sign if present, but only for accuracy stats
+  const isAccuracyStat = fieldKey?.includes("accuracy");
+  const cleanedValue = isAccuracyStat
+    ? statValue.replace(/%/g, "").trim()
+    : statValue;
+
   // Additional validation
   if (validationRules) {
-    const numValue = parseInt(statValue, 10);
+    const numValue = parseInt(cleanedValue, 10);
 
     if (isNaN(numValue)) {
       return { statValue: "0", reqCheck: true };
     }
 
     if (validationRules.min !== undefined && numValue < validationRules.min) {
-      return { statValue: statValue, reqCheck: true };
+      return { statValue: cleanedValue, reqCheck: true };
     }
 
     if (validationRules.max !== undefined && numValue > validationRules.max) {
-      return { statValue: statValue, reqCheck: true };
+      return { statValue: cleanedValue, reqCheck: true };
     }
 
     if (!validationRules.allowZero && numValue === 0) {
-      return { statValue: statValue, reqCheck: true };
+      return { statValue: cleanedValue, reqCheck: true };
     }
   }
 
-  return { statValue: statValue, reqCheck: false };
+  return { statValue: cleanedValue, reqCheck: false };
 };
 
 export const calculateTeamWinners = (

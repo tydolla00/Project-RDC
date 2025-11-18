@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { Label } from "@/components/ui/label";
 import RDCVisionModal from "./RDCVisionModal";
-import { VisionPlayer } from "@/app/actions/visionAction";
 import { FormValues } from "../../_utils/form-helpers";
 import { FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Stat, VisionPlayer } from "@/lib/visionTypes";
 
 interface Props {
   setIndex: number;
@@ -40,9 +40,10 @@ const MatchManager = (props: Props) => {
    */
   const handleNewMatchClick = () => {
     console.log("Handling New Match click", players);
+    // Explicitly type the playerSessions constant.
     const playerSessions = players.map((player: Player) => ({
       playerId: player.playerId,
-      playerSessionName: player.playerName, // Discrepancy in what is being assigned to playerSessionName
+      playerSessionName: player.playerName,
       playerStats: [],
     }));
     console.log("Player Sessions: ", playerSessions);
@@ -54,11 +55,19 @@ const MatchManager = (props: Props) => {
 
   const processTeamPlayers = (teamPlayers: VisionPlayer[]) => {
     console.log("Processing Team Players: ", teamPlayers);
+
     return teamPlayers.map((player) => {
+      // Map over the stats from the vision player to format them for the form
+      const formattedStats = player.stats.map((stat: Stat) => ({
+        statId: stat.statId,
+        stat: stat.stat,
+        statValue: stat.statValue,
+      })) as FormValues["sets"][number]["matches"][number]["playerSessions"][number]["playerStats"];
+
       return {
         playerId: player?.playerId || 0,
         playerSessionName: player?.name || "Unknown Player",
-        playerStats: [...player.stats],
+        playerStats: formattedStats,
       };
     });
   };
@@ -69,6 +78,7 @@ const MatchManager = (props: Props) => {
   ) => {
     const visionMatchPlayerSessions = processTeamPlayers(visionPlayers);
     console.log("Vision Match Player Sessions: ", visionMatchPlayerSessions);
+
     const formattedWinners = visionWinners.map((player: VisionPlayer) => {
       return {
         playerId: player?.playerId || 0,
@@ -80,13 +90,11 @@ const MatchManager = (props: Props) => {
       console.log("Setting Vision Winners!", formattedWinners);
       append({
         matchWinners: formattedWinners,
-        // @ts-expect-error - Type mismatch, but we know this is correct
         playerSessions: visionMatchPlayerSessions,
       });
     } else {
       append({
         matchWinners: [],
-        // @ts-expect-error - Type mismatch, but we know this is correct
         playerSessions: visionMatchPlayerSessions,
       });
     }

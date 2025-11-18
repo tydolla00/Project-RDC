@@ -62,7 +62,7 @@ const PlayerSessionManager = (props: Props) => {
     <div className="@container grid grid-cols-2">
       {fields.map((field, sessionIndex) => {
         return (
-          <div className="col-span-2 @xs:col-span-1" key={field.id}>
+          <div className="@xs:col-span-1 col-span-2" key={field.id}>
             <Label className="font-bold">{getPlayerNameFromField(field)}</Label>
             <div className="flex flex-wrap gap-3">
               <PlayerStatManager

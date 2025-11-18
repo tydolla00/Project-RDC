@@ -51,8 +51,11 @@ const EntryCreatorForm = ({
   });
   console.log(form.formState.isDirty); // make sure formState is read before render to enable the Proxy
 
-  const { handleSubmit } = form;
-
+  const {
+    handleSubmit,
+    formState: { errors },
+  } = form;
+  console.log("Form Errors:", errors);
   /**
    * Handles the form submission for creating a new session.
    *

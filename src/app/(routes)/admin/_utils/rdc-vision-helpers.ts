@@ -2,10 +2,11 @@
 
 import { VisionResultCodes } from "@/lib/constants";
 import { Player } from "prisma/generated";
-import { analyzeScreenShot, VisionResult } from "@/app/actions/visionAction";
+import { analyzeScreenShot } from "@/app/actions/visionAction";
 import { getGameIdFromName } from "@/app/actions/adminAction";
+import { VisionResult } from "@/lib/visionTypes";
 
-/**
+/**x
  * Handles the analysis of a screenshot using vision recognition
  *
  * @description
@@ -45,7 +46,7 @@ export const handleAnalyzeBtnClick = async (
       gameId, // TODO: This should be from the selected game
     );
 
-    console.log({ analysisResults });
+    console.log("Analysis results", { analysisResults });
 
     switch (analysisResults.status) {
       case VisionResultCodes.Success:

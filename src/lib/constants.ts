@@ -1,4 +1,4 @@
-import { $Enums } from "prisma/generated";
+import { StatName } from "@/lib/stat-names";
 import { getAllGames } from "prisma/lib/games";
 
 /**
@@ -68,25 +68,41 @@ export const gameImages = {
   [GamesEnum.SpeedRunners]: "speedrunners.jpeg",
   [GamesEnum.CallOfDuty]: "callofduty.jpeg",
 };
-
-export const statDescriptions: { [key in $Enums.StatName]: string } = {
-  [$Enums.StatName.MK8_DAY]: "Mario Kart 8 Days",
-  [$Enums.StatName.MK8_POS]: "Mario Kart 8 Position",
-  [$Enums.StatName.COD_SCORE]: "Call of Duty Score",
-  [$Enums.StatName.COD_KILLS]: "Call of Duty Kills",
-  [$Enums.StatName.COD_DEATHS]: "Call of Duty Deaths",
-  [$Enums.StatName.COD_MELEES]: "Call of Duty Melees",
-  [$Enums.StatName.COD_POS]: "Call of Duty Position",
-  [$Enums.StatName.LC_DEATHS]: "Lethal Company Deaths",
-  [$Enums.StatName.SR_SETS]: "Speedrunners Sets",
-  [$Enums.StatName.SR_WINS]: "Speedrunners Wins",
-  [$Enums.StatName.SR_POS]: "Speedrunners Position",
-  [$Enums.StatName.RL_GOALS]: "Rocket League Goals",
-  [$Enums.StatName.RL_ASSISTS]: "Rocket League Assists",
-  [$Enums.StatName.RL_SAVES]: "Rocket League Saves",
-  [$Enums.StatName.RL_SHOTS]: "Rocket League Shots",
-  [$Enums.StatName.RL_SCORE]: "Rocket League Score",
-  [$Enums.StatName.RL_DAY]: "Rocket League Position",
+export const statDescriptions: { [key in StatName]: string } = {
+  [StatName.MK8_DAY]: "Mario Kart 8 Days",
+  [StatName.MK8_POS]: "Mario Kart 8 Position",
+  [StatName.COD_SCORE]: "Call of Duty Score",
+  [StatName.COD_KILLS]: "Call of Duty Kills",
+  [StatName.COD_DEATHS]: "Call of Duty Deaths",
+  [StatName.COD_MELEES]: "Call of Duty Melees",
+  [StatName.COD_POS]: "Call of Duty Position",
+  [StatName.LC_DEATHS]: "Lethal Company Deaths",
+  [StatName.SR_SETS]: "Speedrunners Sets",
+  [StatName.SR_WINS]: "Speedrunners Wins",
+  [StatName.SR_POS]: "Speedrunners Position",
+  [StatName.RL_GOALS]: "Rocket League Goals",
+  [StatName.RL_ASSISTS]: "Rocket League Assists",
+  [StatName.RL_SAVES]: "Rocket League Saves",
+  [StatName.RL_SHOTS]: "Rocket League Shots",
+  [StatName.RL_SCORE]: "Rocket League Score",
+  [StatName.RL_DAY]: "Rocket League Days",
+  [StatName.MR_KILLS]: "Marvel Rivals Kills",
+  [StatName.MR_DEATHS]: "Marvel Rivals Deaths",
+  [StatName.MR_ASSISTS]: "Marvel Rivals Assists",
+  [StatName.MR_TRIPLE_KILL]: "Marvel Rivals Triple Kills",
+  [StatName.MR_QUADRA_KILL]: "Marvel Rivals Quadra Kills",
+  [StatName.MR_PENTA_KILL]: "Marvel Rivals Penta Kills",
+  [StatName.MR_HEXA_KILL]: "Marvel Rivals Hexa Kills",
+  [StatName.MR_MOST_KILLS]: "Marvel Rivals Most Kills",
+  [StatName.MR_HIGHEST_DMG]: "Marvel Rivals Highest Damage",
+  [StatName.MR_HIGHEST_DMG_BLOCKED]: "Marvel Rivals Highest Damage Blocked",
+  [StatName.MR_MOST_HEALING]: "Marvel Rivals Most Healing",
+  [StatName.MR_MOST_ASSISTS]: "Marvel Rivals Most Assists (Fist)",
+  [StatName.MR_FINAL_HITS]: "Marvel Rivals Final Hits",
+  [StatName.MR_DMG]: "Marvel Rivals Damage",
+  [StatName.MR_DMG_BLOCKED]: "Marvel Rivals Damage Blocked",
+  [StatName.MR_HEALING]: "Marvel Rivals Healing",
+  [StatName.MR_ACCURACY]: "Marvel Rivals Accuracy",
 };
 
 export enum errorCodes {
@@ -159,6 +175,30 @@ export const GAME_CONFIGS: Record<number, GameConfig> = {
     name: "Speed Runners",
     modelId: "RDC-SR",
     supportedStats: ["sr_wins", "sr_sets", "sr_pos"],
+  },
+  6: {
+    type: "SOLO",
+    id: 6,
+    name: "Marvel Rivals",
+    modelId: "RDC-MR",
+    supportedStats: [
+      "mr_kills",
+      "mr_deaths",
+      "mr_assists",
+      "mr_triple_kill",
+      "mr_quadra_kill",
+      "mr_penta_kill",
+      "mr_hexa_kill",
+      "mr_highest_dmg",
+      "mr_highest_dmg_blocked",
+      "mr_most_healing",
+      "MR_MOST_ASSISTS",
+      "mr_final_hits",
+      "mr_dmg",
+      "mr_dmg_blocked",
+      "mr_healing",
+      "mr_accuracy",
+    ],
   },
 };
 

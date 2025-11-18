@@ -1,4 +1,4 @@
-import { StatName } from "./generated";
+import { StatName } from "@/lib/stat-names";
 import * as fs from "fs";
 import prisma from "./db";
 import { capitalizeFirst } from "@/lib/utils";
@@ -158,8 +158,8 @@ async function seedGames() {
           { statName: StatName.COD_SCORE },
           { statName: StatName.COD_KILLS },
           { statName: StatName.COD_DEATHS },
-          { statName: StatName.COD_MELEES },
           { statName: StatName.COD_POS },
+          { statName: StatName.COD_MELEES },
         ],
       },
     },
@@ -177,23 +177,52 @@ async function seedGames() {
   });
 
   await prisma.game.upsert({
-    where: { gameName: "Speedrunners" },
+    where: { gameName: "SpeedRunners" },
     update: {},
     create: {
-      gameName: "Speedrunners",
+      gameName: "SpeedRunners",
       gameStats: {
         create: [
-          { statName: StatName.SR_SETS },
           { statName: StatName.SR_WINS },
+          { statName: StatName.SR_SETS },
           { statName: StatName.SR_POS },
         ],
       },
     },
   });
 
-  console.log("Games seeded successfully\n");
+  await prisma.game.upsert({
+    where: { gameName: "Marvel Rivals" },
+    update: {},
+    create: {
+      gameName: "Marvel Rivals",
+      gameStats: {
+        create: [
+          { statName: StatName.MR_KILLS },
+          { statName: StatName.MR_DEATHS },
+          { statName: StatName.MR_ASSISTS },
+          { statName: StatName.MR_TRIPLE_KILL },
+          { statName: StatName.MR_QUADRA_KILL },
+          { statName: StatName.MR_PENTA_KILL },
+          { statName: StatName.MR_HEXA_KILL },
+          { statName: StatName.MR_MOST_KILLS },
+          { statName: StatName.MR_HIGHEST_DMG },
+          { statName: StatName.MR_HIGHEST_DMG_BLOCKED },
+          { statName: StatName.MR_MOST_HEALING },
+          { statName: StatName.MR_MOST_ASSISTS },
+          { statName: StatName.MR_FINAL_HITS },
+          { statName: StatName.MR_DMG },
+          { statName: StatName.MR_DMG_BLOCKED },
+          { statName: StatName.MR_HEALING },
+          { statName: StatName.MR_ACCURACY },
+        ],
+      },
+    },
+  });
+  console.log("Games Seeded Successfully.\n");
 }
 
+// Import and Process Sessions
 async function importSessions() {
   /**
    * Imports sessions from a JSON file and populates the database.

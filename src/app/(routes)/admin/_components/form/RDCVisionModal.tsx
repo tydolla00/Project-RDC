@@ -33,7 +33,7 @@ import Image from "next/image";
 import { VisionResultCodes } from "@/lib/constants";
 import { toast } from "sonner";
 import { handleAnalyzeBtnClick } from "../../_utils/rdc-vision-helpers";
-import { VisionPlayer } from "@/app/actions/visionAction";
+import { VisionPlayer } from "@/lib/visionTypes";
 import { z } from "zod/v4";
 import { handleClose } from "../../vision/helpers";
 
