@@ -1,3 +1,5 @@
+"use cache";
+
 import { signIn } from "@/auth";
 import { H1 } from "@/components/headings";
 import { Button } from "@/components/ui/button";
@@ -6,7 +8,7 @@ import { domain } from "@/lib/utils";
 // import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { redirect } from "next/navigation";
 
-export default function Page() {
+export default async function Page() {
   return (
     <div className="m-10">
       <H1>Sign in Page</H1>

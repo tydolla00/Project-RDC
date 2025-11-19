@@ -104,7 +104,7 @@ export const Navbar = async () => {
           <NavigationMenuContent>
             <ul>
               <ListItem href="/about">About</ListItem>
-              <ListItem href="/admin">Admin</ListItem>
+              {session && <ListItem href="/admin">Admin</ListItem>}
               <AuthButton hideOnSmallScreens={false} session={session} />
               <ToggleThemeButton />
             </ul>
