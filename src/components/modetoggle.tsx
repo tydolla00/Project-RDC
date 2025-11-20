@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { logThemeToggle } from "@/posthog/client-analytics";
 
 export function ModeToggle({ className }: { className?: string }) {
   const { setTheme } = useTheme();
@@ -25,13 +26,28 @@ export function ModeToggle({ className }: { className?: string }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem
+          onClick={() => {
+            setTheme("light");
+            logThemeToggle("light");
+          }}
+        >
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem
+          onClick={() => {
+            setTheme("dark");
+            logThemeToggle("dark");
+          }}
+        >
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        <DropdownMenuItem
+          onClick={() => {
+            setTheme("system");
+            logThemeToggle("system");
+          }}
+        >
           System
         </DropdownMenuItem>
       </DropdownMenuContent>

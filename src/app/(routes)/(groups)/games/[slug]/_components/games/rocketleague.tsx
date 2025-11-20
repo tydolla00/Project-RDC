@@ -108,7 +108,11 @@ const RocketLeague = async ({
         config={sumConfig}
         ignoreWarnings // No days in db currently
       /> */}
-      <TabbedChart chartConfig={config} chartData={winsPerPlayer} />
+      <TabbedChart
+        chartConfig={config}
+        chartData={winsPerPlayer}
+        gameName={game.gameName}
+      />
     </div>
   );
 };
