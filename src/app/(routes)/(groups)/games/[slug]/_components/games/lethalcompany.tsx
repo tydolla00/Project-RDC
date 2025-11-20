@@ -55,7 +55,11 @@ const LethalCompany = async ({
         config={sumConfig}
         ignoreWarnings
       />
-      <TabbedChart chartConfig={config} chartData={winsPerPlayer} />
+      <TabbedChart
+        chartConfig={config}
+        chartData={winsPerPlayer}
+        gameName={game.gameName}
+      />
     </div>
   );
 };

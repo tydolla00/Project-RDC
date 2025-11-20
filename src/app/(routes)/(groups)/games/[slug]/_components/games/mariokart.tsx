@@ -64,6 +64,7 @@ const MarioKart = async ({
       <TabbedChart
         chartConfig={config}
         chartData={winsPerPlayer as unknown[]}
+        gameName={game.gameName}
       />
     </div>
   );
