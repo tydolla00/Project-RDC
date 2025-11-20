@@ -6,8 +6,13 @@ import { FormValues } from "../(routes)/admin/_utils/form-helpers";
 import { auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { revalidateTag } from "next/cache";
-import { logFormError, logFormSuccess } from "@/posthog/server-analytics";
+import {
+  logAdminAction,
+  logFormError,
+  logFormSuccess,
+} from "@/posthog/server-analytics";
 import { after } from "next/server";
+import { PostHogEvents } from "@/posthog/events";
 
 export async function approveSession(sessionId: number) {
   try {
@@ -26,6 +31,13 @@ export async function approveSession(sessionId: number) {
       return { error: query.error || "Failed to approve session" };
     }
 
+    after(() =>
+      logAdminAction(
+        PostHogEvents.SESSION_APPROVED,
+        { sessionId },
+        authUser,
+      ),
+    );
     revalidateTag("getAllSessions", "max");
     return { error: null };
   } catch (error) {
@@ -267,6 +279,7 @@ export const insertNewSessionFromAdmin = async (
                             where: {
                               statName: playerStat.stat,
                               gameId: sessionGame.gameId,
+                              type: "INT", // Default to INT
                             },
                           })) || undefined;
                         if (gameStat)
@@ -343,6 +356,11 @@ export async function addGame(
   );
 
   if (!res.success) return { error: res.error || "Failed to add game." };
+  
+  after(() =>
+    logAdminAction(PostHogEvents.GAME_ADDED, { gameName }, session),
+  );
+
   revalidateTag("getAllGames", "max");
   return { error: null };
 }
@@ -361,6 +379,11 @@ export async function addPlayer(
   );
 
   if (!res.success) return { error: res.error || "Failed to add player." };
+
+  after(() =>
+    logAdminAction(PostHogEvents.PLAYER_ADDED, { playerName }, session),
+  );
+
   revalidateTag("getAllMembers", "max");
   return { error: null };
 }

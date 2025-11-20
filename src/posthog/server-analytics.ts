@@ -18,10 +18,15 @@ export const logAuthError = async (
 ) => {
   try {
     const session = userSession ?? (await auth());
-    posthog.captureException(
-      `Authentication Error - ${error}`,
-      session?.user?.email ?? "Unidentified Email",
-    );
+    posthog.capture({
+      event: PostHogEvents.AUTH_ERROR,
+      distinctId: session?.user?.email ?? "Unidentified Email",
+      properties: {
+        error: error.message,
+        stack: error.stack,
+        cause: error.cause,
+      },
+    });
   } catch (error) {
     posthog.captureException(`Authentication Error - ${error}`, undefined);
     console.error("Error logging authentication error:", error);
@@ -77,10 +82,11 @@ export const logFormSuccess = async (
   userSession?: Session | null,
 ) => {
   const session = userSession ?? (await auth());
-  
-  const eventName = event === "ADMIN_FORM" 
-    ? PostHogEvents.ADMIN_FORM_SUBMISSION_SUCCESS 
-    : PostHogEvents.FEEDBACK_FORM_SUBMISSION_SUCCESS;
+
+  const eventName =
+    event === "ADMIN_FORM"
+      ? PostHogEvents.ADMIN_FORM_SUBMISSION_SUCCESS
+      : PostHogEvents.FEEDBACK_FORM_SUBMISSION_SUCCESS;
 
   posthog.capture({
     event: eventName,
@@ -183,5 +189,37 @@ export const logAiGenFailure = (
     posthog.captureException(error, distinctId, {
       ...additionalInfo,
     });
+  });
+};
+
+export const logAdminAction = async (
+  event:
+    | PostHogEvents.SESSION_APPROVED
+    | PostHogEvents.GAME_ADDED
+    | PostHogEvents.PLAYER_ADDED,
+  details: Record<string, unknown>,
+  userSession?: Session | null,
+) => {
+  const session = userSession ?? (await auth());
+  posthog.capture({
+    event,
+    distinctId: session?.user?.email || v4(),
+    properties: details,
+  });
+};
+
+export const logVisionSuccess = async (
+  gameId: number,
+  durationMs: number,
+  userSession?: Session | null,
+) => {
+  const session = userSession ?? (await auth());
+  posthog.capture({
+    event: PostHogEvents.VISION_ANALYSIS_SUCCESS,
+    distinctId: session?.user?.email || v4(),
+    properties: {
+      gameId,
+      durationMs,
+    },
   });
 };

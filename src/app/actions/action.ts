@@ -7,6 +7,7 @@ import { signOut, auth } from "@/auth";
 import { errorCodes } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import posthog from "@/posthog/server-init";
+import { PostHogEvents } from "@/posthog/events";
 
 /**
  * Updates the authentication status based on the provided session.
@@ -55,7 +56,11 @@ export const getRDCVideoDetails = async (
   try {
     const isAuthenticated = await auth();
     if (!isAuthenticated) {
-      posthog.captureException("User not authenticated", distinctId);
+      posthog.capture({
+        event: PostHogEvents.VIDEO_FETCH_DENIED,
+        distinctId,
+        properties: { reason: "User not authenticated" },
+      });
       return { video: null, error: errorCodes.NotAuthenticated };
     }
 

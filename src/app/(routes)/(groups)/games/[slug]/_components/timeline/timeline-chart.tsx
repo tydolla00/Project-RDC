@@ -22,6 +22,7 @@ import { QueryResponseData } from "prisma/db";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { VideoInfo } from "./video-info";
+import { logChartHoverToggle } from "@/posthog/client-analytics";
 
 const chartConfig = {
   id: {
@@ -78,6 +79,7 @@ export function TimelineChart({
               onCheckedChange={(val) => {
                 if (val) setSession(undefined);
                 setShowMatchData(!val);
+                logChartHoverToggle(!val, gameName);
               }}
             />
           </div>

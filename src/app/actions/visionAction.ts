@@ -9,7 +9,7 @@ import { GameProcessor } from "@/lib/game-processors/game-processor-utils";
 import { MarioKart8Processor } from "@/lib/game-processors/MarioKart8Processor";
 import { RocketLeagueProcessor } from "@/lib/game-processors/RocketLeagueProcessor";
 import { CoDGunGameProcessor } from "@/lib/game-processors/CoDGunGameProcessor";
-import { logVisionError } from "@/posthog/server-analytics";
+import { logVisionError, logVisionSuccess } from "@/posthog/server-analytics";
 import { after } from "next/server";
 import { AnalysisResults, Stat, VisionPlayer } from "@/lib/visionTypes";
 import { MarvelRivalsProcessor } from "@/lib/game-processors/MarvelRivalsProcessor";
@@ -57,6 +57,7 @@ export const analyzeScreenShot = async (
   sessionPlayers: Player[] = [],
   gameId: number,
 ): Promise<AnalysisResults> => {
+  const startTime = performance.now();
   try {
     const gameProcessor = getGameProcessor(gameId);
     const gameConfig = GAME_CONFIGS[gameId];
@@ -169,6 +170,10 @@ export const analyzeScreenShot = async (
 
     console.log("Teams Array: ", teamsArray);
     console.log("Validated Result: ", validatedResult);
+
+    const duration = performance.now() - startTime;
+    after(() => logVisionSuccess(gameId, duration));
+
     return validatedResult;
   } catch (error) {
     console.error(error);
