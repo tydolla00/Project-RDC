@@ -49,9 +49,7 @@ export default function RootLayout({
             <CSPostHogProvider>
               <PostHogIdentify />
               {/* Comment this out to see ssg */}
-              <Suspense fallback={<Skeleton className="h-10 w-full" />}>
-                <Navbar />
-              </Suspense>
+              <Navbar />
               <main>{children}</main>
               <Toaster />
               <Footer />
