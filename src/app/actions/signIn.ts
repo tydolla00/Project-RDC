@@ -10,15 +10,19 @@ import { redirect } from "next/navigation";
  * @throws Redirects to root path for invalid providers
  */
 export const signIn = async (provider: string) => {
-  switch (provider.toLowerCase()) {
+  const normalizedProvider = provider.toLowerCase();
+  console.log("[auth] sign-in requested", { provider: normalizedProvider });
+  switch (normalizedProvider) {
     case "google":
+      console.log("[auth] redirecting to Google sign-in");
       await authSignIn("google", { redirectTo: domain });
       break;
     case "github":
+      console.log("[auth] redirecting to GitHub sign-in");
       await authSignIn("github", { redirectTo: domain });
       break;
     default:
-      console.error("Invalid provider");
+      console.error("Invalid provider", { provider });
       redirect("/");
   }
 };

@@ -32,6 +32,9 @@ export async function GET(req: NextRequest) {
       config.RESEND_JOB_SEND_LIST?.split(";").filter(Boolean) || [];
     if (sendList.length === 0)
       return new Response("No email recipients configured", { status: 500 });
+    console.log("[feedback-cron] Recipients configured", {
+      recipients: sendList.length,
+    });
 
     const feedBack = await handlePrismaOperation((prisma) =>
       prisma.feedback.findMany({
@@ -44,9 +47,14 @@ export async function GET(req: NextRequest) {
       }),
     );
     if (!feedBack.success) throw new Error(feedBack.error);
+    console.log("[feedback-cron] Loaded feedback entries", {
+      count: feedBack.data.length,
+    });
 
-    if (feedBack.data.length === 0)
+    if (feedBack.data.length === 0) {
+      console.log("[feedback-cron] No feedback entries to send");
       return new Response("No feedback to send", { status: 200 });
+    }
 
     const feedback = feedBack.data
       .flatMap((fb) => [
@@ -58,6 +66,10 @@ export async function GET(req: NextRequest) {
       ])
       .join("");
 
+    console.log("[feedback-cron] Sending feedback digest", {
+      recipients: sendList.length,
+      feedbackCount: feedBack.data.length,
+    });
     const { error } = await resend.emails.send({
       // TODO configure domain
       from: "project-rdc@resend.dev",
@@ -77,10 +89,13 @@ export async function GET(req: NextRequest) {
         }),
       );
       if (!res.success) throw new Error(res.error);
+      console.log("[feedback-cron] Cleared sent feedback entries", {
+        deleted: res.data.count,
+      });
     }
     return new Response("Emails sent successfully", { status: 200 });
   } catch (error) {
-    // console.error("Error sending feedback emails", { error });
+    console.error("Error sending feedback emails", { error });
     return new Response("Failed to send emails", { status: 500 });
   }
 }

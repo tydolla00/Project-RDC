@@ -15,6 +15,10 @@ export const submitFeedback = async (
     const verification = await checkBotId();
     const session = await auth();
     if (verification.isBot || !session) {
+      console.warn("[feedback] Submission blocked", {
+        reason: verification.isBot ? "bot_detected" : "unauthenticated",
+        hasSession: Boolean(session),
+      });
       return { error: "Access denied" };
     }
 
@@ -29,10 +33,12 @@ export const submitFeedback = async (
       case "bug":
         break;
       default:
+        console.warn("[feedback] Invalid feedback type", { feedback });
         return { error: "Invalid feedback type" };
     }
 
     if (message.trim().length === 0) {
+      console.warn("[feedback] Empty feedback message", { userEmail });
       return { error: "Message cannot be empty" };
     }
 
@@ -47,6 +53,11 @@ export const submitFeedback = async (
     );
 
     if (!res.success) throw new Error(res.error);
+    console.log("[feedback] Stored feedback entry", {
+      type: feedback,
+      userEmail,
+      id: res.data.id,
+    });
 
     logFormSuccess("FEEDBACK_FORM", session);
     return { error: null };

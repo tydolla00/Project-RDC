@@ -14,14 +14,16 @@ import {
 import { PostHogEvents } from "@/posthog/events";
 
 // Serverless-compatible helper to parse base64-encoded service account JSON from env
-// TODO Add logging
 function getServiceAccount(): {
   client_email: string;
   private_key: string;
   [key: string]: unknown;
 } | null {
   const raw = config.GCP_SA_KEY;
-  if (!raw) return null;
+  if (!raw) {
+    logDriveCronJobError("GCP_SA_KEY env var missing");
+    return null;
+  }
   try {
     const decoded = Buffer.from(raw.trim(), "base64").toString("utf8");
     return JSON.parse(decoded);
@@ -37,12 +39,18 @@ export async function GET(req: NextRequest) {
   const cronSecret = config.CRON_SECRET;
   const authHeader = req.headers.get("authorization") ?? "";
 
-  if (!cronSecret) return new Response("Missing cron secret", { status: 500 });
+  if (!cronSecret) {
+    logDriveCronJobError("Missing cron secret env");
+    return new Response("Missing cron secret", { status: 500 });
+  }
 
-  if (authHeader !== `Bearer ${cronSecret}`)
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    logDriveCronJobError("Unauthorized cron attempt");
     return new Response("Unauthorized", { status: 401 });
+  }
 
   // Start work
+  console.log("[sheets-cron] Authorized cron job triggered");
 
   const sa = getServiceAccount();
   const spreadsheetId = config.SHEET_ID;
@@ -89,6 +97,11 @@ export async function GET(req: NextRequest) {
       const { items } = parseTruthRows(truth.data.values || []);
       const dashboardRows = dashboard.data.values || [];
       const newLastRow = startRow + items.length - 1;
+      console.log("[sheets-cron] Retrieved sheet rows", {
+        sheetName,
+        startRow,
+        fetchedRows: items.length,
+      });
       // optionally compute lastVideoId from the final row
       const lastVideoId = getVideoId(items.at(-1)?.videoId || "");
       let summary: string | null = null;
@@ -118,6 +131,12 @@ export async function GET(req: NextRequest) {
         create: { sheetName, lastRow: newLastRow, lastVideoId, summary },
         update: { lastRow: newLastRow, lastVideoId, summary },
       });
+      logDriveCronJobSuccess("Processed sheet rows", {
+        sheetName,
+        processedRows: items.length,
+        newLastRow,
+        lastVideoId,
+      });
 
       return NextResponse.json({
         ok: true,
@@ -127,7 +146,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    logDriveCronJobSuccess("Successfully retrieved rows");
+    logDriveCronJobSuccess("No new sheet rows", { sheetName, startRow });
 
     return NextResponse.json({ ok: true }, { status: 204 });
   } catch (err) {

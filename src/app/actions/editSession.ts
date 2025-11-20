@@ -26,8 +26,18 @@ export async function createSessionEditRequest(
   dirtyFields: UseFormReturn<FormValues>["formState"]["dirtyFields"],
 ): Promise<CreateEditResult> {
   const user = await auth();
-  if (!user) return { error: errorCodes.NotAuthenticated };
-  else if (Object.keys(dirtyFields).length === 0) {
+  if (!user) {
+    console.warn("[edit-session] Edit request rejected", {
+      sessionId,
+      reason: "not_authenticated",
+    });
+    return { error: errorCodes.NotAuthenticated };
+  } else if (Object.keys(dirtyFields).length === 0) {
+    console.warn("[edit-session] Edit request rejected", {
+      sessionId,
+      reason: "no_changes",
+      proposerId: user.user?.id,
+    });
     return { error: "No changes detected to submit." };
   }
 
@@ -51,6 +61,11 @@ export async function createSessionEditRequest(
       return { error: res.error || "Failed to create edit request" };
 
     // Optionally notify admins here
+    console.log("[edit-session] Created edit request", {
+      sessionId,
+      requestId: res.data.id,
+      proposerId: user.user?.id,
+    });
     return { error: null };
   } catch (err) {
     console.error("createSessionEditRequest error", err);
