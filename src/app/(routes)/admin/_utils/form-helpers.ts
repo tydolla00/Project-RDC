@@ -1,4 +1,4 @@
-import { StatName } from "prisma/generated";
+import { StatName } from "@/lib/stat-names";
 import { z } from "zod/v4";
 
 // Marvel Rivals optional stats (expandable stats that can be left empty)

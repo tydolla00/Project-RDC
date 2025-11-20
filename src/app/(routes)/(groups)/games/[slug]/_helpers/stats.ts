@@ -1,4 +1,4 @@
-import { $Enums, StatName } from "prisma/generated";
+import { StatName } from "@/lib/stat-names";
 import {
   getWinsPerPlayer,
   getMatchesPerGame,

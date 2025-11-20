@@ -2,8 +2,8 @@
 
 import { cacheLife, cacheTag } from "next/cache";
 import { handlePrismaOperation } from "../db";
-import { StatName } from "../generated";
 import { getSumOfStat } from "../generated/sql";
+import { StatName } from "@/lib/stat-names";
 
 export type StatEndsWith<
   Suffix extends string,

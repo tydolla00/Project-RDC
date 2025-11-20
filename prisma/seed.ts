@@ -1,4 +1,4 @@
-import { StatName } from "./generated";
+import { StatName } from "@/lib/stat-names";
 import * as fs from "fs";
 import prisma from "./db";
 import { capitalizeFirst } from "@/lib/utils";
