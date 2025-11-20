@@ -1,5 +1,5 @@
+import { StatName } from "@/lib/stat-names";
 import { getAllGames } from "prisma/lib/games";
-import { StatName } from "./stat-names";
 
 /**
  * Enum of RDC member names.
