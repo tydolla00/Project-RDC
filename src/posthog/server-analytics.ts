@@ -6,6 +6,7 @@ import { Session } from "next-auth";
 import { v4 } from "uuid";
 import type { MvpOutput } from "@/app/ai/types";
 import { after } from "next/server";
+import { PostHogEvents } from "@/posthog/events";
 
 /**
  * Logs an authentication error to PostHog
@@ -33,7 +34,7 @@ export const logAuthError = async (
  * @param email - The user's email address
  */
 export const logAuthEvent = async (
-  event: "signin" | "signout",
+  event: PostHogEvents.SIGN_IN | PostHogEvents.SIGN_OUT,
   userSession?: Session | null,
 ) => {
   const session = userSession ?? (await auth());
@@ -50,8 +51,12 @@ export const logNAN = async (
 ) => {
   const session = userSession ?? (await auth());
   posthog.capture({
-    event: `NaN called in ${fnName} for statId: ${statId}`,
+    event: PostHogEvents.NAN_ERROR,
     distinctId: session?.user?.email || v4(),
+    properties: {
+      fnName,
+      statId,
+    },
   });
 };
 
@@ -72,8 +77,13 @@ export const logFormSuccess = async (
   userSession?: Session | null,
 ) => {
   const session = userSession ?? (await auth());
+  
+  const eventName = event === "ADMIN_FORM" 
+    ? PostHogEvents.ADMIN_FORM_SUBMISSION_SUCCESS 
+    : PostHogEvents.FEEDBACK_FORM_SUBMISSION_SUCCESS;
+
   posthog.capture({
-    event: `${event}_SUBMISSION_SUCCESS`,
+    event: eventName,
     distinctId: session?.user?.email || v4(),
     properties: {
       submittedAt: new Date().toISOString(),
@@ -110,7 +120,7 @@ export const logMvpUpdateSuccess = async (
   const session = userSession ?? (await auth());
 
   posthog.capture({
-    event: "MVP_UPDATE_SUCCESS",
+    event: PostHogEvents.MVP_UPDATE_SUCCESS,
     distinctId: session?.user?.email || v4(),
     properties: {
       sessionId,
@@ -138,7 +148,7 @@ export const logDriveCronJobSuccess = (
 ) => {
   after(() => {
     posthog.capture({
-      event: "drive-read-success",
+      event: PostHogEvents.DRIVE_READ_SUCCESS,
       distinctId: "cron-job",
       properties: {
         message,
@@ -149,7 +159,7 @@ export const logDriveCronJobSuccess = (
 };
 
 export const logAiGenSuccess = (
-  event: string,
+  event: PostHogEvents,
   distinctId: string,
   additionalInfo: Record<string, unknown>,
 ) => {

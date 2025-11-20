@@ -86,7 +86,7 @@ export type GameProcessor = {
     requiresCheck: boolean,
   ) => {
     status: VisionResultCodes;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     data: any;
     message: string;
   };
@@ -173,7 +173,7 @@ type ProcessedPlayer = {
 export const processPlayer = (
   player: AnalyzedPlayer,
   teamName?: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   gameId?: number,
 ): ProcessedPlayer => {
   console.log("Processing Player: ", player);

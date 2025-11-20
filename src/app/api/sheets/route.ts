@@ -11,6 +11,7 @@ import {
   logDriveCronJobError,
   logDriveCronJobSuccess,
 } from "@/posthog/server-analytics";
+import { PostHogEvents } from "@/posthog/events";
 
 // Serverless-compatible helper to parse base64-encoded service account JSON from env
 // TODO Add logging
@@ -102,7 +103,7 @@ export async function GET(req: NextRequest) {
         });
 
         summary = text;
-        logAiGenSuccess("Google Drive Summary Generation Success", "cron-job", {
+        logAiGenSuccess(PostHogEvents.GOOGLE_DRIVE_SUMMARY_GENERATION_SUCCESS, "cron-job", {
           summary,
           newLastRow,
           lastVideoId,

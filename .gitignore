@@ -3,6 +3,7 @@
 # vs
 .vscode
 .mcp.json
+.cursor
 
 # dependencies
 /node_modules

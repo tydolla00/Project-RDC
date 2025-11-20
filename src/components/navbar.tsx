@@ -10,7 +10,7 @@ import {
 import { ModeToggle } from "./modetoggle";
 import { FillText } from "./fill-text";
 import Link from "next/link";
-import React from "react";
+import React, { Suspense } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Icon from "@/app/favicon.ico";
@@ -26,9 +26,9 @@ import { getGamesNav } from "@/lib/constants";
 import { getMembersNav } from "prisma/lib/members";
 import { auth } from "@/auth";
 import { AuthButton, ToggleThemeButton } from "./client-buttons";
+import { Skeleton } from "./ui/skeleton";
 
 export const Navbar = async () => {
-  const session = await auth();
   const games = await getGamesNav();
   const members = await getMembersNav();
 
@@ -104,32 +104,18 @@ export const Navbar = async () => {
           <NavigationMenuContent>
             <ul>
               <ListItem href="/about">About</ListItem>
-              <ListItem href="/admin">Admin</ListItem>
-              <AuthButton hideOnSmallScreens={false} session={session} />
+              <Suspense fallback={<Skeleton className="h-full w-9" />}>
+                <AuthSection />
+              </Suspense>
               <ToggleThemeButton />
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
         {/* END MOBILE */}
 
-        <NavigationMenuItem className="hidden sm:block">
-          {session && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Avatar asChild>
-                    <Link href="/profile">
-                      <AvatarImage src={session.user?.image || Icon.src} />
-                      <AvatarFallback>Icon</AvatarFallback>
-                    </Link>
-                  </Avatar>
-                </TooltipTrigger>
-                <TooltipContent>{session.user?.name}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </NavigationMenuItem>
-        <AuthButton hideOnSmallScreens session={session} />
+        <Suspense fallback={<Skeleton className="size-10 rounded-full" />}>
+          <ProfileSection />
+        </Suspense>
         <NavigationMenuItem className="hidden sm:block">
           <ModeToggle className="" />
         </NavigationMenuItem>
@@ -165,3 +151,39 @@ const ListItem = React.forwardRef<
   );
 });
 ListItem.displayName = "ListItem";
+
+const AuthSection = async () => {
+  const session = await auth();
+  return (
+    <>
+      {session && <ListItem href="/admin">Admin</ListItem>}
+      <AuthButton hideOnSmallScreens={false} session={session} />
+    </>
+  );
+};
+
+const ProfileSection = async () => {
+  const session = await auth();
+  return (
+    <>
+      <NavigationMenuItem className="hidden sm:block">
+        {session && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Avatar asChild>
+                  <Link href="/profile">
+                    <AvatarImage src={session.user?.image || Icon.src} />
+                    <AvatarFallback>Icon</AvatarFallback>
+                  </Link>
+                </Avatar>
+              </TooltipTrigger>
+              <TooltipContent>{session.user?.name}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </NavigationMenuItem>
+      <AuthButton hideOnSmallScreens session={session} />
+    </>
+  );
+};

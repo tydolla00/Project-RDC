@@ -1,10 +1,11 @@
 "use client";
 import { Player } from "prisma/generated";
+import React, { useEffect, useState } from "react";
+import PlayerAvatar from "./PlayerAvatar";
 import { ControllerRenderProps, UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { FormValues } from "../../_utils/form-helpers";
-import PlayerAvatar from "./PlayerAvatar";
 interface Props {
   rdcMembers: Player[];
   handlePlayerClick?: (player: Player) => void;

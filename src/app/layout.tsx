@@ -29,9 +29,14 @@ export default function RootLayout({
 }>) {
   return (
     <html className="h-screen" lang="en" suppressHydrationWarning>
-      {/* <head>
-        <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
-      </head> */}
+      <head>
+        {process.env.NODE_ENV === "development" && (
+          <script
+            async
+            src="https://unpkg.com/react-scan/dist/auto.global.js"
+          />
+        )}
+      </head>
       {/* <ReactScan /> */}
       <body className={inter.className}>
         <ThemeProvider
@@ -44,9 +49,7 @@ export default function RootLayout({
             <CSPostHogProvider>
               <PostHogIdentify />
               {/* Comment this out to see ssg */}
-              <Suspense fallback={<Skeleton className="h-10 w-full" />}>
-                <Navbar />
-              </Suspense>
+              <Navbar />
               <main>{children}</main>
               <Toaster />
               <Footer />
