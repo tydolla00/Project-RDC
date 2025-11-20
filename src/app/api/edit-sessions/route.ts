@@ -1,7 +1,10 @@
 import config from "@/lib/config";
 import { NextRequest } from "next/server";
 import { handlePrismaOperation } from "prisma/db";
-import { logDriveCronJobError, logDriveCronJobSuccess } from "@/posthog/server-analytics";
+import {
+  logEditSessionCleanupError,
+  logEditSessionCleanupSuccess,
+} from "@/posthog/server-analytics";
 
 export async function GET(req: NextRequest) {
   // Ensure only authorized cron jobs can access this route
@@ -21,10 +24,14 @@ export async function GET(req: NextRequest) {
   );
   if (res.success) {
     console.log(`Deleted ${res.data.count} edit sessions`);
-    logDriveCronJobSuccess("Cleaned up edit sessions", { count: res.data.count });
+    logEditSessionCleanupSuccess("Cleaned up edit sessions", {
+      count: res.data.count,
+    });
     return new Response("Cleaned up edit sessions", { status: 200 });
   } else {
-    logDriveCronJobError("Error cleaning up edit sessions", { error: res.error });
+    logEditSessionCleanupError("Error cleaning up edit sessions", {
+      error: res.error,
+    });
     return new Response("Error cleaning up edit sessions", { status: 500 });
   }
 }

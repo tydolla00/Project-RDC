@@ -164,6 +164,33 @@ export const logDriveCronJobSuccess = (
   });
 };
 
+export const logEditSessionCleanupSuccess = (
+  message: string,
+  additionalInfo?: Record<string, unknown>,
+) => {
+  after(() => {
+    posthog.capture({
+      event: PostHogEvents.EDIT_SESSION_CLEANUP_SUCCESS,
+      distinctId: "cron-job",
+      properties: {
+        message,
+        ...additionalInfo,
+      },
+    });
+  });
+};
+
+export const logEditSessionCleanupError = (
+  message: string,
+  additionalInfo?: Record<string, unknown>,
+) => {
+  after(() => {
+    posthog.captureException(message, "cron-job", {
+      ...additionalInfo,
+    });
+  });
+};
+
 export const logAiGenSuccess = (
   event: PostHogEvents,
   distinctId: string,
